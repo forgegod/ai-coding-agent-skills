@@ -1,42 +1,66 @@
 ---
 name: git-commit-message
-description: Draft tiered commit messages from staged Git changes.
+description: Commit changes in logical topical batches.
 argument-hint: "[--tier 1|2|3]"
-version: 4.0.0
+version: 4.1.0
 metadata:
   hermes:
     tags: [git, commit]
 ---
 
-# Staged Git Commit
+# Logical Git Commits
 
 ## When to Use
 
-Generate a Conventional Commits message for staged changes, or commit them
-when the user asks. `--tier 1|2|3` overrides the type's default tier.
+Draft a Conventional Commits message from staged changes, or—when the user
+explicitly asks—group, stage, and commit a working tree in logical topical
+batches. `--tier 1|2|3` overrides the type's default tier.
+
+Do not reorganize the index when the user asks only for a message.
 
 ## Procedure
 
-1. Use `terminal` in the target repository to run `git diff --staged --name-status`
-   and `git diff --staged`. If there are no staged changes, report
-   "No staged changes" and stop.
-2. Choose the type by the staged change's purpose:
-   `feat` capability, `fix` correction, `perf` performance,
-   `refactor` restructuring, `test` tests, `build` build tooling,
-   `ci` automation, `revert` reversal, `docs` documentation,
-   `style` formatting only, `chore` maintenance.
-   Security corrections use `fix(security)`.
-3. Write one message using the tier below. Use `type(scope): summary`;
-   scope is a lowercase module name and may be omitted. Use an imperative
-   summary without a trailing period. Count the entire subject, including
-   type and scope, against the tier's limit. Describe only staged changes;
-   do not invent motivation, results, or assistant attribution.
-4. Return the message only when asked for a message. When asked to commit,
-   write that message with `write_file` to a fresh file in the session's
-   scratch directory, then use `terminal` to run `git commit -F <message-file>`.
-5. After committing, use `terminal` to run `git log -1 --format='%h%n%B'`
-   and `git status --short`. Verify the recorded message and report the
-   commit hash and any remaining changes.
+1. Inspect the whole boundary with `terminal`: run `git status --short`,
+   `git diff --name-status`, `git diff`, `git diff --staged --name-status`,
+   and `git diff --staged`. Include untracked files from `git status`. If every
+   view is empty, report "No changes" and stop.
+2. Build dependency-aware logical batches before staging:
+   - Keep one observable change with its tests, current-state documentation,
+     records, and required configuration in the same batch.
+   - Keep unrelated topics separate. Do not split a vertical slice merely to
+     make smaller commits.
+   - A verified implementation may precede a separate documentation/record
+     closure batch when that closure requires evidence from the first commit.
+   - Treat already-staged paths as one existing batch. Do not unstage or
+     repartition them unless the user explicitly asks.
+3. When asked only for a message, operate solely on the existing staged batch.
+   When asked to stage or commit working-tree changes, stage exactly one planned
+   batch with `git add -- <paths>`. Never use `git add -A` unless every changed
+   and untracked path belongs to that batch.
+4. Choose the type by the staged batch's purpose: `feat` capability, `fix`
+   correction, `perf` performance, `refactor` restructuring, `test` tests,
+   `build` build tooling, `ci` automation, `revert` reversal, `docs`
+   documentation, `style` formatting only, or `chore` maintenance. Security
+   corrections use `fix(security)`.
+5. For each batch, run `git diff --staged --name-status` and
+   `git diff --staged`. Confirm the batch has no unrelated paths and run the
+   relevant existing verification command before committing. Never invent a
+   verification command or claim it passed when it did not.
+6. Write one message using the tiers below. Use `type(scope): summary`; scope is
+   a lowercase module name and may be omitted. Use an imperative summary without
+   a trailing period. Count the complete subject, including type and scope,
+   against the tier limit. Describe only the staged batch; do not invent
+   motivation, results, or assistant attribution.
+7. Return the message only when asked for a message. When asked to commit, write
+   it with `write_file` to a fresh session-scratch file, then run
+   `git commit -F <message-file>` through `terminal` with hooks enabled.
+8. After every commit, run `git log -1 --format='%h%n%B'` and
+   `git status --short`. Verify the recorded message, preserve all remaining
+   changes for later planned batches, and repeat from step 3 until every planned
+   batch is committed or a command fails.
+9. After the final batch, run the required integration verification when the
+   repository defines one, then report commit hashes, subjects, verification
+   results, and any remaining changes.
 
 ## Tiers
 
@@ -68,6 +92,7 @@ Subject: at most 72 characters. No body unless brief context is useful.
 
 ## Boundaries
 
-The index is the commit boundary. Do not stage, unstage, split batches,
-change identity, amend history, or push. Keep hooks enabled; report failures
+Stage, split, and commit batches only when the user explicitly asks for that
+work. Otherwise the existing index is the commit boundary. Do not unstage
+paths, change identity, amend history, bypass hooks, or push. Report failures
 instead of bypassing them.

@@ -9,7 +9,7 @@ Portable engineering workflows for AI coding agents. This repository owns the sk
 | [application-records](skills/software-development/application-records/SKILL.md) | Canonical CAP/CHG lifecycle and evidence. |
 | [blueprint-initialization](skills/software-development/blueprint-initialization/SKILL.md) | Explicit one-time adoption of a copied blueprint; includes the initial DOX template. |
 | [capability-wireframes](skills/software-development/capability-wireframes/SKILL.md) | CAP-linked HTML/PNG visual handoff. |
-| [git-commit-message](skills/software-development/git-commit-message/SKILL.md) | Tiered Conventional Commit messages from staged changes. |
+| [git-commit-message](skills/software-development/git-commit-message/SKILL.md) | Dependency-aware logical Git batches and tiered Conventional Commit messages. |
 | [phased-plan-design](skills/software-development/phased-plan-design/SKILL.md) | Design restart-safe CHG phases. |
 | [phased-plan-execution](skills/software-development/phased-plan-execution/SKILL.md) | Execute and prove one CHG phase. |
 | [phased-plan-overview](skills/software-development/phased-plan-overview/SKILL.md) | Inspect active changes and select work to resume. |
