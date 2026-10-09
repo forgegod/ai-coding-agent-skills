@@ -18,6 +18,8 @@ Maintain portable AI coding-agent playbooks and publish complete Agent Skills pa
 - Preserve portable workflows and synthetic examples; project DOX and product policy always outrank a skill.
 - Publish via GitHub Pages at `https://forgegod.github.io/ai-coding-agent-skills/`. Support discovery under the project URL, not an assumed origin-root endpoint.
 - Community installation uses Hermes security scanning. Do not recommend bypassing scan failures with --force or claim built-in trust.
+- Document Claude Code, Codex, Kilo (modern and legacy), and Pi native user/project installation from their current upstream skill-discovery documentation. Native copying preserves complete packages, preflights collisions, makes initialization separately opt-in, and does not claim Hermes scanner approval or cross-host tool equivalence.
+- Directory-discovery documentation distinguishes public package availability from actual indexing/submission. Preserve literal domains, confirm catalog policies, and do not invent listings, dummy root skills, telemetry installs, or authentication/submission success.
 - Publish all eight complete packages. The community scanner blocks blueprint-initialization because its DOX template requires project instruction updates; document that finding and a separate operator-reviewed manual install, never hide or weaken the template. Normal installer examples cover only the other seven packages.
 - A skill installed in a shared agent profile must not remove or modify its installed package while operating on a target project.
 - Source migration preserves complete packages and provenance; generated output is disposable and untracked.
@@ -28,6 +30,7 @@ Maintain portable AI coding-agent playbooks and publish complete Agent Skills pa
 - Use Agent Skills frontmatter with name, description, and version. Keep related skill names resolvable and support files portable.
 - Keep the build dependency-light; reject malformed metadata, unsafe paths, duplicate names, and symlinks rather than publishing incomplete packages.
 - Tests use synthetic fixtures and local output; live endpoint and installer probes are release checks, not ordinary CI dependencies.
+- Exercise documented native copy commands in isolated scratch homes; do not modify real agent installations while testing documentation or claim client discovery was verified if that client is unavailable.
 - Documentation describes the current design. Git history carries migration history.
 
 ## Verification
