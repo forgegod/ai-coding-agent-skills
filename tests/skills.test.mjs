@@ -144,6 +144,19 @@ test("skills package separate review storage and a visual handoff gate", async (
   }
 });
 
+test("git-commit-message previews suggested batches before apply", async () => {
+  const source = await readFile(
+    path.join(skillsRoot, "software-development", "git-commit-message", "SKILL.md"),
+    "utf8",
+  );
+  assert.match(source, /present a preview and stop/i);
+  assert.match(source, /same turn/);
+  assert.match(source, /Apply uses the preview exactly/);
+  assert.match(source, /returns changes/);
+  assert.match(source, /A preview is not permission to commit/);
+  assert.doesNotMatch(source, /(?:~\/\.hermes|\/home\/)/);
+});
+
 test("no repository skill carries credential markers", async () => {
   const files = await skillFiles(skillsRoot);
   const doxFiles = [
