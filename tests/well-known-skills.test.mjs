@@ -9,6 +9,7 @@ import { buildWellKnownSkills } from "../scripts/build-well-known-skills.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const expectedSkillNames = [
   "application-records",
+  "autonomous-implementation-review",
   "blueprint-initialization",
   "capability-wireframes",
   "git-commit-message",
@@ -46,6 +47,8 @@ test("well-known build publishes every skill and all advertised files", async ()
 
     const initializer = index.skills.find((skill) => skill.name === "blueprint-initialization");
     assert.ok(initializer?.files.includes("templates/root-AGENTS.md"));
+    const autonomous = index.skills.find((skill) => skill.name === "autonomous-implementation-review");
+    assert.deepEqual(autonomous?.files, ["scripts/herdr_panes.py", "SKILL.md"]);
   } finally {
     await rm(output, { recursive: true, force: true });
   }

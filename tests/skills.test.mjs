@@ -42,10 +42,28 @@ function frontmatterFields(source) {
 }
 
 test("skills/ ships the DOX chain for the playbook tree", async () => {
-  for (const relative of ["AGENTS.md", "software-development/AGENTS.md"]) {
+  for (const relative of ["AGENTS.md", "autonomous-ai-agents/AGENTS.md", "software-development/AGENTS.md"]) {
     const info = await stat(path.join(skillsRoot, relative)).catch(() => null);
     assert.ok(info?.isFile(), `missing ${relative}`);
   }
+});
+
+test("autonomous-implementation-review packages its selection helper", async () => {
+  const directory = path.join(skillsRoot, "autonomous-ai-agents", "autonomous-implementation-review");
+  const source = await readFile(path.join(directory, "SKILL.md"), "utf8");
+  const helper = await readFile(path.join(directory, "scripts", "herdr_panes.py"), "utf8");
+  assert.match(source, /name: autonomous-implementation-review/);
+  assert.match(source, /independent review loop/i);
+  assert.match(source, /scripts\/herdr_panes\.py/);
+  assert.match(source, /\/loop resume.*do \*\*not\*\* clear, compress, or replace/i);
+  assert.match(source, /\/loop pause`, `\/compress here 2`, inspect `\/context`, then `\/loop resume`/);
+  assert.match(source, /Do not send these commands to `exec`/);
+  assert.match(source, /automatically compresses.*50% by default/i);
+  assert.match(source, /assistant response containing slash-command text does not execute/i);
+  assert.match(source, /\/loop \/autonomous-implementation-review Continue <task name>/);
+  assert.match(source, /\/compress here 2/);
+  assert.match(source, /durable handoff record/i);
+  assert.match(helper, /herdr pane list/);
 });
 
 test("every SKILL.md carries name, description, and version in its frontmatter", async () => {
@@ -144,16 +162,19 @@ test("skills package separate review storage and a visual handoff gate", async (
   }
 });
 
-test("git-commit-message previews suggested batches before apply", async () => {
+test("git-commit-message requires confirmation except in explicit autonomous mode", async () => {
   const source = await readFile(
     path.join(skillsRoot, "software-development", "git-commit-message", "SKILL.md"),
     "utf8",
   );
-  assert.match(source, /present a preview and stop/i);
+  assert.match(source, /In normal operation, present a preview and stop/i);
   assert.match(source, /same turn/);
-  assert.match(source, /Apply uses the preview exactly/);
+  assert.match(source, /In normal operation, apply uses the preview exactly/i);
   assert.match(source, /returns changes/);
-  assert.match(source, /A preview is not permission to commit/);
+  assert.match(source, /Outside\s+explicitly enabled autonomous mode, a preview is not permission to commit/i);
+  assert.match(source, /explicitly enabled autonomous mode/);
+  assert.match(source, /do not wait for a separate confirmation/);
+  assert.match(source, /never infer it from an agent's name, identity, or[\s\S]*ability to act autonomously/);
   assert.doesNotMatch(source, /(?:~\/\.hermes|\/home\/)/);
 });
 

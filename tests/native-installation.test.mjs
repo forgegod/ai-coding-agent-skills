@@ -7,7 +7,17 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
-const names = ["application-records", "capability-wireframes", "git-commit-message", "phased-plan-design", "phased-plan-execution", "phased-plan-overview", "phased-plan-refactoring"];
+const packages = {
+  "autonomous-implementation-review": "autonomous-ai-agents/autonomous-implementation-review",
+  "application-records": "software-development/application-records",
+  "capability-wireframes": "software-development/capability-wireframes",
+  "git-commit-message": "software-development/git-commit-message",
+  "phased-plan-design": "software-development/phased-plan-design",
+  "phased-plan-execution": "software-development/phased-plan-execution",
+  "phased-plan-overview": "software-development/phased-plan-overview",
+  "phased-plan-refactoring": "software-development/phased-plan-refactoring",
+};
+const names = Object.keys(packages);
 
 async function setup(t) {
   const readme = await readFile(path.join(root, "README.md"), "utf8");
@@ -21,7 +31,7 @@ async function setup(t) {
   return { readme, helper, scratch, home, env: { ...process.env, HOME: home, PI_CODING_AGENT_DIR: "" } };
 }
 
-test("documented recipes copy seven complete packages to all four native user locations", async (t) => {
+test("documented recipes copy eight complete packages to all four native user locations", async (t) => {
   const f = await setup(t);
   for (const [heading, directory] of [["Claude Code", ".claude/skills"], ["Codex", ".agents/skills"], ["Kilo", ".kilo/skills"], ["Pi", ".pi/agent/skills"]]) {
     const section = f.readme.split(`### ${heading}\n`)[1]?.split(/\n### |\n## /)[0];
@@ -32,7 +42,7 @@ test("documented recipes copy seven complete packages to all four native user lo
     const destination = path.join(f.home, directory);
     assert.deepEqual((await readdir(destination)).sort(), [...names].sort());
     for (const name of names) {
-      assert.deepEqual(await readFile(path.join(destination, name, "SKILL.md")), await readFile(path.join(root, "skills/software-development", name, "SKILL.md")));
+      assert.deepEqual(await readFile(path.join(destination, name, "SKILL.md")), await readFile(path.join(root, "skills", packages[name], "SKILL.md")));
     }
   }
 });

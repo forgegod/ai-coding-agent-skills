@@ -31,3 +31,12 @@ test("directory-discovery instructions separate installation telemetry from auth
   assert.match(source, /dummy root skill/);
   assert.match(source, /https:\/\/skills\.sh\/docs\/faq/);
 });
+
+test("autonomous loop documentation distinguishes orchestrator compression", async () => {
+  const source = await readFile(readme, "utf8");
+  assert.match(source, /### Run the autonomous implementation-review loop/);
+  assert.match(source, /\/loop \/autonomous-implementation-review Continue <task name>/);
+  assert.match(source, /automatically compresses the orchestrator context.*50% by default/is);
+  assert.match(source, /operator—not the\s+running agent/is);
+  assert.match(source, /An agent printing a slash command does not execute it/i);
+});

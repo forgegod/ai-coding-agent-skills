@@ -6,10 +6,11 @@ Portable engineering workflows for AI coding agents. This repository owns the sk
 
 | Skill | Purpose |
 | --- | --- |
+| [autonomous-implementation-review](skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md) | Bounded implementation and independent review loop. |
 | [application-records](skills/software-development/application-records/SKILL.md) | Canonical CAP/CHG lifecycle and evidence. |
 | [blueprint-initialization](skills/software-development/blueprint-initialization/SKILL.md) | Explicit one-time adoption of a copied blueprint; includes the initial DOX template. |
 | [capability-wireframes](skills/software-development/capability-wireframes/SKILL.md) | CAP-linked HTML/PNG visual handoff. |
-| [git-commit-message](skills/software-development/git-commit-message/SKILL.md) | Dependency-aware logical Git batches, a preview before apply, and tiered Conventional Commit messages. |
+| [git-commit-message](skills/software-development/git-commit-message/SKILL.md) | Dependency-aware logical Git batches, a preview before apply (or autonomous execution), and tiered Conventional Commit messages. |
 | [phased-plan-design](skills/software-development/phased-plan-design/SKILL.md) | Design restart-safe CHG phases. |
 | [phased-plan-execution](skills/software-development/phased-plan-execution/SKILL.md) | Execute and prove one CHG phase. |
 | [phased-plan-overview](skills/software-development/phased-plan-overview/SKILL.md) | Inspect active changes and select work to resume. |
@@ -47,11 +48,64 @@ for skill in application-records capability-wireframes git-commit-message phased
 done
 ```
 
+`autonomous-implementation-review` is published separately because it can coordinate editing
+agents and worktrees. Review its complete package before installing it; the normal
+seven-package example does not establish scanner approval for it:
+
+```sh
+hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/autonomous-implementation-review" --category autonomous-ai-agents
+```
+
 Installations become available in new sessions. Existing local copies can produce name conflicts: back up local edits and review the installer's replacement prompt rather than forcing a reinstall.
+
+### Run the autonomous implementation-review loop
+
+Use `autonomous-implementation-review` from the orchestrator session, not an
+executor pane. First create a compact task packet and durable handoff record;
+ask the skill to prepare this only, without dispatching an executor:
+
+```text
+/autonomous-implementation-review Prepare only the task packet and durable handoff record at <handoff-record path>; do not dispatch an executor yet.
+
+Outcome: <desired result>
+Scope: <included paths or behaviour>
+Non-goals: <excluded work>
+Acceptance criteria: <testable requirements>
+Workspace/base: <repository and base commit or branch>
+Required verification: <tests, lint, build>
+Constraints: no commits, pushes, deployments, secrets, or external writes.
+```
+
+Then start a self-paced loop that reloads the skill at every tick:
+
+```text
+/loop /autonomous-implementation-review Continue <task name> from <handoff-record path>. Read the handoff record and current workspace before acting. Execute one bounded implementation, verification, review, or confirmed-fix phase; update the handoff record with evidence; preserve unrelated changes; do not commit, push, deploy, or access secrets. End with LOOP_COMPLETE only when every acceptance criterion is verified or a real user decision blocks progress. --until every acceptance criterion is verified or a real user decision is required
+```
+
+Omit the interval for self-paced work. Add an interval such as `5m` after
+`/loop` only while waiting for external state such as CI. For one finite coding
+objective, prefer `/goal` instead; do not run an active `/goal` and this loop
+for the same task because the goal defers loop wakeups.
+
+Hermes automatically compresses the orchestrator context at its configured
+threshold (50% by default), and active loops survive that compression. Do not
+use `/loop resume` as a context reset. To compact earlier, the operator—not the
+running agent—must enter these commands in the orchestrator session:
+
+```text
+/loop pause
+/compress here 2
+/context
+/loop resume
+```
+
+An agent printing a slash command does not execute it in its own session. Keep
+the handoff record current so automatic compression and a later fresh session
+have grounded task state without replaying full logs or diffs.
 
 ### Manual initializer installation
 
-All eight complete packages are published. The current Hermes community scanner marks `blueprint-initialization` as **dangerous**, because `templates/root-AGENTS.md` requires updating project AGENTS.md contracts. This is intentional DOX behavior, but normal hub installation is blocked. The template remains intact and visible to scanning; neither the well-known nor GitHub route bypasses this finding.
+All nine complete packages are published. The current Hermes community scanner marks `blueprint-initialization` as **dangerous**, because `templates/root-AGENTS.md` requires updating project AGENTS.md contracts. This is intentional DOX behavior, but normal hub installation is blocked. The template remains intact and visible to scanning; neither the well-known nor GitHub route bypasses this finding.
 
 Only install this package manually after an operator reviews both [SKILL.md](skills/software-development/blueprint-initialization/SKILL.md) and [the full DOX template](skills/software-development/blueprint-initialization/templates/root-AGENTS.md), including its file-deletion and project-instruction boundaries. Manual installation does not receive the hub scanner's approval or hub provenance/update tracking.
 
@@ -102,26 +156,28 @@ git clone https://github.com/forgegod/ai-coding-agent-skills.git ai-coding-agent
 ```
 
 After review, from the directory containing that checkout, define this helper in
-the same shell used for the agent-specific commands below. It copies seven whole
+the same shell used for the agent-specific commands below. It copies eight whole
 package directories, preflights all name collisions, and never overwrites local
 edits. It intentionally excludes `blueprint-initialization` until separate review.
 
 ```sh
 # Native installation helper
-skills_source="$PWD/ai-coding-agent-skills-review/skills/software-development"
+skills_source="$PWD/ai-coding-agent-skills-review/skills"
 install_reviewed_skills() (
   set -eu
   destination="$1"
-  for skill in application-records capability-wireframes git-commit-message phased-plan-design phased-plan-execution phased-plan-overview phased-plan-refactoring; do
-    test -f "$skills_source/$skill/SKILL.md"
+  for package in autonomous-ai-agents/autonomous-implementation-review software-development/application-records software-development/capability-wireframes software-development/git-commit-message software-development/phased-plan-design software-development/phased-plan-execution software-development/phased-plan-overview software-development/phased-plan-refactoring; do
+    skill="${package##*/}"
+    test -f "$skills_source/$package/SKILL.md"
     if [ -e "$destination/$skill" ] || [ -L "$destination/$skill" ]; then
       printf 'Refusing to overwrite %s\n' "$destination/$skill" >&2
       exit 1
     fi
   done
   mkdir -p "$destination"
-  for skill in application-records capability-wireframes git-commit-message phased-plan-design phased-plan-execution phased-plan-overview phased-plan-refactoring; do
-    cp -R "$skills_source/$skill" "$destination/$skill"
+  for package in autonomous-ai-agents/autonomous-implementation-review software-development/application-records software-development/capability-wireframes software-development/git-commit-message software-development/phased-plan-design software-development/phased-plan-execution software-development/phased-plan-overview software-development/phased-plan-refactoring; do
+    skill="${package##*/}"
+    cp -R "$skills_source/$package" "$destination/$skill"
   done
 )
 ```
@@ -181,7 +237,7 @@ The legacy Kilo Code extension uses `~/.kilocode/skills/` and project
 Do not install identical copies into both modern and compatibility directories.
 
 Modern Kilo also supports `skills.urls` pointing at a well-known directory, but
-adding this collection's URL enables discovery of all eight packages, including
+adding this collection's URL enables discovery of all nine packages, including
 the initializer. The selective copy recipe above keeps initialization opt-in;
 it does not imply that Kilo applies the Hermes scanner policy.
 
@@ -214,7 +270,7 @@ select the same native destination used above. For example, for Claude Code:
 ```sh
 skills_destination="$HOME/.claude/skills"
 destination="$skills_destination/blueprint-initialization"
-test ! -e "$destination" && test ! -L "$destination" && mkdir -p "$skills_destination" && cp -R "$skills_source/blueprint-initialization" "$destination"
+test ! -e "$destination" && test ! -L "$destination" && mkdir -p "$skills_destination" && cp -R "$skills_source/software-development/blueprint-initialization" "$destination"
 ```
 
 Change `skills_destination` to the chosen Codex, Kilo, or Pi directory for that
@@ -282,7 +338,7 @@ The verified SkillsLLM site is `https://skillsllm.com`. Its
 [submission page](https://skillsllm.com/submit) requires GitHub OAuth:
 
 1. Sign in as the operator and submit `https://github.com/forgegod/ai-coding-agent-skills`.
-2. Describe it as a collection of eight categorized Agent Skills packages and
+2. Describe it as a collection of nine categorized Agent Skills packages and
    retain the README's installation and security boundaries.
 3. Confirm the platform accepts the collection layout, wait for its scanning and
    catalog policy checks, and read back the resulting listing before claiming success.
@@ -296,7 +352,7 @@ There are two material catalog constraints to resolve with the operator/site:
 - The [FAQ](https://skillsllm.com/faq) describes a root `SKILL.md`, while the
   [submission guide](https://skillsllm.com/blog/skillsllm-features-guide) says any
   public GitHub URL can be submitted. Our canonical packages live under
-  `skills/software-development/<name>/`. Authenticated acceptance of that nested
+  `skills/<category>/<name>/`. Authenticated acceptance of that nested
   collection is not established by the public instructions. Do not add a dummy root skill
   or flatten/duplicate the collection just to satisfy a scraper; confirm collection
   support or an accepted per-package submission format first.

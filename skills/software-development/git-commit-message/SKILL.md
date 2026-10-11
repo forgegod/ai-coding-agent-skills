@@ -1,8 +1,8 @@
 ---
 name: git-commit-message
-description: Preview logical batches, then commit on approval.
+description: Preview batches; autonomous commits skip confirmation.
 argument-hint: "[--tier 1|2|3]"
-version: 4.2.0
+version: 4.3.0
 metadata:
   hermes:
     tags: [git, commit]
@@ -16,9 +16,10 @@ Draft a Conventional Commits message from staged changes, or—when the user
 explicitly asks—group, stage, and commit a working tree in logical topical
 batches. `--tier 1|2|3` overrides the type's default tier.
 
-Do not reorganize the index when the user asks only for a message. Do not
-stage or commit a suggested plan until the user applies its preview or
-returns changes.
+Do not reorganize the index when the user asks only for a message. In normal
+operation, do not stage or commit a suggested plan until the user applies its
+preview or returns changes. Autonomous mode changes that confirmation gate,
+not the required preview or verification.
 
 ## Procedure
 
@@ -44,10 +45,13 @@ returns changes.
    attribution.
 4. When asked only for a message, return the existing staged batch's message
    and stop. Do not stage, and do not ask to apply it.
-5. When recommending batches to stage or commit, present a preview and stop
-   before any `git add` or `git commit`. Follow Preview. A request to commit
-   is not acceptance of a plan the user has not seen. A user-supplied message
-   and path list is already an accepted plan: use it, and do not replace it.
+5. When recommending batches to stage or commit, follow Preview. In normal
+   operation, present a preview and stop before any `git add` or `git commit`.
+   A request to commit is not acceptance of a plan the user has not seen. A
+   user-supplied message and path list is already an accepted plan: use it,
+   and do not replace it. In explicitly enabled autonomous mode, present the
+   preview in the execution report and continue without waiting for a separate
+   confirmation.
 6. After acceptance, stage exactly one accepted batch with
    `git add -- <paths>`. Never use `git add -A` unless every changed and
    untracked path belongs to that batch.
@@ -71,17 +75,29 @@ returns changes.
 
 ## Preview
 
-Present a preview and stop in that same turn. The turn that presents a preview
-does no `git add` and no `git commit`.
+Always prepare a preview. Autonomous mode is enabled only when the active
+agent environment or governing instructions explicitly say it may commit
+without user confirmation; never infer it from an agent's name, identity, or
+general ability to act autonomously.
+
+In normal operation, present a preview and stop in that same turn. The turn
+that presents a preview does no `git add` and no `git commit`.
+
+In explicitly enabled autonomous mode, include the preview immediately before
+staging and committing in the same execution report. A request to commit is
+authorization to apply that preview; do not wait for a separate confirmation.
 
 For each batch, in commit order, show the number, paths, tier, and full
 message. Name every changed path left out, and why. State that nothing has
 been staged or committed.
 
-Wait until the user applies the preview or returns changes.
+In normal operation, wait until the user applies the preview or returns
+changes. In explicitly enabled autonomous mode, continue after recording the
+preview.
 
-- Apply uses the preview exactly. Apply means an explicit acceptance, such as
-  "apply" or "commit these".
+- In normal operation, apply uses the preview exactly. Apply means an explicit
+  acceptance, such as "apply" or "commit these". In explicitly enabled
+  autonomous mode, the request to commit applies the preview exactly.
 - Changes replace only the edited part: message text, path groups, order, or
   drops. A message-only edit that keeps the same path groups is the accepted
   plan. If path groups, order, or included paths change, show the revised
@@ -121,8 +137,9 @@ Subject: at most 72 characters. No body unless brief context is useful.
 ## Boundaries
 
 Stage, split, and commit batches only when the user explicitly asks for that
-work and the plan is accepted: either they supplied the message and paths, or
-they apply a preview or return changes to it. Otherwise the existing index is
-the commit boundary. Do not unstage paths, change identity, amend history,
-bypass hooks, or push. Report failures instead of bypassing them.
-A preview is not permission to commit.
+work and the plan is accepted: either they supplied the message and paths,
+they apply a preview or return changes to it, or explicitly enabled autonomous
+mode treats the request to commit as acceptance. Otherwise the existing index
+is the commit boundary. Do not unstage paths, change identity, amend history,
+bypass hooks, or push. Report failures instead of bypassing them. Outside
+explicitly enabled autonomous mode, a preview is not permission to commit.

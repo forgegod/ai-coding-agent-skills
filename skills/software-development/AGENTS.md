@@ -11,7 +11,7 @@ Own optional, portable agent workflows for initializing a copied blueprint and m
 | `application-records/SKILL.md`    | Canonical CAP/CHG material-change lifecycle and wireframe handoff. |
 | `blueprint-initialization/SKILL.md` | One-time copied-blueprint initialization and cleanup. |
 | `capability-wireframes/SKILL.md`  | Static HTML/PNG wireframes for primary human-facing CAP surfaces. |
-| `git-commit-message/SKILL.md` | Dependency-aware logical Git batches, a preview before apply, and tiered Conventional Commit messages. |
+| `git-commit-message/SKILL.md` | Dependency-aware logical Git batches, a preview before apply (or autonomous execution), and tiered Conventional Commit messages. |
 | `phased-plan-design/SKILL.md`     | CHG phase design for material changes and gates. |
 | `phased-plan-execution/SKILL.md`  | One verified CAP/CHG phase at a time. |
 | `phased-plan-overview/SKILL.md`   | Active-CHG inspection and resume selection. |
