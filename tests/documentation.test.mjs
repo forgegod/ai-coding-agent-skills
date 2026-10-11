@@ -5,17 +5,12 @@ import { fileURLToPath } from "node:url";
 
 const readme = fileURLToPath(new URL("../README.md", import.meta.url));
 
-test("normal installer loop excludes the blocked initializer and documents manual review", async () => {
+test("normal installer loop documents all generic software-development skills", async () => {
   const source = await readFile(readme, "utf8");
   const loop = source.match(/^for skill in (.+); do$/m)?.[1]?.split(/\s+/);
   assert.ok(loop, "document a normal installer loop");
   assert.equal(loop.length, 7);
-  assert.ok(!loop.includes("blueprint-initialization"));
-  assert.match(source, /### Manual initializer installation/);
-  assert.match(source, /dangerous/i);
-  assert.match(source, /templates\/root-AGENTS\.md/);
-  assert.match(source, /manual installation does not receive.*scanner/is);
-  assert.doesNotMatch(source, /^hermes.*skills install.*blueprint-initialization/m);
+  assert.deepEqual(loop, ["application-records", "capability-wireframes", "git-commit-message", "phased-plan-design", "phased-plan-execution", "phased-plan-overview", "phased-plan-refactoring"]);
 });
 
 test("directory-discovery instructions separate installation telemetry from authenticated submission", async () => {

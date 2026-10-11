@@ -10,7 +10,6 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const expectedSkillNames = [
   "application-records",
   "autonomous-implementation-review",
-  "blueprint-initialization",
   "capability-wireframes",
   "git-commit-message",
   "phased-plan-design",
@@ -45,8 +44,6 @@ test("well-known build publishes every skill and all advertised files", async ()
       assert.equal(frontmatterField(source, "description"), skill.description);
     }
 
-    const initializer = index.skills.find((skill) => skill.name === "blueprint-initialization");
-    assert.ok(initializer?.files.includes("templates/root-AGENTS.md"));
     const autonomous = index.skills.find((skill) => skill.name === "autonomous-implementation-review");
     assert.deepEqual(autonomous?.files, ["scripts/herdr_panes.py", "SKILL.md"]);
   } finally {

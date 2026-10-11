@@ -58,20 +58,7 @@ test("native helper refuses collisions before copying any other skill", async (t
   assert.equal(await readFile(path.join(existing, "SKILL.md"), "utf8"), "Operator edits.\n");
 });
 
-test("separate native initializer recipe preserves its complete DOX template", async (t) => {
-  const f = await setup(t);
-  const section = f.readme.split("### Optional initializer for native agents\n")[1]?.split("\n## ")[0];
-  const command = section?.match(/```sh\n([\s\S]*?)\n```/)?.[1];
-  assert.ok(command);
-  execFileSync("sh", ["-c", f.helper + "\n" + command], { cwd: f.scratch, env: f.env });
-  const destination = path.join(f.home, ".claude/skills/blueprint-initialization");
-  for (const relative of ["SKILL.md", "templates/root-AGENTS.md"]) {
-    assert.deepEqual(await readFile(path.join(destination, relative)), await readFile(path.join(root, "skills/software-development/blueprint-initialization", relative)));
-  }
-  assert.throws(() => execFileSync("sh", ["-c", f.helper + "\n" + command], { cwd: f.scratch, env: f.env, stdio: "pipe" }));
-});
-
-test("native instructions retain initializer review, support files, and host-tool caveats", async () => {
+test("native instructions retain support-file and host-tool caveats", async () => {
   const source = await readFile(path.join(root, "README.md"), "utf8");
   assert.match(source, /native installs do not run the Hermes security scanner/i);
   assert.match(source, /Hermes-specific tool names/);
@@ -80,8 +67,7 @@ test("native instructions retain initializer review, support files, and host-too
   assert.match(source, /\.kilo\/skills/);
   assert.match(source, /\.kilocode\/skills/);
   assert.match(source, /\.pi\/agent\/skills/);
-  assert.match(source, /templates\/root-AGENTS\.md/);
-  assert.match(source, /### Optional initializer for native agents/);
+
   assert.match(source, /code\.claude\.com\/docs\/en\/skills/);
   assert.match(source, /learn\.chatgpt\.com\/docs\/build-skills/);
   assert.match(source, /Kilo-Org\/kilocode/);

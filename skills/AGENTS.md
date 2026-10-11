@@ -9,7 +9,7 @@ Own optional, versioned agent playbooks that contributors can install and reuse 
 | Path                  | Owns                                                          |
 | --------------------- | ------------------------------------------------------------- |
 | `autonomous-ai-agents/` | Autonomous implementation-and-review-loop playbook. |
-| `software-development/` | Blueprint initialization, product-record, wireframe, and CAP/CHG phase-workflow playbooks. |
+| `software-development/` | Product-record, wireframe, and CAP/CHG phase-workflow playbooks. |
 
 ## Local Contracts
 
@@ -31,6 +31,6 @@ Run `npm test` and `npm run build` in this repository. Validate changed skill me
 | Child                            | Owns                                          | Read when editing… |
 | -------------------------------- | --------------------------------------------- | ------------------------------------------------------ |
 | `autonomous-ai-agents/AGENTS.md` | Autonomous implementation and review workflow. | Autonomous orchestration skill or support files. |
-| `software-development/AGENTS.md` | Blueprint initialization, product-record, wireframe, and phase-workflow skills. | Adoption initialization, capability/change-record workflows, CHG sequencing, or wireframe output. |
+| `software-development/AGENTS.md` | Product-record, wireframe, and phase-workflow skills. | Capability/change-record workflows, CHG sequencing, or wireframe output. |
 
 Parent contract: `../AGENTS.md`.

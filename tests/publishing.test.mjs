@@ -20,6 +20,5 @@ test("Pages artifact includes the hidden well-known endpoint", async (t) => {
   execFileSync("sh", ["-c", archive.run], { cwd: scratch, env: { ...process.env, RUNNER_TEMP: scratch } });
   const inventory = execFileSync("tar", ["-tf", path.join(scratch, "artifact.tar")], { encoding: "utf8" });
   assert.match(inventory, /\.well-known\/skills\/index\.json/);
-  assert.match(inventory, /blueprint-initialization\/templates\/root-AGENTS\.md/);
   assert.doesNotMatch(inventory, /(?:^|\/)AGENTS\.md$/m);
 });

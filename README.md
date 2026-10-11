@@ -8,7 +8,6 @@ Portable engineering workflows for AI coding agents. This repository owns the sk
 | --- | --- |
 | [autonomous-implementation-review](skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md) | Bounded implementation and independent review loop. |
 | [application-records](skills/software-development/application-records/SKILL.md) | Canonical CAP/CHG lifecycle and evidence. |
-| [blueprint-initialization](skills/software-development/blueprint-initialization/SKILL.md) | Explicit one-time adoption of a copied blueprint; includes the initial DOX template. |
 | [capability-wireframes](skills/software-development/capability-wireframes/SKILL.md) | CAP-linked HTML/PNG visual handoff. |
 | [git-commit-message](skills/software-development/git-commit-message/SKILL.md) | Dependency-aware logical Git batches, a preview before apply (or autonomous execution), and tiered Conventional Commit messages. |
 | [phased-plan-design](skills/software-development/phased-plan-design/SKILL.md) | Design restart-safe CHG phases. |
@@ -40,7 +39,7 @@ To target a named profile, add `-p <profile>`; for example:
 hermes -p hermes-dev skills install well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/application-records --category software-development
 ```
 
-Install the seven scanner-compatible skills (POSIX shell; omit `-p hermes-dev` to use the active profile). The initializer has a separate manual-review path below:
+Install the seven generic software-development skills (POSIX shell; omit `-p hermes-dev` to use the active profile):
 
 ```sh
 for skill in application-records capability-wireframes git-commit-message phased-plan-design phased-plan-execution phased-plan-overview phased-plan-refactoring; do
@@ -103,28 +102,6 @@ An agent printing a slash command does not execute it in its own session. Keep
 the handoff record current so automatic compression and a later fresh session
 have grounded task state without replaying full logs or diffs.
 
-### Manual initializer installation
-
-All nine complete packages are published. The current Hermes community scanner marks `blueprint-initialization` as **dangerous**, because `templates/root-AGENTS.md` requires updating project AGENTS.md contracts. This is intentional DOX behavior, but normal hub installation is blocked. The template remains intact and visible to scanning; neither the well-known nor GitHub route bypasses this finding.
-
-Only install this package manually after an operator reviews both [SKILL.md](skills/software-development/blueprint-initialization/SKILL.md) and [the full DOX template](skills/software-development/blueprint-initialization/templates/root-AGENTS.md), including its file-deletion and project-instruction boundaries. Manual installation does not receive the hub scanner's approval or hub provenance/update tracking.
-
-For an explicitly reviewed `hermes-dev` installation, clone this repository into a new review directory, inspect the two files, then copy the complete package into that profile. These are separate operator steps, not an automatic install script:
-
-```sh
-git clone https://github.com/forgegod/ai-coding-agent-skills.git ai-coding-agent-skills-review
-```
-
-After review, from the directory containing that checkout:
-
-```sh
-destination="$HOME/.hermes/profiles/hermes-dev/skills/software-development/blueprint-initialization"
-test ! -e "$destination" && mkdir -p "$(dirname "$destination")" && cp -R ai-coding-agent-skills-review/skills/software-development/blueprint-initialization "$destination"
-hermes -p hermes-dev skills list --source local
-```
-
-The copy command refuses to overwrite an existing installation. If one exists, stop and compare it rather than deleting local edits. Select another profile destination deliberately; never modify another profile implicitly. Initialization still requires an explicit adoption request and must never run on this skills-hosting repository itself.
-
 ### GitHub fallback
 
 The well-known endpoint is the preferred, host-independent distribution route. The categorized source packages can also be installed directly:
@@ -146,8 +123,8 @@ evade a finding you have not reviewed.
 
 ### Prepare a reviewed checkout
 
-Clone into a new review directory, or reuse the checkout from the Hermes manual
-review above. Inspect the source and note `git -C ai-coding-agent-skills-review rev-parse HEAD`
+Clone into a new review directory. Inspect the source and note
+`git -C ai-coding-agent-skills-review rev-parse HEAD`
 to record the revision you reviewed. Do not automatically pull
 unreviewed changes into a global skill directory.
 
@@ -156,9 +133,9 @@ git clone https://github.com/forgegod/ai-coding-agent-skills.git ai-coding-agent
 ```
 
 After review, from the directory containing that checkout, define this helper in
-the same shell used for the agent-specific commands below. It copies eight whole
+the same shell used for the agent-specific commands below. It copies all eight
 package directories, preflights all name collisions, and never overwrites local
-edits. It intentionally excludes `blueprint-initialization` until separate review.
+edits.
 
 ```sh
 # Native installation helper
@@ -237,9 +214,7 @@ The legacy Kilo Code extension uses `~/.kilocode/skills/` and project
 Do not install identical copies into both modern and compatibility directories.
 
 Modern Kilo also supports `skills.urls` pointing at a well-known directory, but
-adding this collection's URL enables discovery of all nine packages, including
-the initializer. The selective copy recipe above keeps initialization opt-in;
-it does not imply that Kilo applies the Hermes scanner policy.
+its discovery behavior does not imply that Kilo applies the Hermes scanner policy.
 
 References: [Current Kilo skills](https://github.com/Kilo-Org/kilocode/blob/main/packages/kilo-docs/pages/customize/skills.md)
 and [legacy Kilo skills](https://github.com/Kilo-Org/kilocode-legacy/blob/main/docs/legacy-ides/customize/skills.md).
@@ -260,24 +235,6 @@ or run `/reload`, then invoke `/skill:application-records`. Pi also discovers
 
 References: [Pi skills](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/skills.md)
 and [Pi agent/project directories](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/configuration.md).
-
-### Optional initializer for native agents
-
-Only after explicitly reviewing [the initializer](skills/software-development/blueprint-initialization/SKILL.md)
-and [its complete template](skills/software-development/blueprint-initialization/templates/root-AGENTS.md),
-select the same native destination used above. For example, for Claude Code:
-
-```sh
-skills_destination="$HOME/.claude/skills"
-destination="$skills_destination/blueprint-initialization"
-test ! -e "$destination" && test ! -L "$destination" && mkdir -p "$skills_destination" && cp -R "$skills_source/software-development/blueprint-initialization" "$destination"
-```
-
-Change `skills_destination` to the chosen Codex, Kilo, or Pi directory for that
-agent. Preserve `templates/root-AGENTS.md`; copying just SKILL.md is incomplete.
-Refresh the agent's skill discovery and verify the template is present. Installing
-the initializer does not authorize running it: an explicit target-project adoption
-request is still required, and shared installed packages must remain intact.
 
 These packages contain Hermes-specific tool names such as `terminal`, `read_file`,
 `patch`, and `skill_view`. In another agent, use its equivalent shell/read/edit
@@ -312,10 +269,10 @@ npx skills add forgegod/ai-coding-agent-skills --skill application-records --age
 ```
 
 The default scope is the current project; add `--global` for a personal install.
-Choose explicit skill names rather than `--all` or `--skill '*'`, which would also
-select the separately reviewed initializer. The `skills` CLI is not the Hermes
-installer, and its installation/audit behavior must not be presented as Hermes
-scanner approval. Review replacement prompts and preserve existing edits.
+Choose explicit skill names rather than `--all` or `--skill '*'`. The `skills` CLI
+is not the Hermes installer, and its installation/audit behavior must not be
+presented as Hermes scanner approval. Review replacement prompts and preserve
+existing edits.
 
 When install telemetry is enabled, genuine installations contribute to the
 directory's indexing/ranking. Do not manufacture installs to inflate the listing.
@@ -338,7 +295,7 @@ The verified SkillsLLM site is `https://skillsllm.com`. Its
 [submission page](https://skillsllm.com/submit) requires GitHub OAuth:
 
 1. Sign in as the operator and submit `https://github.com/forgegod/ai-coding-agent-skills`.
-2. Describe it as a collection of nine categorized Agent Skills packages and
+2. Describe it as a collection of eight categorized Agent Skills packages and
    retain the README's installation and security boundaries.
 3. Confirm the platform accepts the collection layout, wait for its scanning and
    catalog policy checks, and read back the resulting listing before claiming success.
@@ -369,7 +326,7 @@ These are community skills, not Hermes built-in or official skills. Hermes fetch
 
 Only SKILL.md and allowlisted support directories are distributed. Repository-control documents and hidden or credential-file paths are excluded or rejected; symlinks are rejected. This packaging boundary does not establish that arbitrary source content is safe.
 
-Skills are execution aids. The target project's root and child AGENTS.md files remain authoritative. Blueprint initialization runs only on an explicit adoption request and never removes a shared profile installation.
+Skills are execution aids. The target project's root and child AGENTS.md files remain authoritative.
 
 ## Development and publishing
 
@@ -381,7 +338,7 @@ npm test
 npm run build
 ```
 
-Canonical source is `skills/<category>/<name>/`. `dist/` is generated and ignored. The generator emits the complete `.well-known/skills/` inventory, with an explicit file list for each package. The initializer's `templates/root-AGENTS.md` is included.
+Canonical source is `skills/<category>/<name>/`. `dist/` is generated and ignored. The generator emits the complete `.well-known/skills/` inventory, with an explicit file list for each package.
 
 Pull requests run credential-free checks. Pushes to main and manual publishing runs build and test before deploying dist/ to GitHub Pages. Deployment packages dot-directories explicitly because the stock upload-pages-artifact action omits them.
 
@@ -389,6 +346,6 @@ The build tests cover metadata, workflow contracts, complete inventories, forbid
 
 ## Provenance and license
 
-The initial collection was extracted from [AI Software Blueprint](https://github.com/forgegod/ai-software-blueprint), preserving skill authors and versions except for the installed-package safety correction to blueprint-initialization. Skill source, testing, and publication are owned here; the blueprint references installation instead of bundling a second source copy.
+The initial collection was extracted from [AI Software Blueprint](https://github.com/forgegod/ai-software-blueprint), preserving skill authors and versions. Skill source, testing, and publication are owned here; the scanner-blocked one-time blueprint initializer remains local to that blueprint for migration.
 
 MIT; see [LICENSE](LICENSE).

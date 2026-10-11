@@ -99,7 +99,6 @@ test("every SKILL.md name matches its directory", async () => {
 test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
   const names = [
     "application-records",
-    "blueprint-initialization",
     "phased-plan-design",
     "phased-plan-execution",
     "phased-plan-overview",
@@ -127,21 +126,8 @@ test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
   assert.match(sources.get("phased-plan-execution"), /CHG phase table/i);
   assert.match(sources.get("phased-plan-overview"), /docs\/changes\/active/i);
   assert.match(sources.get("phased-plan-refactoring"), /one progress authority/i);
-  assert.match(sources.get("blueprint-initialization"), /templates\/root-AGENTS\.md/);
-  assert.match(sources.get("blueprint-initialization"), /never delete.*installed.*skill/is);
-  assert.doesNotMatch(sources.get("blueprint-initialization"), /remove itself/i);
-  assert.match(sources.get("blueprint-initialization"), /target-project-owned/i);
-  assert.match(
-    sources.get("blueprint-initialization"),
-    /rewrite the copied root `README\.md`.*project goal/is,
-  );
   const rootAgent = await readFile(path.join(root, "AGENTS.md"), "utf8");
   assert.match(rootAgent, /shared agent profile/);
-  const initialRoot = await readFile(
-    path.join(skillsRoot, "software-development", "blueprint-initialization", "templates", "root-AGENTS.md"),
-    "utf8",
-  );
-  assert.doesNotMatch(initialRoot, /AI Software Blueprint|CAP-00\d|CHG-00\d/);
 });
 
 test("skills package separate review storage and a visual handoff gate", async () => {
