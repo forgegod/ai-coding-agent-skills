@@ -43,7 +43,8 @@ test("autonomous goal documentation distinguishes orchestration from polling", a
   assert.match(source, /\/busy queue/);
   assert.match(source, /\/stop` is not an immediate foreground-turn/);
   assert.match(source, /Operator commands, not an agent response/);
-  assert.match(source, /\/goal Continue <task name> from <handoff-record path>/);
+  assert.match(source, /\/goal -- Continue <task name> from <handoff-record path>/);
+  assert.match(source, /`Continue` is a `\/goal` control verb/);
   assert.match(source, /Do not use `\/loop` for implementation and review/);
   assert.match(source, /Reserve `\/loop` for bounded external polling/);
   assert.match(source, /automatically compresses the orchestrator context.*50% by default/is);

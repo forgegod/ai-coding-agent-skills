@@ -60,7 +60,8 @@ test("autonomous-implementation-review packages its selection helper", async () 
   assert.match(source, /Do not send these commands to `exec`/);
   assert.match(source, /automatically compresses.*50% by default/i);
   assert.match(source, /assistant response containing slash-command text does not execute/i);
-  assert.match(source, /\/goal Continue <task name> from <handoff-record path>/);
+  assert.match(source, /\/goal -- Continue <task name> from <handoff-record path>/);
+  assert.match(source, /`Continue` is a `\/goal` control verb/);
   assert.match(source, /Do not use `\/loop` for this workflow/);
   assert.match(source, /cadence and does not maintain this completion contract/);
   assert.match(source, /\/compress here 2/);

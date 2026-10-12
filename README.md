@@ -120,10 +120,11 @@ message if necessary.
 
 Send this one message after the preparation result is acceptable. `/goal` starts
 immediately, and its judge only continues while the acceptance criteria remain
-unproven:
+unproven. `Continue` is a `/goal` control verb, so `--` makes the following text
+the goal rather than a resume command:
 
 ```text
-/goal Continue <task name> from <handoff-record path>. Read the handoff record and current workspace before acting. Execute bounded implementation, verification, review, or confirmed-fix phases; update the handoff record with evidence; preserve unrelated changes; do not commit, push, deploy, or access secrets.
+/goal -- Continue <task name> from <handoff-record path>. Read the handoff record and current workspace before acting. Execute bounded implementation, verification, review, or confirmed-fix phases; update the handoff record with evidence; preserve unrelated changes; do not commit, push, deploy, or access secrets.
 
 verify: every acceptance criterion is verified by the required checks
 constraints: preserve unrelated changes; no commits, pushes, deployments, secrets, or external writes

@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.2.6
+version: 0.2.7
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -122,10 +122,10 @@ Only an operator's explicit request may stop autonomous work. First send `/goal 
 
 ## Starting the Orchestrator Goal
 
-Use this only after the skill is installed and visible as `/autonomous-implementation-review`. In the **orchestrator** session, set one completion contract. `/goal` starts the first turn immediately and, after every turn, its judge continues only until the outcome is verified, a stated stop condition applies, or the turn budget is exhausted:
+Use this only after the skill is installed and visible as `/autonomous-implementation-review`. In the **orchestrator** session, set one completion contract. `/goal` starts the first turn immediately and, after every turn, its judge continues only until the outcome is verified, a stated stop condition applies, or the turn budget is exhausted. `Continue` is a `/goal` control verb, so prefix a goal that starts with it using `--`:
 
 ```text
-/goal Continue <task name> from <handoff-record path>. Read the handoff record and current workspace before acting. Execute bounded implementation, verification, review, or confirmed-fix phases; update the handoff record with evidence; preserve unrelated changes; do not commit, push, deploy, or access secrets.
+/goal -- Continue <task name> from <handoff-record path>. Read the handoff record and current workspace before acting. Execute bounded implementation, verification, review, or confirmed-fix phases; update the handoff record with evidence; preserve unrelated changes; do not commit, push, deploy, or access secrets.
 
 verify: every acceptance criterion is verified by the required checks
 constraints: preserve unrelated changes; no commits, pushes, deployments, secrets, or external writes
