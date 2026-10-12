@@ -27,10 +27,25 @@ test("directory-discovery instructions separate installation telemetry from auth
   assert.match(source, /https:\/\/skills\.sh\/docs\/faq/);
 });
 
-test("autonomous loop documentation distinguishes orchestrator compression", async () => {
+test("autonomous goal documentation distinguishes orchestration from polling", async () => {
   const source = await readFile(readme, "utf8");
-  assert.match(source, /### Run the autonomous implementation-review loop/);
-  assert.match(source, /\/loop \/autonomous-implementation-review Continue <task name>/);
+  assert.match(source, /### Run the autonomous implementation-review goal/);
+  assert.match(source, /#### Choose the progress authority first/);
+  assert.match(source, /Do not answer every placeholder below when an active CHG already answers it/);
+  assert.match(source, /Progress authority: docs\/changes\/active\/CHG-<number>\.md/);
+  assert.match(source, /phased-plan-design/);
+  assert.match(source, /phased-plan-execution/);
+  assert.match(source, /#### 1\. Prompt the orchestrator for standalone non-material work/);
+  assert.match(source, /#### 2\. Start the orchestrator goal/);
+  assert.match(source, /What the agent does next/);
+  assert.match(source, /#### Fresh-session busy-input protection/);
+  assert.match(source, /#### Stop an execution deliberately/);
+  assert.match(source, /\/busy queue/);
+  assert.match(source, /\/stop` is not an immediate foreground-turn/);
+  assert.match(source, /Operator commands, not an agent response/);
+  assert.match(source, /\/goal Continue <task name> from <handoff-record path>/);
+  assert.match(source, /Do not use `\/loop` for implementation and review/);
+  assert.match(source, /Reserve `\/loop` for bounded external polling/);
   assert.match(source, /automatically compresses the orchestrator context.*50% by default/is);
   assert.match(source, /operator—not the\s+running agent/is);
   assert.match(source, /An agent printing a slash command does not execute it/i);

@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.2.1
+version: 0.2.6
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -41,15 +41,17 @@ Do not use this for a trivial one-file edit, credentials, destructive production
 - For each Hermes role session, confirm the configured `/model` selector is accepted in that session. A model alias is valid only when Hermes accepts it; do not probe it with `command -v` or treat it as a shell command.
 - Give each editing agent its own git worktree. A reviewer uses a read-only checkout or the completed implementation worktree and must not modify files.
 - Set a finite turn, time, and cost budget appropriate to the task.
+- For a material change in a CAP/CHG repository, load `application-records`, then use `phased-plan-design` to create or revise the active CHG before autonomous work and `phased-plan-execution` to execute the selected phase. The CHG phase table is the only progress authority; this skill's handoff record may link its evidence but must not duplicate phase status or become a second plan.
 
-### Context budget and durable handoff
+### Goal lifecycle and durable handoff
 
-- `/loop` repeats work in the current session. `/loop pause` and `/loop resume` change only the loop state; they do **not** clear, compress, or replace its conversation context. Do not use a resumed loop as a context-reset mechanism.
-- Hermes automatically compresses active conversations when its configured context threshold is reached (50% by default). An active `/loop` survives that compaction and follows the compressed session lineage. This is the normal unattended context-control mechanism for the orchestrator; keep compression enabled and keep the handoff record current so its summary has grounded evidence to preserve.
+- Use `/goal` for the orchestrator's implementation-review work. Its judge re-evaluates the explicit outcome, verification, constraints, boundaries, and stop condition after every turn, then continues only while the goal remains unproven. Do not use `/loop` for this workflow: `/loop` replays a fixed prompt on a cadence and does not maintain this completion contract, so it can re-fire stale work after a verified checkpoint. Reserve `/loop` for bounded external polling such as CI status.
+- Hermes automatically compresses active conversations when its configured context threshold is reached (50% by default). Goal state persists independently of the active transcript, but compression is not a substitute for a handoff record. Keep the record current so a later continuation or fresh session has grounded evidence.
 - At each verified phase boundary, use `/context` to inspect the orchestrator's active-context headroom. Before the next packet would crowd out the current task, write or update an operator-approved durable handoff record. Reuse the task's existing progress artifact when it has one; otherwise choose an explicit scratch handoff file outside the repository.
 - The handoff record must contain the goal and constraints; workspace and base commit; exact changed paths; verification commands and outcomes; review findings and dispositions; the next bounded phase; and unresolved decisions or risks. Store references to diffs, logs, and reports rather than copying their full contents into the next prompt.
-- When an operator wants to compact earlier, they—not the running agent—run this sequence in the **orchestrator** session: `/loop pause`, `/compress here 2`, inspect `/context`, then `/loop resume`. Compression reduces that session's active context while preserving loop state and session history; it is not deletion and is not a substitute for a handoff record. Do not send these commands to `exec`; executor sessions are already reset for each role phase. An assistant response containing slash-command text does not execute those commands in its own session.
-- An operator starts a new orchestrator session only at an intentional loop boundary: pause or stop the old loop after recording the handoff, use `/new <next-goal-name>`, seed it with the compact task packet and handoff-record path, then explicitly start the next loop there. Use `session_search` only to retrieve a specific prior decision or claim, then verify it against the workspace; do not use `/resume` or `/loop resume` to make an overloaded orchestrator session small.
+- When an active CHG exists, derive the outcome, scope, phase gate, and next phase from that record. The handoff record is transient execution context only: link the CHG path and evidence locations rather than restating or updating its phase table.
+- When an operator wants to compact earlier, they—not the running agent—run this sequence in the **orchestrator** session: `/goal pause`, `/compress here 2`, inspect `/context`, then `/goal resume`. Pausing stops automatic continuation without clearing the goal; compression reduces active context while preserving goal state and session history. Do not send these commands to `exec`; executor sessions are already reset for each role phase. An assistant response containing slash-command text does not execute those commands in its own session.
+- An operator starts a new orchestrator session only at an intentional goal boundary: pause or clear the old goal after recording the handoff, use `/new --yes <next-goal-name>` to bypass the reset confirmation, then send `/busy queue` before seeding it with the compact task packet and handoff-record path and setting the next `/goal`. Queue mode prevents a follow-up message from redirecting active goal work. Use `session_search` only to retrieve a specific prior decision or claim, then verify it against the workspace; do not use `/resume` to make an overloaded orchestrator session small.
 - Keep role prompts compact: pass the task packet, paths, commit IDs, and acceptance criteria. Let agents inspect the working tree and reports themselves; never paste full diffs, test logs, or prior transcripts into every phase.
 
 ### Herdr session selection
@@ -77,6 +79,16 @@ After the operator selects the executor pane, claim that live agent with the sho
 
 Do not infer a draft from plain terminal text. Hermes' Ink UI renders its idle-and-empty composer examples such as `Try "explain this codebase"` as an italic placeholder only when the real buffer is empty. ANSI formatting may help identify that placeholder, but an unstyled/stripped terminal capture cannot prove it is not user text. For an existing session, rely on the live Herdr state and never overwrite an apparent draft; offer a different pane or ask the operator when the input state is ambiguous.
 
+### Herdr prompt delivery
+
+For a normal role prompt or Hermes slash command, use `herdr agent prompt <pane-id> "<text>"`. This is the submission primitive: Herdr writes the text using the pane's live bracketed-paste mode, when enabled, followed by an encoded Enter as one ordered submission. It does not rely on terminal focus, pane labels, or a model simulating individual keystrokes.
+
+A successful `agent prompt` only proves that Herdr wrote the text and Enter; it does not prove Hermes accepted the command or started the requested turn. For a task prompt, use `--wait` only when its lifecycle semantics are appropriate, then inspect the resulting state and pane report. For local slash commands such as `/new` and `/model`, send without `--wait`: they can complete without producing the `working` transition that `--wait` expects.
+
+After every `/new --yes` accepted in an executor pane, send `/busy queue` and confirm it before selecting the model or delivering the role task. Queue mode keeps later messages as distinct follow-up turns instead of redirecting active work; it prevents an accidental operator message from interrupting the executor.
+
+Use `herdr agent send-keys <pane-id> <key>...` only for deliberate interactive controls, such as `esc` or `ctrl+c`. It sends logical key presses after validating every key token. Do not use `send-keys` to type or submit normal task text; that bypasses `agent prompt`'s ordered bracketed-paste-and-Enter delivery. A blocked agent rejects `agent prompt` before any input is sent, so inspect the blocked UI and surface the decision instead of trying key sequences.
+
 ### Herdr lifecycle monitoring
 
 After dispatching a role task, monitor the selected executor through Herdr's lifecycle API rather than repeatedly inspecting its terminal output or workspace changes to infer progress. With `terminal`, wait on the selected pane ID (not its label or current focus):
@@ -91,11 +103,16 @@ Do not install or depend on `herdr integration install hermes` for lifecycle mon
 
 Before sending a role task to the selected idle Hermes pane:
 
-1. Start a fresh session with `/new <goal-name>` through `herdr agent prompt <pane-id> ...` without `--wait`. Use a short, compelling, outcome-oriented name such as `implement-profile-binding`, `review-profile-binding`, or `fix-resume-refusal`; never use a generic phase label alone.
+1. Start a fresh session with `/new --yes <goal-name>` through `herdr agent prompt <pane-id> ...` without `--wait`. `--yes` bypasses Hermes' reset confirmation, so it is required for unattended role dispatch. Use a short, compelling, outcome-oriented name such as `implement-profile-binding`, `review-profile-binding`, or `fix-resume-refusal`; never use a generic phase label alone.
 2. Read the pane and confirm the new session was accepted and the input is idle. Do not reset a blocked, working, or input-ambiguous session.
-3. Send `/model <configured-key>` through `herdr agent prompt <pane-id> ...` without `--wait`. Slash commands may complete locally without producing the `working` state that `--wait` requires.
-4. Read the pane and confirm Hermes accepted the requested selector; do not send a task if it is rejected, blocked, or remains ambiguous.
-5. Send the role task only after that confirmation. Do not use `/model --global`.
+3. Send `/busy queue` through `herdr agent prompt <pane-id> ...` without `--wait`, then read the pane and confirm it was accepted. This must happen before model selection or task delivery so accidental follow-up input queues instead of redirecting the role task.
+4. Send `/model <configured-key>` through `herdr agent prompt <pane-id> ...` without `--wait`. Slash commands may complete locally without producing the `working` state that `--wait` requires.
+5. Read the pane and confirm Hermes accepted the requested selector; do not send a task if it is rejected, blocked, or remains ambiguous.
+6. Send the role task only after that confirmation. Do not use `/model --global`.
+
+### Explicit stop requests
+
+Only an operator's explicit request may stop autonomous work. First send `/goal pause` to the orchestrator so it cannot dispatch another phase. Then, after the executor settles, prompt the selected executor with `/stop` through `herdr agent prompt <pane-id> "/stop"` when its background processes must be stopped. `/stop` stops Hermes background processes; it does not prove that a currently running foreground role turn was interrupted. With `/busy queue` active, a stop prompt is a queued follow-up, not an interruption. Read the pane and agent state after it runs; do not substitute `ctrl+c` or claim a stop completed without that evidence.
 
 ### Local Browser Access
 
@@ -103,24 +120,28 @@ Before sending a role task to the selected idle Hermes pane:
 - Treat browser access as a scoped capability: use a separate browser profile or a clean browser state for autonomous work, never expose an operator's authenticated personal browser session without explicit approval.
 - A connected browser does not remove normal safety constraints. Keep login, payment, account, and irreversible external actions under the operator's approval policy.
 
-## Starting the Orchestrator Loop
+## Starting the Orchestrator Goal
 
-Use this only after the skill is installed and visible as `/autonomous-implementation-review`. In the **orchestrator** session, start a self-paced loop with a compact, stable continuation prompt:
+Use this only after the skill is installed and visible as `/autonomous-implementation-review`. In the **orchestrator** session, set one completion contract. `/goal` starts the first turn immediately and, after every turn, its judge continues only until the outcome is verified, a stated stop condition applies, or the turn budget is exhausted:
 
 ```text
-/loop /autonomous-implementation-review Continue <task name> from <handoff-record path>. Read the handoff record and current workspace before acting. Execute one bounded implementation, verification, review, or confirmed-fix phase; update the handoff record with evidence; preserve unrelated changes; do not commit, push, deploy, or access secrets. End with LOOP_COMPLETE only when every acceptance criterion is verified or a real user decision blocks progress. --until every acceptance criterion is verified or a real user decision is required
+/goal Continue <task name> from <handoff-record path>. Read the handoff record and current workspace before acting. Execute bounded implementation, verification, review, or confirmed-fix phases; update the handoff record with evidence; preserve unrelated changes; do not commit, push, deploy, or access secrets.
+
+verify: every acceptance criterion is verified by the required checks
+constraints: preserve unrelated changes; no commits, pushes, deployments, secrets, or external writes
+boundaries: <agreed paths and systems>
+stop when: a real user decision or external dependency blocks progress
 ```
 
-Omit the interval for self-paced work: Hermes starts at its configured floor and backs off only when replies stop changing. Use a fixed interval only when waiting on an external event, for example `5m` before the skill command while polling CI.
+Do not replace this goal with `/loop`: a loop repeats its prompt on a schedule and is suitable for external polling, not an acceptance-criteria-driven coding workflow. Do not run `/goal` and `/loop` for the same task. Use `/goal pause`, `/goal resume`, and `/goal clear` to control the objective; add newly discovered acceptance criteria with `/subgoal <criterion>` rather than replacing the goal.
 
-For a single coding objective, prefer `/goal` instead of `/loop`: it is judge-driven rather than timer-driven. Do not run an active `/goal` and this loop for the same implementation task; an active goal owns the session and defers loop wakeups.
-
-Before starting, give the first skill invocation or handoff record a complete task packet: outcome, scope and non-goals, acceptance criteria, workspace/base, required checks, constraints, and the handoff-record location. The loop prompt stays short on later ticks because the record and workspace are the source of detail.
+Before starting, give the goal and handoff record a complete task packet: outcome, scope and non-goals, acceptance criteria, workspace/base, required checks, constraints, and the handoff-record location. The handoff record and workspace remain the source of detail across continuations.
 
 ## Procedure
 
 1. Define the task packet.
    - State the user outcome, scope, non-goals, acceptance criteria, relevant paths, required verification, and constraints such as no commits or no network writes.
+   - For a selected CHG phase, read those facts from the CHG and its applicable CAP/DOX chain. Ask the operator only for an unresolved decision, missing CHG selection, or additional constraint; do not require a second questionnaire or create a parallel plan.
    - Record the starting branch, `git status --short`, and merge base. Preserve unrelated changes.
    - Completion: another agent could implement the task without guessing the target or permitted side effects.
 
@@ -159,7 +180,7 @@ Before starting, give the first skill invocation or handoff record a complete ta
 7. Triage and iterate.
    - Reproduce or inspect every substantive finding. Before fixing a confirmed defect, start a fresh executor session named for the correction, switch `exec` to the configured implementer `/model` selector, and verify both operations; send the confirmed finding plus task packet, then fix it in the same worktree. Dismiss unsupported findings with evidence.
    - Rerun focused verification after each fix. Request a final reviewer-model phase only when the diff materially changed after review.
-   - Limit the loop to two review/fix passes by default. Escalate to the user with the evidence if a third pass is needed or requirements conflict.
+   - Limit review/fix passes to two by default. Escalate to the user with the evidence if a third pass is needed or requirements conflict.
    - Completion: every finding is fixed, explicitly declined with evidence, or surfaced as a user decision.
 
 8. Close out a verified checkpoint.
@@ -168,12 +189,12 @@ Before starting, give the first skill invocation or handoff record a complete ta
    - Completion: the checkpoint is verified, its handoff record is sufficient for a fresh session, its next action is explicit, and any blocker is named plainly.
 
 9. Rotate orchestration context when needed.
-   - At every checkpoint, inspect `/context`. `/loop resume` only restarts its scheduler and retains the same conversation; it must never be selected to reclaim context.
-   - Rely on Hermes automatic compression for an unattended loop. If earlier compression is needed, stop normal work and instruct the operator to run `/loop pause`, `/compress here 2`, inspect `/context`, then `/loop resume` in the orchestrator session. Do not route this context rotation through an executor session or claim that the orchestrator can execute its own slash commands.
-   - Start `/new <goal-named-next-phase>` only when the operator deliberately ends the old orchestrator loop; seed it from the durable handoff record and explicitly create the next loop in that fresh session. Do not resume an overloaded session.
-   - Completion: the orchestrator has continued through automatic or operator-triggered compression with enough headroom for one bounded next phase, or an intentional new loop has started in a goal-named session from the verified handoff record.
+   - At every checkpoint, inspect `/context`. `/goal resume` continues the same objective and does not reclaim context; it must never be selected as a context-reset mechanism.
+   - Rely on Hermes automatic compression for an unattended goal. If earlier compression is needed, stop normal work and instruct the operator to run `/goal pause`, `/compress here 2`, inspect `/context`, then `/goal resume` in the orchestrator session. Do not route this context rotation through an executor session or claim that the orchestrator can execute its own slash commands.
+   - Start `/new --yes <goal-named-next-phase>` only when the operator deliberately ends the old orchestrator goal; send `/busy queue`, seed it from the durable handoff record, and explicitly set the next goal in that fresh session. Do not resume an overloaded session.
+   - Completion: the orchestrator has continued through automatic or operator-triggered compression with enough headroom for one bounded next phase, or an intentional new goal has started in a goal-named session from the verified handoff record.
 
-10. Continue the execution loop.
+10. Continue toward the goal.
    - Unless the operator explicitly stops, pauses, narrows scope, or a real blocker requires their decision, immediately select and dispatch the next planned bounded phase after a verified review/commit checkpoint. Do not leave a finished worker idle merely to report normal progress.
    - Honor explicit standing authorization for approved commit proposals, but still follow repository commit policy and never invent permission for an unreviewed batch.
    - Continue until every requested record is complete, cancelled, blocked on a real dependency, or requires an operator decision. Report only terminal completion or an actionable blocker.
@@ -186,6 +207,7 @@ Before starting, give the first skill invocation or handoff record a complete ta
 Include these requirements in the implementation task:
 
 - Read repository-local instructions before editing.
+- When the task names a CHG phase, follow `phased-plan-execution`: keep that CHG's phase table synchronized and do not create a separate progress tracker.
 - Inspect existing code and tests before choosing an API or architecture.
 - Keep the diff minimal and preserve unrelated changes.
 - Add or update regression coverage for behaviour changes.
@@ -214,7 +236,8 @@ Include these requirements in the review task:
 ## Pitfalls
 
 - A fresh `/new` session reduces carry-over context but does not make the executor independent. This is a role-separated self-review; Hermes must still verify it, and high-risk changes may require an external reviewer.
-- `/loop resume` resumes its existing loop in the same orchestrator context; it does not free context. Automatic compression is the normal unattended path. An operator may pause, compress, inspect, and resume earlier; the orchestrator cannot execute its own slash commands. Use a goal-named `/new` session only for an intentional new orchestrator loop seeded from a durable handoff record.
+- Do not use `/loop` for implementation and review work. It is cadence-driven prompt replay, which can repeat stale work and lacks `/goal`'s outcome, verification, constraints, boundaries, and stop-condition contract. Use it only for bounded external polling. `/goal resume` keeps the same objective and does not free context; use automatic compression or the documented pause/compress/resume sequence instead. The orchestrator cannot execute its own slash commands. After every goal-named `/new --yes`, send `/busy queue` before any model, goal, or task prompt so accidental follow-up messages queue rather than redirecting work.
+- Do not describe `/stop` as an immediate executor interrupt. It stops Hermes background processes and, under `/busy queue`, runs only as a later queued turn. An explicit operator stop request pauses the goal first, then prompts `/stop` and verifies the settled pane state.
 - Do not use `--resume latest` as a review handoff. It may select an unrelated terminal-aware or globally recent session; search by task evidence, then inspect the current checkout.
 - Agent completion is not verification. Inspect the diff and execute checks yourself.
 - More parallelism often creates merge conflicts and diluted ownership. Prefer one implementer unless tasks are demonstrably disjoint.
@@ -230,13 +253,13 @@ Include these requirements in the review task:
 
 Before reporting a task done, confirm all of the following:
 
-- The `exec` session has a recorded goal name and accepted the configured session-only implementer selector before edits, plus a fresh recorded review goal name and reviewer selector before every read-only review phase; any reset/selector failure or user-approved replacement is recorded.
+- The `exec` session has a recorded goal name, accepted `/busy queue`, and accepted the configured session-only implementer selector before edits, plus a fresh recorded review goal name, `/busy queue`, and reviewer selector before every read-only review phase; any reset/queue/selector failure or user-approved replacement is recorded.
 - When running inside Herdr, the current-workspace pane overview was shown, the operator selected the executor through a `clarify` form or its validated Other pane ID, and its read-back label is `exec` or its verified collision suffix.
 - When running inside Herdr, every dispatched role task reached a recorded `idle`, `done`, `blocked`, or timeout outcome through `herdr agent wait` on the selected pane ID; each blocked or timeout outcome was inspected before any follow-up input.
 - Repository instructions and starting state were recorded before edits.
 - The final diff matches the agreed scope and preserves unrelated user changes.
 - Relevant tests, lint, type checks, and build commands were actually run or named as blockers.
 - Review findings have concrete dispositions with evidence.
-- Every multi-phase checkpoint has a handoff record with the current workspace/base, exact evidence references, and the next bounded phase; the orchestrator can resume its loop after compression or start an intentional new loop without replaying the complete transcript.
+- Every multi-phase checkpoint has a handoff record with the current workspace/base, exact evidence references, and the next bounded phase; the orchestrator can continue its goal after compression or start an intentional new goal without replaying the complete transcript.
 - No unapproved external side effect, commit, push, deployment, or credential change occurred.
 - The final summary separates verified results, skipped checks, and remaining risks.

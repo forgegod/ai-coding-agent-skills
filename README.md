@@ -57,11 +57,47 @@ hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-co
 
 Installations become available in new sessions. Existing local copies can produce name conflicts: back up local edits and review the installer's replacement prompt rather than forcing a reinstall.
 
-### Run the autonomous implementation-review loop
+### Run the autonomous implementation-review goal
 
 Use `autonomous-implementation-review` from the orchestrator session, not an
-executor pane. First create a compact task packet and durable handoff record;
-ask the skill to prepare this only, without dispatching an executor:
+executor pane. The two code blocks below are **messages you send**. The text
+between them describes agent behaviour and is **not** another prompt to paste.
+
+#### Choose the progress authority first
+
+`autonomous-implementation-review` coordinates executor sessions and reviews;
+it does not replace the planning skills or create a second progress tracker.
+
+- **Material change with no active CHG:** use `application-records`, then
+  `phased-plan-design`, to create or revise the CHG. Resolve only the outcome or
+  policy decisions that are genuinely unknown; the design skill creates the
+  phase table and gates.
+- **Selected active CHG phase:** use `phased-plan-execution` as the execution
+  authority. The orchestrator reads the CHG, CAPs, and DOX chain for scope,
+  phase gate, and status. The user need only identify the CHG and phase, plus
+  any constraint not already recorded.
+- **Non-material standalone work:** no CAP/CHG is required. Provide a compact
+  task packet in the first prompt below.
+
+**Do not answer every placeholder below when an active CHG already answers it.**
+For an existing phase, this shorter preparation prompt is enough:
+
+```text
+/autonomous-implementation-review Prepare only the task packet and durable handoff record; do not dispatch an executor yet.
+
+Progress authority: docs/changes/active/CHG-<number>.md
+Selected phase: <number or phase name>
+Additional constraints: <only constraints not already in the CHG, or none>
+```
+
+The agent must read the named CHG and use `phased-plan-execution`; it asks for
+clarification only if the record does not select a phase, lacks an executable
+gate, or leaves a required decision unresolved.
+
+#### 1. Prompt the orchestrator for standalone non-material work
+
+Send this one message. It creates the task packet and durable handoff record,
+but must not dispatch an executor:
 
 ```text
 /autonomous-implementation-review Prepare only the task packet and durable handoff record at <handoff-record path>; do not dispatch an executor yet.
@@ -75,27 +111,81 @@ Required verification: <tests, lint, build>
 Constraints: no commits, pushes, deployments, secrets, or external writes.
 ```
 
-Then start a self-paced loop that reloads the skill at every tick:
+**What the agent does next:** it reads the repository and returns the prepared
+task packet and handoff-record location. It does not start a worker. Review that
+result before continuing; correct missing scope or acceptance criteria in a new
+message if necessary.
+
+#### 2. Start the orchestrator goal
+
+Send this one message after the preparation result is acceptable. `/goal` starts
+immediately, and its judge only continues while the acceptance criteria remain
+unproven:
 
 ```text
-/loop /autonomous-implementation-review Continue <task name> from <handoff-record path>. Read the handoff record and current workspace before acting. Execute one bounded implementation, verification, review, or confirmed-fix phase; update the handoff record with evidence; preserve unrelated changes; do not commit, push, deploy, or access secrets. End with LOOP_COMPLETE only when every acceptance criterion is verified or a real user decision blocks progress. --until every acceptance criterion is verified or a real user decision is required
+/goal Continue <task name> from <handoff-record path>. Read the handoff record and current workspace before acting. Execute bounded implementation, verification, review, or confirmed-fix phases; update the handoff record with evidence; preserve unrelated changes; do not commit, push, deploy, or access secrets.
+
+verify: every acceptance criterion is verified by the required checks
+constraints: preserve unrelated changes; no commits, pushes, deployments, secrets, or external writes
+boundaries: <agreed paths and systems>
+stop when: a real user decision or external dependency blocks progress
 ```
 
-Omit the interval for self-paced work. Add an interval such as `5m` after
-`/loop` only while waiting for external state such as CI. For one finite coding
-objective, prefer `/goal` instead; do not run an active `/goal` and this loop
-for the same task because the goal defers loop wakeups.
+**What the agent does next:** it selects and dispatches the executor, verifies
+each implementation and review phase, and continues until the contract is
+verified or the stated stop condition applies. Do not paste the agent's reports
+back into the goal; they are evidence for the agent to record in the handoff
+file and for the operator to inspect.
 
-Hermes automatically compresses the orchestrator context at its configured
-threshold (50% by default), and active loops survive that compression. Do not
-use `/loop resume` as a context reset. To compact earlier, the operator—not the
-running agent—must enter these commands in the orchestrator session:
+#### Fresh-session busy-input protection
+
+When the orchestrator starts a fresh executor session, it sends `/new --yes
+<goal-name>`, waits until that session is idle, then sends `/busy queue` before
+the model or role task. Queue mode keeps any later operator message as the next
+turn instead of redirecting the executor's active work. This is an orchestrator
+action; the operator does not need to send it separately during a normal run.
+
+#### Stop an execution deliberately
+
+Stopping is an explicit operator decision. The orchestrator first sends
+`/goal pause` so it cannot dispatch another phase. After the executor settles,
+it prompts that executor with `/stop` to stop Hermes background processes and
+then verifies the pane state. `/stop` is not an immediate foreground-turn
+interrupt; with `/busy queue` it is queued until the current role turn finishes.
+Do not use `ctrl+c` as an undocumented substitute.
+
+For a selected CHG phase, replace the generic goal with a phase-specific one.
+The CHG supplies outcome, boundaries, and status; copy its exact verification
+gate rather than inventing a second checklist:
 
 ```text
-/loop pause
+/goal Execute only phase <number or name> of docs/changes/active/CHG-<number>.md. Load phased-plan-execution and keep that CHG as the sole progress authority. Read the CHG, linked CAPs, and applicable DOX before dispatching; update the CHG only as that skill requires.
+
+verify: <the selected CHG phase's exact verification gate>
+constraints: <only additional operator constraints, or none>
+stop when: the CHG lacks a selected executable phase, a required decision is unresolved, or an external dependency blocks progress
+```
+
+Do not use `/loop` for implementation and review: it replays a fixed prompt on
+a cadence and lacks `/goal`'s outcome, verification, constraint, boundary, and
+stop-condition contract. It can therefore re-fire stale work after a verified
+checkpoint. Reserve `/loop` for bounded external polling, such as CI status.
+Use `/goal pause`, `/goal resume`, and `/goal clear` to control the objective;
+add a newly discovered acceptance criterion with `/subgoal <criterion>`.
+
+Hermes automatically compresses the orchestrator context at its configured
+threshold (50% by default). Goal state persists independently of the active
+transcript, but `/goal resume` is not a context reset. To compact earlier, the
+operator—not the running agent—must enter these commands in the orchestrator
+session:
+
+**Operator commands, not an agent response:**
+
+```text
+/goal pause
 /compress here 2
 /context
-/loop resume
+/goal resume
 ```
 
 An agent printing a slash command does not execute it in its own session. Keep
