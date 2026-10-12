@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.2.0
+version: 0.2.1
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -77,6 +77,18 @@ After the operator selects the executor pane, claim that live agent with the sho
 
 Do not infer a draft from plain terminal text. Hermes' Ink UI renders its idle-and-empty composer examples such as `Try "explain this codebase"` as an italic placeholder only when the real buffer is empty. ANSI formatting may help identify that placeholder, but an unstyled/stripped terminal capture cannot prove it is not user text. For an existing session, rely on the live Herdr state and never overwrite an apparent draft; offer a different pane or ask the operator when the input state is ambiguous.
 
+### Herdr lifecycle monitoring
+
+After dispatching a role task, monitor the selected executor through Herdr's lifecycle API rather than repeatedly inspecting its terminal output or workspace changes to infer progress. With `terminal`, wait on the selected pane ID (not its label or current focus):
+
+```sh
+herdr agent wait <pane-id> --until idle --until done --until blocked --timeout <time-budget-ms>
+```
+
+`idle` and `done` both mean the executor can accept input. On either state, read the agent's report and inspect the actual workspace, diff, and checks before starting the next phase. On `blocked`, use `herdr agent get <pane-id>` and `herdr agent read <pane-id>` to inspect the request, then surface the decision to the operator; never answer it or send speculative input. A timeout is ambiguous: inspect the agent state and output before deciding whether the task was delivered, still running, or needs recovery; never send the same prompt again solely because the wait timed out.
+
+Do not install or depend on `herdr integration install hermes` for lifecycle monitoring. The Hermes integration reports a resumable session ID for server-restart recovery; Herdr derives Hermes `working`, `idle`, and `blocked` from its own screen detection. Installing it changes the selected Hermes profile and requires a restart, so treat it as explicit operator-approved recovery setup, not a routine prerequisite.
+
 Before sending a role task to the selected idle Hermes pane:
 
 1. Start a fresh session with `/new <goal-name>` through `herdr agent prompt <pane-id> ...` without `--wait`. Use a short, compelling, outcome-oriented name such as `implement-profile-binding`, `review-profile-binding`, or `fix-resume-refusal`; never use a generic phase label alone.
@@ -122,6 +134,7 @@ Before starting, give the first skill invocation or handoff record a complete ta
    - Start a fresh executor session named for the implementation outcome, then set its configured session-only implementer `/model` selector and verify both operations before the task prompt. Do not reset or model-switch a working, blocked, or input-ambiguous session.
    - Tell the configured implementer to inspect repository instructions first; change only the agreed scope; add or update focused tests; run the specified checks; and report exact changed paths, commands, outputs, assumptions, and unresolved risks.
    - Do not ask it to commit, push, deploy, change credentials, or overwrite unrelated work unless the user explicitly requested that action.
+   - In Herdr, dispatch without `--wait`, then use `herdr agent wait <pane-id> --until idle --until done --until blocked --timeout <time-budget-ms>` as the completion gate. Do not poll terminal text, diffs, or workspace state to decide that the executor has settled.
    - Completion: the implementation workspace contains the intended diff and the agent has reported its verification evidence.
 
 4. Recover prior-session context when roles change.
@@ -136,7 +149,7 @@ Before starting, give the first skill invocation or handoff record a complete ta
    - Completion: Hermes can state what changed and which acceptance criteria remain unproven.
 
 6. Run the executor review phase.
-   - Wait for the implementation workspace to reach a stable checkpoint. Start a fresh executor session named for the review outcome, then switch it to the configured session-only reviewer `/model` selector and verify both operations before the review packet.
+   - Wait for the implementation workspace to reach a stable checkpoint. In Herdr, use the executor lifecycle wait and handle `blocked` or timeout as specified above; do not infer readiness from a quiet pane. Start a fresh executor session named for the review outcome, then switch it to the configured session-only reviewer `/model` selector and verify both operations before the review packet.
    - The orchestrator must send the complete review packet again: task outcome, base commit, final diff, changed-path list, test evidence, and implementation report. A fresh session has no access to the implementation conversation.
    - The executor must remain read-only for this phase: inspect the task packet, base commit, final diff, changed-path list, and test evidence; do not edit files.
    - Require findings ordered by severity, each with file and line, concrete failure mode, and a minimal reproduction or reason. Require an explicit `no findings` verdict when none qualify.
@@ -210,6 +223,7 @@ Include these requirements in the review task:
 - Avoid generic `review this` prompts. A reviewer needs the acceptance criteria, comparison base, and evidence to detect real regressions.
 - Do not silently replace the configured reviewer or implementer model selector. If `/model <key>` fails, preserve the failure evidence and ask the operator for a replacement key.
 - Do not use `agent_status` as proof that an input buffer is empty. In particular, a plain-text `Try "…"` line can be an Ink placeholder after styles are stripped; never clear or submit it as if it were disposable user text.
+- Herdr's `idle` or `done` state proves only that its lifecycle monitor settled. It does not prove an individual turn completed the requested work or that the work is correct; read the report and verify the workspace and checks. Hermes' optional Herdr integration supplies session-resume identity, not lifecycle reports.
 - Do not auto-adopt a Herdr pane from its label, current UI focus, or workspace order. In the two-pane topology, show the overview, use the interactive `clarify` form for an explicit executor pane-ID choice, validate it against fresh state, and rename only that selected live agent to `exec` (or its collision suffix).
 
 ## Verification
@@ -218,6 +232,7 @@ Before reporting a task done, confirm all of the following:
 
 - The `exec` session has a recorded goal name and accepted the configured session-only implementer selector before edits, plus a fresh recorded review goal name and reviewer selector before every read-only review phase; any reset/selector failure or user-approved replacement is recorded.
 - When running inside Herdr, the current-workspace pane overview was shown, the operator selected the executor through a `clarify` form or its validated Other pane ID, and its read-back label is `exec` or its verified collision suffix.
+- When running inside Herdr, every dispatched role task reached a recorded `idle`, `done`, `blocked`, or timeout outcome through `herdr agent wait` on the selected pane ID; each blocked or timeout outcome was inspected before any follow-up input.
 - Repository instructions and starting state were recorded before edits.
 - The final diff matches the agreed scope and preserves unrelated user changes.
 - Relevant tests, lint, type checks, and build commands were actually run or named as blockers.

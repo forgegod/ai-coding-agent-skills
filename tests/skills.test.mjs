@@ -63,6 +63,11 @@ test("autonomous-implementation-review packages its selection helper", async () 
   assert.match(source, /\/loop \/autonomous-implementation-review Continue <task name>/);
   assert.match(source, /\/compress here 2/);
   assert.match(source, /durable handoff record/i);
+  assert.match(source, /Herdr lifecycle monitoring/);
+  assert.match(source, /herdr agent wait <pane-id> --until idle --until done --until blocked/);
+  assert.match(source, /Do not install or depend on `herdr integration install hermes` for lifecycle monitoring/);
+  assert.match(source, /resumable session ID for server-restart recovery/);
+  assert.match(source, /Do not poll terminal text, diffs, or workspace state to decide that the executor has settled/);
   assert.match(helper, /herdr pane list/);
 });
 
