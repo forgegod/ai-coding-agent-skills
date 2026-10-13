@@ -17,6 +17,7 @@ Herdr pane-selection helper.
 - The implementation and review phases use distinct, goal-named sessions; review is read-only.
 - Never infer autonomous commit authority or a pane selection from labels, focus, or agent identity.
 - The helper accepts only Herdr pane-list JSON and must not control panes or send input.
+- For CAP/CHG work, the tracked CHG is the sole mutable progress authority; do not create profile-local continuation documents.
 - Keep external tool and model references as prerequisites, not bundled dependencies.
 
 ## Verification

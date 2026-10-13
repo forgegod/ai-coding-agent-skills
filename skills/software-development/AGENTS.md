@@ -13,7 +13,7 @@ Own optional, portable agent workflows for maintaining the canonical capability 
 | `git-commit-message/SKILL.md` | Dependency-aware logical Git batches, a preview before apply (or autonomous execution), and tiered Conventional Commit messages. |
 | `phased-plan-design/SKILL.md`     | CHG phase design for material changes and gates. |
 | `phased-plan-execution/SKILL.md`  | One verified CAP/CHG phase at a time. |
-| `phased-plan-overview/SKILL.md`   | Active-CHG inspection and resume selection. |
+| `phased-plan-overview/SKILL.md`   | Active-CHG inspection, resume selection, and next-goal command. |
 | `phased-plan-refactoring/SKILL.md` | Verified CHG splitting and resequencing. |
 
 ## Local Contracts

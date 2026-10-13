@@ -55,17 +55,19 @@ test("autonomous-implementation-review packages its selection helper", async () 
   assert.match(source, /name: autonomous-implementation-review/);
   assert.match(source, /independent review loop/i);
   assert.match(source, /scripts\/herdr_panes\.py/);
-  assert.match(source, /Goal lifecycle and durable handoff/);
+  assert.match(source, /Goal lifecycle and repository truth/);
   assert.match(source, /\/goal pause`, `\/compress here 2`, inspect `\/context`, then `\/goal resume`/);
   assert.match(source, /Do not send these commands to `exec`/);
   assert.match(source, /automatically compresses.*50% by default/i);
   assert.match(source, /assistant response containing slash-command text does not execute/i);
-  assert.match(source, /\/goal -- Continue <task name> from <handoff-record path>/);
-  assert.match(source, /`Continue` is a `\/goal` control verb/);
+  assert.match(source, /\/goal draft Execute phase <number or name> of docs\/changes\/active\/CHG-<number>\.md using autonomous-implementation-review and phased-plan-execution/);
+  assert.match(source, /The tracked CHG phase table is the only mutable progress authority/);
+  assert.match(source, /Scratch logs, patches, and agent reports are temporary evidence only/);
+  assert.doesNotMatch(source, /durable handoff record|<handoff-record path>|scratch handoff/i);
   assert.match(source, /Do not use `\/loop` for this workflow/);
   assert.match(source, /cadence and does not maintain this completion contract/);
   assert.match(source, /\/compress here 2/);
-  assert.match(source, /durable handoff record/i);
+  assert.match(source, /A fresh session must read the CHG, any linked committed review receipt, and the current workspace before acting/);
   assert.match(source, /Herdr prompt delivery/);
   assert.match(source, /herdr agent prompt <pane-id> "<text>"/);
   assert.match(source, /bracketed-paste mode/);
@@ -77,7 +79,7 @@ test("autonomous-implementation-review packages its selection helper", async () 
   assert.match(source, /accidental follow-up input queues instead of redirecting the role task/);
   assert.match(source, /### Explicit stop requests/);
   assert.match(source, /\/stop` stops Hermes background processes/);
-  assert.match(source, /The CHG phase table is the only progress authority/);
+  assert.match(source, /The tracked CHG phase table is the only mutable progress authority/);
   assert.match(source, /do not require a second questionnaire or create a parallel plan/);
   assert.match(source, /Herdr lifecycle monitoring/);
   assert.match(source, /herdr agent wait <pane-id> --until idle --until done --until blocked/);
@@ -145,7 +147,11 @@ test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
   }
   assert.match(sources.get("phased-plan-design"), /active CHG/i);
   assert.match(sources.get("phased-plan-execution"), /CHG phase table/i);
-  assert.match(sources.get("phased-plan-overview"), /docs\/changes\/active/i);
+  const overview = sources.get("phased-plan-overview");
+  assert.match(overview, /docs\/changes\/active/i);
+  assert.match(overview, /\/goal draft Execute phase <selected phase number or name> of <selected active CHG path> using autonomous-implementation-review and phased-plan-execution/);
+  assert.match(overview, /Do not print a launch command until an operator has\s+selected a phase/);
+  assert.match(overview, /must not dispatch work/);
   assert.match(sources.get("phased-plan-refactoring"), /one progress authority/i);
   const rootAgent = await readFile(path.join(root, "AGENTS.md"), "utf8");
   assert.match(rootAgent, /shared agent profile/);

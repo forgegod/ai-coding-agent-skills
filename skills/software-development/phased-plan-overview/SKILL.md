@@ -1,13 +1,13 @@
 ---
 name: phased-plan-overview
 description: Use when inspecting active CAP/CHG-backed work and selecting a repository-tracked change record to resume, inspect, or close.
-version: 1.0.0
+version: 1.0.1
 author: AI Software Blueprint
 license: MIT
 metadata:
   hermes:
     tags: [planning, overview, product, change-records]
-    related_skills: [application-records, phased-plan-execution, phased-plan-refactoring]
+    related_skills: [application-records, autonomous-implementation-review, phased-plan-execution, phased-plan-refactoring]
 ---
 
 # Phased Plan Overview
@@ -16,7 +16,9 @@ metadata:
 
 Provide a restart-safe view of material work from repository truth. Active
 `docs/changes/active/CHG-*.md` records—not chat history, commit recency, tracker
-status, or private plans—state what can be resumed.
+status, or private plans—state what can be resumed. Once an operator has selected
+an executable phase, provide the literal `/goal draft` command that launches the
+autonomous implementation-review workflow; do not run it yourself.
 
 ## Procedure
 
@@ -29,10 +31,21 @@ status, or private plans—state what can be resumed.
    in-progress record has exactly one in-progress phase, and named CAPs exist.
    Use the repository record validator for structural confirmation.
 5. Resume only the CHG chosen by the operator or unambiguously identified by an
-   explicit dependency/order rule. Hand its path to `phased-plan-execution`.
+   explicit dependency/order rule. State the exact selected CHG path and phase,
+   then print this ready-to-send command with those literal values:
+
+   ```text
+   /goal draft Execute phase <selected phase number or name> of <selected active CHG path> using autonomous-implementation-review and phased-plan-execution.
+   ```
+
+   Do not add a second checklist, private continuation file, or copied phase
+   details. The next `/goal draft` turn reads the CHG and creates the completion
+   contract; this overview turn remains read-only and must not dispatch work.
 6. Inspect a blocked or ambiguous record without changing it. If no active CHG
    exists, report that no material work is scheduled; do not synthesize work from
-   archives or old commits.
+   archives or old commits. Do not print a launch command until an operator has
+   selected a phase or an explicit dependency/order rule makes selection
+   unambiguous.
 
 ## Selection rules
 
@@ -50,4 +63,6 @@ status, or private plans—state what can be resumed.
 The overview is correct when a fresh agent can identify the selected CHG, its
 next phase, the phase gate, affected CAPs, and any blocker without relying on
 memory. It makes no source or status change until `phased-plan-execution` starts
-the selected phase.
+the selected phase. When a phase is selected, its result includes exactly one
+literal `/goal draft` command naming that CHG path and phase; it does not execute
+the command or create a profile-local continuation document.

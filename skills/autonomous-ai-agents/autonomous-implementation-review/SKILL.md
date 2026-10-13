@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.2.7
+version: 0.2.8
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -27,7 +27,7 @@ The `autonomous_ai_agents.implementer` and `autonomous_ai_agents.reviewer` value
 
 ## When to Use
 
-- A code change benefits from an independent review before handoff.
+- A code change benefits from an independent review before integration.
 - Work can be expressed as a bounded acceptance criterion with relevant tests.
 - Parallel subtasks are independent enough for separate worktrees.
 - The user requests an implementer/reviewer agent workflow.
@@ -41,17 +41,16 @@ Do not use this for a trivial one-file edit, credentials, destructive production
 - For each Hermes role session, confirm the configured `/model` selector is accepted in that session. A model alias is valid only when Hermes accepts it; do not probe it with `command -v` or treat it as a shell command.
 - Give each editing agent its own git worktree. A reviewer uses a read-only checkout or the completed implementation worktree and must not modify files.
 - Set a finite turn, time, and cost budget appropriate to the task.
-- For a material change in a CAP/CHG repository, load `application-records`, then use `phased-plan-design` to create or revise the active CHG before autonomous work and `phased-plan-execution` to execute the selected phase. The CHG phase table is the only progress authority; this skill's handoff record may link its evidence but must not duplicate phase status or become a second plan.
+- For a material change in a CAP/CHG repository, load `application-records`, then use `phased-plan-design` to create or revise the active CHG before autonomous work and `phased-plan-execution` to execute the selected phase. The tracked CHG phase table is the only mutable progress authority.
 
-### Goal lifecycle and durable handoff
+### Goal lifecycle and repository truth
 
 - Use `/goal` for the orchestrator's implementation-review work. Its judge re-evaluates the explicit outcome, verification, constraints, boundaries, and stop condition after every turn, then continues only while the goal remains unproven. Do not use `/loop` for this workflow: `/loop` replays a fixed prompt on a cadence and does not maintain this completion contract, so it can re-fire stale work after a verified checkpoint. Reserve `/loop` for bounded external polling such as CI status.
-- Hermes automatically compresses active conversations when its configured context threshold is reached (50% by default). Goal state persists independently of the active transcript, but compression is not a substitute for a handoff record. Keep the record current so a later continuation or fresh session has grounded evidence.
-- At each verified phase boundary, use `/context` to inspect the orchestrator's active-context headroom. Before the next packet would crowd out the current task, write or update an operator-approved durable handoff record. Reuse the task's existing progress artifact when it has one; otherwise choose an explicit scratch handoff file outside the repository.
-- The handoff record must contain the goal and constraints; workspace and base commit; exact changed paths; verification commands and outcomes; review findings and dispositions; the next bounded phase; and unresolved decisions or risks. Store references to diffs, logs, and reports rather than copying their full contents into the next prompt.
-- When an active CHG exists, derive the outcome, scope, phase gate, and next phase from that record. The handoff record is transient execution context only: link the CHG path and evidence locations rather than restating or updating its phase table.
+- Hermes automatically compresses active conversations when its configured context threshold is reached (50% by default). Goal state persists independently of the active transcript. For material work, the CHG and any committed review receipt provide fresh-session context; do not create a profile-local continuation document.
+- At each verified phase boundary, use `/context` to inspect the orchestrator's active-context headroom. Update the selected CHG with the phase state and concise verification evidence as `phased-plan-execution` requires. When a project needs a review receipt, retain a frozen, review-only artifact under `docs/changes/reviews/CHG-<number>/`; it is evidence, not a second plan.
+- When an active CHG exists, derive the outcome, scope, phase gate, and next phase from that record. A fresh session must read the CHG, any linked committed review receipt, and the current workspace before acting. Scratch logs, patches, and agent reports are temporary evidence only and never the sole resumption source.
 - When an operator wants to compact earlier, they—not the running agent—run this sequence in the **orchestrator** session: `/goal pause`, `/compress here 2`, inspect `/context`, then `/goal resume`. Pausing stops automatic continuation without clearing the goal; compression reduces active context while preserving goal state and session history. Do not send these commands to `exec`; executor sessions are already reset for each role phase. An assistant response containing slash-command text does not execute those commands in its own session.
-- An operator starts a new orchestrator session only at an intentional goal boundary: pause or clear the old goal after recording the handoff, use `/new --yes <next-goal-name>` to bypass the reset confirmation, then send `/busy queue` before seeding it with the compact task packet and handoff-record path and setting the next `/goal`. Queue mode prevents a follow-up message from redirecting active goal work. Use `session_search` only to retrieve a specific prior decision or claim, then verify it against the workspace; do not use `/resume` to make an overloaded orchestrator session small.
+- An operator starts a new orchestrator session only at an intentional goal boundary: pause or clear the old goal, use `/new --yes <next-goal-name>` to bypass the reset confirmation, then send `/busy queue` before seeding it from the selected CHG and setting the next `/goal`. Queue mode prevents a follow-up message from redirecting active goal work. Use `session_search` only to retrieve a specific prior decision or claim, then verify it against the repository; do not use `/resume` to make an overloaded orchestrator session small.
 - Keep role prompts compact: pass the task packet, paths, commit IDs, and acceptance criteria. Let agents inspect the working tree and reports themselves; never paste full diffs, test logs, or prior transcripts into every phase.
 
 ### Herdr session selection
@@ -122,26 +121,21 @@ Only an operator's explicit request may stop autonomous work. First send `/goal 
 
 ## Starting the Orchestrator Goal
 
-Use this only after the skill is installed and visible as `/autonomous-implementation-review`. In the **orchestrator** session, set one completion contract. `/goal` starts the first turn immediately and, after every turn, its judge continues only until the outcome is verified, a stated stop condition applies, or the turn budget is exhausted. `Continue` is a `/goal` control verb, so prefix a goal that starts with it using `--`:
+Use this only after the skill is installed and visible as `/autonomous-implementation-review`. For a selected material phase, use Hermes' `/goal draft` to expand a concise operator request into the persisted completion contract; it starts the first turn immediately. The agent must load this skill and `phased-plan-execution`, then read the selected CHG, linked CAPs, and applicable DOX before dispatching any executor:
 
 ```text
-/goal -- Continue <task name> from <handoff-record path>. Read the handoff record and current workspace before acting. Execute bounded implementation, verification, review, or confirmed-fix phases; update the handoff record with evidence; preserve unrelated changes; do not commit, push, deploy, or access secrets.
-
-verify: every acceptance criterion is verified by the required checks
-constraints: preserve unrelated changes; no commits, pushes, deployments, secrets, or external writes
-boundaries: <agreed paths and systems>
-stop when: a real user decision or external dependency blocks progress
+/goal draft Execute phase <number or name> of docs/changes/active/CHG-<number>.md using autonomous-implementation-review and phased-plan-execution.
 ```
 
-Do not replace this goal with `/loop`: a loop repeats its prompt on a schedule and is suitable for external polling, not an acceptance-criteria-driven coding workflow. Do not run `/goal` and `/loop` for the same task. Use `/goal pause`, `/goal resume`, and `/goal clear` to control the objective; add newly discovered acceptance criteria with `/subgoal <criterion>` rather than replacing the goal.
+The CHG supplies the outcome, boundaries, selected phase, and verification gate. Add only constraints that are not already recorded. Use `/goal show` to inspect the drafted contract; pause or clear it if it materially misstates the CHG. Do not replace this goal with `/loop`: a loop repeats its prompt on a schedule and is suitable for external polling, not an acceptance-criteria-driven coding workflow. Do not run `/goal` and `/loop` for the same task. Use `/goal pause`, `/goal resume`, and `/goal clear` to control the objective; add newly discovered acceptance criteria with `/subgoal <criterion>` rather than replacing the goal.
 
-Before starting, give the goal and handoff record a complete task packet: outcome, scope and non-goals, acceptance criteria, workspace/base, required checks, constraints, and the handoff-record location. The handoff record and workspace remain the source of detail across continuations.
+For non-material standalone work, use `/goal draft <concise objective>` with its explicit verification and constraints. Do not create a profile-local continuation document. If an adopting project requires a durable standalone artifact, use only its documented repository-tracked location.
 
 ## Procedure
 
-1. Define the task packet.
-   - State the user outcome, scope, non-goals, acceptance criteria, relevant paths, required verification, and constraints such as no commits or no network writes.
-   - For a selected CHG phase, read those facts from the CHG and its applicable CAP/DOX chain. Ask the operator only for an unresolved decision, missing CHG selection, or additional constraint; do not require a second questionnaire or create a parallel plan.
+1. Derive the task contract.
+   - For a selected CHG phase, read the outcome, scope, non-goals, acceptance criteria, relevant paths, required verification, and constraints from the CHG and its applicable CAP/DOX chain. Ask the operator only for an unresolved decision, missing CHG selection, or additional constraint; do not require a second questionnaire or create a parallel plan.
+   - For standalone work, establish those facts in the goal contract before dispatch. Do not persist them in profile scratch.
    - Record the starting branch, `git status --short`, and merge base. Preserve unrelated changes.
    - Completion: another agent could implement the task without guessing the target or permitted side effects.
 
@@ -158,11 +152,11 @@ Before starting, give the goal and handoff record a complete task packet: outcom
    - In Herdr, dispatch without `--wait`, then use `herdr agent wait <pane-id> --until idle --until done --until blocked --timeout <time-budget-ms>` as the completion gate. Do not poll terminal text, diffs, or workspace state to decide that the executor has settled.
    - Completion: the implementation workspace contains the intended diff and the agent has reported its verification evidence.
 
-4. Recover prior-session context when roles change.
-   - In a new Hermes session, use `session_search` to locate the prior coding or review session by its task, repository, distinctive changed paths, or reported verification. Read only the matching prior session or relevant turns; do not assume the immediately previous global session belongs to this task.
-   - Use the recovered transcript to reconstruct the task packet, stated constraints, claimed checks, decisions, and unresolved risks. Treat it as evidence, not authority: inspect the current workspace and diff before relying on it.
-   - Prefer `session_search` for inspection. Use `hermes --resume <session-id-or-title>` only when deliberately continuing that conversation; resuming changes the active context and can restore its working directory.
-   - Completion: the handoff has enough grounded context to review the actual current diff without rediscovering the task from scratch.
+4. Recover repository context when roles change.
+   - In a new Hermes session, read the selected CHG, linked CAP/DOX chain, committed review receipts, current status, and current diff. These are the authority for scope, phase, and evidence.
+   - Use `session_search` only to locate a specific prior decision or claimed check when repository evidence is incomplete. Treat a recovered transcript as evidence, not authority; inspect the current workspace and diff before relying on it.
+   - Use `hermes --resume <session-id-or-title>` only when deliberately continuing that conversation; resuming changes the active context and can restore its working directory.
+   - Completion: the repository establishes the phase scope, current evidence, next action, and any blocker without a profile-local document.
 
 5. Verify implementation evidence before review.
    - Inspect `git diff` and `git status` yourself. Read changed source and tests, trace affected call paths, and rerun the relevant tests or build commands when feasible.
@@ -185,14 +179,14 @@ Before starting, give the goal and handoff record a complete task packet: outcom
 
 8. Close out a verified checkpoint.
    - Recheck the final diff, current status, applicable documentation contracts, and the exact required test/lint/build commands.
-   - Update the durable handoff record with reviewer findings and dispositions, commands run with outcomes, the current commit/diff reference, the next bounded phase, and remaining risks. Keep large evidence at stable paths and record pointers rather than embedding it.
-   - Completion: the checkpoint is verified, its handoff record is sufficient for a fresh session, its next action is explicit, and any blocker is named plainly.
+   - Update the CHG with the phase transition and concise evidence as `phased-plan-execution` requires. Retain a committed review-only receipt only when the project needs one; keep logs and patches outside the repository as temporary evidence.
+   - Completion: the checkpoint is verified, the CHG identifies its next action, and any blocker is named plainly.
 
 9. Rotate orchestration context when needed.
    - At every checkpoint, inspect `/context`. `/goal resume` continues the same objective and does not reclaim context; it must never be selected as a context-reset mechanism.
    - Rely on Hermes automatic compression for an unattended goal. If earlier compression is needed, stop normal work and instruct the operator to run `/goal pause`, `/compress here 2`, inspect `/context`, then `/goal resume` in the orchestrator session. Do not route this context rotation through an executor session or claim that the orchestrator can execute its own slash commands.
-   - Start `/new --yes <goal-named-next-phase>` only when the operator deliberately ends the old orchestrator goal; send `/busy queue`, seed it from the durable handoff record, and explicitly set the next goal in that fresh session. Do not resume an overloaded session.
-   - Completion: the orchestrator has continued through automatic or operator-triggered compression with enough headroom for one bounded next phase, or an intentional new goal has started in a goal-named session from the verified handoff record.
+   - Start `/new --yes <goal-named-next-phase>` only when the operator deliberately ends the old orchestrator goal; send `/busy queue`, read the selected CHG and committed evidence, and explicitly set the next goal in that fresh session. Do not resume an overloaded session.
+   - Completion: the orchestrator has continued through automatic or operator-triggered compression with enough headroom for one bounded next phase, or an intentional new goal has started in a goal-named session from repository truth.
 
 10. Continue toward the goal.
    - Unless the operator explicitly stops, pauses, narrows scope, or a real blocker requires their decision, immediately select and dispatch the next planned bounded phase after a verified review/commit checkpoint. Do not leave a finished worker idle merely to report normal progress.
@@ -238,7 +232,7 @@ Include these requirements in the review task:
 - A fresh `/new` session reduces carry-over context but does not make the executor independent. This is a role-separated self-review; Hermes must still verify it, and high-risk changes may require an external reviewer.
 - Do not use `/loop` for implementation and review work. It is cadence-driven prompt replay, which can repeat stale work and lacks `/goal`'s outcome, verification, constraints, boundaries, and stop-condition contract. Use it only for bounded external polling. `/goal resume` keeps the same objective and does not free context; use automatic compression or the documented pause/compress/resume sequence instead. The orchestrator cannot execute its own slash commands. After every goal-named `/new --yes`, send `/busy queue` before any model, goal, or task prompt so accidental follow-up messages queue rather than redirecting work.
 - Do not describe `/stop` as an immediate executor interrupt. It stops Hermes background processes and, under `/busy queue`, runs only as a later queued turn. An explicit operator stop request pauses the goal first, then prompts `/stop` and verifies the settled pane state.
-- Do not use `--resume latest` as a review handoff. It may select an unrelated terminal-aware or globally recent session; search by task evidence, then inspect the current checkout.
+- Do not use `--resume latest` as context recovery. It may select an unrelated terminal-aware or globally recent session; read the selected CHG and inspect the current checkout first.
 - Agent completion is not verification. Inspect the diff and execute checks yourself.
 - More parallelism often creates merge conflicts and diluted ownership. Prefer one implementer unless tasks are demonstrably disjoint.
 - The executor performs both roles sequentially in distinct goal-named sessions: begin a fresh session before every model switch, use the reviewer model only for a read-only review phase, and start another fresh implementer session only for confirmed fixes.
@@ -260,6 +254,6 @@ Before reporting a task done, confirm all of the following:
 - The final diff matches the agreed scope and preserves unrelated user changes.
 - Relevant tests, lint, type checks, and build commands were actually run or named as blockers.
 - Review findings have concrete dispositions with evidence.
-- Every multi-phase checkpoint has a handoff record with the current workspace/base, exact evidence references, and the next bounded phase; the orchestrator can continue its goal after compression or start an intentional new goal without replaying the complete transcript.
+- Every material multi-phase checkpoint updates the CHG with the phase transition and concise evidence; any review receipt is committed, frozen, and review-only. A fresh session can resume from repository truth without a profile-local continuation file.
 - No unapproved external side effect, commit, push, deployment, or credential change occurred.
 - The final summary separates verified results, skipped checks, and remaining risks.

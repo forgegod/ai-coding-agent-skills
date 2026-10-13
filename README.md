@@ -60,13 +60,10 @@ Installations become available in new sessions. Existing local copies can produc
 ### Run the autonomous implementation-review goal
 
 Use `autonomous-implementation-review` from the orchestrator session, not an
-executor pane. The two code blocks below are **messages you send**. The text
-between them describes agent behaviour and is **not** another prompt to paste.
+executor pane. It coordinates implementation and review; it does not replace a
+project's planning records or create a second progress tracker.
 
 #### Choose the progress authority first
-
-`autonomous-implementation-review` coordinates executor sessions and reviews;
-it does not replace the planning skills or create a second progress tracker.
 
 - **Material change with no active CHG:** use `application-records`, then
   `phased-plan-design`, to create or revise the CHG. Resolve only the outcome or
@@ -74,69 +71,53 @@ it does not replace the planning skills or create a second progress tracker.
   phase table and gates.
 - **Selected active CHG phase:** use `phased-plan-execution` as the execution
   authority. The orchestrator reads the CHG, CAPs, and DOX chain for scope,
-  phase gate, and status. The user need only identify the CHG and phase, plus
-  any constraint not already recorded.
-- **Non-material standalone work:** no CAP/CHG is required. Provide a compact
-  task packet in the first prompt below.
+  phase gate, and status.
+- **Non-material standalone work:** no CAP/CHG is required. Use a bounded goal
+  with explicit verification and constraints.
 
-**Do not answer every placeholder below when an active CHG already answers it.**
-For an existing phase, this shorter preparation prompt is enough:
+#### Start a selected CHG phase
 
-```text
-/autonomous-implementation-review Prepare only the task packet and durable handoff record; do not dispatch an executor yet.
+If the active CHG or phase is not already selected, run
+`/phased-plan-overview` first. It remains read-only: it lists active records,
+applies the selection rules, and, only after a phase is selected or unambiguous,
+returns the exact command below for the operator to send.
 
-Progress authority: docs/changes/active/CHG-<number>.md
-Selected phase: <number or phase name>
-Additional constraints: <only constraints not already in the CHG, or none>
-```
-
-The agent must read the named CHG and use `phased-plan-execution`; it asks for
-clarification only if the record does not select a phase, lacks an executable
-gate, or leaves a required decision unresolved.
-
-#### 1. Prompt the orchestrator for standalone non-material work
-
-Send this one message. It creates the task packet and durable handoff record,
-but must not dispatch an executor:
+The operator supplies only the CHG and phase. Hermes' `/goal draft` expands the
+short request into a persisted completion contract and immediately starts it:
 
 ```text
-/autonomous-implementation-review Prepare only the task packet and durable handoff record at <handoff-record path>; do not dispatch an executor yet.
-
-Outcome: <desired result>
-Scope: <included paths or behaviour>
-Non-goals: <excluded work>
-Acceptance criteria: <testable requirements>
-Workspace/base: <repository and base commit or branch>
-Required verification: <tests, lint, build>
-Constraints: no commits, pushes, deployments, secrets, or external writes.
+/goal draft Execute phase <number or name> of docs/changes/active/CHG-<number>.md using autonomous-implementation-review and phased-plan-execution.
 ```
 
-**What the agent does next:** it reads the repository and returns the prepared
-task packet and handoff-record location. It does not start a worker. Review that
-result before continuing; correct missing scope or acceptance criteria in a new
-message if necessary.
+The agent must load both named skills, read the selected CHG, linked CAPs, and
+applicable DOX before dispatching. The CHG supplies scope, boundaries, the
+phase gate, and status; add only constraints that are not already recorded.
+Use `/goal show` to inspect the drafted contract. Pause or clear it if it
+materially misstates the CHG.
 
-#### 2. Start the orchestrator goal
+Resume on a new session or machine with the same concise command. The current
+repository—not profile state or a prior transcript—determines what can resume.
 
-Send this one message after the preparation result is acceptable. `/goal` starts
-immediately, and its judge only continues while the acceptance criteria remain
-unproven. `Continue` is a `/goal` control verb, so `--` makes the following text
-the goal rather than a resume command:
+#### Start bounded standalone work
 
-```text
-/goal -- Continue <task name> from <handoff-record path>. Read the handoff record and current workspace before acting. Execute bounded implementation, verification, review, or confirmed-fix phases; update the handoff record with evidence; preserve unrelated changes; do not commit, push, deploy, or access secrets.
+For non-material work, use `/goal draft <concise objective>`. State any required
+verification and constraints in that objective. Do not create a profile-local
+continuation document. If the adopting project requires a durable artifact, use
+only its documented repository-tracked location.
 
-verify: every acceptance criterion is verified by the required checks
-constraints: preserve unrelated changes; no commits, pushes, deployments, secrets, or external writes
-boundaries: <agreed paths and systems>
-stop when: a real user decision or external dependency blocks progress
-```
+#### What persists across sessions and machines
 
-**What the agent does next:** it selects and dispatches the executor, verifies
-each implementation and review phase, and continues until the contract is
-verified or the stated stop condition applies. Do not paste the agent's reports
-back into the goal; they are evidence for the agent to record in the handoff
-file and for the operator to inspect.
+- `docs/changes/active/CHG-*.md` is the sole mutable authority for a material
+  change: phase, scope, gate, decisions, evidence, and next executable action.
+- `docs/changes/reviews/CHG-<number>/` may retain a committed, frozen,
+  review-only receipt when the project needs one. It is evidence, never another
+  progress plan.
+- Scratch logs, patches, and agent reports are temporary evidence only. They are
+  never required to resume work.
+
+The [Hermes workflow research record](docs/research/hermes-autonomous-goal-workflow.md)
+documents the evidence behind this boundary, the existing `/goal draft` option,
+and the future custom-shortcut proposal.
 
 #### Fresh-session busy-input protection
 
@@ -154,18 +135,6 @@ it prompts that executor with `/stop` to stop Hermes background processes and
 then verifies the pane state. `/stop` is not an immediate foreground-turn
 interrupt; with `/busy queue` it is queued until the current role turn finishes.
 Do not use `ctrl+c` as an undocumented substitute.
-
-For a selected CHG phase, replace the generic goal with a phase-specific one.
-The CHG supplies outcome, boundaries, and status; copy its exact verification
-gate rather than inventing a second checklist:
-
-```text
-/goal Execute only phase <number or name> of docs/changes/active/CHG-<number>.md. Load phased-plan-execution and keep that CHG as the sole progress authority. Read the CHG, linked CAPs, and applicable DOX before dispatching; update the CHG only as that skill requires.
-
-verify: <the selected CHG phase's exact verification gate>
-constraints: <only additional operator constraints, or none>
-stop when: the CHG lacks a selected executable phase, a required decision is unresolved, or an external dependency blocks progress
-```
 
 Do not use `/loop` for implementation and review: it replays a fixed prompt on
 a cadence and lacks `/goal`'s outcome, verification, constraint, boundary, and
@@ -190,8 +159,9 @@ session:
 ```
 
 An agent printing a slash command does not execute it in its own session. Keep
-the handoff record current so automatic compression and a later fresh session
-have grounded task state without replaying full logs or diffs.
+the CHG and any committed review receipt current so automatic compression and a
+later fresh session have grounded task state without replaying full logs or
+diffs.
 
 ### GitHub fallback
 
