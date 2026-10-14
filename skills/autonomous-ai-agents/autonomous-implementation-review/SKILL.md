@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.2.9
+version: 0.3.0
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -52,6 +52,12 @@ Do not use this for a trivial one-file edit, credentials, destructive production
 - When an operator wants to compact earlier, they—not the running agent—run this sequence in the **orchestrator** session: `/goal pause`, `/compress here 2`, inspect `/context`, then `/goal resume`. Pausing stops automatic continuation without clearing the goal; compression reduces active context while preserving goal state and session history. Do not send these commands to `exec`; executor sessions are already reset for each role phase. An assistant response containing slash-command text does not execute those commands in its own session.
 - An operator starts a new orchestrator session only at an intentional goal boundary: pause or clear the old goal, use `/new --yes <next-goal-name>` to bypass the reset confirmation, then send `/busy queue` before seeding it from the selected CHG and setting the next `/goal`. Queue mode prevents a follow-up message from redirecting active goal work. Use `session_search` only to retrieve a specific prior decision or claim, then verify it against the repository; do not use `/resume` to make an overloaded orchestrator session small.
 - Keep role prompts compact: pass the task packet, paths, commit IDs, and acceptance criteria. Let agents inspect the working tree and reports themselves; never paste full diffs, test logs, or prior transcripts into every phase.
+
+### Goal-scoped finalization authority
+
+- A terminal goal closes its implementation worktree automatically when the request or project policy grants goal-scoped finalization authority. `commit` authorizes integration and a commit; `push` is separate authority and must be explicit. Do not infer either from a goal name, executor identity, or a passing test.
+- Record that authority in the goal packet. If it is absent, complete verification and review but leave the worktree intact and report the exact ready-to-commit boundary; do not treat a manual closeout as silently authorized.
+- Finalization is part of the goal, not an operator cleanup chore: after the verified gate and review approve the same frozen diff, integrate the phase, commit it through `git-commit-message`, verify the commit, and remove the dedicated worktree. A terminal goal must not remain active solely because its verified changes are still stranded in a worktree.
 
 ### Executor turn-cap recovery
 
@@ -186,10 +192,12 @@ For non-material standalone work, use `/goal draft <concise objective>` with its
    - Limit review/fix passes to two by default. Escalate to the user with the evidence if a third pass is needed or requirements conflict.
    - Completion: every finding is fixed, explicitly declined with evidence, or surfaced as a user decision.
 
-8. Close out a verified checkpoint.
-   - Recheck the final diff, current status, applicable documentation contracts, and the exact required test/lint/build commands.
-   - Update the CHG with the phase transition and concise evidence as `phased-plan-execution` requires. Retain a committed review-only receipt only when the project needs one; keep logs and patches outside the repository as temporary evidence.
-   - Completion: the checkpoint is verified, the CHG identifies its next action, and any blocker is named plainly.
+8. Close out a verified checkpoint or terminal goal.
+   - Recheck the final diff, current status, applicable documentation contracts, and the exact required test/lint/build commands. Update the CHG with the phase transition and concise evidence as `phased-plan-execution` requires. Retain a committed review-only receipt only when the project needs one; keep logs and patches outside the repository as temporary evidence.
+   - After the verified phase gate and review approve the same frozen diff, apply goal-scoped finalization authority immediately. Inspect the primary checkout and worktree diff together, preserve unrelated primary changes, integrate only the approved phase boundary, and rerun the phase gate in the integration checkout before committing.
+   - Use `git-commit-message` to preview the exact batch, stage only its paths, run hooks, and verify `git log -1` plus `git status --short`. When finalization authority covers the batch, do not stop for a manual closeout confirmation after the preview. Push only when the goal or project policy explicitly authorizes push; read back the remote tracking ref before reporting success.
+   - After integration and the verified commit, close the dedicated worktree with `git worktree remove <path>`. Never force removal over uncommitted work, remove the primary checkout, or delete a branch with unclear ownership. Report a failed removal as a blocker rather than leaving a terminal goal deceptively complete.
+   - Completion: the checkpoint is verified and the CHG identifies its next action; for an authorized terminal goal, the approved diff is committed, any authorized push is verified, and the dedicated worktree is removed.
 
 9. Rotate orchestration context when needed.
    - At every checkpoint, inspect `/context`. `/goal resume` continues the same objective and does not reclaim context; it must never be selected as a context-reset mechanism.
@@ -199,6 +207,7 @@ For non-material standalone work, use `/goal draft <concise objective>` with its
 
 10. Continue toward the goal.
    - Unless the operator explicitly stops, pauses, narrows scope, or a real blocker requires their decision, immediately select and dispatch the next planned bounded phase after a verified review/commit checkpoint. After executor cap exhaustion, first reconcile the CHG phase row and current verification state, then dispatch the exact unfinished bounded action in a fresh executor session. Do not leave a finished worker idle merely to report normal progress.
+   - When the selected goal itself reaches its terminal outcome, execute Step 8 and report terminal completion. Do not re-dispatch the completed phase, repeat a stale goal prompt, or advance to a later CHG phase without a new operator request.
    - Honor explicit standing authorization for approved commit proposals, but still follow repository commit policy and never invent permission for an unreviewed batch.
    - Continue until every requested record is complete, cancelled, blocked on a real dependency, or requires an operator decision. Report only terminal completion or an actionable blocker.
    - Completion: the next implementation or review worker is actively running, or the loop has an evidenced terminal state.
@@ -265,5 +274,6 @@ Before reporting a task done, confirm all of the following:
 - Relevant tests, lint, type checks, and build commands were actually run or named as blockers.
 - Review findings have concrete dispositions with evidence.
 - Every material multi-phase checkpoint updates the CHG with the phase transition and concise evidence; any review receipt is committed, frozen, and review-only. A fresh session can resume from repository truth without a profile-local continuation file.
+- When goal-scoped finalization authority exists, the integrated primary checkout has the verified commit, `git log -1` and `git status --short` were read back, any authorized push matches its remote tracking ref, and `git worktree remove <path>` closed the dedicated worktree.
 - No unapproved external side effect, commit, push, deployment, or credential change occurred.
 - The final summary separates verified results, skipped checks, and remaining risks.

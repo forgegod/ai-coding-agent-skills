@@ -90,6 +90,10 @@ test("autonomous-implementation-review packages its selection helper", async () 
   assert.match(source, /Do not install or depend on `herdr integration install hermes` for lifecycle monitoring/);
   assert.match(source, /resumable session ID for server-restart recovery/);
   assert.match(source, /Do not poll terminal text, diffs, or workspace state to decide that the executor has settled/);
+  assert.match(source, /Goal-scoped finalization authority/);
+  assert.match(source, /After the verified phase gate and review approve the same frozen diff/);
+  assert.match(source, /git worktree remove <path>/);
+  assert.match(source, /Push only when the goal or project policy explicitly authorizes push/);
   assert.match(helper, /herdr pane list/);
 });
 
