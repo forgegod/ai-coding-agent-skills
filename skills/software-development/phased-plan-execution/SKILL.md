@@ -1,7 +1,7 @@
 ---
 name: phased-plan-execution
 description: Use when executing one CAP/CHG-backed phase and keeping the active change record synchronized with verified work.
-version: 1.1.0
+version: 1.1.1
 author: AI Software Blueprint
 license: MIT
 metadata:
@@ -46,15 +46,20 @@ a CHG lifecycle onto a refactor with no observable outcome.
    regenerate HTML, render PNG, and synchronize CAP/manifest/index links.
 4. Classify a new finding immediately. Add required-now work to this phase or add
    a prerequisite phase before changing source. Route an independent scope split
-   through `phased-plan-refactoring`. Do not preserve actionable work only in
-   chat, temporary files, or a profile-private plan.
+   through `phased-plan-refactoring`. If a post-gate correction or review finding
+   changes a row already marked done, restore that row to `in-progress` before
+   editing; its former gate/review evidence applies only to the older frozen diff.
+   Do not preserve actionable work only in chat, temporary files, or a
+   profile-private plan.
 5. Run the phase gate. It includes the affected tests and every project check the
    phase names. Fix resolvable failures before proceeding.
    A visual handoff gate includes generation, rendering, and visual inspection;
    record validation alone cannot prove current renders or honest surface metadata.
-6. After the gate passes, update the CHG row to `done (<evidence>)`. Update the
-   CAP in the same reviewed slice whenever current behaviour changed. Do not mark
-   a row done because edits merely look complete.
+6. After the gate passes and any required independent review approves the same
+   frozen diff, update the CHG row to `done (<evidence>)`. Update the CAP in the
+   same reviewed slice whenever current behaviour changed. Do not mark a row done
+   because edits merely look complete. A later correction invalidates that done
+   status until the current diff reruns the gate and required review.
 7. Review the phase-only diff, create the repository's required checkpoint, and
    verify the checkpoint according to local Git policy. Keep generated verification
    byproducts out of the reviewed scope.
@@ -78,7 +83,12 @@ a CHG lifecycle onto a refactor with no observable outcome.
 - One active material request has one mutable progress authority. A ticket,
   checklist, private plan, or prior commit cannot replace it.
 - A phase changes from `pending` to `in-progress` to `done (<evidence>)` only in
-  that order. Keep one phase in progress at a time.
+  that order unless post-gate work invalidates its evidence; then restore that
+  exact row to `in-progress` before correcting it. Keep one phase in progress at
+  a time.
+- The phase table is authoritative. Execution notes and review receipts must
+  agree with it; narrative prose cannot leave a done row overridden by an
+  informal “still in progress” claim.
 - Close and archive only after the CAP, record validator, affected tests, and
   required repository integration gate agree on the implemented state.
 

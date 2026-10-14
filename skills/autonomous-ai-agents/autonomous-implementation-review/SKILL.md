@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.2.8
+version: 0.2.9
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -52,6 +52,14 @@ Do not use this for a trivial one-file edit, credentials, destructive production
 - When an operator wants to compact earlier, they—not the running agent—run this sequence in the **orchestrator** session: `/goal pause`, `/compress here 2`, inspect `/context`, then `/goal resume`. Pausing stops automatic continuation without clearing the goal; compression reduces active context while preserving goal state and session history. Do not send these commands to `exec`; executor sessions are already reset for each role phase. An assistant response containing slash-command text does not execute those commands in its own session.
 - An operator starts a new orchestrator session only at an intentional goal boundary: pause or clear the old goal, use `/new --yes <next-goal-name>` to bypass the reset confirmation, then send `/busy queue` before seeding it from the selected CHG and setting the next `/goal`. Queue mode prevents a follow-up message from redirecting active goal work. Use `session_search` only to retrieve a specific prior decision or claim, then verify it against the repository; do not use `/resume` to make an overloaded orchestrator session small.
 - Keep role prompts compact: pass the task packet, paths, commit IDs, and acceptance criteria. Let agents inspect the working tree and reports themselves; never paste full diffs, test logs, or prior transcripts into every phase.
+
+### Executor turn-cap recovery
+
+- Treat executor turn or tool-call exhaustion as a terminal lifecycle event, not as an executor-controlled pause. Its forced final reply cannot run checks, update the CHG, or send itself a generic “continue as planned” prompt.
+- The orchestrator must read that report, inspect the current diff and verification state, and dispatch a fresh, goal-named executor session for the exact unfinished bounded action. A turn cap is not a user decision or a completed checkpoint.
+- Keep each executor packet below the configured cap: one defect cluster, one focused verification rerun, one phase gate, or one review. Split dependent work at a verified boundary rather than merely raising the cap and producing a larger unreviewed diff.
+- If a correction occurs after a phase row was marked done or after its frozen review, restore that row to `in-progress` before further correction work. The prior gate and review apply only to their exact freeze; do not leave a done table row and append contradictory narrative progress elsewhere.
+- Continue automatically after cap recovery unless a real external dependency, explicit operator pause, or unresolved decision blocks the next bounded action.
 
 ### Herdr session selection
 
@@ -142,6 +150,7 @@ For non-material standalone work, use `/goal draft <concise objective>` with its
 2. Choose the execution shape.
    - Use one implementer worktree for dependent changes.
    - Split only genuinely independent work into separate worktrees; assign non-overlapping paths and integration ownership.
+   - Budget every executor packet below its configured turn/tool-call cap. Reserve separate packets for a material review finding, final verification, and review rather than combining them into one cap-prone run.
    - Use `delegate_task` for bounded research or code-reading subtasks. Use a provider CLI through `terminal` only after verifying its current CLI and authentication. Use a background process only for a long bounded job that needs live monitoring.
    - Completion: every agent has an explicit role, workspace, budget, and output contract.
 
@@ -189,7 +198,7 @@ For non-material standalone work, use `/goal draft <concise objective>` with its
    - Completion: the orchestrator has continued through automatic or operator-triggered compression with enough headroom for one bounded next phase, or an intentional new goal has started in a goal-named session from repository truth.
 
 10. Continue toward the goal.
-   - Unless the operator explicitly stops, pauses, narrows scope, or a real blocker requires their decision, immediately select and dispatch the next planned bounded phase after a verified review/commit checkpoint. Do not leave a finished worker idle merely to report normal progress.
+   - Unless the operator explicitly stops, pauses, narrows scope, or a real blocker requires their decision, immediately select and dispatch the next planned bounded phase after a verified review/commit checkpoint. After executor cap exhaustion, first reconcile the CHG phase row and current verification state, then dispatch the exact unfinished bounded action in a fresh executor session. Do not leave a finished worker idle merely to report normal progress.
    - Honor explicit standing authorization for approved commit proposals, but still follow repository commit policy and never invent permission for an unreviewed batch.
    - Continue until every requested record is complete, cancelled, blocked on a real dependency, or requires an operator decision. Report only terminal completion or an actionable blocker.
    - Completion: the next implementation or review worker is actively running, or the loop has an evidenced terminal state.
@@ -230,6 +239,7 @@ Include these requirements in the review task:
 ## Pitfalls
 
 - A fresh `/new` session reduces carry-over context but does not make the executor independent. This is a role-separated self-review; Hermes must still verify it, and high-risk changes may require an external reviewer.
+- Do not expect an executor that hit its turn/tool-call cap to resume itself. Its final response is evidence for the orchestrator; start a fresh bounded executor session after inspecting the report, diff, CHG row, and failed or skipped verification.
 - Do not use `/loop` for implementation and review work. It is cadence-driven prompt replay, which can repeat stale work and lacks `/goal`'s outcome, verification, constraints, boundaries, and stop-condition contract. Use it only for bounded external polling. `/goal resume` keeps the same objective and does not free context; use automatic compression or the documented pause/compress/resume sequence instead. The orchestrator cannot execute its own slash commands. After every goal-named `/new --yes`, send `/busy queue` before any model, goal, or task prompt so accidental follow-up messages queue rather than redirecting work.
 - Do not describe `/stop` as an immediate executor interrupt. It stops Hermes background processes and, under `/busy queue`, runs only as a later queued turn. An explicit operator stop request pauses the goal first, then prompts `/stop` and verifies the settled pane state.
 - Do not use `--resume latest` as context recovery. It may select an unrelated terminal-aware or globally recent session; read the selected CHG and inspect the current checkout first.

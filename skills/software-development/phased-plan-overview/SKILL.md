@@ -1,7 +1,7 @@
 ---
 name: phased-plan-overview
 description: Use when inspecting active CAP/CHG-backed work and selecting a repository-tracked change record to resume, inspect, or close.
-version: 1.0.1
+version: 1.0.2
 author: AI Software Blueprint
 license: MIT
 metadata:
@@ -28,8 +28,11 @@ autonomous implementation-review workflow; do not run it yourself.
 3. For every active CHG, report: status, affected CAPs, the one in-progress phase
    or first pending phase, its verification gate, and any explicit blocker.
 4. Validate obvious drift before acting: an active record is not `done`, an
-   in-progress record has exactly one in-progress phase, and named CAPs exist.
-   Use the repository record validator for structural confirmation.
+   in-progress record has exactly one in-progress phase, named CAPs exist, and
+   the latest execution/review evidence does not contradict the phase-table row.
+   Use the repository record validator for structural confirmation. If prose says
+   a done phase needs more corrections, gate work, or review, report the record
+   as ambiguous rather than treating that prose as a second progress authority.
 5. Resume only the CHG chosen by the operator or unambiguously identified by an
    explicit dependency/order rule. State the exact selected CHG path and phase,
    then print this ready-to-send command with those literal values:
@@ -41,7 +44,9 @@ autonomous implementation-review workflow; do not run it yourself.
    Do not add a second checklist, private continuation file, or copied phase
    details. The next `/goal draft` turn reads the CHG and creates the completion
    contract; this overview turn remains read-only and must not dispatch work.
-6. Inspect a blocked or ambiguous record without changing it. If no active CHG
+6. Inspect a blocked or ambiguous record without changing it. State that
+   `phased-plan-execution` must reconcile the phase table before the change can
+   resume; do not print a launch command for the ambiguous record. If no active CHG
    exists, report that no material work is scheduled; do not synthesize work from
    archives or old commits. Do not print a launch command until an operator has
    selected a phase or an explicit dependency/order rule makes selection
@@ -57,6 +62,10 @@ autonomous implementation-review workflow; do not run it yourself.
   receipt but cannot be resumed as active progress.
 - A material request with no active CHG routes to `application-records` and then
   `phased-plan-design`; a refactor with no material outcome does not.
+- The phase table is the sole mutable progress authority. A later correction after
+  done evidence must be returned to `in-progress` by `phased-plan-execution`;
+  overview reports the inconsistency but never repairs or silently chooses a
+  narrative phase.
 
 ## Verification
 
