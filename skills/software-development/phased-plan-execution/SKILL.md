@@ -1,7 +1,7 @@
 ---
 name: phased-plan-execution
 description: Use when executing one CAP/CHG-backed phase and keeping the active change record synchronized with verified work.
-version: 1.1.1
+version: 1.1.2
 author: AI Software Blueprint
 license: MIT
 metadata:
@@ -36,7 +36,8 @@ a CHG lifecycle onto a refactor with no observable outcome.
    active, affected CAP IDs exist, and only the selected phase is or will become
    `in-progress`.
 2. Mark the selected phase `in-progress` in the CHG before implementation. Do not
-   start the next phase opportunistically.
+   start the next phase opportunistically. A worktree copy is only a candidate;
+   the integration commit must carry that exact table transition to the target ref.
 3. Read definitions, usages, local contracts, and focused tests before editing.
    Implement the phase's complete vertical slice: behaviour, CAP delta, and
    executable evidence belong together when the outcome is material.
@@ -59,10 +60,15 @@ a CHG lifecycle onto a refactor with no observable outcome.
    frozen diff, update the CHG row to `done (<evidence>)`. Update the CAP in the
    same reviewed slice whenever current behaviour changed. Do not mark a row done
    because edits merely look complete. A later correction invalidates that done
-   status until the current diff reruns the gate and required review.
+   status until the current diff reruns the gate and required review. Keep the
+   replacement row and its evidence in the integration diff; do not append a
+   conflicting progress note separately.
 7. Review the phase-only diff, create the repository's required checkpoint, and
    verify the checkpoint according to local Git policy. Keep generated verification
-   byproducts out of the reviewed scope.
+   byproducts out of the reviewed scope. The integration commit must contain the
+   exact phase-table transition. Before removing a dedicated worktree or starting
+   the next phase, use `terminal` to inspect `git show <commit>:<chg-path>` and
+   confirm the target ref has that row and no contradictory current-state prose.
 8. If phases remain, leave all later rows `pending` and return to the CHG on the
    next execution cycle. When the final gate passes, set the CHG status `done`,
    move it to `docs/changes/archive/`, refresh the change index, and hand control
@@ -73,6 +79,18 @@ a CHG lifecycle onto a refactor with no observable outcome.
    owner links rather than moving its assets into active/archive or the product
    tree. Apply the same retention rule to cancelled changes without claiming
    implementation; removing an owner also removes its package.
+
+## Worktree synchronization
+
+- The CHG in the target ref is the progress authority. An uncommitted worktree
+  change, scratch patch, review transcript, or agent report is evidence only.
+- Integrate the selected row's `in-progress` or `done` state with the code and
+  tests it describes. If project policy requires separate commits, they must be
+  adjacent and the target-ref readback must show the completed transition before
+  worktree removal or further phase selection.
+- If a merged implementation lacks its matching phase state, stop. Reconcile the
+  target CHG before more work; never compensate by appending a narrative claim
+  that a different worktree had the correct status.
 
 ## CAP/CHG invariants
 
@@ -89,6 +107,8 @@ a CHG lifecycle onto a refactor with no observable outcome.
 - The phase table is authoritative. Execution notes and review receipts must
   agree with it; narrative prose cannot leave a done row overridden by an
   informal “still in progress” claim.
+- Worktree lifecycle does not synchronize the record. The integration commit,
+  verified from the target ref, is the only durable phase transition.
 - Close and archive only after the CAP, record validator, affected tests, and
   required repository integration gate agree on the implemented state.
 
@@ -98,3 +118,5 @@ For each phase, record the exact passed command or durable evidence in the CHG.
 Before closing, run the record validation command, affected behaviour tests, and
 the repository-wide gate. Confirm the archived CHG is no longer in
 `docs/changes/active/` and the CAP describes the resulting current behaviour.
+For a worktree execution, also read the committed target-ref CHG before removing
+the worktree or reporting the next phase.

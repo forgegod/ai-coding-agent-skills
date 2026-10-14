@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.3.0
+version: 0.3.1
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -58,6 +58,13 @@ Do not use this for a trivial one-file edit, credentials, destructive production
 - A terminal goal closes its implementation worktree automatically when the request or project policy grants goal-scoped finalization authority. `commit` authorizes integration and a commit; `push` is separate authority and must be explicit. Do not infer either from a goal name, executor identity, or a passing test.
 - Record that authority in the goal packet. If it is absent, complete verification and review but leave the worktree intact and report the exact ready-to-commit boundary; do not treat a manual closeout as silently authorized.
 - Finalization is part of the goal, not an operator cleanup chore: after the verified gate and review approve the same frozen diff, integrate the phase, commit it through `git-commit-message`, verify the commit, and remove the dedicated worktree. A terminal goal must not remain active solely because its verified changes are still stranded in a worktree.
+
+### Worktree-to-record synchronization
+
+- A worktree phase-table edit is a candidate until the integration commit contains it. Scratch patches, agent reports, and a removed worktree cannot advance, reopen, or close a phase.
+- Make the selected row `in-progress` in the implementation worktree before source edits, then keep that CHG edit in the same integration boundary as the phase work. Never recreate only its evidence prose on the target branch while dropping or replacing the table transition.
+- When a post-gate correction reopens a phase, restore the target CHG row to `in-progress` before the correction is integrated. A later `done` update must replace that state only after the current gate and review approve the current frozen diff.
+- Verify the committed target-ref CHG with `git show <commit>:<chg-path>` before removing the worktree. It must contain the expected row state and evidence, with no contradictory current-tense narrative. If it does not, keep the worktree and reconcile the target record before proceeding.
 
 ### Executor turn-cap recovery
 
@@ -194,9 +201,9 @@ For non-material standalone work, use `/goal draft <concise objective>` with its
 
 8. Close out a verified checkpoint or terminal goal.
    - Recheck the final diff, current status, applicable documentation contracts, and the exact required test/lint/build commands. Update the CHG with the phase transition and concise evidence as `phased-plan-execution` requires. Retain a committed review-only receipt only when the project needs one; keep logs and patches outside the repository as temporary evidence.
-   - After the verified phase gate and review approve the same frozen diff, apply goal-scoped finalization authority immediately. Inspect the primary checkout and worktree diff together, preserve unrelated primary changes, integrate only the approved phase boundary, and rerun the phase gate in the integration checkout before committing.
+   - After the verified phase gate and review approve the same frozen diff, apply goal-scoped finalization authority immediately. Inspect the primary checkout and worktree diff together, preserve unrelated primary changes, integrate only the approved phase boundary including its CHG row, and rerun the phase gate in the integration checkout before committing.
    - Use `git-commit-message` to preview the exact batch, stage only its paths, run hooks, and verify `git log -1` plus `git status --short`. When finalization authority covers the batch, do not stop for a manual closeout confirmation after the preview. Push only when the goal or project policy explicitly authorizes push; read back the remote tracking ref before reporting success.
-   - After integration and the verified commit, close the dedicated worktree with `git worktree remove <path>`. Never force removal over uncommitted work, remove the primary checkout, or delete a branch with unclear ownership. Report a failed removal as a blocker rather than leaving a terminal goal deceptively complete.
+   - After integration and the verified commit, use `git show <commit>:<chg-path>` to verify that the target ref contains the exact phase-table transition. Only then close the dedicated worktree with `git worktree remove <path>`. Never force removal over uncommitted work, remove the primary checkout, or delete a branch with unclear ownership. Report a failed removal or record mismatch as a blocker rather than leaving a terminal goal deceptively complete.
    - Completion: the checkpoint is verified and the CHG identifies its next action; for an authorized terminal goal, the approved diff is committed, any authorized push is verified, and the dedicated worktree is removed.
 
 9. Rotate orchestration context when needed.
@@ -244,6 +251,7 @@ Include these requirements in the review task:
 - Keep agent logs and temporary material under the active Hermes scratch directory; do not place them in the repository unless they are deliberate project artifacts.
 - Review only after the implementer has stopped or reached a stable checkpoint; do not review a moving diff.
 - Before integrating parallel work, inspect diffs together and run integration verification from one designated workspace.
+- Do not remove a worktree until the integrating commit's CHG record has been read back from the target ref. A local record edit or a handoff sentence is not a substitute.
 
 ## Pitfalls
 
@@ -274,6 +282,6 @@ Before reporting a task done, confirm all of the following:
 - Relevant tests, lint, type checks, and build commands were actually run or named as blockers.
 - Review findings have concrete dispositions with evidence.
 - Every material multi-phase checkpoint updates the CHG with the phase transition and concise evidence; any review receipt is committed, frozen, and review-only. A fresh session can resume from repository truth without a profile-local continuation file.
-- When goal-scoped finalization authority exists, the integrated primary checkout has the verified commit, `git log -1` and `git status --short` were read back, any authorized push matches its remote tracking ref, and `git worktree remove <path>` closed the dedicated worktree.
+- When goal-scoped finalization authority exists, the integrated primary checkout has the verified commit, `git log -1`, `git status --short`, and `git show <commit>:<chg-path>` were read back, any authorized push matches its remote tracking ref, and `git worktree remove <path>` closed the dedicated worktree.
 - No unapproved external side effect, commit, push, deployment, or credential change occurred.
 - The final summary separates verified results, skipped checks, and remaining risks.

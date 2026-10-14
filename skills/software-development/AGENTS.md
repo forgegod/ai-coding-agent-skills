@@ -22,6 +22,7 @@ Own optional, portable agent workflows for maintaining the canonical capability 
 - `capability-wireframes` owns the portable canonical `docs/product/wireframes/` layout and explicit CAP surface declarations. Review packages stay separate under `docs/changes/reviews/CHG-<number>/`; `application-records` and the phase skills maintain their ownership, implementation handoff, and stable-path retention. Visual artifacts never replace executable behavior evidence.
 - `application-records` decides when CAP/CHG records apply; the packaged `phased-plan-*` skills own their phase design, execution, overview, and restructuring.
 - The active CHG phase table is the only mutable progress authority for material work. Profile-private plans, temporary notes, and tracker checklists do not schedule implementation.
+- For worktree execution, the target ref must contain the matching phase-table transition before worktree removal or later-phase selection; scratch and narrative evidence cannot substitute for that readback.
 
 ## Work Guidance
 

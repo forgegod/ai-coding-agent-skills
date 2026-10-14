@@ -65,6 +65,8 @@ test("autonomous-implementation-review packages its selection helper", async () 
   assert.match(source, /Executor turn-cap recovery/);
   assert.match(source, /forced final reply cannot run checks, update the CHG, or send itself a generic “continue as planned” prompt/);
   assert.match(source, /restore that row to `in-progress` before further correction work/);
+  assert.match(source, /A worktree phase-table edit is a candidate until the integration commit contains it/);
+  assert.match(source, /Verify the committed target-ref CHG with `git show <commit>:<chg-path>` before removing the worktree/);
   assert.match(source, /turn cap is not a user decision or a completed checkpoint/i);
   assert.match(source, /Scratch logs, patches, and agent reports are temporary evidence only/);
   assert.doesNotMatch(source, /durable handoff record|<handoff-record path>|scratch handoff/i);
@@ -95,6 +97,8 @@ test("autonomous-implementation-review packages its selection helper", async () 
   assert.match(source, /git worktree remove <path>/);
   assert.match(source, /Push only when the goal or project policy explicitly authorizes push/);
   assert.match(helper, /herdr pane list/);
+  const ownerContract = await readFile(path.join(skillsRoot, "autonomous-ai-agents", "AGENTS.md"), "utf8");
+  assert.match(ownerContract, /target-?ref/);
 });
 
 test("every SKILL.md carries name, description, and version in its frontmatter", async () => {
@@ -157,6 +161,7 @@ test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
   assert.match(sources.get("phased-plan-execution"), /CHG phase table/i);
   assert.match(sources.get("phased-plan-execution"), /post-gate correction or review finding/i);
   assert.match(sources.get("phased-plan-execution"), /narrative prose cannot leave a done row overridden/i);
+  assert.match(sources.get("phased-plan-execution"), /The integration commit must contain the\s+exact phase-table transition/);
   const overview = sources.get("phased-plan-overview");
   assert.match(overview, /docs\/changes\/active/i);
   assert.match(overview, /\/goal draft Execute phase <selected phase number or name> of <selected active CHG path> using autonomous-implementation-review and phased-plan-execution/);
@@ -164,9 +169,12 @@ test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
   assert.match(overview, /must not dispatch work/);
   assert.match(overview, /latest execution\/review evidence does not contradict the phase-table row/);
   assert.match(overview, /do not print a launch command for the ambiguous record/);
+  assert.match(overview, /An unintegrated worktree, scratch patch, or agent report cannot advance the\s+phase/);
   assert.match(sources.get("phased-plan-refactoring"), /one progress authority/i);
   const rootAgent = await readFile(path.join(root, "AGENTS.md"), "utf8");
   assert.match(rootAgent, /shared agent profile/);
+  const workflowContract = await readFile(path.join(skillsRoot, "software-development", "AGENTS.md"), "utf8");
+  assert.match(workflowContract, /target ref/);
 });
 
 test("skills package separate review storage and a visual handoff gate", async () => {

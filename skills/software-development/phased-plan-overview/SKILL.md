@@ -1,7 +1,7 @@
 ---
 name: phased-plan-overview
 description: Use when inspecting active CAP/CHG-backed work and selecting a repository-tracked change record to resume, inspect, or close.
-version: 1.0.2
+version: 1.0.3
 author: AI Software Blueprint
 license: MIT
 metadata:
@@ -33,6 +33,9 @@ autonomous implementation-review workflow; do not run it yourself.
    Use the repository record validator for structural confirmation. If prose says
    a done phase needs more corrections, gate work, or review, report the record
    as ambiguous rather than treating that prose as a second progress authority.
+   An unintegrated worktree, scratch patch, or agent report cannot advance the
+   phase. If such evidence names a different state, inspect the target ref's CHG
+   record and report the mismatch as ambiguous rather than following the worktree.
 5. Resume only the CHG chosen by the operator or unambiguously identified by an
    explicit dependency/order rule. State the exact selected CHG path and phase,
    then print this ready-to-send command with those literal values:

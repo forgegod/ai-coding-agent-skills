@@ -18,6 +18,7 @@ Herdr pane-selection helper.
 - Never infer autonomous commit authority or a pane selection from labels, focus, or agent identity.
 - The helper accepts only Herdr pane-list JSON and must not control panes or send input.
 - For CAP/CHG work, the tracked CHG is the sole mutable progress authority; do not create profile-local continuation documents.
+- A worktree CHG edit becomes progress only when the integrating commit carries it and target-ref readback confirms the phase table; never close a worktree on scratch or narrative evidence alone.
 - Keep external tool and model references as prerequisites, not bundled dependencies.
 
 ## Verification
