@@ -167,9 +167,12 @@ test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
   assert.match(overview, /\/goal draft Execute phase <selected phase number or name> of <selected active CHG path> using autonomous-implementation-review and phased-plan-execution/);
   assert.match(overview, /Do not print a launch command until an operator has\s+selected a phase/);
   assert.match(overview, /must not dispatch work/);
-  assert.match(overview, /latest execution\/review evidence does not contradict the phase-table row/);
+  assert.match(overview, /latest execution\/review evidence does not contradict a done row/);
   assert.match(overview, /do not print a launch command for the ambiguous record/);
-  assert.match(overview, /An unintegrated worktree, scratch patch, or agent report cannot advance the\s+phase/);
+  assert.match(overview, /Zero `in-progress` rows with a pending\s+phase is a normal verified-boundary state; select the first pending phase/);
+  assert.match(overview, /More than one `in-progress` row is ambiguous/);
+  assert.match(overview, /cannot record a durable transition or completion/);
+  assert.match(overview, /select only the target ref's existing `in-progress` phase or first pending phase/);
   assert.match(sources.get("phased-plan-refactoring"), /one progress authority/i);
   const rootAgent = await readFile(path.join(root, "AGENTS.md"), "utf8");
   assert.match(rootAgent, /shared agent profile/);

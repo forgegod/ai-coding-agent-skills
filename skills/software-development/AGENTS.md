@@ -26,7 +26,7 @@ Own optional, portable agent workflows for maintaining the canonical capability 
 
 ## Work Guidance
 
-Keep the skills complementary: normal material work uses `application-records` plus the relevant `phased-plan-*` entry point; primary human-facing surface work also uses `capability-wireframes`. Keep the skills repository-portable: no profile-local paths or harness-only state.
+Keep the skills complementary: use `application-records` when creating or revising CAP/CHG records, and use the relevant `phased-plan-*` entry point to select or execute an existing CHG. Do not require `application-records` merely to resume an existing record. Primary human-facing surface work also uses `capability-wireframes`. Keep the skills repository-portable: no profile-local paths or harness-only state.
 
 ## Verification
 
