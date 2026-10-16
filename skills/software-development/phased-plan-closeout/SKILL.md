@@ -1,7 +1,8 @@
 ---
 name: phased-plan-closeout
 description: Close a verified CHG phase and hand off the next goal.
-version: 0.1.0
+argument-hint: "[--commit-ff]"
+version: 0.2.0
 author: AI Software Blueprint
 license: MIT
 metadata:
@@ -17,12 +18,19 @@ silently committing unrelated work. It commits and removes a dedicated worktree
 only when the operator or governing goal explicitly authorizes commit; it never
 pushes without separate authorization.
 
+`--commit-ff` is an explicit authorization to commit the reviewed phase and
+integrate it only with `git merge --ff-only`. It is not push authority, does not
+authorize unrelated paths, and does not override a failed gate, unresolved
+review, dirty primary checkout, or incompatible worktree topology.
+
 ## When to Use
 
 - A selected CHG phase passed its named gate and independent review.
 - Its approved phase diff is ready in a dedicated worktree.
 - The operator asks to close and commit that phase, or the active goal grants
   goal-scoped finalization authority.
+- The operator may invoke `/phased-plan-closeout --commit-ff` to grant that
+  commit authority for this closeout and require fast-forward-only integration.
 
 Do not use for an unreviewed diff, a phase with failed or skipped required gates,
 an ambiguous target branch, a working tree with unrelated changes, or to begin a
@@ -33,8 +41,10 @@ later phase.
 - Read the selected CHG, applicable DOX chain, and the final review result.
 - Know the primary checkout, dedicated worktree, worktree branch, target branch,
   CHG path, and selected phase number.
-- Confirm explicit commit authority. A request to inspect or prepare closeout is
-  not commit authority; `push` requires separate explicit authorization.
+- Confirm explicit commit authority. `/phased-plan-closeout --commit-ff`, an
+  explicit request to commit, or goal-scoped finalization authority grants it;
+  a request to inspect or prepare closeout does not. `push` requires separate
+  explicit authorization.
 - Confirm the project permits an `--ff-only` integration. If it requires a pull
   request, rebase, squash merge, or another integration system, use that project
   contract instead and stop rather than improvising.
@@ -46,13 +56,16 @@ later phase.
      worktree diff, and the selected CHG row.
    - Confirm the named phase gate passed on this frozen diff and the final
      independent review has no unresolved findings.
+   - When invoked with `--commit-ff`, do not ask a separate commit-authority
+     question. If a prerequisite fails, report that exact blocker; do not weaken
+     the fast-forward-only, reviewed-boundary, or clean-primary requirements.
    - Completion: one reviewed phase boundary is identified; unrelated changes are
      explicitly excluded.
 
 2. Verify the commit boundary.
    - Use `git-commit-message` to produce the primary dependency-aware batch and
-     preview. Commit exactly that primary batch only when current request or goal
-     grants commit authority.
+    preview. Commit exactly that primary batch only when current request or goal
+     grants commit authority, including `--commit-ff`.
    - Include the selected CHG row, implementation, tests, and current-state
      records needed by that phase. Do not split the phase merely to make a smaller
      commit. Do not use `git add -A` unless every changed path belongs to it.
@@ -114,7 +127,11 @@ later phase.
 - A passing worktree test is not an integrated phase. The target ref and its CHG
   row must be read back before worktree removal.
 - `git-commit-message` still requires its preview. Goal-scoped finalization
-  authority permits applying that primary preview; it does not authorize a push.
+  authority and `--commit-ff` permit applying that primary preview; neither
+  authorizes a push.
+- Do not treat `--commit-ff` as an escape hatch for a dirty target checkout or a
+  worktree branch that is not ahead of it. Those shapes cannot safely satisfy
+  fast-forward-only integration and remain blockers.
 - Never use this skill to bypass an unresolved review finding or a project-specific
   merge policy.
 - Do not auto-run the next prompt. Phase selection and its new goal remain an

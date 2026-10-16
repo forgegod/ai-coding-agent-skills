@@ -108,6 +108,12 @@ it, verifies the target-ref CHG row, removes the dedicated worktree, and prints
 `/goal clear` plus the next bounded `/goal draft` command. It never pushes or
 starts that next goal without separate authorization.
 
+For an explicit one-shot closeout authorization, invoke
+`/phased-plan-closeout --commit-ff`. The flag authorizes committing only the
+reviewed phase batch and requires `git merge --ff-only`; it neither authorizes a
+push nor bypasses the verified gate, review, clean-primary, or worktree-topology
+checks.
+
 #### Start bounded standalone work
 
 For non-material work, use `/goal draft <concise objective>`. State any required

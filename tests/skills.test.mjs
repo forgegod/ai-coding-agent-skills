@@ -187,6 +187,11 @@ test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
     "utf8",
   );
   assert.match(closeout, /name: phased-plan-closeout/);
+  assert.match(closeout, /argument-hint: "\[--commit-ff\]"/);
+  assert.match(closeout, /version: 0\.2\.0/);
+  assert.match(closeout, /\/phased-plan-closeout --commit-ff/);
+  assert.match(closeout, /do not ask a separate commit-authority\s+question/i);
+  assert.match(closeout, /does not override a failed gate, unresolved\s+review, dirty primary checkout/i);
   assert.match(closeout, /git-commit-message/);
   assert.match(closeout, /git merge --ff-only <worktree-branch>/);
   assert.match(closeout, /git rev-parse --abbrev-ref HEAD/);
