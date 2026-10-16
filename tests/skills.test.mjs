@@ -167,8 +167,11 @@ test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
   assert.match(sources.get("phased-plan-execution"), /post-gate correction or review finding/i);
   assert.match(sources.get("phased-plan-execution"), /narrative prose cannot leave a done row overridden/i);
   assert.match(sources.get("phased-plan-execution"), /The integration commit must contain the\s+exact phase-table transition/);
-  assert.match(records, /version: 1\.6\.0/);
+  assert.match(records, /version: 1\.6\.1/);
   assert.match(records, /related_skills: \[capability-wireframes, phased-plan-closeout,/);
+  assert.match(records, /does not change phase state, archive a CHG, or prescribe phase lifecycle/i);
+  assert.match(records, /Those skills select phases and maintain the\s+phase table; do not set a phase to `in-progress` here/i);
+  assert.match(records, /selected `phased-plan-\*` skill owns every CHG phase-state and archive/i);
   const overview = sources.get("phased-plan-overview");
   assert.match(overview, /docs\/changes\/active/i);
   assert.match(overview, /\/goal draft Execute only phase <selected phase number or name> of <selected active CHG path> using autonomous-implementation-review and phased-plan-execution/);
