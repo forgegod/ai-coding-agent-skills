@@ -10,8 +10,10 @@ test("normal installer loop documents all generic software-development skills", 
   const source = await readFile(readme, "utf8");
   const loop = source.match(/^for skill in (.+); do$/m)?.[1]?.split(/\s+/);
   assert.ok(loop, "document a normal installer loop");
-  assert.equal(loop.length, 7);
-  assert.deepEqual(loop, ["application-records", "capability-wireframes", "git-commit-message", "phased-plan-design", "phased-plan-execution", "phased-plan-overview", "phased-plan-refactoring"]);
+  assert.equal(loop.length, 8);
+  assert.deepEqual(loop, ["application-records", "capability-wireframes", "git-commit-message", "phased-plan-design", "phased-plan-execution", "phased-plan-closeout", "phased-plan-overview", "phased-plan-refactoring"]);
+  assert.match(source, /eight-package example/);
+  assert.match(source, /collection of \*\*nine\*\* categorized Agent Skills packages/);
 });
 
 test("directory-discovery instructions separate installation telemetry from authenticated submission", async () => {
@@ -33,10 +35,11 @@ test("autonomous goal documentation distinguishes orchestration from polling", a
   assert.match(source, /### Run the autonomous implementation-review goal/);
   assert.match(source, /#### Choose the progress authority first/);
   assert.match(source, /#### Start a selected CHG phase/);
-  assert.match(source, /\/goal draft Execute phase <number or name> of docs\/changes\/active\/CHG-<number>\.md using autonomous-implementation-review and phased-plan-execution/);
+  assert.match(source, /\/goal draft Execute only phase <number or name> of docs\/changes\/active\/CHG-<number>\.md using autonomous-implementation-review and phased-plan-execution/);
+  assert.match(source, /Stop when the selected phase is verified, reviewed, and recorded as `done`; do not start another phase/);
   assert.match(source, /The operator supplies only the CHG and phase/);
   assert.match(source, /`\/phased-plan-overview` first/);
-  assert.match(source, /returns the exact command below for the operator to send/);
+  assert.match(source, /returns the exact bounded command below for the operator to send/);
   assert.match(source, /\[Hermes workflow research record\]\(docs\/research\/hermes-autonomous-goal-workflow\.md\)/);
   assert.match(source, /phased-plan-design/);
   assert.match(source, /phased-plan-execution/);

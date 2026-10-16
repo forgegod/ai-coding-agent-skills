@@ -60,7 +60,7 @@ test("autonomous-implementation-review packages its selection helper", async () 
   assert.match(source, /Do not send these commands to `exec`/);
   assert.match(source, /automatically compresses.*50% by default/i);
   assert.match(source, /assistant response containing slash-command text does not execute/i);
-  assert.match(source, /\/goal draft Execute phase <number or name> of docs\/changes\/active\/CHG-<number>\.md using autonomous-implementation-review and phased-plan-execution/);
+  assert.match(source, /\/goal draft Execute only phase <number or name> of docs\/changes\/active\/CHG-<number>\.md using autonomous-implementation-review and phased-plan-execution/);
   assert.match(source, /The tracked CHG phase table is the only mutable progress authority/);
   assert.match(source, /Executor turn-cap recovery/);
   assert.match(source, /forced final reply cannot run checks, update the CHG, or send itself a generic “continue as planned” prompt/);
@@ -96,6 +96,9 @@ test("autonomous-implementation-review packages its selection helper", async () 
   assert.match(source, /After the verified phase gate and review approve the same frozen diff/);
   assert.match(source, /git worktree remove <path>/);
   assert.match(source, /Push only when the goal or project policy explicitly authorizes push/);
+  assert.match(source, /never use `delegate_task` as the implementation or review executor/i);
+  assert.match(source, /`delegate_task` cannot prove the session-only `\/model` selector/i);
+  assert.match(source, /If Herdr selection or model verification cannot be completed, stop and report the blocker/);
   assert.match(helper, /herdr pane list/);
   const ownerContract = await readFile(path.join(skillsRoot, "autonomous-ai-agents", "AGENTS.md"), "utf8");
   assert.match(ownerContract, /target-?ref/);
@@ -136,6 +139,7 @@ test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
     "application-records",
     "phased-plan-design",
     "phased-plan-execution",
+    "phased-plan-closeout",
     "phased-plan-overview",
     "phased-plan-refactoring",
   ];
@@ -151,6 +155,7 @@ test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
   const phaseSkills = [
     "phased-plan-design",
     "phased-plan-execution",
+    "phased-plan-closeout",
     "phased-plan-overview",
     "phased-plan-refactoring",
   ];
@@ -162,9 +167,12 @@ test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
   assert.match(sources.get("phased-plan-execution"), /post-gate correction or review finding/i);
   assert.match(sources.get("phased-plan-execution"), /narrative prose cannot leave a done row overridden/i);
   assert.match(sources.get("phased-plan-execution"), /The integration commit must contain the\s+exact phase-table transition/);
+  assert.match(records, /version: 1\.6\.0/);
+  assert.match(records, /related_skills: \[capability-wireframes, phased-plan-closeout,/);
   const overview = sources.get("phased-plan-overview");
   assert.match(overview, /docs\/changes\/active/i);
-  assert.match(overview, /\/goal draft Execute phase <selected phase number or name> of <selected active CHG path> using autonomous-implementation-review and phased-plan-execution/);
+  assert.match(overview, /\/goal draft Execute only phase <selected phase number or name> of <selected active CHG path> using autonomous-implementation-review and phased-plan-execution/);
+  assert.match(overview, /Stop when the selected phase is verified, reviewed, and recorded as `done`; do not start another phase/);
   assert.match(overview, /Do not print a launch command until an operator has\s+selected a phase/);
   assert.match(overview, /must not dispatch work/);
   assert.match(overview, /latest execution\/review evidence does not contradict a done row/);
@@ -174,10 +182,24 @@ test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
   assert.match(overview, /cannot record a durable transition or completion/);
   assert.match(overview, /select only the target ref's existing `in-progress` phase or first pending phase/);
   assert.match(sources.get("phased-plan-refactoring"), /one progress authority/i);
+  const closeout = await readFile(
+    path.join(skillsRoot, "software-development", "phased-plan-closeout", "SKILL.md"),
+    "utf8",
+  );
+  assert.match(closeout, /name: phased-plan-closeout/);
+  assert.match(closeout, /git-commit-message/);
+  assert.match(closeout, /git merge --ff-only <worktree-branch>/);
+  assert.match(closeout, /git rev-parse --abbrev-ref HEAD/);
+  assert.match(closeout, /primary checkout.*target branch/i);
+  assert.match(closeout, /git worktree remove <worktree-path>/);
+  assert.match(closeout, /\/goal clear/);
+  assert.match(closeout, /Stop when the selected phase is verified, reviewed, and recorded as `done`; do not start another phase/);
   const rootAgent = await readFile(path.join(root, "AGENTS.md"), "utf8");
   assert.match(rootAgent, /shared agent profile/);
   const workflowContract = await readFile(path.join(skillsRoot, "software-development", "AGENTS.md"), "utf8");
   assert.match(workflowContract, /target ref/);
+  const autonomousContract = await readFile(path.join(skillsRoot, "autonomous-ai-agents", "AGENTS.md"), "utf8");
+  assert.match(autonomousContract, /`delegate_task` is research-only/i);
 });
 
 test("skills package separate review storage and a visual handoff gate", async () => {

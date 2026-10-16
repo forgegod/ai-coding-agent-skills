@@ -12,6 +12,7 @@ const expectedSkillNames = [
   "autonomous-implementation-review",
   "capability-wireframes",
   "git-commit-message",
+  "phased-plan-closeout",
   "phased-plan-design",
   "phased-plan-execution",
   "phased-plan-overview",

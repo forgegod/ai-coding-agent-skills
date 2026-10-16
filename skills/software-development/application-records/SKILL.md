@@ -1,13 +1,13 @@
 ---
 name: application-records
 description: Use when a material change needs canonical CAP, CHG, decision records, and CAP-linked wireframes for primary human-facing surfaces.
-version: 1.5.0
+version: 1.6.0
 author: Hermes contributors
 license: MIT
 metadata:
   hermes:
     tags: [product, capability, change-records, documentation]
-    related_skills: [capability-wireframes, phased-plan-design, phased-plan-execution, phased-plan-overview, phased-plan-refactoring]
+    related_skills: [capability-wireframes, phased-plan-closeout, phased-plan-design, phased-plan-execution, phased-plan-overview, phased-plan-refactoring]
 ---
 
 # Application Records
@@ -61,6 +61,8 @@ phase skills instead of creating a private plan that duplicates CHG progress:
   resume without relying on commit recency or chat memory.
 - `phased-plan-execution` runs one CHG phase, verifies its gate, and synchronizes
   its CAP/CHG evidence before the checkpoint.
+- `phased-plan-closeout` integrates an approved phase, commits it when authorized,
+  removes its dedicated worktree, and prints the next bounded goal prompt.
 - `phased-plan-refactoring` splits or resequences active CHGs only at verified
   boundaries while preserving one progress authority per request.
 

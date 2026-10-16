@@ -13,6 +13,7 @@ Own optional, portable agent workflows for maintaining the canonical capability 
 | `git-commit-message/SKILL.md` | Dependency-aware logical Git batches, a preview before apply (or autonomous execution), and tiered Conventional Commit messages. |
 | `phased-plan-design/SKILL.md`     | CHG phase design for material changes and gates. |
 | `phased-plan-execution/SKILL.md`  | One verified CAP/CHG phase at a time. |
+| `phased-plan-closeout/SKILL.md`   | Authorized phase integration, commit, worktree removal, and next-goal handoff. |
 | `phased-plan-overview/SKILL.md`   | Active-CHG inspection, resume selection, and next-goal command. |
 | `phased-plan-refactoring/SKILL.md` | Verified CHG splitting and resequencing. |
 
@@ -20,7 +21,7 @@ Own optional, portable agent workflows for maintaining the canonical capability 
 
 - These skills use `docs/product/capabilities/CAP-*.md` for current behaviour and `docs/changes/{active,archive}/CHG-*.md` for implementation progress.
 - `capability-wireframes` owns the portable canonical `docs/product/wireframes/` layout and explicit CAP surface declarations. Review packages stay separate under `docs/changes/reviews/CHG-<number>/`; `application-records` and the phase skills maintain their ownership, implementation handoff, and stable-path retention. Visual artifacts never replace executable behavior evidence.
-- `application-records` decides when CAP/CHG records apply; the packaged `phased-plan-*` skills own their phase design, execution, overview, and restructuring.
+- `application-records` decides when CAP/CHG records apply; the packaged `phased-plan-*` skills own their phase design, execution, closeout, overview, and restructuring.
 - The active CHG phase table is the only mutable progress authority for material work. Profile-private plans, temporary notes, and tracker checklists do not schedule implementation.
 - For worktree execution, the target ref must contain the matching phase-table transition before worktree removal or later-phase selection; scratch and narrative evidence cannot substitute for that readback.
 

@@ -14,6 +14,7 @@ const packages = {
   "git-commit-message": "software-development/git-commit-message",
   "phased-plan-design": "software-development/phased-plan-design",
   "phased-plan-execution": "software-development/phased-plan-execution",
+  "phased-plan-closeout": "software-development/phased-plan-closeout",
   "phased-plan-overview": "software-development/phased-plan-overview",
   "phased-plan-refactoring": "software-development/phased-plan-refactoring",
 };
@@ -31,7 +32,7 @@ async function setup(t) {
   return { readme, helper, scratch, home, env: { ...process.env, HOME: home, PI_CODING_AGENT_DIR: "" } };
 }
 
-test("documented recipes copy eight complete packages to all four native user locations", async (t) => {
+test("documented recipes copy nine complete packages to all four native user locations", async (t) => {
   const f = await setup(t);
   for (const [heading, directory] of [["Claude Code", ".claude/skills"], ["Codex", ".agents/skills"], ["Kilo", ".kilo/skills"], ["Pi", ".pi/agent/skills"]]) {
     const section = f.readme.split(`### ${heading}\n`)[1]?.split(/\n### |\n## /)[0];

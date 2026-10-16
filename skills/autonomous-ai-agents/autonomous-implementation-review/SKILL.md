@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.3.1
+version: 0.3.2
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -24,6 +24,8 @@ metadata:
 Run a bounded implementation-and-review loop with explicit roles. The executor starts a fresh, goal-named Hermes session for each phase, implements with the configured implementer model, then the orchestrator starts a second fresh session in that same executor process and switches it to the configured reviewer model for a read-only review phase. Hermes remains the coordinator and verifies every claimed result itself.
 
 The `autonomous_ai_agents.implementer` and `autonomous_ai_agents.reviewer` values are Hermes `/model` selectors, not executable names, Herdr agent kinds, pane names, or shell arguments. When controlling an idle Hermes session, send `/model <configured-key>` through that session before the role prompt, then read back the resulting model status. Keep the change session-scoped: never add `--global`, edit config, or interpolate the value into a shell command. If the selector is unavailable, report the actual `/model` failure and ask for a usable selector; do not substitute one silently.
+
+When `$HERDR_ENV=1`, never use `delegate_task` as the implementation or review executor. `delegate_task` cannot prove the session-only `/model` selector or the required fresh-session model switch. Execute both roles only in the explicitly selected Herdr pane. If Herdr selection or model verification cannot be completed, stop and report the blocker; do not launch a fallback worker.
 
 ## When to Use
 
@@ -145,7 +147,7 @@ Only an operator's explicit request may stop autonomous work. First send `/goal 
 Use this only after the skill is installed and visible as `/autonomous-implementation-review`. For a selected material phase, use Hermes' `/goal draft` to expand a concise operator request into the persisted completion contract; it starts the first turn immediately. The agent must load this skill and `phased-plan-execution`, then read the selected CHG, linked CAPs, and applicable DOX before dispatching any executor:
 
 ```text
-/goal draft Execute phase <number or name> of docs/changes/active/CHG-<number>.md using autonomous-implementation-review and phased-plan-execution.
+/goal draft Execute only phase <number or name> of docs/changes/active/CHG-<number>.md using autonomous-implementation-review and phased-plan-execution. Stop when the selected phase is verified, reviewed, and recorded as `done`; do not start another phase.
 ```
 
 The CHG supplies the outcome, boundaries, selected phase, and verification gate. Add only constraints that are not already recorded. Use `/goal show` to inspect the drafted contract; pause or clear it if it materially misstates the CHG. Do not replace this goal with `/loop`: a loop repeats its prompt on a schedule and is suitable for external polling, not an acceptance-criteria-driven coding workflow. Do not run `/goal` and `/loop` for the same task. Use `/goal pause`, `/goal resume`, and `/goal clear` to control the objective; add newly discovered acceptance criteria with `/subgoal <criterion>` rather than replacing the goal.
@@ -164,7 +166,7 @@ For non-material standalone work, use `/goal draft <concise objective>` with its
    - Use one implementer worktree for dependent changes.
    - Split only genuinely independent work into separate worktrees; assign non-overlapping paths and integration ownership.
    - Budget every executor packet below its configured turn/tool-call cap. Reserve separate packets for a material review finding, final verification, and review rather than combining them into one cap-prone run.
-   - Use `delegate_task` for bounded research or code-reading subtasks. Use a provider CLI through `terminal` only after verifying its current CLI and authentication. Use a background process only for a long bounded job that needs live monitoring.
+   - Use `delegate_task` only for bounded read-only research or code-reading subtasks; never use `delegate_task` as the implementation or review executor. In a Herdr workspace, role execution stays in the selected pane so `/model` acceptance is observable. Use a provider CLI through `terminal` only after verifying its current CLI and authentication. Use a background process only for a long bounded job that needs live monitoring.
    - Completion: every agent has an explicit role, workspace, budget, and output contract.
 
 3. Dispatch the implementer.

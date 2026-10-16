@@ -9,7 +9,7 @@ review around that record; it must not create a profile-local handoff document.
 The normal operator entry point is Hermes' existing goal drafting command:
 
 ```text
-/goal draft Execute phase <number or name> of docs/changes/active/CHG-<number>.md using autonomous-implementation-review and phased-plan-execution.
+/goal draft Execute only phase <number or name> of docs/changes/active/CHG-<number>.md using autonomous-implementation-review and phased-plan-execution. Stop when the selected phase is verified, reviewed, and recorded as `done`; do not start another phase.
 ```
 
 The CHG identifier and phase are the only recurring operator input. Hermes

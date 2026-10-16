@@ -1,7 +1,7 @@
 ---
 name: phased-plan-overview
 description: Use when inspecting active CAP/CHG-backed work and selecting a repository-tracked change record to resume, inspect, or close.
-version: 1.0.4
+version: 1.0.5
 author: AI Software Blueprint
 license: MIT
 metadata:
@@ -44,7 +44,7 @@ autonomous implementation-review workflow; do not run it yourself.
    then print this ready-to-send command with those literal values:
 
    ```text
-   /goal draft Execute phase <selected phase number or name> of <selected active CHG path> using autonomous-implementation-review and phased-plan-execution.
+   /goal draft Execute only phase <selected phase number or name> of <selected active CHG path> using autonomous-implementation-review and phased-plan-execution. Stop when the selected phase is verified, reviewed, and recorded as `done`; do not start another phase.
    ```
 
    Do not add a second checklist, private continuation file, or copied phase
@@ -82,5 +82,6 @@ next phase, the phase gate, affected CAPs, and any blocker without relying on
 memory. A verified-boundary CHG with zero `in-progress` rows selects its first
 pending phase. It makes no source or status change until `phased-plan-execution`
 starts the selected phase. When a phase is selected, its result includes exactly
-one literal `/goal draft` command naming that CHG path and phase; it does not
-execute the command or create a profile-local continuation document.
+one literal `/goal draft` command naming that CHG path, phase, and terminal stop
+condition; it does not execute the command or create a profile-local continuation
+document.
