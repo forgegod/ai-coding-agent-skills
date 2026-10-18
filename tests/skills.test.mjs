@@ -52,56 +52,31 @@ test("autonomous-implementation-review packages its selection helper", async () 
   const directory = path.join(skillsRoot, "autonomous-ai-agents", "autonomous-implementation-review");
   const source = await readFile(path.join(directory, "SKILL.md"), "utf8");
   const helper = await readFile(path.join(directory, "scripts", "herdr_panes.py"), "utf8");
-  assert.match(source, /name: autonomous-implementation-review/);
-  assert.match(source, /independent review loop/i);
-  assert.match(source, /scripts\/herdr_panes\.py/);
-  assert.match(source, /Goal lifecycle and repository truth/);
-  assert.match(source, /\/goal pause`, `\/compress here 2`, inspect `\/context`, then `\/goal resume`/);
-  assert.match(source, /Do not send these commands to `exec`/);
-  assert.match(source, /automatically compresses.*50% by default/i);
-  assert.match(source, /assistant response containing slash-command text does not execute/i);
-  assert.match(source, /\/goal draft Execute only phase <number or name> of docs\/changes\/active\/CHG-<number>\.md using autonomous-implementation-review and phased-plan-execution/);
-  assert.match(source, /The tracked CHG phase table is the only mutable progress authority/);
-  assert.match(source, /Executor turn-cap recovery/);
-  assert.match(source, /forced final reply cannot run checks, update the CHG, or send itself a generic “continue as planned” prompt/);
-  assert.match(source, /restore that row to `in-progress` before further correction work/);
-  assert.match(source, /A worktree phase-table edit is a candidate until the integration commit contains it/);
-  assert.match(source, /Verify the committed target-ref CHG with `git show <commit>:<chg-path>` before removing the worktree/);
-  assert.match(source, /turn cap is not a user decision or a completed checkpoint/i);
-  assert.match(source, /Scratch logs, patches, and agent reports are temporary evidence only/);
+  const transport = await readFile(path.join(directory, "references", "herdr.md"), "utf8");
+  assert.ok(source.length < 9000, "keep the always-loaded orchestration skill bounded");
+  assert.ok(transport.length < 6500, "transport reference must not accumulate duplicated procedures");
+  assert.match(source, /references\/herdr\.md/);
+  assert.match(source, /\/goal draft Execute only phase <phase-number> of <active-chg-path>/);
+  assert.match(source, /automated role loop is Herdr-only/);
+  assert.match(source, /Dispatch failed prerequisites to a fresh\s+implementer session/);
+  assert.match(source, /orchestrator does not edit worker code/);
+  assert.match(source, /orchestrator follows `phased-plan-closeout`/);
+  assert.match(source, /executor must not edit or commit the CHG path/);
+  assert.match(source, /forced final reply cannot run checks, update the CHG, or resume itself/i);
+  assert.match(source, /existing worktree/);
   assert.doesNotMatch(source, /durable handoff record|<handoff-record path>|scratch handoff/i);
-  assert.match(source, /Do not use `\/loop` for this workflow/);
-  assert.match(source, /cadence and does not maintain this completion contract/);
+  assert.doesNotMatch(source, /git .*merge|git .*commit|git .*worktree remove/);
+  assert.match(source, /Use `\/goal`, not `\/loop`/);
   assert.match(source, /\/compress here 2/);
-  assert.match(source, /A fresh session must read the CHG, any linked committed review receipt, and the current workspace before acting/);
-  assert.match(source, /Herdr prompt delivery/);
-  assert.match(source, /herdr agent prompt <pane-id> "<text>"/);
-  assert.match(source, /bracketed-paste mode/);
-  assert.match(source, /herdr agent send-keys <pane-id> <key>\.\.\./);
-  assert.match(source, /Do not use `send-keys` to type or submit normal task text/);
-  assert.match(source, /\/new --yes <goal-name>/);
-  assert.match(source, /`--yes` bypasses Hermes' reset confirmation/);
-  assert.match(source, /send `\/busy queue` and confirm it before selecting the model/);
-  assert.match(source, /accidental follow-up input queues instead of redirecting the role task/);
-  assert.match(source, /### Explicit stop requests/);
-  assert.match(source, /\/stop` stops Hermes background processes/);
-  assert.match(source, /The tracked CHG phase table is the only mutable progress authority/);
-  assert.match(source, /do not require a second questionnaire or create a parallel plan/);
-  assert.match(source, /Herdr lifecycle monitoring/);
-  assert.match(source, /herdr agent wait <pane-id> --until idle --until done --until blocked/);
-  assert.match(source, /Do not install or depend on `herdr integration install hermes` for lifecycle monitoring/);
-  assert.match(source, /resumable session ID for server-restart recovery/);
-  assert.match(source, /Do not poll terminal text, diffs, or workspace state to decide that the executor has settled/);
-  assert.match(source, /Goal-scoped finalization authority/);
-  assert.match(source, /After the verified phase gate and review approve the same frozen diff/);
-  assert.match(source, /git worktree remove <path>/);
-  assert.match(source, /Push only when the goal or project policy explicitly authorizes push/);
-  assert.match(source, /never use `delegate_task` as the implementation or review executor/i);
-  assert.match(source, /`delegate_task` cannot prove the session-only `\/model` selector/i);
-  assert.match(source, /If Herdr selection or model verification cannot be completed, stop and report the blocker/);
+  for (const expected of [/clarify/, /pane ID/, /agent rename <pane-id> exec/,
+    /agent's\s+`name`, not its display `label`/, /scripts\/herdr_panes\.py/,
+    /herdr agent prompt <pane-id> "<text>"/, /\/new --yes <goal-name>/,
+    /\/busy queue/, /\/model <configured-key>/,
+    /herdr agent wait <pane-id> --until idle --until done --until blocked/,
+    /not an immediate\s+foreground-turn interrupt/, /Do not install `herdr integration install hermes`/]) {
+    assert.match(transport, expected);
+  }
   assert.match(helper, /herdr pane list/);
-  const ownerContract = await readFile(path.join(skillsRoot, "autonomous-ai-agents", "AGENTS.md"), "utf8");
-  assert.match(ownerContract, /target-?ref/);
 });
 
 test("every SKILL.md carries name, description, and version in its frontmatter", async () => {
@@ -117,6 +92,12 @@ test("every SKILL.md carries name, description, and version in its frontmatter",
         `${path.relative(root, file)} frontmatter is missing ${field}`,
       );
     }
+    const ceiling = fields.name === "capability-wireframes" ? 1024 : 60;
+    assert.ok(fields.description.length <= ceiling, `${path.relative(root, file)} description exceeds ${ceiling} characters`);
+    assert.ok(
+      fields.description.endsWith("."),
+      `${path.relative(root, file)} description must end with a period`,
+    );
   }
 });
 
@@ -164,48 +145,53 @@ test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
   }
   assert.match(sources.get("phased-plan-design"), /active CHG/i);
   assert.match(sources.get("phased-plan-execution"), /CHG phase table/i);
-  assert.match(sources.get("phased-plan-execution"), /post-gate correction or review finding/i);
-  assert.match(sources.get("phased-plan-execution"), /narrative prose cannot leave a done row overridden/i);
-  assert.match(sources.get("phased-plan-execution"), /The integration commit must contain the\s+exact phase-table transition/);
-  assert.match(records, /version: 1\.6\.1/);
-  assert.match(records, /related_skills: \[capability-wireframes, phased-plan-closeout,/);
+  for (const name of ["phased-plan-design", "phased-plan-execution", "phased-plan-overview", "phased-plan-refactoring"]) {
+    const source = sources.get(name);
+    assert.match(source, /phased-plan-closeout/);
+    assert.match(source, /executor must not\s+edit or\s+commit the CHG path/i);
+    assert.doesNotMatch(source, /reset that\s+path|follow its declared rebase|git .*merge --|git .*commit -/i);
+  }
   assert.match(records, /does not change phase state, archive a CHG, or prescribe phase lifecycle/i);
-  assert.match(records, /Those skills select phases and maintain the\s+phase table; do not set a phase to `in-progress` here/i);
-  assert.match(records, /selected `phased-plan-\*` skill owns every CHG phase-state and archive/i);
   const overview = sources.get("phased-plan-overview");
   assert.match(overview, /docs\/changes\/active/i);
-  assert.match(overview, /\/goal draft Execute only phase <selected phase number or name> of <selected active CHG path> using autonomous-implementation-review and phased-plan-execution/);
-  assert.match(overview, /Stop when the selected phase is verified, reviewed, and recorded as `done`; do not start another phase/);
-  assert.match(overview, /Do not print a launch command until an operator has\s+selected a phase/);
-  assert.match(overview, /must not dispatch work/);
-  assert.match(overview, /latest execution\/review evidence does not contradict a done row/);
-  assert.match(overview, /do not print a launch command for the ambiguous record/);
-  assert.match(overview, /Zero `in-progress` rows with a pending\s+phase is a normal verified-boundary state; select the first pending phase/);
-  assert.match(overview, /More than one `in-progress` row is ambiguous/);
-  assert.match(overview, /cannot record a durable transition or completion/);
-  assert.match(overview, /select only the target ref's existing `in-progress` phase or first pending phase/);
+  assert.match(overview, /\/goal draft Execute only phase <phase-number> of <active-chg-path>/);
+  assert.match(overview, /Stop after verified target completion and cleanup; do not push or start another phase/);
+  assert.match(overview, /print exactly one\s+command and do not dispatch it/);
+  assert.match(overview, /Historical evidence for earlier completed phases is allowed/);
+  assert.match(overview, /Treat an `in-progress` target row as the reserved phase/);
+  assert.match(overview, /committed or dirty\s+worktree CHG change/);
   assert.match(sources.get("phased-plan-refactoring"), /one progress authority/i);
   const closeout = await readFile(
     path.join(skillsRoot, "software-development", "phased-plan-closeout", "SKILL.md"),
     "utf8",
   );
   assert.match(closeout, /name: phased-plan-closeout/);
-  assert.match(closeout, /argument-hint: "\[--commit-ff\]"/);
-  assert.match(closeout, /version: 0\.2\.0/);
-  assert.match(closeout, /\/phased-plan-closeout --commit-ff/);
-  assert.match(closeout, /do not ask a separate commit-authority\s+question/i);
-  assert.match(closeout, /does not override a failed gate, unresolved\s+review, dirty primary checkout/i);
-  assert.match(closeout, /git-commit-message/);
-  assert.match(closeout, /git merge --ff-only <worktree-branch>/);
-  assert.match(closeout, /git rev-parse --abbrev-ref HEAD/);
-  assert.match(closeout, /primary checkout.*target branch/i);
-  assert.match(closeout, /git worktree remove <worktree-path>/);
-  assert.match(closeout, /\/goal clear/);
-  assert.match(closeout, /Stop when the selected phase is verified, reviewed, and recorded as `done`; do not start another phase/);
+  assert.match(closeout, /argument-hint: "\[--reserve \| --commit-ff\]"/);
+  assert.match(closeout, /orchestrator is the sole Git\/CHG writer/);
+  assert.match(closeout, /identical reservation\/target\/worktree CHG blobs/);
+  assert.match(closeout, /phase-guard\.mjs preflight/);
+  assert.match(closeout, /phase-guard\.mjs row/);
+  assert.match(closeout, /done \(<command> exit 0 @ <implementation-sha>\)/);
+  assert.match(closeout, /references\/record-writes\.md/);
+  const recordWrites = await readFile(path.join(skillsRoot, "software-development/phased-plan-closeout/references/record-writes.md"), "utf8");
+  assert.match(recordWrites, /git-commit-message/);
+  const commands = [...recordWrites.matchAll(/^[ \t]*```text\n([\s\S]*?)\n[ \t]*```/gm)].map((match) => match[1]).join("\n");
+  assert.match(commands, /phase-guard\.mjs paths --repo <target> --base <base-sha> --allow-path <path>/);
+  assert.match(commands, /phase-guard\.mjs paths --repo <target> --ref <record-sha> --base <base-sha> --expect-content <reviewed-content-digest> --allow-path <path>/);
+  assert.match(recordWrites, /operator-approved recovery decision/);
+  for (const name of ["phased-plan-design", "phased-plan-refactoring"]) {
+    assert.match(sources.get(name), /references\/record-writes\.md/);
+    assert.match(sources.get(name), /unwritten proposal/);
+    assert.match(sources.get(name), /target-only/);
+  }
+  assert.match(closeout, /phase\/.*full-reservation-sha/);
+  assert.match(closeout, /phase-guard\.mjs locate/);
+  assert.match(closeout, /git -C <target> merge --ff-only <reviewed-sha>/);
+  assert.match(closeout, /git -C <target> worktree remove <worktree-path>/);
   const rootAgent = await readFile(path.join(root, "AGENTS.md"), "utf8");
   assert.match(rootAgent, /shared agent profile/);
   const workflowContract = await readFile(path.join(skillsRoot, "software-development", "AGENTS.md"), "utf8");
-  assert.match(workflowContract, /target ref/);
+  assert.match(workflowContract, /single Git\/CHG writer/);
   const autonomousContract = await readFile(path.join(skillsRoot, "autonomous-ai-agents", "AGENTS.md"), "utf8");
   assert.match(autonomousContract, /`delegate_task` is research-only/i);
 });
@@ -241,6 +227,9 @@ test("git-commit-message requires confirmation except in explicit autonomous mod
   assert.match(source, /explicitly enabled autonomous mode/);
   assert.match(source, /do not wait for a separate confirmation/);
   assert.match(source, /never infer it from an agent's name, identity, or[\s\S]*ability to act autonomously/);
+  assert.match(source, /phased-plan-closeout.*controls/s);
+  assert.match(source, /Do not combine its record-only target commits with implementation/);
+  assert.match(source, /Repository commit-message rules override/);
   assert.doesNotMatch(source, /(?:~\/\.hermes|\/home\/)/);
 });
 

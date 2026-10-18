@@ -45,6 +45,9 @@ test("documented recipes copy nine complete packages to all four native user loc
     for (const name of names) {
       assert.deepEqual(await readFile(path.join(destination, name, "SKILL.md")), await readFile(path.join(root, "skills", packages[name], "SKILL.md")));
     }
+    for (const [name, file] of [["autonomous-implementation-review", "references/herdr.md"], ["phased-plan-closeout", "scripts/phase-guard.mjs"], ["phased-plan-closeout", "references/record-writes.md"]]) {
+      assert.deepEqual(await readFile(path.join(destination, name, file)), await readFile(path.join(root, "skills", packages[name], file)));
+    }
   }
 });
 

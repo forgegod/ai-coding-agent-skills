@@ -56,13 +56,21 @@ eight-package example does not establish scanner approval for it:
 hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/autonomous-implementation-review" --category autonomous-ai-agents
 ```
 
-Installations become available in new sessions. Existing local copies can produce name conflicts: back up local edits and review the installer's replacement prompt rather than forcing a reinstall.
+Source edits do not update installed copies. After an authorized publication,
+install through the normal hub and start a new session. For an unmodified
+hub-tracked copy, use `hermes -p <profile> skills update <skill-name>`; preserve and
+resolve local edits/name collisions explicitly rather than forcing replacement.
+On a first install, `--yes` answers the install confirmation only, after operator
+authorization; it does not bypass scanning or resolve existing-copy conflicts.
 
 ### Run the autonomous implementation-review goal
 
 Use `autonomous-implementation-review` from the orchestrator session, not an
 executor pane. It coordinates implementation and review; it does not replace a
 project's planning records or create a second progress tracker.
+This automated role loop currently supports Herdr only (`HERDR_ENV=1`, selected
+Hermes executor, verified model keys). Outside Herdr, use the portable phase skills
+under an explicitly agreed manual workflow; do not invent a fallback transport.
 
 #### Choose the progress authority first
 
@@ -83,36 +91,42 @@ If the active CHG or phase is not already selected, run
 applies the selection rules, and, only after a phase is selected or unambiguous,
 returns the exact bounded command below for the operator to send.
 
-The operator supplies only the CHG and phase. Hermes' `/goal draft` expands the
-short request into a persisted completion contract and immediately starts it:
+The operator fills the numeric phase ID and literal active CHG path and sends
+this command only if they authorize its listed local Git operations. Displaying
+the template grants no authority. Hermes' `/goal draft` expands the request into
+a persisted completion contract and immediately starts it:
 
 ```text
-/goal draft Execute only phase <number or name> of docs/changes/active/CHG-<number>.md using autonomous-implementation-review and phased-plan-execution. Stop when the selected phase is verified, reviewed, and recorded as `done`; do not start another phase.
+/goal draft Execute only phase <phase-number> of <active-chg-path> using autonomous-implementation-review, phased-plan-execution, and phased-plan-closeout. I authorize the orchestrator to reserve this phase and create its worktree, commit its reviewed implementation, fast-forward the target, commit its completion/archive records, and remove its clean dedicated worktree after verification. Stop after verified target completion and cleanup; do not push or start another phase.
 ```
 
-The agent must load both named skills, read the selected CHG, linked CAPs, and
+The agent must load all three named skills, read the selected CHG, linked CAPs, and
 applicable DOX before dispatching. The CHG supplies scope, boundaries, the
 phase gate, and status; add only constraints that are not already recorded.
 Use `/goal show` to inspect the drafted contract. Pause or clear it if it
 materially misstates the CHG.
 
-Resume on a new session or machine with the same concise command. The current
-repository—not profile state or a prior transcript—determines what can resume.
+Resume with the same bounded command only after closeout identifies the existing
+reservation/worktree. A fresh clone lacks local worktree registration; request an
+explicit recovery handoff instead of starting a duplicate. For assessment without
+commit authority, request a read-only assessment, not this completion goal.
 
 #### Close a verified phase
 
-Use `phased-plan-closeout` only after the selected phase gate and independent
-review approve the same frozen diff. With explicit commit authority, it uses the
-primary `git-commit-message` batch, fast-forwards only when the project permits
-it, verifies the target-ref CHG row, removes the dedicated worktree, and prints
-`/goal clear` plus the next bounded `/goal draft` command. It never pushes or
-starts that next goal without separate authorization.
+Use `phased-plan-closeout` before dispatch for reservation and after gate/review
+approval for integration. `/phased-plan-closeout --reserve` authorizes the selected
+CHG-only target commit and worktree creation, not implementation/completion commits.
+A governing goal may explicitly authorize both stages.
+The orchestrator is the only Git/CHG writer; executors never stage, commit, or
+edit the CHG path. The skill's read-only Node 22+/Git guard checks committed CHG
+blobs, history, topology, and phase-table cells; it does not infer passed tests
+from prose or discard conflicting edits.
 
 For an explicit one-shot closeout authorization, invoke
 `/phased-plan-closeout --commit-ff`. The flag authorizes committing only the
-reviewed phase batch and requires `git merge --ff-only`; it neither authorizes a
-push nor bypasses the verified gate, review, clean-primary, or worktree-topology
-checks.
+reviewed implementation and record completion batches and requires fast-forward
+integration. It does not authorize a missing reservation, a push, bypassed gates,
+or another phase. The command protocol lives only in the closeout skill.
 
 #### Start bounded standalone work
 
@@ -125,6 +139,9 @@ only its documented repository-tracked location.
 
 - `docs/changes/active/CHG-*.md` is the sole mutable authority for a material
   change: phase, scope, gate, decisions, evidence, and next executable action.
+- For worktree phases, the orchestrator follows `phased-plan-closeout`; executors
+  must not edit or commit the CHG path. Resume a reserved worktree rather than
+  creating a competing status writer.
 - `docs/changes/reviews/CHG-<number>/` may retain a committed, frozen,
   review-only receipt when the project needs one. It is evidence, never another
   progress plan.
@@ -145,9 +162,9 @@ action; the operator does not need to send it separately during a normal run.
 
 #### Stop an execution deliberately
 
-Stopping is an explicit operator decision. The orchestrator first sends
-`/goal pause` so it cannot dispatch another phase. After the executor settles,
-it prompts that executor with `/stop` to stop Hermes background processes and
+Stopping is an explicit operator decision. The operator sends `/goal pause` in
+the orchestrator session; the orchestrator does not dispatch another packet.
+After the executor settles, the orchestrator prompts it with `/stop` to stop Hermes background processes and
 then verifies the pane state. `/stop` is not an immediate foreground-turn
 interrupt; with `/busy queue` it is queued until the current role turn finishes.
 Do not use `ctrl+c` as an undocumented substitute.
@@ -416,6 +433,29 @@ npm run build
 ```
 
 Canonical source is `skills/<category>/<name>/`. `dist/` is generated and ignored. The generator emits the complete `.well-known/skills/` inventory, with an explicit file list for each package.
+
+Before publishing, run the additional local security gate with a trusted Hermes
+source checkout and a compatible Python interpreter (`python3`, Python 3.11+ for
+skills-guard-v10):
+
+```sh
+HERMES_SOURCE=/path/to/trusted/hermes-agent npm run test:security
+```
+
+This rebuilds all packages, tests an inert malicious `.mjs` negative control, then
+uses that checkout's actual scanner and community policy. It extends scanning to
+every UTF-8 package file, including `.mjs`/`.cjs` and extensionless files, without
+renaming files or modifying Hermes. The JSON report includes scanner version/hash,
+file counts, findings, and verdicts. Missing scanner, inventory drift, symlinks,
+undecodable/binary content needing manual review, or a non-safe verdict fails the
+gate. No network, package installation, credentials, or profile writes are used.
+This is a stricter local release check, not a promise of approval by other scanner
+versions. Ordinary `npm test` and CI remain independent of a Hermes checkout.
+
+Publication and profile updates need separate operator authorization. After
+publication, verify the live files and normal hub installation in an isolated
+scratch home, then update the intended profile and start a fresh session. Do not
+use `--force` to bypass security findings; `--yes` only skips the install question.
 
 Pull requests run credential-free checks. Pushes to main and manual publishing runs build and test before deploying dist/ to GitHub Pages. Deployment packages dot-directories explicitly because the stock upload-pages-artifact action omits them.
 

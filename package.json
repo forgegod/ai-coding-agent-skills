@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "build": "node scripts/build-well-known-skills.mjs --out dist"
+    "build": "node scripts/build-well-known-skills.mjs --out dist",
+    "test:security": "npm run build && python3 -B tests/security_scan_test.py && python3 -B scripts/check-skill-security.py"
   },
   "dependencies": {
     "yaml": "^2.9.1"

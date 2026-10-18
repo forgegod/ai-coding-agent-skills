@@ -13,7 +13,7 @@ Own optional, portable agent workflows for maintaining the canonical capability 
 | `git-commit-message/SKILL.md` | Dependency-aware logical Git batches, a preview before apply (or autonomous execution), and tiered Conventional Commit messages. |
 | `phased-plan-design/SKILL.md`     | CHG phase design for material changes and gates. |
 | `phased-plan-execution/SKILL.md`  | One verified CAP/CHG phase at a time. |
-| `phased-plan-closeout/SKILL.md`   | Authorized phase integration, commit, worktree removal, and next-goal handoff. |
+| `phased-plan-closeout/`   | Orchestrator-only Git/CHG protocol, read-only phase guard, and next-goal handoff. |
 | `phased-plan-overview/SKILL.md`   | Active-CHG inspection, resume selection, and next-goal command. |
 | `phased-plan-refactoring/SKILL.md` | Verified CHG splitting and resequencing. |
 
@@ -23,7 +23,10 @@ Own optional, portable agent workflows for maintaining the canonical capability 
 - `capability-wireframes` owns the portable canonical `docs/product/wireframes/` layout and explicit CAP surface declarations. Review packages stay separate under `docs/changes/reviews/CHG-<number>/`; `application-records` and the phase skills maintain their ownership, implementation handoff, and stable-path retention. Visual artifacts never replace executable behavior evidence.
 - `application-records` decides when CAP/CHG records apply and their artifact semantics; the packaged `phased-plan-*` skills exclusively own CHG phase design, lifecycle transitions, execution, closeout, overview, and restructuring.
 - The active CHG phase table is the only mutable progress authority for material work. Profile-private plans, temporary notes, and tracker checklists do not schedule implementation.
-- For worktree execution, the target ref must contain the matching phase-table transition before worktree removal or later-phase selection; scratch and narrative evidence cannot substitute for that readback.
+- The orchestrator follows `phased-plan-closeout` as the single Git/CHG writer. Its `references/record-writes.md` recipe also governs target-only creation/restructuring before phases; executors never stage, commit, or edit the CHG path. Other skills delegate rather than copying its protocol.
+- `phased-plan-closeout/scripts/phase-guard.mjs` is a read-only Node 22+/Git helper. Real Git fixtures verify reservation-derived worktree identity, blob/history/topology refusal, exact path/content/parent readback across hooks, and completion evidence tied to the reviewed tip. It does not acquire a lock, authorize writes, or repair failures.
+- Worktree creation uses the guard's `create-preview` argument array after reservation; it refuses collisions and stale/dirty targets, never creates anything, and does not replace authorization or recovery. Keep `.mjs` packaging independent of a consumer's module settings.
+- Launch examples state the exact operator-authorized local Git scope and stay identical across README, overview, and orchestration. Displaying them is not authorization. Missing/competing ownership or invalid readback preserves work and requires an explicit recovery handoff.
 
 ## Work Guidance
 

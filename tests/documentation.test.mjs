@@ -6,6 +6,24 @@ import { fileURLToPath } from "node:url";
 const readme = fileURLToPath(new URL("../README.md", import.meta.url));
 const autonomousResearch = fileURLToPath(new URL("../docs/research/hermes-autonomous-goal-workflow.md", import.meta.url));
 
+test("all launch examples carry the same bounded operator authorization", async () => {
+  const files = [readme,
+    fileURLToPath(new URL("../skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md", import.meta.url)),
+    fileURLToPath(new URL("../skills/software-development/phased-plan-overview/SKILL.md", import.meta.url))];
+  const prompts = [];
+  for (const file of files) {
+    const source = await readFile(file, "utf8");
+    const promptsInFile = [...source.matchAll(/^\s*(\/goal draft Execute only phase .+)$/gm)].map((match) => match[1]);
+    assert.equal(promptsInFile.length, 1, file);
+    const prompt = promptsInFile[0];
+    assert.match(prompt, /phased-plan-closeout/);
+    assert.match(prompt, /I authorize the orchestrator/);
+    for (const action of [/reserve/, /commit/, /fast-forward/, /clean dedicated worktree/, /after verification/, /do not push or start another phase/]) assert.match(prompt, action);
+    prompts.push(prompt);
+  }
+  assert.ok(prompts.every((prompt) => prompt === prompts[0]), "launch contract drift");
+});
+
 test("normal installer loop documents all generic software-development skills", async () => {
   const source = await readFile(readme, "utf8");
   const loop = source.match(/^for skill in (.+); do$/m)?.[1]?.split(/\s+/);
@@ -35,9 +53,11 @@ test("autonomous goal documentation distinguishes orchestration from polling", a
   assert.match(source, /### Run the autonomous implementation-review goal/);
   assert.match(source, /#### Choose the progress authority first/);
   assert.match(source, /#### Start a selected CHG phase/);
-  assert.match(source, /\/goal draft Execute only phase <number or name> of docs\/changes\/active\/CHG-<number>\.md using autonomous-implementation-review and phased-plan-execution/);
-  assert.match(source, /Stop when the selected phase is verified, reviewed, and recorded as `done`; do not start another phase/);
-  assert.match(source, /The operator supplies only the CHG and phase/);
+  assert.match(source, /\/goal draft Execute only phase <phase-number> of <active-chg-path>/);
+  assert.match(source, /Stop after verified target completion and cleanup; do not push or start another phase/);
+  assert.match(source, /The operator fills the numeric phase ID/);
+  assert.match(source, /supports Herdr only/);
+  assert.match(source, /operator sends `\/goal pause`/i);
   assert.match(source, /`\/phased-plan-overview` first/);
   assert.match(source, /returns the exact bounded command below for the operator to send/);
   assert.match(source, /\[Hermes workflow research record\]\(docs\/research\/hermes-autonomous-goal-workflow\.md\)/);
@@ -61,6 +81,8 @@ test("autonomous goal documentation distinguishes orchestration from polling", a
 
 test("autonomous workflow research separates shipped Hermes features from proposals", async () => {
   const source = await readFile(autonomousResearch, "utf8");
+  assert.match(source, /README\.md#start-a-selected-chg-phase/);
+  assert.doesNotMatch(source, /^\/goal draft Execute only phase /m, "research links the current launch contract rather than forking it");
   assert.match(source, /\/goal draft <objective>/);
   assert.match(source, /read-only launch helper/);
   assert.match(source, /Custom Slash Commands \/ Shortcuts proposal #25335/);

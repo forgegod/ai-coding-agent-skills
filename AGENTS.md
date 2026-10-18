@@ -7,7 +7,7 @@ Maintain portable AI coding-agent playbooks and publish complete Agent Skills pa
 ## Ownership
 
 - `skills/` owns categorized skill source and its local DOX contracts.
-- `scripts/` owns deterministic endpoint generation; `tests/` owns executable packaging evidence.
+- `scripts/` owns deterministic endpoint generation and the opt-in release security scan; `tests/` owns executable packaging and guard evidence.
 - `.github/` owns credential-free verification and GitHub Pages deployment with narrowly scoped deployment permissions.
 - Root owns this contract, README, package manifest, license, ignore rules, and distribution documentation.
 
@@ -32,11 +32,13 @@ Maintain portable AI coding-agent playbooks and publish complete Agent Skills pa
 - Tests use synthetic fixtures and local output; live endpoint and installer probes are release checks, not ordinary CI dependencies.
 - Exercise documented native copy commands in isolated scratch homes; do not modify real agent installations while testing documentation or claim client discovery was verified if that client is unavailable.
 - Documentation describes the current design. Git history carries migration history.
+- Operator-facing launch examples state their exact side-effect authority; displaying a template neither executes it nor grants permission. Keep canonical examples synchronized by tests and link them from research rather than copying them.
 
 ## Verification
 
-- `npm test` proves package metadata, workflow boundaries, and endpoint artifacts.
+- With Node 22+ and Git available, `npm test` proves package metadata, workflow boundaries, read-only phase guards against isolated Git fixtures, and endpoint artifacts.
 - `npm run build` generates the distributable static site.
+- `HERMES_SOURCE=<trusted-checkout> npm run test:security` additionally requires Python compatible with that Hermes scanner. It rebuilds, proves `.mjs` negative controls, and requires safe community verdicts for every complete package. This local release gate does not replace the normal installer scan or grant installation authority.
 - Before publishing, verify clean diffs and the full package inventory. After publishing, fetch the index and every advertised file and exercise Hermes discovery and installation in an isolated scratch home.
 
 ## Child DOX Index
@@ -44,5 +46,5 @@ Maintain portable AI coding-agent playbooks and publish complete Agent Skills pa
 | Child | Owns | Read when editing |
 | --- | --- | --- |
 | `skills/AGENTS.md` | Portable skill sources and category ownership. | Any skill or support file. |
-| `scripts/AGENTS.md` | Endpoint generator. | Build behavior and public package format. |
+| `scripts/AGENTS.md` | Endpoint generation and release security scanning. | Build behavior, public package format, or scanner verification. |
 | `.github/AGENTS.md` | Verification and deployment workflows. | CI or GitHub Pages publishing. |

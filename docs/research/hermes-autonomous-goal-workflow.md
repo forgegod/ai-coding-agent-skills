@@ -6,14 +6,11 @@ For a material change, the repository's active CHG is the only mutable progress
 record. `autonomous-implementation-review` orchestrates implementation and
 review around that record; it must not create a profile-local handoff document.
 
-The normal operator entry point is Hermes' existing goal drafting command:
-
-```text
-/goal draft Execute only phase <number or name> of docs/changes/active/CHG-<number>.md using autonomous-implementation-review and phased-plan-execution. Stop when the selected phase is verified, reviewed, and recorded as `done`; do not start another phase.
-```
-
-The CHG identifier and phase are the only recurring operator input. Hermes
-expands the short objective into a completion contract and starts the goal.
+The normal operator entry point is Hermes' existing goal drafting command.
+Use the [current launch contract](../../README.md#start-a-selected-chg-phase),
+including its explicit local Git authorization and supported Herdr environment;
+do not maintain a competing prompt here. The operator selects the CHG and numeric
+phase and decides whether to grant those operations before sending the command.
 
 ## Findings
 
@@ -37,9 +34,10 @@ expands the short objective into a completion contract and starts the goal.
   progress tracker.
 - Hermes scratch space may contain temporary logs, patches, and agent reports,
   but it is never the only resumption source.
-- A fresh machine or session resumes by reading the repository's CHG and any
-  committed review receipt, then verifying the current workspace. It does not
-  depend on a profile-local handoff file or a prior transcript.
+- A fresh session reads the CHG and committed review evidence, then uses closeout's
+  reservation/worktree identity checks. A fresh clone has no local worktree
+  registration; missing ownership needs an explicit recovery handoff, not a new
+  competing worker. A profile-local plan or prior transcript is not authority.
 
 ## Future Hermes improvement
 

@@ -1,7 +1,7 @@
 ---
 name: application-records
-description: Use when a material change needs canonical CAP, CHG, decision records, and CAP-linked wireframes for primary human-facing surfaces.
-version: 1.6.1
+description: Maintain CAP/CHG records for material product changes.
+version: 1.8.0
 author: Hermes contributors
 license: MIT
 metadata:
@@ -64,10 +64,9 @@ plan that duplicates CHG progress:
 - `phased-plan-design` creates or reshapes the CHG phase table before work.
 - `phased-plan-overview` finds active CHGs and identifies the selected record to
   resume without relying on commit recency or chat memory.
-- `phased-plan-execution` runs one CHG phase, verifies its gate, and synchronizes
-  its CAP/CHG evidence before the checkpoint.
-- `phased-plan-closeout` integrates an approved phase, commits it when authorized,
-  removes its dedicated worktree, and prints the next bounded goal prompt.
+- `phased-plan-execution` implements and verifies one selected phase.
+- `phased-plan-closeout` owns the orchestrator's authorized Git/CHG writes and
+  worktree lifecycle, plus the next bounded goal prompt.
 - `phased-plan-refactoring` splits or resequences active CHGs only at verified
   boundaries while preserving one progress authority per request.
 
@@ -121,12 +120,9 @@ convention. Do not create CAP/CHG churn simply because the work has phases.
    - Leave short-lived implementation reasoning in the CHG or Git history.
 
 5. **Hand lifecycle work to the phase skills.**
-   - Use `phased-plan-execution` to run a selected phase and record its verified
-     evidence. It alone changes the selected row between `pending`,
-     `in-progress`, and `done`.
-   - Use `phased-plan-closeout` to integrate an approved phase and, after the
-     final verified phase, archive the CHG. Use `phased-plan-refactoring` for
-     splits or resequencing.
+   - Use `phased-plan-execution` to implement and verify a selected phase.
+     The orchestrator follows `phased-plan-closeout`; the executor must not edit
+     or commit the CHG path. Use `phased-plan-refactoring` for splits/resequencing.
    - Return to `phased-plan-overview` to select the next active work; do not make
      lifecycle decisions from this skill's checklist.
 

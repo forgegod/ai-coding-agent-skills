@@ -2,7 +2,7 @@
 name: git-commit-message
 description: Preview batches; autonomous commits skip confirmation.
 argument-hint: "[--tier 1|2|3]"
-version: 4.3.0
+version: 4.5.0
 metadata:
   hermes:
     tags: [git, commit]
@@ -28,8 +28,12 @@ not the required preview or verification.
    and `git diff --staged`. Include untracked files from `git status`. If every
    view is empty, report "No changes" and stop.
 2. Build dependency-aware logical batches before staging:
-   - Keep one observable change with its tests, current-state documentation,
-     records, and required configuration in the same batch.
+   - For CHG creation/restructuring or phase execution, `phased-plan-closeout`
+     controls the explicit record/implementation batches and their path allowlists.
+     Do not combine its record-only target commits with implementation or assign
+     Git writes to an executor. This exception precedes the general grouping rule.
+   - Otherwise keep one observable change with its tests, current-state CAP/docs,
+     and required configuration in the same batch; exclude CHG lifecycle records.
    - Keep unrelated topics separate. Do not split a vertical slice merely to
      make smaller commits.
    - A verified implementation may precede a separate documentation/record
@@ -42,7 +46,7 @@ not the required preview or verification.
    automation, `revert` reversal, `docs` documentation, `style` formatting
    only, or `chore` maintenance. Security corrections use `fix(security)`.
    Use the tiers below. Do not invent motivation, results, or assistant
-   attribution.
+   attribution. Repository commit-message rules override the default format here.
 4. When asked only for a message, return the existing staged batch's message
    and stop. Do not stage, and do not ask to apply it.
 5. When recommending batches to stage or commit, follow Preview. In normal
