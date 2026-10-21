@@ -1,7 +1,7 @@
 ---
 name: phased-plan-design
-description: Design restart-safe CAP/CHG phases with explicit gates.
-version: 1.4.0
+description: Design CAP/CHG plans without starting execution.
+version: 1.5.0
 author: AI Software Blueprint
 license: MIT
 metadata:
@@ -15,6 +15,24 @@ metadata:
 Design restart-safe phases for a material request. The active CHG is the plan;
 the CAP is current behaviour. Do not create a private plan that duplicates phase
 state.
+
+## Scope and stopping rule
+
+Invoking `phased-plan-design` authorizes planning only, not phase execution.
+A later planning-only instruction narrows an earlier general implementation request.
+Read source, tests, and contracts as needed to ground the plan; write only authorized
+planning records, indexes, and review-only design artifacts. Do not reserve a phase,
+create an execution worktree, dispatch an executor, or write implementation/regression
+tests. Phase 1 is execution even when named specification, evidence, tests, or design.
+Describe its work and verification commands in the plan; do not perform them here.
+
+Plan approval or permission to commit the record is not permission to execute.
+Do not bundle record-edit/commit consent with reservation or implementation.
+If permission is missing, ask only about the planning artifact or return an unwritten
+proposal; do not make "plan and implement" the recommended default.
+Only an explicit request to also execute a named phase permits a separate execution
+handoff after planning, not merely loading related skills or completing prerequisites.
+That handoff still requires the execution/closeout authority and checks.
 
 ## Procedure
 
@@ -33,8 +51,11 @@ state.
 4. Include a final integration phase that proves CAP/current state, record check,
    affected tests, project gate, and canonical visuals where required. Only it
    archives the CHG.
-5. Validate and commit/read back the planned record through that recipe before
-   handing it to `phased-plan-execution`. The orchestrator follows
+5. Validate and, when authorized, commit/read back the planned record through that
+   recipe. Leave a new CHG `planned` with every phase `pending`. Report the plan or
+   proposal, validation result, and unresolved decisions, then stop. Execution is
+   a separate authorized action through `phased-plan-execution`, not the next step
+   of design. The orchestrator follows
    `phased-plan-closeout`; the executor must not edit or commit the CHG path.
    Do not copy the Git protocol into product CHGs; record only project-specific
    outcomes, dependencies, gates, and evidence.
@@ -61,6 +82,9 @@ Use a table such as:
 
 Run the repository record validator. Confirm every phase row has a numbered
 section, executable gate, and no competing progress plan. Resolve repository
-integration-policy conflicts before handing off for execution.
+integration-policy conflicts before calling the plan ready. Confirm that no phase
+was started and no product source, regression tests, or current-state CAP claims
+were changed to implement the proposal. State any authorized record commit separately
+from implementation; a plan or proposal is a complete result for a planning request.
 Keep one unfenced canonical phase table; put illustrative tables in code fences
 so closeout's parser cannot mistake examples for competing progress authority.

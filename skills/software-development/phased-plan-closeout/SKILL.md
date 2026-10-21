@@ -2,7 +2,7 @@
 name: phased-plan-closeout
 description: Reserve and close CHG phases through one Git writer.
 argument-hint: "[--reserve | --commit-ff]"
-version: 0.8.0
+version: 0.8.1
 author: AI Software Blueprint
 license: MIT
 metadata:
@@ -15,7 +15,7 @@ metadata:
 
 The orchestrator is the sole Git/CHG writer; executors implement, reviewers read only.
 
-Load references at their boundary:
+Load at the relevant boundary:
 - Before any target record edit (including design/refactoring):
   [record writes](references/record-writes.md) for preview, factual review and readback.
 - Before implementation review: [review boundary](references/review-boundary.md)
@@ -26,6 +26,8 @@ Load references at their boundary:
 
 ## Preconditions and authority
 
+- When loaded by design/refactoring for record writes, do not enter reservation
+  or phase execution without separate explicit authority.
 - Read CHG/DOX, gates and integration policy. Record literal CHG path, numeric phase,
   target/worktree paths/branches, reservation SHA and reviewed boundary.
 - `--reserve` authorizes reservation/worktree creation; `--commit-ff` authorizes
@@ -63,13 +65,12 @@ Load references at their boundary:
    node <this-skill-dir>/scripts/phase-guard.mjs create-preview --target <target> --target-branch <target-branch> --reservation <reservation-sha> --chg <chg-path> --phase <number> --worktree <absolute-worktree-path>
    ```
 
-   The preview requires clean target HEAD at reservation and no collisions/competing
-   workers. Its branch is
+   Preview requires clean target HEAD at reservation, no collisions/competing workers;
+   branch:
    `phase/<CHG-filename-without-.md>/<phase-number>/<full-reservation-sha>`.
-   With authority/ownership still valid, execute exactly its returned JSON `argv`
-   through `terminal`, quoting each argument; never join/eval blindly, add flags,
-   or invent suffixes. The preview grants no lock/permission and creates nothing.
-   Before dispatch, verify the created identity through `terminal`:
+   With authority/ownership valid, execute exactly its JSON `argv` through `terminal`:
+   quote arguments; no blind join/eval, extra flags or invented suffixes.
+   Preview grants no lock/permission and creates nothing. Verify before dispatch:
 
    ```text
    node <this-skill-dir>/scripts/phase-guard.mjs locate --repo <target> --reservation <reservation-sha> --chg <chg-path> --phase <number>
@@ -104,10 +105,9 @@ Load references at their boundary:
 
 1. After target gates pass, set only the selected row to
    `done (<command> exit 0 @ <implementation-sha>)` plus required metadata. Use the
-   exact reviewed tip passed to preflight, including fixups; completion's sole parent
-   must be that tip. Intervening writes require a new verified boundary. Join actual
-   commands with `;` if needed; escape table pipes. Reconcile current narrative;
-   historical evidence may remain.
+   reviewed preflight tip including fixups; completion's sole parent must be that tip.
+   Intervening writes require a new verified boundary. Join commands with `;`, escape
+   table pipes. Reconcile current narrative; retain historical evidence.
 2. Only for the final verified phase, archive and repair index/owner links in this
    record batch. Keep review packages at stable review-only paths. Allow exactly
    old/new CHG and required record/index paths; otherwise only the active CHG.
@@ -131,6 +131,5 @@ Load references at their boundary:
 
 ## Verification
 
-Require both committed row checks, preflight, target gate, record validation,
-commit allowlists/content and cleanup. Guards are snapshots, not locks or proof
-commands ran; the orchestrator verifies execution evidence.
+Require committed row checks, preflight, target gate, record validation,
+commit allowlists/content and cleanup. Guards are snapshots, not execution evidence.

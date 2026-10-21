@@ -1,7 +1,7 @@
 ---
 name: application-records
 description: Maintain CAP/CHG records for material product changes.
-version: 1.8.0
+version: 1.8.1
 author: Hermes contributors
 license: MIT
 metadata:
@@ -69,6 +69,10 @@ plan that duplicates CHG progress:
   worktree lifecycle, plus the next bounded goal prompt.
 - `phased-plan-refactoring` splits or resequences active CHGs only at verified
   boundaries while preserving one progress authority per request.
+
+Routing to a skill is not execution authority. For a planning-only request, stop
+after design; the implementation/CAP-update steps below apply only to authorized
+implementation. Creating or approving a CHG does not start its first phase.
 
 For a non-material refactor, use the adopting repository's ordinary planning
 convention. Do not create CAP/CHG churn simply because the work has phases.

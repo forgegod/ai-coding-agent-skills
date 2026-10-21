@@ -17,6 +17,7 @@ Herdr pane-selection helper.
 
 - The implementation and review phases use distinct, goal-named sessions; review is read-only.
 - Never infer autonomous commit authority or a pane selection from labels, focus, or agent identity.
+- Planning-only requests end after design. An approved plan is a prerequisite, not authorization to reserve a phase or dispatch the implementation/review loop.
 - Explicit launch selection or an answered form precedes reservation and every pane mutation; a timeout is not consent. The helper validates supplied evidence, not its authenticity or future liveness.
 - The automated role loop is Herdr-only (`$HERDR_ENV=1`); role execution stays in the selected pane. `delegate_task` is research-only and never substitutes for session-scoped model selection. Other environments use an explicitly approved manual workflow, not a guessed transport.
 - The helper accepts Herdr pane-list JSON and optional operator-selection evidence; it must not control panes or send input.

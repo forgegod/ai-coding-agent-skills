@@ -1,7 +1,7 @@
 ---
 name: phased-plan-execution
 description: Execute one CAP/CHG phase without competing status writers.
-version: 1.5.0
+version: 1.5.1
 author: AI Software Blueprint
 license: MIT
 metadata:
@@ -12,13 +12,14 @@ metadata:
 
 # Phased Plan Execution
 
-Execute one material phase. The CHG phase table owns progress; CAPs own current
-behaviour. No parallel tracker or lifecycle for non-material work.
+Execute one material phase. The CHG phase table owns progress; CAPs own behaviour.
+No parallel tracker or non-material lifecycle.
 
 ## Procedure
 
-1. Read the active CHG, CAPs, DOX, gate and target identity/status. Resolve ownership;
-   batch independent reads, not actions dependent on consent or earlier results.
+1. Require an explicit request to execute the selected phase; a design handoff or
+   approved plan is not sufficient. Read CHG, CAPs, DOX, gate, target identity/status
+   and ownership; batch independent reads, never consent-dependent actions.
 2. The orchestrator owns reservation and Git/CHG writes through `phased-plan-closeout`.
    The executor must not edit or commit the CHG path, stage, commit, integrate or
    remove worktrees. Without a permitted reservation, stop before mutable work.

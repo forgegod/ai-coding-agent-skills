@@ -1,7 +1,7 @@
 ---
 name: phased-plan-refactoring
 description: Resequence active CAP/CHG work at verified boundaries.
-version: 1.4.0
+version: 1.4.1
 author: AI Software Blueprint
 license: MIT
 metadata:
@@ -36,7 +36,8 @@ never a second status writer.
    live phase rows or mutable review packages.
 5. Run record/document checks, then use `phased-plan-overview` to select the next
    phase. The orchestrator follows `phased-plan-closeout`; the executor must not
-   edit or commit the CHG path. Resume execution only after verified record readback.
+   edit or commit the CHG path. Stop after the revised plan; verified record readback
+   does not authorize execution. Resume only under explicit phase-execution authority.
 
 ## Rules
 

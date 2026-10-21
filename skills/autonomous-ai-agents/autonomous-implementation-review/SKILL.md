@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.8.0
+version: 0.8.1
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -21,14 +21,16 @@ metadata:
 
 # Autonomous Implementation Review
 
-Use fresh implementer/reviewer sessions; the orchestrator verifies results.
-Role separation is not external independence; high-risk work may need external review.
+Use fresh role sessions; the orchestrator verifies results. Role separation is not
+external independence; high-risk work may need external review.
 
 ## Preconditions and roles
 
 - Read DOX, manifests, code/tests, branch/status, criteria, gates and authority.
   Existing phases use `phased-plan-execution`; new/reshaped material work uses
   `application-records`/`phased-plan-design`. No records for non-material work.
+  A planning-only request stops after design; do not reserve or dispatch phase 1.
+  Require explicit phase-execution authority before step 1.
 - The orchestrator follows `phased-plan-closeout` for CHG/Git writes. The executor
   must not edit or commit the CHG path, stage, commit, integrate, or retire worktrees.
   Reviewers are read-only. Missing reservation authority blocks mutable phase work.
@@ -65,8 +67,7 @@ Compression is automatic; for earlier compression the operator runs `/goal pause
 Printed commands do not execute; resume does not reset context.
 
 Stop discovery once scope, authority, executor, ownership, bootstrap and gates
-are resolved. Reuse valid evidence until content/environment changes or a check
-fails. Batch independent lookups; report only new outcomes, decisions or blockers.
+are resolved. Reuse evidence unless invalidated; batch independent lookups.
 
 ## Procedure
 
