@@ -27,12 +27,39 @@ record-edit/commit permission; phase flags authorize only their selected phase.
    archival permits the old/new paths plus required index/owner links. Preserve
    review packages at stable review-only paths. Never mix implementation into these
    record batches. Without commit authority, return a proposal without file edits.
-3. Edit only the approved records. Use `git-commit-message` to preview the explicit
-   batch and repository-compliant message. Its general grouping rules do not merge
-   these boundaries. Stage only named paths with `git -C <target> add -- <paths>`.
+3. Edit only the approved records. Use `git-commit-message` to preview exact paths
+   and the full repository-compliant message before any index write, including
+   `git mv`. Autonomous authority removes the confirmation wait, not this preview.
+   Its general grouping rules do not merge these boundaries. Stage only named paths
+   with `git -C <target> add -- <paths>`; include deletions that are not yet staged.
    Run the record validator and inspect the full staged diff and status again;
    review any validator-generated edits before proceeding. The index must contain
    exactly the allowlist; never unstage unrelated work to make the check pass.
+
+## Factual review before completion
+
+Before staging a completion/archive batch, conduct factual review separately from
+the implementation diff. Require a fresh read-only reviewer for new or rewritten
+behavior/evidence prose; provide the actual batch and evidence, not merely the
+earlier implementation approval. Freeze that batch through commit/readback below;
+changed reviewed prose needs renewed review. Keep the verdict outside the frozen
+batch rather than adding self-approval claims after review.
+
+- Tie each check to its checkout, exact revision/candidate digest, command, exit
+  status and observed result. Preserve failed attempts, bootstrap and retries;
+  distinguish a successful target run from earlier failures or skipped checks.
+- Reconcile adapter-specific boundaries against current CAPs/tests. Do not turn
+  one adapter's fallback into a blanket promise for every source.
+- Classify deferred findings by their actual owner/scope, not by nearby findings.
+  Small same-scope stale comments are not automatically unrelated improvements.
+- Never record cleanup, commit or integration as completed when it has not yet
+  happened. Pre-cleanup receipts state pending cleanup; the final response verifies
+  removal afterward without manufacturing a second completion commit.
+- Review packages remain optional unless project DOX requires them. Prefer concise
+  CHG evidence over creating a package only to satisfy an imagined requirement.
+
+Structural validation proves paths/table shape, not factual truth. A green guard
+cannot approve a narrative, authenticate review, or establish that a test ran.
 
 ## Commit and read back
 

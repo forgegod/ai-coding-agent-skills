@@ -53,7 +53,7 @@ test("autonomous-implementation-review packages its selection helper", async () 
   const source = await readFile(path.join(directory, "SKILL.md"), "utf8");
   const helper = await readFile(path.join(directory, "scripts", "herdr_panes.py"), "utf8");
   const transport = await readFile(path.join(directory, "references", "herdr.md"), "utf8");
-  assert.ok(source.length < 9000, "keep the always-loaded orchestration skill bounded");
+  assert.ok(source.length < 6500, "keep the normal orchestration path compact");
   assert.ok(transport.length < 6500, "transport reference must not accumulate duplicated procedures");
   assert.match(source, /references\/herdr\.md/);
   assert.match(source, /\/goal draft Execute only phase <phase-number> of <active-chg-path>/);
@@ -61,7 +61,7 @@ test("autonomous-implementation-review packages its selection helper", async () 
   assert.match(source, /Dispatch failed prerequisites to a fresh\s+implementer session/);
   assert.match(source, /orchestrator does not edit worker code/);
   assert.match(source, /orchestrator follows `phased-plan-closeout`/);
-  assert.match(source, /executor must not edit or commit the CHG path/);
+  assert.match(source, /executor\s+must not edit or commit the CHG path/);
   assert.match(source, /forced final reply cannot run checks, update the CHG, or resume itself/i);
   assert.match(source, /existing worktree/);
   assert.doesNotMatch(source, /durable handoff record|<handoff-record path>|scratch handoff/i);
@@ -185,7 +185,9 @@ test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
     assert.match(sources.get(name), /target-only/);
   }
   assert.match(closeout, /phase\/.*full-reservation-sha/);
-  assert.match(closeout, /phase-guard\.mjs locate/);
+  const recovery = await readFile(path.join(skillsRoot, "software-development/phased-plan-closeout/references/recovery.md"), "utf8");
+  assert.match(closeout, /references\/recovery\.md/);
+  assert.match(recovery, /phase-guard\.mjs locate/);
   assert.match(closeout, /git -C <target> merge --ff-only <reviewed-sha>/);
   assert.match(closeout, /git -C <target> worktree remove <worktree-path>/);
   const rootAgent = await readFile(path.join(root, "AGENTS.md"), "utf8");

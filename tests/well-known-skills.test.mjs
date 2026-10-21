@@ -48,7 +48,7 @@ test("well-known build publishes every skill and all advertised files", async ()
     const autonomous = index.skills.find((skill) => skill.name === "autonomous-implementation-review");
     assert.deepEqual(autonomous?.files, ["references/herdr.md", "scripts/herdr_panes.py", "SKILL.md"]);
     const closeout = index.skills.find((skill) => skill.name === "phased-plan-closeout");
-    assert.deepEqual(closeout?.files, ["references/record-writes.md", "scripts/phase-guard.mjs", "SKILL.md"]);
+    assert.deepEqual(closeout?.files, ["references/record-writes.md", "references/recovery.md", "references/review-boundary.md", "scripts/phase-guard.mjs", "SKILL.md"]);
   } finally {
     await rm(output, { recursive: true, force: true });
   }

@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from pathlib import Path
 from collections import OrderedDict
 from typing import Any
 
@@ -44,6 +45,8 @@ def pane_summary(pane: dict[str, Any]) -> tuple[str, str, str, str]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--workspace", required=True, help="workspace passed to `herdr pane list --workspace`")
+    parser.add_argument("--orchestrator", required=True, help="literal current pane ID, not inferred from focus")
+    parser.add_argument("--selection", type=Path, help="operator selection evidence JSON; validate only, never control a pane")
     args = parser.parse_args()
 
     raw = sys.stdin.read()
@@ -66,9 +69,35 @@ def main() -> int:
     if not all(isinstance(pane, dict) for pane in panes):
         return die("result.panes contains a non-object entry")
 
-    outside = [text(pane.get("pane_id")) for pane in panes if text(pane.get("workspace_id")) not in ("", args.workspace)]
+    outside = [text(pane.get("pane_id")) for pane in panes if pane.get("workspace_id") != args.workspace]
     if outside:
         return die(f"response includes panes outside workspace {args.workspace}: {', '.join(outside)}")
+
+    ids = [pane.get("pane_id") for pane in panes]
+    if any(not isinstance(value, str) or not value or value != value.strip() for value in ids):
+        return die("expected literal nonempty pane IDs")
+    if len(set(ids)) != len(ids):
+        return die("duplicate pane IDs")
+    if args.orchestrator not in ids:
+        return die("orchestrator pane is absent; require its actual identity")
+    eligible = [pane for pane in panes if pane["pane_id"] != args.orchestrator
+                and pane.get("agent") == "hermes" and pane.get("agent_status") in ("idle", "done")]
+    if args.selection:
+        try:
+            selection = json.loads(args.selection.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as error:
+            return die(f"invalid selection evidence: {error}")
+        if not isinstance(selection, dict) or not (
+            selection.get("source") == "launch" or
+            (selection.get("source") == "clarify" and selection.get("outcome") == "submitted"
+             and selection.get("status") == "answered")
+        ):
+            return die("explicit answered selection or operator launch pane required; no implicit consent")
+        selected = selection.get("pane_id")
+        if selected not in [pane["pane_id"] for pane in eligible]:
+            return die("selected pane is not an eligible executor")
+        print(json.dumps({"ok": True, "workspace": args.workspace, "pane_id": selected}))
+        return 0
 
     tabs: OrderedDict[str, list[dict[str, Any]]] = OrderedDict()
     for pane in panes:
@@ -83,17 +112,17 @@ def main() -> int:
             pane_id, display, agent, cwd = pane_summary(pane)
             print(f"  {display}")
             print(f"    cwd: {cwd}")
-            if agent:
+            if pane in eligible:
                 candidates.append((pane_id, text(pane.get("label")), agent, text(pane.get("agent_status")) or "unknown"))
 
     if candidates:
-        print("\nCoding-session candidates — select one explicitly before control:")
+        print("\nEligible executor candidates — select one explicitly before control:")
         for pane_id, label, agent, status in candidates:
             suffix = f" ({label})" if label else ""
             print(f"  {pane_id}{suffix}: {agent}, {status}")
         print("Use the pane ID as the Herdr control target; labels are display metadata, not reliable agent targets.")
     else:
-        print("\nNo recognized coding-agent sessions are available in this workspace.")
+        print("\nNo eligible Hermes executors are available in this workspace.")
     return 0
 
 

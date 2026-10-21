@@ -2,7 +2,7 @@
 // Read-only Git/CHG preflight. Never stages, commits, merges, or repairs files.
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { lstatSync, realpathSync } from "node:fs";
+import { lstatSync, readFileSync, readlinkSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { parseArgs } from "node:util";
 
@@ -177,17 +177,83 @@ function row(o) {
   return { ref, phase: o.phase, state };
 }
 
-function contentDigest(repo, ref) {
+function treeEntries(repo, ref) {
   const listing = ref ? gitRaw(repo, "ls-tree", "-rz", "--full-tree", ref)
     : gitRaw(repo, "ls-files", "--stage", "-z");
-  const entries = listing.split("\0").filter(Boolean).map((entry) => {
+  return listing.split("\0").filter(Boolean).map((entry) => {
     const tab = entry.indexOf("\t");
     const [mode, middle, last] = entry.slice(0, tab).split(" ");
     requireThat(tab > 0 && (ref || last === "0"), "Expected a resolved full index");
     return [entry.slice(tab + 1), mode, ref ? last : middle];
   });
-  entries.sort((a, b) => a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0);
+}
+
+function digestEntries(entries) {
+  entries = [...entries].sort((a, b) => a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0);
   return createHash("sha256").update(JSON.stringify(entries)).digest("hex");
+}
+
+function contentDigest(repo, ref) {
+  return digestEntries(treeEntries(repo, ref));
+}
+
+function workingEntries(repo, baseEntries) {
+  const index = treeEntries(repo);
+  requireThat([...baseEntries, ...index].every(([, mode]) => mode !== "160000"), "Submodules require a separate review boundary");
+  const objectFormat = git(repo, "rev-parse", "--show-object-format");
+  requireThat(["sha1", "sha256"].includes(objectFormat), "Unsupported Git object format");
+  const names = new Set([...baseEntries, ...index].map(([name]) => name));
+  for (const name of gitRaw(repo, "ls-files", "--others", "--exclude-standard", "-z").split("\0").filter(Boolean)) names.add(name);
+  const entries = [];
+  for (const name of names) {
+    const parts = name.split("/");
+    for (let i = 1; i < parts.length; i++) {
+      const parent = lstatSync(path.join(repo, ...parts.slice(0, i)), { throwIfNoEntry: false });
+      requireThat(!parent || parent.isDirectory(), "Candidate path has a non-directory or symlink parent");
+    }
+    const file = path.join(repo, name);
+    const info = lstatSync(file, { throwIfNoEntry: false });
+    if (!info) continue;
+    requireThat(info.isFile() || info.isSymbolicLink(), "Candidate contains an unsupported file type");
+    const mode = info.isSymbolicLink() ? "120000" : (info.mode & 0o111) ? "100755" : "100644";
+    const input = info.isSymbolicLink() ? readlinkSync(file, { encoding: "buffer" }) : readFileSync(file);
+    // Git's raw blob framing; no filters, object writes, or subprocess per file.
+    const oid = createHash(objectFormat).update(`blob ${input.length}\0`).update(input).digest("hex");
+    entries.push([name, mode, oid]);
+  }
+  return entries;
+}
+
+function candidate(o) {
+  const repo = realpathSync(o.repo);
+  requireThat(repo === realpathSync(git(repo, "rev-parse", "--show-toplevel")), "Expected checkout root");
+  const base = sha(o.base);
+  const boundary = o.boundary;
+  requireThat(["worktree", "index", "commit"].includes(boundary), "Expected worktree, index, or commit boundary");
+  requireThat(boundary === "commit" ? !!o.ref : !o.ref, "Only commit boundary accepts and requires --ref");
+  requireThat(boundary === "worktree" || o["expect-content"], "Index and commit checks require the reviewed content digest");
+  const before = treeEntries(repo, base);
+  let entries;
+  if (boundary === "commit") {
+    const ref = sha(o.ref);
+    requireThat(git(repo, "rev-parse", "HEAD") === ref, "Candidate commit is not checkout HEAD");
+    requireThat(git(repo, "rev-list", "--parents", "-n", "1", ref) === `${ref} ${base}`, "Candidate parent differs from review base");
+    requireThat(git(repo, "status", "--porcelain=v1", "--untracked-files=all") === "", "Checkout is dirty; preserve its changes");
+    entries = treeEntries(repo, ref);
+  } else {
+    requireThat(git(repo, "rev-parse", "HEAD") === base, "Candidate base changed");
+    const working = workingEntries(repo, before);
+    entries = boundary === "worktree" ? working : treeEntries(repo);
+    requireThat(digestEntries(working) === digestEntries(entries), "Index differs from working candidate; preserve unstaged/untracked content");
+  }
+  const old = new Map(before.map(([name, ...rest]) => [name, JSON.stringify(rest)]));
+  const current = new Map(entries.map(([name, ...rest]) => [name, JSON.stringify(rest)]));
+  const changed = [...new Set([...old.keys(), ...current.keys()])].filter(name => old.get(name) !== current.get(name)).sort();
+  const allowlist = o["allow-path"];
+  requireThat(new Set(allowlist).size === allowlist.length && JSON.stringify(changed) === JSON.stringify([...allowlist].sort()), "Candidate paths do not match the exact allowlist");
+  const digest = digestEntries(entries);
+  if (o["expect-content"]) requireThat(/^[a-f0-9]{64}$/.test(o["expect-content"]) && digest === o["expect-content"], "Candidate differs from reviewed content");
+  return { base, boundary, paths: changed, contentDigest: digest, ...(o.ref ? { ref: o.ref } : {}) };
 }
 
 function paths(o) {
@@ -226,20 +292,21 @@ try {
   const pathNames = ["repo", "ref", "allow-path", "base", "expect-content"];
   const locateNames = ["repo", "reservation", "chg", "phase"];
   const createNames = ["target", "target-branch", "reservation", "chg", "phase", "worktree"];
-  const names = [...new Set([...preflightNames, ...rowNames, "evidence-commit", ...pathNames])];
+  const candidateNames = [...pathNames, "boundary"];
+  const names = [...new Set([...preflightNames, ...rowNames, "evidence-commit", ...candidateNames])];
   const { positionals, values: o } = parseArgs({ allowPositionals: true,
     options: Object.fromEntries(names.map((name) => [name, { type: "string", multiple: name === "allow-path" }])) });
   const command = positionals[0];
-  requireThat(positionals.length === 1 && ["preflight", "row", "paths", "locate", "create-preview"].includes(command), "Expected preflight, row, paths, locate, or create-preview command");
-  const required = { preflight: preflightNames, row: rowNames, paths: ["repo", "allow-path"], locate: locateNames, "create-preview": createNames }[command];
+  requireThat(positionals.length === 1 && ["preflight", "row", "paths", "locate", "create-preview", "candidate"].includes(command), "Expected preflight, row, paths, locate, create-preview, or candidate command");
+  const required = { preflight: preflightNames, row: rowNames, paths: ["repo", "allow-path"], locate: locateNames, "create-preview": createNames, candidate: ["repo", "base", "boundary", "allow-path"] }[command];
   requireThat(required.every((name) => o[name]), "Missing required argument");
-  const allowed = { preflight: preflightNames, row: [...rowNames, "evidence-commit"], paths: pathNames, locate: locateNames, "create-preview": createNames }[command];
+  const allowed = { preflight: preflightNames, row: [...rowNames, "evidence-commit"], paths: pathNames, locate: locateNames, "create-preview": createNames, candidate: candidateNames }[command];
   requireThat(Object.keys(o).every((name) => allowed.includes(name)), "Unexpected argument for command");
-  if (command !== "paths") {
+  if (!["paths", "candidate"].includes(command)) {
     requireThat(/^docs\/changes\/(?:active|archive)\/CHG-[^/\\:*?\[\]\s]+\.md$/.test(o.chg) && !o.chg.includes(".."), "Expected one literal repository-relative CHG path");
     requireThat(/^[1-9]\d*$/.test(o.phase), "Expected numeric phase ID");
   }
-  console.log(JSON.stringify({ ok: true, ...({ preflight, row, paths, locate, "create-preview": createPreview }[command](o)) }));
+  console.log(JSON.stringify({ ok: true, ...({ preflight, row, paths, locate, "create-preview": createPreview, candidate }[command](o)) }));
 } catch (error) {
   console.log(JSON.stringify({ ok: false, ...details, error: error.message }));
   process.exitCode = 1;

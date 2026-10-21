@@ -7,23 +7,38 @@ Require Herdr, Python 3, and a live Hermes executor with the configured model ke
 
 ## Select and claim
 
-1. Require `$HERDR_WORKSPACE_ID`. Through `terminal`, run the read-only overview:
+Before reservation or any mutating pane command (including rename, `/new`,
+`/busy`, or `/model`), require explicit operator selection. A timed-out,
+cancelled, skipped, unanswered, or undelivered form is a blocker. A sole candidate,
+an existing `exec` name, or broad autonomous authority never supplies consent.
+
+1. Require `$HERDR_WORKSPACE_ID` and the actual orchestrator pane ID; do not infer
+   it from focus. Capture JSON to a fresh session-scratch path through `terminal`:
 
    ```sh
-   set -o pipefail
-   herdr pane list --workspace "$HERDR_WORKSPACE_ID" | python3 <this-skill-dir>/scripts/herdr_panes.py --workspace "$HERDR_WORKSPACE_ID"
+   herdr pane list --workspace "$HERDR_WORKSPACE_ID" > <scratch>/panes.json
    ```
 
-2. Show the grouped overview. Use `clarify` with a single-select form for an
-   explicit executor pane ID: up to four non-orchestrator candidates, preferred
-   idle first; each choice names ID, label, agent kind, state, and cwd. The Other
-   field accepts another pane ID. A candidate needs a non-empty recognized
-   `agent`; `agent_status: unknown` without `agent` is not a coding session.
-3. Read fresh pane JSON after selection. The chosen ID must still exist in this
-   workspace, differ from the orchestrator, have a recognized coding agent, and
-   be idle or done. Do not accept labels, agent kinds, prose, working, blocked,
-   or unknown panes. On failure, offer one corrective form; with no eligible
-   pane, report the blocker without sending input.
+   Inspect it with `read_file`, then run the read-only overview through `terminal`:
+
+   ```sh
+   python3 <this-skill-dir>/scripts/herdr_panes.py --workspace "$HERDR_WORKSPACE_ID" --orchestrator <pane-id> < <scratch>/panes.json
+   ```
+
+2. Show the overview. An explicit executor pane ID supplied by the operator in
+   this launch may be used directly; otherwise use `clarify` with up to four eligible
+   Hermes panes (idle/done, not the orchestrator). Each choice names pane ID,
+   label, state, and cwd; Other accepts a literal pane ID. No answer means stop.
+3. Capture fresh pane JSON after selection. Use `write_file` for selection evidence:
+   `{"source":"launch","pane_id":"<literal-id>"}` for an explicit launch choice,
+   or `{"source":"clarify","outcome":"submitted","status":"answered","pane_id":"<literal-id>"}`
+   reflecting the actual form result. Never invent a launch choice after timeout.
+   Validate through `terminal` by adding `--selection <scratch>/selection.json` to
+   the overview command. Require exit 0 before control; reject stale/busy, foreign,
+   duplicate, missing, or unknown panes. The helper checks supplied evidence, not
+   its authenticity or future liveness: retain the operator message/form result
+   and recheck state before control. On an invalid answered choice,
+   offer one corrective form; timeout or absent candidates ends in a blocker.
 4. Claim only the selected live agent with `herdr agent rename <pane-id> exec`
    (or use `exec` on an explicitly approved new agent start). If occupied, try
    `exec2`, then `exec3`; do not take over another pane. Read back the agent's
@@ -64,6 +79,11 @@ For each implement, review, or correction role, from a verified idle/done sessio
    ```text
    herdr agent wait <pane-id> --until idle --until done --until blocked --timeout <time-budget-ms>
    ```
+
+   Herdr timeout is milliseconds; `terminal.timeout` is seconds. For example,
+   use Herdr `--timeout 240000` with `terminal(timeout=300)`. For longer waits,
+   run one tracked background wait and consume its result via `process_manage`;
+   never substitute sleeps, pane captures, or concurrent waits.
 
 `idle`/`done` permit reading the report and verifying the actual diff/checks;
 they do not prove task completion. On `blocked`, inspect with `herdr agent get`

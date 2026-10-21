@@ -1,7 +1,7 @@
 ---
 name: phased-plan-execution
 description: Execute one CAP/CHG phase without competing status writers.
-version: 1.3.0
+version: 1.5.0
 author: AI Software Blueprint
 license: MIT
 metadata:
@@ -12,42 +12,42 @@ metadata:
 
 # Phased Plan Execution
 
-Execute one selected material phase. The CHG phase table is progress authority;
-CAPs describe current behaviour. Do not create a parallel tracker or apply this
-lifecycle to non-material work.
+Execute one material phase. The CHG phase table owns progress; CAPs own current
+behaviour. No parallel tracker or lifecycle for non-material work.
 
 ## Procedure
 
-1. Read the selected active CHG, affected CAPs, DOX chain, phase gate, target
-   branch, and Git status. Resolve ambiguous ownership before implementation.
-2. The orchestrator follows `phased-plan-closeout` for reservation and all Git/CHG
-   writes. The executor must not edit or commit the CHG path, stage files, commit
-   implementation, integrate branches, or remove worktrees. If commit authority
-   or repository policy prevents reservation, stop before mutable phase work.
-3. In the reserved worktree, inspect definitions, usages, and tests; implement
-   the complete behaviour/test/CAP slice. For a visual handoff, load
+1. Read the active CHG, CAPs, DOX, gate and target identity/status. Resolve ownership;
+   batch independent reads, not actions dependent on consent or earlier results.
+2. The orchestrator owns reservation and Git/CHG writes through `phased-plan-closeout`.
+   The executor must not edit or commit the CHG path, stage, commit, integrate or
+   remove worktrees. Without a permitted reservation, stop before mutable work.
+3. In the reserved worktree, inspect package exports, build scripts, runtime pins
+   and CI order. Derive installation/generated-output prerequisites from the project,
+   not another checkout's caches. Run bootstrap separately from the unchanged phase gate;
+   retain exit statuses/failures and honor stop rules before repairs. Inspect code,
+   usages and tests, then implement only the selected slice. Verification-only phases
+   need no invented edits or empty commits. For a visual handoff, load
    `capability-wireframes`; keep proposals in the CHG review package and regenerate
    canonical HTML/PNG, manifest, and CAP links with the changed interaction.
-4. Run every named phase gate and required independent review against one frozen
-   diff, including untracked source files. Record exact commands and real outcomes
-   in the report; a report is evidence, not a second phase table.
-5. Fix confirmed review findings in the same worktree; any changed reviewed
-   content invalidates its approval and requires renewed checks/review. Report
-   new scope or prerequisites to the orchestrator before implementing them.
-   It uses `phased-plan-refactoring` only at a verified boundary.
-6. Hand the frozen diff and gate/review evidence to the orchestrator for closeout.
-   Do not mark the phase done or start a later phase from the worktree.
+4. Run every named gate and required independent review on the frozen candidate,
+   including untracked source, using closeout's review-boundary recipe. Report
+   commands/results, checkout, base/digest, environment, logs, skips and retries.
+   Evidence is not a second phase table; reuse valid results, not unverified claims.
+5. Fix confirmed findings in the same worktree; changed content requires renewed
+   checks/review. Report new scope/prerequisites before implementing; the orchestrator
+   uses `phased-plan-refactoring` only at a verified boundary.
+6. Hand candidate and evidence to closeout. Never mark done or start a later phase.
 
 ## Pitfalls
 
-- A CHG diff or conflicting status is a blocker. Preserve it; never reset,
-  overwrite, or choose a merge side to make closeout pass.
-- A turn/tool cap does not finish a phase. Resume the exact unfinished action
-  in the existing reserved worktree, not a fresh competing implementation.
-- A post-completion correction needs an orchestrator-owned reopening before
-  edits; prior evidence covers only its original frozen revision.
+- CHG/status conflicts block; preserve them, never reset, overwrite or choose sides.
+- A cap is not completion. Resume the unfinished action in the existing reserved
+  worktree, not a competing implementation.
+- Post-completion corrections require orchestrator reopening; old evidence covers
+  only its frozen revision.
 
 ## Verification
 
-The slice passes its named gates and required review. Only closeout proves target
-integration and completion; until then the target row remains in progress.
+Named gates and review must pass; only closeout proves target completion.
+Until then the target row remains in progress.

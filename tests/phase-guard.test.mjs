@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -11,13 +11,13 @@ const chg = "docs/changes/active/CHG-001-example.md";
 const record = (state = "in-progress", second = "pending") => `# Example\n\n| # | Phase | Status | Verification gate |\n| --- | --- | --- | --- |\n| 1 | Implement | ${state} | npm test |\n| 2 | Integrate | ${second} | npm test |\n`;
 const git = (cwd, ...args) => execFileSync("git", ["-C", cwd, ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, GIT_CONFIG_NOSYSTEM: "1", GIT_CONFIG_GLOBAL: os.devNull } }).trim();
 
-async function fixture(t, state = "in-progress", second = "pending", createWorker = true) {
+async function fixture(t, state = "in-progress", second = "pending", createWorker = true, objectFormat = "sha1") {
   const scratch = await mkdtemp(path.join(os.tmpdir(), "phase-guard-"));
   t.after(() => rm(scratch, { recursive: true, force: true }));
   const target = path.join(scratch, "primary");
   const worktree = path.join(scratch, "worker");
   await mkdir(target);
-  git(target, "init", "-b", "main");
+  git(target, "init", "-b", "main", `--object-format=${objectFormat}`);
   git(target, "config", "user.email", "fixture@example.invalid");
   git(target, "config", "user.name", "Fixture");
   git(target, "config", "commit.gpgsign", "false");
@@ -39,8 +39,8 @@ async function fixture(t, state = "in-progress", second = "pending", createWorke
   return { target, worktree, reservation, worktreeHead, branch };
 }
 
-function invoke(args) {
-  const result = spawnSync(process.execPath, [guard, ...args], { encoding: "utf8" });
+function invoke(args, env = {}) {
+  const result = spawnSync(process.execPath, [guard, ...args], { encoding: "utf8", env: { ...process.env, ...env } });
   assert.equal(result.signal, null);
   assert.ok(result.stdout.trim(), result.stderr);
   return { status: result.status, ...JSON.parse(result.stdout) };
@@ -394,4 +394,128 @@ test("unborn worktree registration reports an ownership handoff without silently
   assert.equal(result.status, 1);
   assert.match(result.error, /unresolved HEAD.*ownership handoff/);
   assert.equal(git(f.target, "worktree", "list", "--porcelain"), before);
+});
+
+test("candidate binds unstaged and untracked content through index and commit without staging", async t => {
+  const f = await fixture(t);
+  await writeFile(path.join(f.worktree, "implementation.txt"), "Changed implementation.\n");
+  await writeFile(path.join(f.worktree, "new test.txt"), "Regression.\n");
+  const args = ["candidate", "--repo", f.worktree, "--base", f.worktreeHead,
+    "--allow-path", "implementation.txt", "--allow-path", "new test.txt"];
+  const status = git(f.worktree, "status", "--porcelain");
+  const frozen = invoke([...args, "--boundary", "worktree"]);
+  assert.equal(frozen.status, 0, JSON.stringify(frozen));
+  assert.equal(git(f.worktree, "status", "--porcelain"), status);
+  assert.equal(git(f.worktree, "diff", "--cached"), "");
+  git(f.worktree, "add", "--", "implementation.txt", "new test.txt");
+  assert.equal(invoke([...args, "--boundary", "index", "--expect-content", frozen.contentDigest]).status, 0);
+  git(f.worktree, "commit", "-m", "Reviewed content");
+  const ref = git(f.worktree, "rev-parse", "HEAD");
+  assert.equal(invoke([...args, "--boundary", "commit", "--ref", ref, "--expect-content", frozen.contentDigest]).status, 0);
+  await writeFile(path.join(f.worktree, "new test.txt"), "Unreviewed drift.\n");
+  assert.notEqual(invoke([...args, "--boundary", "commit", "--ref", ref, "--expect-content", frozen.contentDigest]).status, 0);
+});
+
+test("candidate rejects post-review edits, unstaged additions, omissions, and same-path commit rewrites", async t => {
+  const f = await fixture(t);
+  const file = path.join(f.worktree, "new.txt");
+  await writeFile(file, "Reviewed.\n");
+  const args = ["candidate", "--repo", f.worktree, "--base", f.worktreeHead, "--allow-path", "new.txt"];
+  const frozen = invoke([...args, "--boundary", "worktree"]);
+  assert.equal(frozen.status, 0);
+  const expect = ["--expect-content", frozen.contentDigest];
+  assert.match(invoke([...args, "--boundary", "index", ...expect]).error, /Index differs/);
+  await writeFile(file, "Different.\n");
+  assert.match(invoke([...args, "--boundary", "worktree", ...expect]).error, /reviewed content/);
+  git(f.worktree, "add", "--", "new.txt");
+  assert.match(invoke([...args, "--boundary", "index", ...expect]).error, /reviewed content/);
+  // Simulates a hook that replaces the staged content under the same path.
+  git(f.worktree, "commit", "-m", "Rewritten content");
+  const ref = git(f.worktree, "rev-parse", "HEAD");
+  assert.match(invoke([...args, "--boundary", "commit", "--ref", ref, ...expect]).error, /reviewed content/);
+});
+
+test("candidate fingerprints binary contents, deletions, executable modes and symlink targets", async t => {
+  if (process.platform === "win32") return t.skip("POSIX executable and symlink fixture");
+  const f = await fixture(t);
+  await rm(path.join(f.worktree, "implementation.txt"));
+  await writeFile(path.join(f.worktree, "binary"), Buffer.from([0, 128, 255]));
+  await chmod(path.join(f.worktree, "binary"), 0o755);
+  await symlink("binary", path.join(f.worktree, "link"));
+  const args = ["candidate", "--repo", f.worktree, "--base", f.worktreeHead,
+    ...["implementation.txt", "binary", "link"].flatMap(p => ["--allow-path", p])];
+  const frozen = invoke([...args, "--boundary", "worktree"]);
+  assert.equal(frozen.status, 0, JSON.stringify(frozen));
+  git(f.worktree, "add", "--", "implementation.txt", "binary", "link");
+  assert.equal(invoke([...args, "--boundary", "index", "--expect-content", frozen.contentDigest]).status, 0);
+  await chmod(path.join(f.worktree, "binary"), 0o644);
+  assert.match(invoke([...args, "--boundary", "worktree", "--expect-content", frozen.contentDigest]).error, /reviewed content/);
+  await chmod(path.join(f.worktree, "binary"), 0o755);
+  await rm(path.join(f.worktree, "link"));
+  await symlink("elsewhere", path.join(f.worktree, "link"));
+  assert.match(invoke([...args, "--boundary", "worktree", "--expect-content", frozen.contentDigest]).error, /reviewed content/);
+});
+
+test("candidate includes unexpected untracked files but ignores disposable build output", async t => {
+  const f = await fixture(t);
+  await writeFile(path.join(f.worktree, ".gitignore"), "dist/\n");
+  await mkdir(path.join(f.worktree, "dist"));
+  await writeFile(path.join(f.worktree, "dist", "build.js"), "ignored");
+  const args = ["candidate", "--repo", f.worktree, "--base", f.worktreeHead, "--allow-path", ".gitignore", "--boundary", "worktree"];
+  assert.equal(invoke(args).status, 0);
+  await writeFile(path.join(f.worktree, "unexpected.txt"), "Do not omit me");
+  assert.match(invoke(args).error, /exact allowlist/);
+  assert.match(invoke([...args, "--allow-path", ".gitignore"]).error, /exact allowlist/);
+});
+
+for (const format of ["sha1", "sha256"]) {
+  test(`candidate raw-byte digest equals Git's staged and committed ${format} trees`, async t => {
+    const f = await fixture(t, "in-progress", "pending", true, format);
+    const names = ["empty", "binary", "crlf", "utf8", "large"];
+    const contents = [Buffer.alloc(0), Buffer.from([0, 128, 255, 10]), Buffer.from("a\r\nb\r\n"),
+      Buffer.from("Unicode: λ🙂\n"), Buffer.alloc(1024 * 1024, 255)];
+    for (let i = 0; i < names.length; i++) await writeFile(path.join(f.worktree, names[i]), contents[i]);
+    const args = ["candidate", "--repo", f.worktree, "--base", f.worktreeHead,
+      ...names.flatMap(name => ["--allow-path", name])];
+    const frozen = invoke([...args, "--boundary", "worktree"]);
+    assert.equal(frozen.status, 0, JSON.stringify(frozen));
+    git(f.worktree, "-c", "core.autocrlf=false", "add", "--", ...names);
+    const indexed = invoke(["paths", "--repo", f.worktree, ...names.flatMap(name => ["--allow-path", name])]);
+    assert.equal(indexed.status, 0, JSON.stringify(indexed));
+    assert.equal(frozen.contentDigest, indexed.contentDigest);
+    assert.equal(invoke([...args, "--boundary", "index", "--expect-content", frozen.contentDigest]).status, 0);
+    git(f.worktree, "commit", "-m", "Git-generated reference objects");
+    assert.equal(invoke([...args, "--boundary", "commit", "--ref", git(f.worktree, "rev-parse", "HEAD"),
+      "--expect-content", frozen.contentDigest]).status, 0);
+  });
+}
+
+test("candidate Git subprocess count is constant as file count grows", async t => {
+  const f = await fixture(t);
+  const scratch = path.dirname(f.target);
+  const probe = path.join(scratch, "count-git.mjs");
+  const log = path.join(scratch, "git-calls.jsonl");
+  await writeFile(probe, `import cp from 'node:child_process';
+import { syncBuiltinESMExports } from 'node:module';
+import { appendFileSync } from 'node:fs';
+const original = cp.execFileSync;
+cp.execFileSync = function(file, args, options) {
+  if (file === 'git') appendFileSync(process.env.GIT_PROBE_LOG, JSON.stringify(args) + '\\n');
+  return original.call(this, file, args, options);
+};
+syncBuiltinESMExports();\n`);
+  const counts = [];
+  for (const count of [1, 40]) {
+    const names = Array.from({ length: count }, (_, i) => `new-${i}.txt`);
+    for (const name of names) await writeFile(path.join(f.worktree, name), "content\n");
+    await writeFile(log, "");
+    const r = invoke(["candidate", "--repo", f.worktree, "--base", f.worktreeHead, "--boundary", "worktree",
+      ...names.flatMap(name => ["--allow-path", name])],
+    { NODE_OPTIONS: `--import=${JSON.stringify(probe)}`, GIT_PROBE_LOG: log });
+    assert.equal(r.status, 0, JSON.stringify(r));
+    const calls = (await readFile(log, "utf8")).trim().split("\n").map(line => JSON.parse(line));
+    counts.push(calls.length);
+  }
+  assert.equal(counts[0], counts[1], `Git subprocesses grew with files: ${counts}`);
+  assert.ok(counts[0] <= 10, `Expected bounded Git metadata calls, saw ${counts[0]}`);
 });
