@@ -196,6 +196,29 @@ test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
   assert.match(autonomousContract, /`delegate_task` is research-only/i);
 });
 
+test("phase overview bounds discovery, recovery, and the final handoff", async () => {
+  const source = await readFile(
+    path.join(skillsRoot, "software-development/phased-plan-overview/SKILL.md"),
+    "utf8",
+  );
+  assert.ok(source.length < 7000, "keep overview guidance bounded");
+  assert.match(source, /## Scope and stopping rule/);
+  assert.match(source, /Do not rerun implementation tests, lint, builds, or visual gates/);
+  assert.match(source, /Do not scan archives or upstream assessments/);
+  assert.match(source, /Do not search host directories or inspect Herdr\/Hermes source/);
+  assert.match(source, /\$HERDR_ENV=1/);
+  assert.match(source, /\$HERDR_WORKSPACE_ID/);
+  assert.match(source, /single active CHG is unambiguous/);
+  assert.match(source, /## Decision table/);
+  assert.match(source, /No in-progress row; cleanup proved complete/);
+  assert.match(source, /zero matches is expected only after removal/);
+  assert.match(source, /merged leftover branch ref alone is not outstanding cleanup/);
+  assert.match(source, /Run the repository's record validator once/);
+  assert.match(source, /Stop gathering evidence once/);
+  assert.match(source, /## Final answer/);
+  assert.match(source, /Do not repeat the full phase table/);
+});
+
 test("skills package separate review storage and a visual handoff gate", async () => {
   const sources = {};
   for (const name of ["application-records", "capability-wireframes", "phased-plan-design", "phased-plan-execution"]) {

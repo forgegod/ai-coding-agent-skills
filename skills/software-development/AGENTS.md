@@ -27,6 +27,7 @@ Own optional, portable agent workflows for maintaining the canonical capability 
 - `phased-plan-closeout/scripts/phase-guard.mjs` is a read-only Node 22+/Git helper. Real Git fixtures verify reservation-derived worktree identity, blob/history/topology refusal, exact path/content/parent readback across hooks, and completion evidence tied to the reviewed tip. It does not acquire a lock, authorize writes, or repair failures.
 - Worktree creation uses the guard's `create-preview` argument array after reservation; it refuses collisions and stale/dirty targets, never creates anything, and does not replace authorization or recovery. Keep `.mjs` packaging independent of a consumer's module settings.
 - Launch examples state the exact operator-authorized local Git scope and stay identical across README, overview, and orchestration. Displaying them is not authorization. Missing/competing ownership or invalid readback preserves work and requires an explicit recovery handoff.
+- Overview is bounded read-only selection: one Git snapshot and record-validation pass, conditional recovery of the relevant phase, and named Herdr environment checks. It does not rerun implementation gates or inspect host/source trees to prove transport support; unresolved evidence ends in a blocker, not broader discovery.
 
 ## Work Guidance
 
