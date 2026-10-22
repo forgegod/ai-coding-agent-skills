@@ -1,8 +1,9 @@
 # Herdr executor transport
 
-Load this reference before controlling a pane when `$HERDR_ENV=1`. The parent
-skill owns task scope and review; this reference owns selection, delivery, and
-lifecycle checks. It grants no commit, credential, installation, or stop authority.
+Load this before controlling a pane where `$HERDR_ENV=1`; it owns selection,
+delivery, and lifecycle, not task scope or authority. Load
+[environment-passthrough.md](environment-passthrough.md) only when a role
+needs Herdr context inside a child tool.
 Require Herdr, Python 3, and a live Hermes executor with the configured model keys.
 
 ## Select and claim

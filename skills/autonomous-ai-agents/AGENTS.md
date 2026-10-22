@@ -11,6 +11,7 @@ Herdr pane-selection helper.
 | --- | --- |
 | `autonomous-implementation-review/SKILL.md` | Bounded implementation, review, and verification loop. |
 | `autonomous-implementation-review/scripts/herdr_panes.py` | Read-only overview and fail-closed validation of supplied operator selection against fresh pane JSON. |
+| `autonomous-implementation-review/references/environment-passthrough.md` | Profile-scoped Hermes child-environment configuration for Herdr context. |
 | `autonomous-implementation-review/references/herdr.md` | On-demand Herdr selection, delivery, lifecycle, and stop mechanics. |
 
 ## Local Contracts

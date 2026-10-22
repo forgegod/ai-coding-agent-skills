@@ -53,6 +53,7 @@ test("autonomous-implementation-review packages its selection helper", async () 
   const source = await readFile(path.join(directory, "SKILL.md"), "utf8");
   const helper = await readFile(path.join(directory, "scripts", "herdr_panes.py"), "utf8");
   const transport = await readFile(path.join(directory, "references", "herdr.md"), "utf8");
+  const environment = await readFile(path.join(directory, "references", "environment-passthrough.md"), "utf8");
   assert.ok(source.length < 6500, "keep the normal orchestration path compact");
   assert.ok(transport.length < 6500, "transport reference must not accumulate duplicated procedures");
   assert.match(source, /references\/herdr\.md/);
@@ -77,6 +78,12 @@ test("autonomous-implementation-review packages its selection helper", async () 
     assert.match(transport, expected);
   }
   assert.match(helper, /herdr pane list/);
+  assert.match(environment, /terminal\.env_passthrough/);
+  assert.match(environment, /HERDR_ENV/);
+  assert.match(environment, /HERDR_WORKSPACE_ID/);
+  assert.match(environment, /does not create\s+variables missing from the Hermes process/);
+  assert.match(environment, /Do not pass through `HERMES_HOME`/);
+  assert.match(environment, /no wildcard/);
 });
 
 test("every SKILL.md carries name, description, and version in its frontmatter", async () => {
