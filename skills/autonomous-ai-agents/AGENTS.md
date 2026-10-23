@@ -26,7 +26,7 @@ Herdr pane-selection helper.
 - The orchestrator delegates Git/CHG writes to `phased-plan-closeout`; executors never stage, commit, integrate, retire worktrees, or edit the CHG path. Keep the command protocol out of this skill.
 - The orchestrator dispatches code/prerequisite fixes to the executor, never edits worker code itself, and honors the operator's explicit launch authority and stop decisions.
 - Keep external tool and model references as prerequisites, not bundled dependencies.
-- Bound discovery and reuse valid evidence; monitor one lifecycle wait with explicit milliseconds/seconds, not sleep/capture loops. Source changes do not authorize installed-profile updates.
+- Bound discovery and reuse valid evidence; monitor one lifecycle wait with explicit milliseconds/seconds, not sleep/capture loops. Reconcile an immediate stale idle/done result through one pane readback before continuing lifecycle monitoring. Source changes do not authorize installed-profile updates.
 
 ## Verification
 

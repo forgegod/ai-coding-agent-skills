@@ -1,9 +1,9 @@
 # Herdr executor transport
 
-Load this before controlling a pane where `$HERDR_ENV=1`; it owns selection,
-delivery, and lifecycle, not task scope or authority. Load
-[environment-passthrough.md](environment-passthrough.md) only when a role
-needs Herdr context inside a child tool.
+Load before pane control in `$HERDR_ENV=1`; it owns selection, delivery and
+lifecycle, not scope or authority. Load
+[environment-passthrough.md](environment-passthrough.md) only for child-tool
+Herdr context.
 Require Herdr, Python 3, and a live Hermes executor with the configured model keys.
 
 ## Select and claim
@@ -26,20 +26,16 @@ an existing `exec` name, or broad autonomous authority never supplies consent.
    python3 <this-skill-dir>/scripts/herdr_panes.py --workspace "$HERDR_WORKSPACE_ID" --orchestrator <pane-id> < <scratch>/panes.json
    ```
 
-2. Show the overview. An explicit executor pane ID supplied by the operator in
-   this launch may be used directly; otherwise use `clarify` with up to four eligible
-   Hermes panes (idle/done, not the orchestrator). Each choice names pane ID,
-   label, state, and cwd; Other accepts a literal pane ID. No answer means stop.
-3. Capture fresh pane JSON after selection. Use `write_file` for selection evidence:
-   `{"source":"launch","pane_id":"<literal-id>"}` for an explicit launch choice,
-   or `{"source":"clarify","outcome":"submitted","status":"answered","pane_id":"<literal-id>"}`
-   reflecting the actual form result. Never invent a launch choice after timeout.
-   Validate through `terminal` by adding `--selection <scratch>/selection.json` to
-   the overview command. Require exit 0 before control; reject stale/busy, foreign,
-   duplicate, missing, or unknown panes. The helper checks supplied evidence, not
-   its authenticity or future liveness: retain the operator message/form result
-   and recheck state before control. On an invalid answered choice,
-   offer one corrective form; timeout or absent candidates ends in a blocker.
+2. Show the overview. An explicit launch pane ID may be used directly; otherwise
+   `clarify` lists up to four idle/done, non-orchestrator Hermes panes with pane ID,
+   label, state and cwd. Other accepts a literal pane ID. No answer stops.
+3. Capture fresh pane JSON and use `write_file` for actual selection evidence:
+   `{"source":"launch","pane_id":"<literal-id>"}` or
+   `{"source":"clarify","outcome":"submitted","status":"answered","pane_id":"<literal-id>"}`.
+   Validate through `terminal` with `--selection <scratch>/selection.json`; require
+   exit 0 before control and reject stale/busy, foreign, duplicate, missing or
+   unknown panes. Evidence is not future liveness: retain the result and recheck
+   state. Offer one corrective form only; otherwise block.
 4. Claim only the selected live agent with `herdr agent rename <pane-id> exec`
    (or use `exec` on an explicitly approved new agent start). If occupied, try
    `exec2`, then `exec3`; do not take over another pane. Read back the agent's
@@ -85,6 +81,12 @@ For each implement, review, or correction role, from a verified idle/done sessio
    use Herdr `--timeout 240000` with `terminal(timeout=300)`. For longer waits,
    run one tracked background wait and consume its result via `process_manage`;
    never substitute sleeps, pane captures, or concurrent waits.
+
+   A just-delivered packet can race lifecycle detection: an immediate `idle` or
+   `done` that still carries the pre-dispatch completion/state sequence is not
+   role settlement. Read the pane once to reconcile that impossible result. If
+   it visibly contains an active turn, do not send another packet or treat it as
+   finished; wait again through the lifecycle API after detection catches up.
 
 `idle`/`done` permit reading the report and verifying the actual diff/checks;
 they do not prove task completion. On `blocked`, inspect with `herdr agent get`
