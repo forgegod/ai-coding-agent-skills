@@ -1,7 +1,7 @@
 ---
 name: phased-plan-overview
 description: Select a resumable CAP/CHG phase from the target branch.
-version: 1.4.0
+version: 1.4.1
 author: AI Software Blueprint
 license: MIT
 metadata:
@@ -71,20 +71,20 @@ this run; repeat only a failed/incomplete check or one invalidated by changed st
 | No in-progress row; cleanup proved complete | Select the first pending row of the chosen CHG. With no prior completed phase, require no outstanding phase worktree. |
 | All rows done in an active record | Report closure inconsistency; never replay implementation from an archive. |
 
-For a known worktree, compare its committed CHG blob with the target/reservation
-and inspect history, index, and working files; an empty `git diff` is insufficient.
-For an already removed completed worktree, prove the exact reservation-derived
-branch tip is the integrated implementation and its registration is absent.
-A merged leftover branch ref alone is not outstanding cleanup. `locate` requires
-a registered worktree: zero matches is expected only after removal has been proved
-by completion, branch-tip/ancestry, and registration evidence. Zero matches for an
-in-progress reservation remains a blocker. Do not scan sibling folders to guess identity.
+Follow closeout's recovery recipes: use captured full SHAs and exact ref lookups,
+not wildcard absence or reflogs as ownership proof. Classify completion and
+registration before `locate`; do not run it for an already removed worktree.
+A merged leftover branch ref alone is not outstanding cleanup. A missing worktree
+for an in-progress reservation remains a blocker. Do not scan sibling folders
+to guess identity.
 
 ## Final answer
 
 Lead with the selected CHG and phase, or the blocker/choices. Give target branch/SHA,
 CAPs, selected gate, validation result, and one sentence about ownership/cleanup.
 Do not repeat the full phase table, command transcript, or historical audit unless asked.
+Report selection and transport separately: a transport blocker does not invalidate
+a verified selection. Name the failed layer and next action; never imply delivery.
 
 For a selected implementation phase with no blocker in the supported Herdr
 environment, print exactly one command and do not dispatch it. Only the operator

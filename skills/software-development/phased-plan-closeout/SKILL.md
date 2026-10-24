@@ -2,7 +2,7 @@
 name: phased-plan-closeout
 description: Reserve and close CHG phases through one Git writer.
 argument-hint: "[--reserve | --commit-ff]"
-version: 0.8.1
+version: 0.8.2
 author: AI Software Blueprint
 license: MIT
 metadata:

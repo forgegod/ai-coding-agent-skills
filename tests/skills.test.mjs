@@ -220,7 +220,7 @@ test("phase overview bounds discovery, recovery, and the final handoff", async (
   assert.match(source, /single active CHG is unambiguous/);
   assert.match(source, /## Decision table/);
   assert.match(source, /No in-progress row; cleanup proved complete/);
-  assert.match(source, /zero matches is expected only after removal/);
+  assert.match(source, /do not run it for an already removed worktree/);
   assert.match(source, /merged leftover branch ref alone is not outstanding cleanup/);
   assert.match(source, /Run the repository's record validator once/);
   assert.match(source, /Stop gathering evidence once/);
