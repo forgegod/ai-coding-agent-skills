@@ -67,13 +67,35 @@ hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-co
 ```
 
 Source edits do not update installed copies. After an authorized publication,
-install through the normal hub and start a new session. For an unmodified
-hub-tracked copy, use `hermes -p <profile> skills update <skill-name>`; preserve and
+install through the normal hub and start a new session, or use the reviewed local
+installer below to copy unpublished source. For an unmodified hub-tracked copy
+(including copies registered by the local installer), use
+`hermes -p <profile> skills update <skill-name>`; preserve and
 resolve local edits/name collisions explicitly rather than forcing replacement.
 On a first install, `--yes` answers the install confirmation only, after operator
 authorization; it does not bypass scanning or resolve existing-copy conflicts.
 
 ### Copy every local package to Hermes profiles
+
+Run these commands from the reviewed repository checkout. Local installation
+copies this checkout's bytes and registers the public source for future updates;
+it does not download the published version or start a skill workflow.
+
+#### Choose where updates come from
+
+| Intent | Command | Content source |
+| --- | --- | --- |
+| Install missing local packages; refuse existing copies | `npm run install:local` | Reviewed checkout |
+| Install missing packages and replace existing copies with backups | `npm run install:local -- --update` | Reviewed checkout |
+| Update registered packages in one profile | `hermes -p <profile> skills update` | Published internet sources |
+
+The local commands default to all recognized profiles, not just the active profile.
+Use `--profile <name>` to limit that scope; `--all` makes the default explicit and
+cannot be combined with `--profile`. `--hermes-home <path>` selects an alternate
+base containing the default profile and `profiles/`; it is not a named profile's
+home. The local installer does not infer this base from the session's HERMES_HOME.
+
+#### Install or refresh local packages
 
 For a reviewed checkout on the local machine, the repository script copies all
 ten complete packages to the default profile and every recognized named profile:
@@ -89,17 +111,84 @@ base `~/.hermes` profile explicitly:
 npm run install:local -- --profile hermes-dev --profile default
 ```
 
-Use `--dry-run` to validate the source, profile discovery, and every destination
-without writing. The script preserves the canonical category/package paths under
-each profile's `skills/` directory, ignores bare directories that Hermes does not
-recognize as profiles, and refuses all existing package destinations before it
-copies anything. It intentionally does not overwrite, update, or remove local
-skills.
+Install missing packages and update existing packages across all recognized
+profiles, including `phased-plan-next`:
+
+```sh
+npm run install:local -- --update --dry-run
+npm run install:local -- --update
+```
+
+Use `--profile <name>` (repeatable) to limit updates, just as for installation.
+Without `--update`, existing package destinations are refused. Both modes preserve
+the canonical category/package paths under each profile's `skills/` directory
+and ignore bare directories that Hermes does not recognize as profiles.
+
+Update replaces each complete package, removing obsolete support files from the
+installed copy. Before replacement it moves the entire previous package—including
+local edits—to `<profile-home>/.skills-backups/<batch>/<category>/<skill>` and
+prints each backup path. Unrelated skills and profile configuration are untouched.
+Backups stay outside skill discovery and are not automatically deleted. To recover
+local edits, compare or restore from the printed backup after stopping the agent.
+
+Source validation and destination preflight cover all selected profiles; symlink
+destinations/parents and source overlap are refused. All copies are staged before
+replacing installed packages. This is not an all-profiles transaction: a runtime
+failure can leave earlier packages updated; inspect the error and backups before
+retrying. `--dry-run` previews install/update counts without creating copies or
+backups. Stop agents using the selected profiles and avoid concurrent installers
+or source edits during updates; start fresh sessions afterwards.
 
 This is a direct local copy for a checkout you have reviewed; it does **not** run
 the Hermes Skills Hub security scanner or establish scanner approval. Use the
 normal `hermes skills install` workflow above when that scanner-managed install
 path is required.
+
+Local installations also register each package in the selected profile's Hermes
+`skills/.hub/lock.json`, pointing to this repository's public well-known endpoint. Registration
+records the exact locally installed hash and category, with `local-checkout`
+metadata and an `unscanned` verdict—not a fabricated scan attestation. Existing
+unrelated registrations are preserved; conflicting sources/paths or malformed
+locks are refused rather than silently reassigned.
+
+#### Migrate existing local copies to internet updates
+
+For copies made by the older untracked installer, stop agents using the selected
+profile, review the checkout and local edits, then preview and apply one refresh:
+
+```sh
+npm run install:local -- --update --profile hermes-dev --dry-run
+npm run install:local -- --update --profile hermes-dev
+```
+
+This replaces the package files, preserves the previous packages in backups, and
+registers the new installed-content baseline. There is no registration-only mode.
+Without `--profile`, the same migration applies to every recognized profile.
+Start a fresh session after installation. Later, use the normal internet updater:
+
+```sh
+hermes -p hermes-dev skills update
+hermes -p hermes-dev skills update phased-plan-next
+```
+
+The first command updates all eligible registered skills in that profile, including
+skills from other sources; the second targets only `phased-plan-next`. Unlike the
+local installer, Hermes does not update every profile at once.
+
+Internet updates run Hermes's normal scanner, keep the category, and protect edits made after that
+installation. Local installation does not publish anything: a newly added skill
+needs to reach the public endpoint before Hermes can fetch it. Hermes compares
+content hashes, not version ordering, so an internet update can replace newer,
+unpublished local source with the currently published version. Publish first if
+that replacement is not wanted. Do not run Hermes updates and the local installer
+concurrently.
+
+If registration fails because a skill already belongs to another source or
+install path, preserve that copy and resolve its ownership explicitly. Do not
+hand-edit the hub lock or use `--force` to suppress a scan failure. A missing
+public package is a publication prerequisite, not a reason to change its source.
+`npm run test:local-update` checks the local-to-internet workflow using a scratch
+profile and a real public update; it does not update your live installations.
 
 ### Run the autonomous implementation-review goal
 
@@ -492,6 +581,13 @@ npm run build
 ```
 
 Canonical source is `skills/<category>/<name>/`. `dist/` is generated and ignored. The generator emits the complete `.well-known/skills/` inventory, with an explicit file list for each package.
+
+The optional `npm run test:local-update` probe requires the installed `hermes`
+CLI and internet access. It installs all local packages into a disposable scratch
+home, then tests a real public `application-records` update, scanner acceptance,
+category retention, and local-edit protection. It is not part of offline CI and
+does not touch live profile skills. Prefer a scratch TMPDIR under the existing
+Hermes data root so the CLI can reuse its managed dependency runtime.
 
 Before publishing, run the additional local security gate with a trusted Hermes
 source checkout and a compatible Python interpreter (`python3`, Python 3.11+ for

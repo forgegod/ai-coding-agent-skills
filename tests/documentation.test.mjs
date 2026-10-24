@@ -37,6 +37,26 @@ test("normal installer loop documents all generic software-development skills", 
   assert.match(source, /skills\/phased-plan-next" --category software-development/);
 });
 
+test("local installation docs distinguish source, migration, profile scope, and scanning", async () => {
+  const source = await readFile(readme, "utf8");
+  const section = source.split("### Copy every local package to Hermes profiles\n")[1]?.split("### Run the autonomous implementation-review goal")[0];
+  assert.ok(section);
+  assert.match(section, /#### Choose where updates come from/);
+  assert.match(section, /#### Migrate existing local copies to internet updates/);
+  assert.match(section, /npm run install:local -- --update --profile hermes-dev --dry-run/);
+  assert.match(section, /npm run install:local -- --update --profile hermes-dev\n/);
+  assert.match(section, /hermes -p hermes-dev skills update\n/);
+  assert.match(section, /all recognized profiles, not just the active profile/);
+  assert.match(section, /--hermes-home/);
+  assert.match(section, /skills\/\.hub\/lock\.json/);
+  assert.match(section, /unscanned/);
+  assert.match(section, /\.skills-backups/);
+  assert.match(section, /content hashes, not version ordering/);
+  assert.match(section, /does not publish/);
+  assert.match(section, /no registration-only mode/i);
+  assert.match(section, /test:local-update/);
+});
+
 test("directory-discovery instructions separate installation telemetry from authenticated submission", async () => {
   const source = await readFile(readme, "utf8");
   assert.match(source, /## Discovery on skill directories/);
