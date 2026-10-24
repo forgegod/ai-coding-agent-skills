@@ -63,6 +63,34 @@ resolve local edits/name collisions explicitly rather than forcing replacement.
 On a first install, `--yes` answers the install confirmation only, after operator
 authorization; it does not bypass scanning or resolve existing-copy conflicts.
 
+### Copy every local package to Hermes profiles
+
+For a reviewed checkout on the local machine, the repository script copies all
+nine complete packages to the default profile and every recognized named profile:
+
+```sh
+npm run install:local
+```
+
+To limit the copy to named profiles, repeat `--profile`; `default` names the
+base `~/.hermes` profile explicitly:
+
+```sh
+npm run install:local -- --profile hermes-dev --profile default
+```
+
+Use `--dry-run` to validate the source, profile discovery, and every destination
+without writing. The script preserves the canonical category/package paths under
+each profile's `skills/` directory, ignores bare directories that Hermes does not
+recognize as profiles, and refuses all existing package destinations before it
+copies anything. It intentionally does not overwrite, update, or remove local
+skills.
+
+This is a direct local copy for a checkout you have reviewed; it does **not** run
+the Hermes Skills Hub security scanner or establish scanner approval. Use the
+normal `hermes skills install` workflow above when that scanner-managed install
+path is required.
+
 ### Run the autonomous implementation-review goal
 
 Use `autonomous-implementation-review` from the orchestrator session, not an

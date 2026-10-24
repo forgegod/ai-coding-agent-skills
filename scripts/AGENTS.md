@@ -8,6 +8,7 @@ Generate and verify the static well-known skill endpoint from canonical categori
 
 - `build-well-known-skills.mjs` owns discovery, metadata validation, package inventory, and site generation.
 - `check-skill-security.py` owns the opt-in release scan against an explicitly selected trusted Hermes source checkout; it never installs packages or changes a profile.
+- `install-local-skills.mjs` owns collision-safe copying of every validated local package into selected Hermes profiles.
 
 ## Local Contracts
 
@@ -18,6 +19,7 @@ Generate and verify the static well-known skill endpoint from canonical categori
 - Publish complete packages deterministically; rebuilds remove stale endpoint inventory. Keep the root landing page minimal and link the index.
 - This is a static build, not a custom registry server. Installer scanning remains the consumer's responsibility.
 - The release scan uses the real Hermes community policy without force, checks exact advertised inventories, and extends content coverage to all UTF-8 package files (including `.mjs`/`.cjs`) in-process only. Missing scanner, invalid inventory, symlinks, undecodable content, and non-safe verdicts fail closed. Never duplicate threat regexes or hide required package files to pass.
+- The local installer preserves category/package paths, detects only Hermes profiles with an identity file, and preflights every selected destination before copying. It never overwrites an existing package and does not represent direct copying as a Hermes scanner-approved installation.
 
 ## Work Guidance
 

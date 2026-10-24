@@ -92,6 +92,41 @@ export async function buildWellKnownSkills({ root = scriptRoot, output }) {
     throw new Error("Output directory must not overlap canonical skill source");
   }
   const endpoint = path.join(destinationRoot, ".well-known", "skills");
+  const packages = await discoverSkillPackages({ root });
+
+  await rm(endpoint, { recursive: true, force: true });
+  await mkdir(endpoint, { recursive: true });
+  for (const { name, files, directory } of packages) {
+    const destination = path.join(endpoint, name);
+    await mkdir(destination, { recursive: true });
+    for (const file of files) {
+      const target = path.join(destination, file);
+      await mkdir(path.dirname(target), { recursive: true });
+      await cp(path.join(directory, file), target, { verbatimSymlinks: true });
+    }
+  }
+  const skills = packages.map(({ directory, relativePath, ...metadata }) => metadata);
+  await writeFile(
+    path.join(endpoint, "index.json"),
+    `${JSON.stringify({ skills }, null, 2)}\n`,
+  );
+  await writeFile(path.join(destinationRoot, ".nojekyll"), "");
+  await writeFile(path.join(destinationRoot, "index.html"), `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Coding Agent Skills</title></head>
+<body><h1>AI Coding Agent Skills</h1><p>Portable engineering playbooks for AI coding agents.</p>
+<p><a href=".well-known/skills/index.json">Skill discovery index</a></p>
+<p><a href="https://github.com/forgegod/ai-coding-agent-skills#install-with-hermes">Catalog and installation instructions</a></p>
+</body></html>\n`);
+  return { endpoint, skills };
+}
+
+/**
+ * Discover and validate the complete local packages that the endpoint publishes.
+ *
+ * @param {{root?: string}} options
+ */
+export async function discoverSkillPackages({ root = scriptRoot } = {}) {
+  const source = path.resolve(root, "skills");
   const packages = [];
 
   for (const directory of await skillDirectories(source)) {
@@ -115,34 +150,17 @@ export async function buildWellKnownSkills({ root = scriptRoot, output }) {
       throw new Error(`duplicate public skill name: ${name}`);
     }
 
-    packages.push({ name, description, files: await packageFiles(directory), directory });
+    packages.push({
+      name,
+      description,
+      files: await packageFiles(directory),
+      directory,
+      relativePath: path.relative(source, directory),
+    });
   }
 
   packages.sort((left, right) => left.name.localeCompare(right.name));
-  await rm(endpoint, { recursive: true, force: true });
-  await mkdir(endpoint, { recursive: true });
-  for (const { name, files, directory } of packages) {
-    const destination = path.join(endpoint, name);
-    await mkdir(destination, { recursive: true });
-    for (const file of files) {
-      const target = path.join(destination, file);
-      await mkdir(path.dirname(target), { recursive: true });
-      await cp(path.join(directory, file), target, { verbatimSymlinks: true });
-    }
-  }
-  const skills = packages.map(({ directory, ...metadata }) => metadata);
-  await writeFile(
-    path.join(endpoint, "index.json"),
-    `${JSON.stringify({ skills }, null, 2)}\n`,
-  );
-  await writeFile(path.join(destinationRoot, ".nojekyll"), "");
-  await writeFile(path.join(destinationRoot, "index.html"), `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Coding Agent Skills</title></head>
-<body><h1>AI Coding Agent Skills</h1><p>Portable engineering playbooks for AI coding agents.</p>
-<p><a href=".well-known/skills/index.json">Skill discovery index</a></p>
-<p><a href="https://github.com/forgegod/ai-coding-agent-skills#install-with-hermes">Catalog and installation instructions</a></p>
-</body></html>\n`);
-  return { endpoint, skills };
+  return packages;
 }
 
 async function main() {
