@@ -16,6 +16,7 @@ const packages = {
   "phased-plan-execution": "software-development/phased-plan-execution",
   "phased-plan-closeout": "software-development/phased-plan-closeout",
   "phased-plan-overview": "software-development/phased-plan-overview",
+  "phased-plan-next": "software-development/phased-plan-next",
   "phased-plan-refactoring": "software-development/phased-plan-refactoring",
 };
 const names = Object.keys(packages);
@@ -32,7 +33,7 @@ async function setup(t) {
   return { readme, helper, scratch, home, env: { ...process.env, HOME: home, PI_CODING_AGENT_DIR: "" } };
 }
 
-test("documented recipes copy nine complete packages to all four native user locations", async (t) => {
+test("documented recipes copy ten complete packages to all four native user locations", async (t) => {
   const f = await setup(t);
   for (const [heading, directory] of [["Claude Code", ".claude/skills"], ["Codex", ".agents/skills"], ["Kilo", ".kilo/skills"], ["Pi", ".pi/agent/skills"]]) {
     const section = f.readme.split(`### ${heading}\n`)[1]?.split(/\n### |\n## /)[0];
@@ -45,7 +46,7 @@ test("documented recipes copy nine complete packages to all four native user loc
     for (const name of names) {
       assert.deepEqual(await readFile(path.join(destination, name, "SKILL.md")), await readFile(path.join(root, "skills", packages[name], "SKILL.md")));
     }
-    for (const [name, file] of [["autonomous-implementation-review", "references/environment-passthrough.md"], ["autonomous-implementation-review", "references/herdr.md"], ["phased-plan-closeout", "scripts/phase-guard.mjs"], ["phased-plan-closeout", "references/record-writes.md"]]) {
+    for (const [name, file] of [["autonomous-implementation-review", "references/environment-passthrough.md"], ["autonomous-implementation-review", "references/herdr.md"], ["phased-plan-closeout", "scripts/phase-guard.mjs"], ["phased-plan-closeout", "references/record-writes.md"], ["phased-plan-next", "scripts/handoff.mjs"]]) {
       assert.deepEqual(await readFile(path.join(destination, name, file)), await readFile(path.join(root, "skills", packages[name], file)));
     }
   }

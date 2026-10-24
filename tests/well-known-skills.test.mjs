@@ -15,6 +15,7 @@ const expectedSkillNames = [
   "phased-plan-closeout",
   "phased-plan-design",
   "phased-plan-execution",
+  "phased-plan-next",
   "phased-plan-overview",
   "phased-plan-refactoring",
 ];
@@ -49,6 +50,8 @@ test("well-known build publishes every skill and all advertised files", async ()
     assert.deepEqual(autonomous?.files, ["references/environment-passthrough.md", "references/herdr.md", "scripts/herdr_panes.py", "SKILL.md"]);
     const closeout = index.skills.find((skill) => skill.name === "phased-plan-closeout");
     assert.deepEqual(closeout?.files, ["references/record-writes.md", "references/recovery.md", "references/review-boundary.md", "scripts/phase-guard.mjs", "SKILL.md"]);
+    const next = index.skills.find((skill) => skill.name === "phased-plan-next");
+    assert.deepEqual(next?.files, ["scripts/handoff.mjs", "SKILL.md"]);
   } finally {
     await rm(output, { recursive: true, force: true });
   }

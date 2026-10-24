@@ -14,6 +14,7 @@ Portable engineering workflows for AI coding agents. This repository owns the sk
 | [phased-plan-execution](skills/software-development/phased-plan-execution/SKILL.md) | Execute and prove one CHG phase. |
 | [phased-plan-closeout](skills/software-development/phased-plan-closeout/SKILL.md) | Integrate a verified phase and hand off the next goal. |
 | [phased-plan-overview](skills/software-development/phased-plan-overview/SKILL.md) | Inspect active changes and select work to resume. |
+| [phased-plan-next](skills/software-development/phased-plan-next/SKILL.md) | Select work and inject its goal into a fresh session in the current Herdr pane. |
 | [phased-plan-refactoring](skills/software-development/phased-plan-refactoring/SKILL.md) | Split or resequence work at verified boundaries. |
 
 ## Install with Hermes
@@ -56,6 +57,15 @@ eight-package example does not establish scanner approval for it:
 hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/autonomous-implementation-review" --category autonomous-ai-agents
 ```
 
+`phased-plan-next` can reset the current session and launch that bounded workflow;
+review its complete package separately as well. It is not part of the generic
+eight-package loop. Install its related overview, execution, closeout, and
+autonomous orchestration skills before use:
+
+```sh
+hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/phased-plan-next" --category software-development
+```
+
 Source edits do not update installed copies. After an authorized publication,
 install through the normal hub and start a new session. For an unmodified
 hub-tracked copy, use `hermes -p <profile> skills update <skill-name>`; preserve and
@@ -66,7 +76,7 @@ authorization; it does not bypass scanning or resolve existing-copy conflicts.
 ### Copy every local package to Hermes profiles
 
 For a reviewed checkout on the local machine, the repository script copies all
-nine complete packages to the default profile and every recognized named profile:
+ten complete packages to the default profile and every recognized named profile:
 
 ```sh
 npm run install:local
@@ -138,6 +148,27 @@ Resume with the same bounded command only after closeout identifies the existing
 reservation/worktree. A fresh clone lacks local worktree registration; request an
 explicit recovery handoff instead of starting a duplicate. For assessment without
 commit authority, request a read-only assessment, not this completion goal.
+
+#### Automatically hand off the next phase
+
+For the automatic selection-to-goal handoff instead of copying the launch command,
+explicitly invoke `/phased-plan-next` in the intended Herdr orchestrator pane.
+It applies overview's selection and blocker rules, then schedules three separate
+submissions after the selecting turn settles: `/new --yes <unique-phase-session-name>`,
+`/busy queue`, and the designed `/goal draft` command above. This invocation
+authorizes that reset, the busy-input preference change (which Hermes may persist),
+and the command's single-phase local Git scope; it never authorizes a push or
+another phase. A new session may reset session-only model selections. Reading or
+installing the skill does not invoke it. Executor selection remains separately
+operator-controlled by the orchestration skill.
+
+The helper requires `HERDR_ENV=1`, `HERDR_WORKSPACE_ID`, and `HERDR_PANE_ID`, an
+observed working-to-settled lifecycle transition, and recognizable English Hermes
+CLI acknowledgments. It refuses missing caller context rather than guessing from
+focus. Outside Herdr, with ambiguous selection, or on a transport blocker, it
+reports the selected action without injection. Keep the composer untouched during
+handoff. The selecting turn reports a scratch receipt path, not premature success;
+failed or partial delivery is never retried automatically. Preview stays read-only.
 
 #### Close a verified phase
 
@@ -255,7 +286,7 @@ git clone https://github.com/forgegod/ai-coding-agent-skills.git ai-coding-agent
 ```
 
 After review, from the directory containing that checkout, define this helper in
-the same shell used for the agent-specific commands below. It copies all nine
+the same shell used for the agent-specific commands below. It copies all ten
 package directories, preflights all name collisions, and never overwrites local
 edits.
 
@@ -265,7 +296,7 @@ skills_source="$PWD/ai-coding-agent-skills-review/skills"
 install_reviewed_skills() (
   set -eu
   destination="$1"
-  for package in autonomous-ai-agents/autonomous-implementation-review software-development/application-records software-development/capability-wireframes software-development/git-commit-message software-development/phased-plan-design software-development/phased-plan-execution software-development/phased-plan-closeout software-development/phased-plan-overview software-development/phased-plan-refactoring; do
+  for package in autonomous-ai-agents/autonomous-implementation-review software-development/application-records software-development/capability-wireframes software-development/git-commit-message software-development/phased-plan-design software-development/phased-plan-execution software-development/phased-plan-closeout software-development/phased-plan-overview software-development/phased-plan-next software-development/phased-plan-refactoring; do
     skill="${package##*/}"
     test -f "$skills_source/$package/SKILL.md"
     if [ -e "$destination/$skill" ] || [ -L "$destination/$skill" ]; then
@@ -274,7 +305,7 @@ install_reviewed_skills() (
     fi
   done
   mkdir -p "$destination"
-  for package in autonomous-ai-agents/autonomous-implementation-review software-development/application-records software-development/capability-wireframes software-development/git-commit-message software-development/phased-plan-design software-development/phased-plan-execution software-development/phased-plan-closeout software-development/phased-plan-overview software-development/phased-plan-refactoring; do
+  for package in autonomous-ai-agents/autonomous-implementation-review software-development/application-records software-development/capability-wireframes software-development/git-commit-message software-development/phased-plan-design software-development/phased-plan-execution software-development/phased-plan-closeout software-development/phased-plan-overview software-development/phased-plan-next software-development/phased-plan-refactoring; do
     skill="${package##*/}"
     cp -R "$skills_source/$package" "$destination/$skill"
   done
@@ -417,7 +448,7 @@ The verified SkillsLLM site is `https://skillsllm.com`. Its
 [submission page](https://skillsllm.com/submit) requires GitHub OAuth:
 
 1. Sign in as the operator and submit `https://github.com/forgegod/ai-coding-agent-skills`.
-2. Describe it as a collection of **nine** categorized Agent Skills packages and
+2. Describe it as a collection of **ten** categorized Agent Skills packages and
    retain the README's installation and security boundaries.
 3. Confirm the platform accepts the collection layout, wait for its scanning and
    catalog policy checks, and read back the resulting listing before claiming success.

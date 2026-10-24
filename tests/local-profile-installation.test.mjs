@@ -77,7 +77,7 @@ test("CLI accepts repeated --profile arguments and reports a dry run", async (t)
     { cwd: f.root, encoding: "utf8" },
   );
 
-  assert.match(output, /Would install 9 skill packages into default\./);
-  assert.match(output, /Would install 9 skill packages into named\./);
+  assert.match(output, /Would install 10 skill packages into default\./);
+  assert.match(output, /Would install 10 skill packages into named\./);
   await assert.rejects(stat(path.join(f.hermesHome, "profiles", "named", "skills", "software-development", "demo")));
 });

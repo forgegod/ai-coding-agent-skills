@@ -9,7 +9,8 @@ const autonomousResearch = fileURLToPath(new URL("../docs/research/hermes-autono
 test("all launch examples carry the same bounded operator authorization", async () => {
   const files = [readme,
     fileURLToPath(new URL("../skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md", import.meta.url)),
-    fileURLToPath(new URL("../skills/software-development/phased-plan-overview/SKILL.md", import.meta.url))];
+    fileURLToPath(new URL("../skills/software-development/phased-plan-overview/SKILL.md", import.meta.url)),
+    fileURLToPath(new URL("../skills/software-development/phased-plan-next/SKILL.md", import.meta.url))];
   const prompts = [];
   for (const file of files) {
     const source = await readFile(file, "utf8");
@@ -31,7 +32,9 @@ test("normal installer loop documents all generic software-development skills", 
   assert.equal(loop.length, 8);
   assert.deepEqual(loop, ["application-records", "capability-wireframes", "git-commit-message", "phased-plan-design", "phased-plan-execution", "phased-plan-closeout", "phased-plan-overview", "phased-plan-refactoring"]);
   assert.match(source, /eight-package example/);
-  assert.match(source, /collection of \*\*nine\*\* categorized Agent Skills packages/);
+  assert.match(source, /collection of \*\*ten\*\* categorized Agent Skills packages/);
+  assert.match(source, /phased-plan-next.*review.*separately/is);
+  assert.match(source, /skills\/phased-plan-next" --category software-development/);
 });
 
 test("directory-discovery instructions separate installation telemetry from authenticated submission", async () => {

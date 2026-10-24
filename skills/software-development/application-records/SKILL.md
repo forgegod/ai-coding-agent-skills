@@ -1,13 +1,13 @@
 ---
 name: application-records
 description: Maintain CAP/CHG records for material product changes.
-version: 1.8.1
+version: 1.8.2
 author: Hermes contributors
 license: MIT
 metadata:
   hermes:
     tags: [product, capability, change-records, documentation]
-    related_skills: [capability-wireframes, phased-plan-closeout, phased-plan-design, phased-plan-execution, phased-plan-overview, phased-plan-refactoring]
+    related_skills: [capability-wireframes, phased-plan-closeout, phased-plan-design, phased-plan-execution, phased-plan-overview, phased-plan-next, phased-plan-refactoring]
 ---
 
 # Application Records
@@ -64,6 +64,8 @@ plan that duplicates CHG progress:
 - `phased-plan-design` creates or reshapes the CHG phase table before work.
 - `phased-plan-overview` finds active CHGs and identifies the selected record to
   resume without relying on commit recency or chat memory.
+- `phased-plan-next` uses that selection and, only on explicit operator invocation,
+  submits the bounded goal into a fresh session in the current Herdr pane.
 - `phased-plan-execution` implements and verifies one selected phase.
 - `phased-plan-closeout` owns the orchestrator's authorized Git/CHG writes and
   worktree lifecycle, plus the next bounded goal prompt.
