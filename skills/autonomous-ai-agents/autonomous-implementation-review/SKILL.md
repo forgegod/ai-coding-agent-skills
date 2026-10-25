@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.10.3
+version: 0.10.4
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -65,15 +65,15 @@ Compression is automatic; for earlier compression the operator runs `/goal pause
 Printed commands do not execute; resume does not reset context.
 
 Stop discovery once scope, authority, executor, ownership, bootstrap and gates
-are resolved. Reuse evidence unless invalidated; batch independent lookups.
+resolve. Reuse valid evidence; batch independent lookups.
 
 ## Procedure
 
 1. Reserve through closeout; standalone work uses project isolation/Git policy.
-2. Through the Herdr recipe, start a fresh outcome-named implementer session,
-   accepted `/busy queue` and configured model. Send outcome, scope/non-goals,
-   workspace/base, paths, links, gates, constraints, budget and report format.
-   Require focused tests and paths/results/risks; link logs/diffs.
+2. Through the Herdr recipe, start a fresh outcome-named implementer session with
+   accepted `/busy queue`, configured model and a visible `Agent Running` readback.
+   Send outcome, scope/non-goals, workspace/base, paths, links, gates, constraints
+   and budget; require focused tests, paths/results/risks and a report with links.
 3. On watcher `settled`, inspect the candidate and run relevant checks; lifecycle is
    not success. Under `lifecycle-watch.md`, one `inconclusive` receipt may be resumed
    once with `--resume-from`; the role stays incomplete until it settles. Otherwise

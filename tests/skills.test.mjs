@@ -80,6 +80,10 @@ test("autonomous-implementation-review packages its selection helper", async () 
     /not an immediate\s+foreground-turn interrupt/, /Do not install `herdr integration install hermes`/]) {
     assert.match(transport, expected);
   }
+  assert.match(transport, /\/model <configured-key>`[\s\S]*then `\/status`[\s\S]*Agent Running/);
+  assert.match(transport, /A missing card, mismatched model or rejection stops the role/);
+  assert.match(lifecycle, /`\/status` readback belongs to herdr\.md step 4, before arming/);
+  assert.match(lifecycle, /Never inject a status request while watching/);
   for (const expected of [/herdr_lifecycle_watch\.mjs/, /never runs `agent prompt`/,
     /inconclusive_fast/, /--resume-from/, /no lifecycle deadline/, /state_change_seq/, /completion_seq/]) {
     assert.match(lifecycle, expected);

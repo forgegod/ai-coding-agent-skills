@@ -21,6 +21,8 @@ node <this-skill-dir>/scripts/herdr_lifecycle_watch.mjs --wait-armed --receipt <
 Require exit 0 and JSON `outcome` `armed`. The baseline is visibly `idle`, with literal pane, workspace, and terminal IDs and `source: pane-output`. Any other result blocks delivery: stop that background process with `process_manage`, and do not dispatch or start another watcher.
 
 3. Send the role packet once, without `--wait`, then end the turn. Do not poll, run `herdr agent wait`, or inject input. The watcher never runs `agent prompt`, `/new`, `/busy`, `/goal`, or a status question.
+The setup `/status` readback belongs to herdr.md step 4, before arming; while this
+watcher runs it stays forbidden.
 
 4. On the exit notification, read the receipt once with `read_file`; the notification carries the same outcome. If the watcher ended `inconclusive`, the role may still be running. Run one fresh `--inspect` and compare its literal pane, workspace, and terminal IDs with the receipt's `final` identity. Only when all three match and the status is `working` may you resume:
 
@@ -83,4 +85,4 @@ role. A later `inconclusive` is not success, and the same receipt cannot be
 resumed twice. A role switch still needs the orchestrator's separate, explicitly
 approved handoff after factual verification.
 
-For every non-`settled` outcome, capture `herdr agent get`, `herdr agent read`, and external artifacts. Never inject a status request. Waiting is an external process, so it spends neither executor tokens nor goal turns. A deadline bounds polling and debounce; it cannot become a late `settled`.
+For every non-`settled` outcome, capture `herdr agent get`, `herdr agent read`, and external artifacts. Never inject a status request while watching. Waiting is an external process, so it spends neither executor tokens nor goal turns. A deadline bounds polling and debounce; it cannot become a late `settled`.
