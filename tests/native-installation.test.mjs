@@ -46,10 +46,11 @@ test("documented recipes copy ten complete packages to all four native user loca
     for (const name of names) {
       assert.deepEqual(await readFile(path.join(destination, name, "SKILL.md")), await readFile(path.join(root, "skills", packages[name], "SKILL.md")));
     }
-    for (const [name, file] of [["autonomous-implementation-review", "references/environment-passthrough.md"], ["autonomous-implementation-review", "references/herdr.md"], ["autonomous-implementation-review", "references/lifecycle-watch.md"], ["autonomous-implementation-review", "scripts/herdr_lifecycle_watch.mjs"], ["phased-plan-closeout", "scripts/phase-guard.mjs"], ["phased-plan-closeout", "references/record-writes.md"], ["phased-plan-next", "scripts/handoff.mjs"]]) {
+    assert.deepEqual(await readdir(path.join(destination, "phased-plan-next")), ["SKILL.md"]);
+    for (const [name, file] of [["autonomous-implementation-review", "references/environment-passthrough.md"], ["autonomous-implementation-review", "references/herdr.md"], ["autonomous-implementation-review", "references/lifecycle-watch.md"], ["autonomous-implementation-review", "scripts/herdr_lifecycle_watch.mjs"], ["phased-plan-closeout", "scripts/phase-guard.mjs"], ["phased-plan-closeout", "references/record-writes.md"]]) {
       assert.deepEqual(await readFile(path.join(destination, name, file)), await readFile(path.join(root, "skills", packages[name], file)));
     }
-    for (const name of ["autonomous-implementation-review", "phased-plan-next"]) {
+    for (const name of ["autonomous-implementation-review"]) {
       const script = "scripts/herdr-pane-state.mjs";
       assert.deepEqual(await readFile(path.join(destination, name, script)), await readFile(path.join(root, "skills", packages[name], script)));
       const url = new URL(`file://${path.join(destination, name, script)}`);

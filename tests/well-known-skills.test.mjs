@@ -51,7 +51,7 @@ test("well-known build publishes every skill and all advertised files", async ()
     const closeout = index.skills.find((skill) => skill.name === "phased-plan-closeout");
     assert.deepEqual(closeout?.files, ["references/record-writes.md", "references/recovery.md", "references/review-boundary.md", "scripts/phase-guard.mjs", "SKILL.md"]);
     const next = index.skills.find((skill) => skill.name === "phased-plan-next");
-    assert.deepEqual(next?.files, ["scripts/handoff.mjs", "scripts/herdr-pane-state.mjs", "SKILL.md"]);
+    assert.deepEqual(next?.files, ["SKILL.md"]);
   } finally {
     await rm(output, { recursive: true, force: true });
   }

@@ -15,7 +15,7 @@ Own optional, portable agent workflows for maintaining the canonical capability 
 | `phased-plan-execution/SKILL.md`  | One verified CAP/CHG phase at a time. |
 | `phased-plan-closeout/`   | Orchestrator-only Git/CHG protocol, read-only phase guard, and next-goal handoff. |
 | `phased-plan-overview/SKILL.md`   | Active-CHG inspection, resume selection, and next-goal command. |
-| `phased-plan-next/` | Overview-based selection and an explicitly authorized, ordered current-pane Herdr handoff. |
+| `phased-plan-next/SKILL.md` | Read-only overview-based selection and the next goal for operator submission. |
 | `phased-plan-refactoring/SKILL.md` | Verified CHG splitting and resequencing. |
 
 ## Local Contracts
@@ -35,8 +35,7 @@ Own optional, portable agent workflows for maintaining the canonical capability 
 - Derive fresh-worktree bootstrap from project exports/scripts/CI and record it separately from acceptance gates. Completion prose needs factual review distinct from implementation approval; receipts never predeclare cleanup or erase failed attempts.
 - Launch examples state the exact operator-authorized local Git scope and stay identical across README, overview, and orchestration. Displaying them is not authorization. Missing/competing ownership or invalid readback preserves work and requires an explicit recovery handoff.
 - Overview is bounded read-only selection: one Git snapshot and record-validation pass, conditional recovery of the relevant phase, and named Herdr environment checks. It does not rerun implementation gates or inspect host/source trees to prove transport support; unresolved evidence ends in a blocker, not broader discovery.
-- `phased-plan-next` reuses overview's selection rules but owns an explicit-invocation-only current-pane handoff: fresh session, busy queue, then the canonical single-phase goal. Its bounded helper survives the selecting session, requires caller identity and fresh lifecycle settlement, verifies ordered acknowledgments, and never falls back to focus or retries uncertain delivery. Dispatch creates the scratch receipt only after startup; the selecting turn confirms `armed` with foreground `--wait-armed`, never an immediate file read. Scratch receipts are transport evidence only. Overview remains print-only; routing or installing next grants no launch authority.
-- Herdr activity uses live output, not `agent_status` or lifecycle counters. Next ships a test-synchronized copy of autonomous orchestration's `scripts/herdr-pane-state.mjs`; keep both standalone packages complete. Reset requires visible working followed by stable visible idle, never immediate dispatch on stale idle metadata. Unknown composer/footer layouts, drafts and identity drift stop delivery.
+- `phased-plan-next` reuses overview's repository-selection and recovery rules and only presents the canonical single-phase goal for the operator to send. Transport checks belong to execution; next requires no Herdr context, session reset, pane monitoring, dispatch helper, or receipt. Invoking it grants no execution authority. Autonomous orchestration alone owns role handoff to an explicitly selected non-orchestrator Herdr pane.
 
 ## Work Guidance
 

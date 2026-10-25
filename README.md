@@ -14,7 +14,7 @@ Portable engineering workflows for AI coding agents. This repository owns the sk
 | [phased-plan-execution](skills/software-development/phased-plan-execution/SKILL.md) | Execute and prove one CHG phase. |
 | [phased-plan-closeout](skills/software-development/phased-plan-closeout/SKILL.md) | Integrate a verified phase and hand off the next goal. |
 | [phased-plan-overview](skills/software-development/phased-plan-overview/SKILL.md) | Inspect active changes and select work to resume. |
-| [phased-plan-next](skills/software-development/phased-plan-next/SKILL.md) | Select work and inject its goal into a fresh session in the current Herdr pane. |
+| [phased-plan-next](skills/software-development/phased-plan-next/SKILL.md) | Select work and present its bounded goal for the operator to send. |
 | [phased-plan-refactoring](skills/software-development/phased-plan-refactoring/SKILL.md) | Split or resequence work at verified boundaries. |
 
 ## Install with Hermes
@@ -41,30 +41,26 @@ To target a named profile, add `-p <profile>`; for example:
 hermes -p hermes-dev skills install well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/application-records --category software-development
 ```
 
-Install the eight generic software-development skills (POSIX shell; omit `-p hermes-dev` to use the active profile):
+Install the nine generic software-development skills (POSIX shell; omit `-p hermes-dev` to use the active profile):
 
 ```sh
-for skill in application-records capability-wireframes git-commit-message phased-plan-design phased-plan-execution phased-plan-closeout phased-plan-overview phased-plan-refactoring; do
+for skill in application-records capability-wireframes git-commit-message phased-plan-design phased-plan-execution phased-plan-closeout phased-plan-overview phased-plan-next phased-plan-refactoring; do
   hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/$skill" --category software-development || break
 done
 ```
 
 `autonomous-implementation-review` is published separately because it can coordinate editing
 agents and worktrees. Review its complete package before installing it; the normal
-eight-package example does not establish scanner approval for it:
+nine-package example does not establish scanner approval for it:
 
 ```sh
 hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/autonomous-implementation-review" --category autonomous-ai-agents
 ```
 
-`phased-plan-next` can reset the current session and launch that bounded workflow;
-review its complete package separately as well. It is not part of the generic
-eight-package loop. Install its related overview, execution, closeout, and
-autonomous orchestration skills before use:
-
-```sh
-hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/phased-plan-next" --category software-development
-```
+`phased-plan-next` is read-only and included in the generic loop. It uses overview
+to select a phase and prints the bounded goal; it never submits it, resets a
+session, or monitors a pane. Executing the displayed goal separately requires
+the related execution, closeout, and autonomous orchestration skills.
 
 Source edits do not update installed copies. After an authorized publication,
 install through the normal hub and start a new session, or use the reviewed local
@@ -238,29 +234,20 @@ reservation/worktree. A fresh clone lacks local worktree registration; request a
 explicit recovery handoff instead of starting a duplicate. For assessment without
 commit authority, request a read-only assessment, not this completion goal.
 
-#### Automatically hand off the next phase
+#### Present the next goal
 
-For the automatic selection-to-goal handoff instead of copying the launch command,
-explicitly invoke `/phased-plan-next` in the intended Herdr orchestrator pane.
-It applies overview's selection and blocker rules, then schedules three separate
-submissions after the selecting turn settles: `/new --yes <unique-phase-session-name>`,
-`/busy queue`, and the designed `/goal draft` command above. This invocation
-authorizes that reset, the busy-input preference change (which Hermes may persist),
-and the command's single-phase local Git scope; it never authorizes a push or
-another phase. A new session may reset session-only model selections. Reading or
-installing the skill does not invoke it. Executor selection remains separately
-operator-controlled by the orchestration skill.
+Invoke `/phased-plan-next` to apply overview's repository selection and blocker
+rules and print the filled single-phase command above. Selection is read-only:
+no session reset, prompt submission, queue-mode change, pane monitoring, or Git
+write is authorized by the invocation. Missing Herdr context does not prevent
+presenting a goal; transport is checked only when execution is requested.
 
-The helper requires `HERDR_ENV=1`, `HERDR_WORKSPACE_ID`, and `HERDR_PANE_ID`, an
-observed working-to-settled transition in the live composer/footer, and recognizable
-English Hermes CLI acknowledgments. Herdr status/counters can be stale; structured
-metadata binds identity, not activity. Unknown output blocks injection. It refuses
-missing caller context rather than guessing from
-focus. Outside Herdr, with ambiguous selection, or on a transport blocker, it
-reports the selected action without injection. Keep the composer untouched during
-handoff. The selecting turn confirms the helper armed with foreground `--wait-armed`
-before reporting the scratch receipt path; a missing file is not an empty receipt.
-Armed is not delivery, and failed or partial delivery is never retried automatically. Preview stays read-only.
+The operator decides when and where to send the goal. After submission,
+`autonomous-implementation-review` keeps that session as orchestrator and asks
+for an explicitly selected different Herdr pane for implementer/reviewer roles.
+It owns that role handoff, including fresh-session queue/model setup, visible
+idle/input checks and passive executor monitoring. It never resets or runs a
+worker in the orchestrator pane. A displayed goal grants no execution authority.
 
 #### Close a verified phase
 

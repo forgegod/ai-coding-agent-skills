@@ -29,12 +29,12 @@ test("normal installer loop documents all generic software-development skills", 
   const source = await readFile(readme, "utf8");
   const loop = source.match(/^for skill in (.+); do$/m)?.[1]?.split(/\s+/);
   assert.ok(loop, "document a normal installer loop");
-  assert.equal(loop.length, 8);
-  assert.deepEqual(loop, ["application-records", "capability-wireframes", "git-commit-message", "phased-plan-design", "phased-plan-execution", "phased-plan-closeout", "phased-plan-overview", "phased-plan-refactoring"]);
-  assert.match(source, /eight-package example/);
+  assert.equal(loop.length, 9);
+  assert.deepEqual(loop, ["application-records", "capability-wireframes", "git-commit-message", "phased-plan-design", "phased-plan-execution", "phased-plan-closeout", "phased-plan-overview", "phased-plan-next", "phased-plan-refactoring"]);
+  assert.match(source, /nine-package example/);
   assert.match(source, /collection of \*\*ten\*\* categorized Agent Skills packages/);
-  assert.match(source, /phased-plan-next.*review.*separately/is);
-  assert.match(source, /skills\/phased-plan-next" --category software-development/);
+  assert.match(source, /`phased-plan-next` is read-only and included in the generic loop/);
+  assert.doesNotMatch(source, /phased-plan-next.*can reset/i);
 });
 
 test("local installation docs distinguish source, migration, profile scope, and scanning", async () => {

@@ -86,12 +86,13 @@ test("guards keep immutable SHA arguments and classify caller mistakes separatel
   assert.match(text, /invocation error, not evidence of corrupt history or missing ownership/);
 });
 
-test("selection and handoff outcomes are reported separately", async () => {
-  for (const file of ["phased-plan-overview/SKILL.md", "phased-plan-next/SKILL.md"]) {
-    const text = (await read(file)).replace(/\s+/g, " ");
-    assert.match(text, /Report selection and (?:transport|handoff) separately/);
-    assert.match(text, /does not invalidate (?:a verified|the) selection/);
-  }
+test("overview separates transport from selection and next defers transport to execution", async () => {
+  const overview = (await read("phased-plan-overview/SKILL.md")).replace(/\s+/g, " ");
+  assert.match(overview, /Report selection and transport separately/);
+  assert.match(overview, /does not invalidate a verified selection/);
+  const next = (await read("phased-plan-next/SKILL.md")).replace(/\s+/g, " ");
+  assert.match(next, /defer its transport checks to execution/);
+  assert.match(next, /Missing Herdr context does not block goal presentation/);
 });
 
 for (const registered of [true, false]) {

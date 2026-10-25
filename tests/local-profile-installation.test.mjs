@@ -110,6 +110,12 @@ test("CLI update supports dry-run and updates all ten complete packages in selec
   const f = await fixture(t);
   const args = [script, "--hermes-home", f.hermesHome, "--profile", "default", "--profile", "named"];
   execFileSync(process.execPath, args, { encoding: "utf8" });
+  for (const home of [f.hermesHome, path.join(f.hermesHome, "profiles", "named")]) {
+    const obsolete = path.join(home, "skills/software-development/phased-plan-next/scripts");
+    await mkdir(obsolete, { recursive: true });
+    await writeFile(path.join(obsolete, "handoff.mjs"), "Obsolete dispatch helper.\n");
+    await writeFile(path.join(obsolete, "herdr-pane-state.mjs"), "Obsolete pane monitor.\n");
+  }
   const before = await readdir(f.hermesHome);
   const preview = execFileSync(process.execPath, [...args, "--update", "--dry-run"], { encoding: "utf8" });
   assert.match(preview, /Would install 0 and update 10 skill packages in default/);
@@ -120,8 +126,10 @@ test("CLI update supports dry-run and updates all ten complete packages in selec
   assert.match(output, /Installed 0 and updated 10 skill packages in named/);
   assert.match(output, /Backup:/);
   for (const home of [f.hermesHome, path.join(f.hermesHome, "profiles", "named")]) {
-    const source = fileURLToPath(new URL("../skills/software-development/phased-plan-next/scripts/handoff.mjs", import.meta.url));
-    assert.deepEqual(await readFile(path.join(home, "skills/software-development/phased-plan-next/scripts/handoff.mjs")), await readFile(source));
+    const source = fileURLToPath(new URL("../skills/software-development/phased-plan-next/SKILL.md", import.meta.url));
+    const destination = path.join(home, "skills/software-development/phased-plan-next");
+    assert.deepEqual(await readFile(path.join(destination, "SKILL.md")), await readFile(source));
+    assert.deepEqual(await readdir(destination), ["SKILL.md"]);
     assert.ok((await readdir(home)).every((name) => !name.startsWith(".skills-staging-")));
   }
 });
