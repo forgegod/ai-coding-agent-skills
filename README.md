@@ -252,8 +252,10 @@ installing the skill does not invoke it. Executor selection remains separately
 operator-controlled by the orchestration skill.
 
 The helper requires `HERDR_ENV=1`, `HERDR_WORKSPACE_ID`, and `HERDR_PANE_ID`, an
-observed working-to-settled lifecycle transition, and recognizable English Hermes
-CLI acknowledgments. It refuses missing caller context rather than guessing from
+observed working-to-settled transition in the live composer/footer, and recognizable
+English Hermes CLI acknowledgments. Herdr status/counters can be stale; structured
+metadata binds identity, not activity. Unknown output blocks injection. It refuses
+missing caller context rather than guessing from
 focus. Outside Herdr, with ambiguous selection, or on a transport blocker, it
 reports the selected action without injection. Keep the composer untouched during
 handoff. The selecting turn reports a scratch receipt path, not premature success;
@@ -303,7 +305,7 @@ and the future custom-shortcut proposal.
 #### Fresh-session busy-input protection
 
 When the orchestrator starts a fresh executor session, it sends `/new --yes
-<goal-name>`, waits until that session is idle, then sends `/busy queue` before
+<goal-name>`, verifies visible idle through output inspection, then sends `/busy queue` before
 the model or role task. Queue mode keeps any later operator message as the next
 turn instead of redirecting the executor's active work. This is an orchestrator
 action; the operator does not need to send it separately during a normal run.

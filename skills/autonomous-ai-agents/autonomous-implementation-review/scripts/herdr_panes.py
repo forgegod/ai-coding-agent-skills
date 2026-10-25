@@ -47,6 +47,7 @@ def main() -> int:
     parser.add_argument("--workspace", required=True, help="workspace passed to `herdr pane list --workspace`")
     parser.add_argument("--orchestrator", required=True, help="literal current pane ID, not inferred from focus")
     parser.add_argument("--selection", type=Path, help="operator selection evidence JSON; validate only, never control a pane")
+    parser.add_argument("--inspection", type=Path, help="fresh --inspect output from herdr_lifecycle_watch.mjs for the selected pane")
     args = parser.parse_args()
 
     raw = sys.stdin.read()
@@ -81,7 +82,7 @@ def main() -> int:
     if args.orchestrator not in ids:
         return die("orchestrator pane is absent; require its actual identity")
     eligible = [pane for pane in panes if pane["pane_id"] != args.orchestrator
-                and pane.get("agent") == "hermes" and pane.get("agent_status") in ("idle", "done")]
+                and pane.get("agent") == "hermes"]
     if args.selection:
         try:
             selection = json.loads(args.selection.read_text(encoding="utf-8"))
@@ -96,6 +97,19 @@ def main() -> int:
         selected = selection.get("pane_id")
         if selected not in [pane["pane_id"] for pane in eligible]:
             return die("selected pane is not an eligible executor")
+        if not args.inspection:
+            return die("fresh pane-output inspection required; metadata is not availability proof")
+        try:
+            inspection = json.loads(args.inspection.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as error:
+            return die(f"invalid inspection evidence: {error}")
+        target = next(pane for pane in eligible if pane["pane_id"] == selected)
+        if not isinstance(inspection, dict) or not (
+            inspection.get("pane") == selected and inspection.get("workspace") == args.workspace
+            and inspection.get("terminal") and inspection.get("terminal") == target.get("terminal_id")
+            and inspection.get("source") == "pane-output" and inspection.get("status") == "idle"
+        ):
+            return die("selected pane lacks matching visible idle inspection")
         print(json.dumps({"ok": True, "workspace": args.workspace, "pane_id": selected}))
         return 0
 
@@ -116,13 +130,13 @@ def main() -> int:
                 candidates.append((pane_id, text(pane.get("label")), agent, text(pane.get("agent_status")) or "unknown"))
 
     if candidates:
-        print("\nEligible executor candidates — select one explicitly before control:")
+        print("\nHermes candidates — availability unverified; select explicitly, then inspect:")
         for pane_id, label, agent, status in candidates:
             suffix = f" ({label})" if label else ""
-            print(f"  {pane_id}{suffix}: {agent}, {status}")
+            print(f"  {pane_id}{suffix}: {agent}, reported {status} (not availability proof)")
         print("Use the pane ID as the Herdr control target; labels are display metadata, not reliable agent targets.")
     else:
-        print("\nNo eligible Hermes executors are available in this workspace.")
+        print("\nNo non-orchestrator Hermes candidates in this workspace.")
     return 0
 
 

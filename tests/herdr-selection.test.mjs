@@ -7,8 +7,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const helper = fileURLToPath(new URL("../skills/autonomous-ai-agents/autonomous-implementation-review/scripts/herdr_panes.py", import.meta.url));
-const pane = (id, extra = {}) => ({ pane_id: id, workspace_id: "w1", tab_id: "t1", agent: "hermes", agent_status: "idle", ...extra });
-async function run(t, panes, selection) {
+const pane = (id, extra = {}) => ({ pane_id: id, workspace_id: "w1", tab_id: "t1", terminal_id: "term1", agent: "hermes", agent_status: "idle", ...extra });
+async function run(t, panes, selection, inspection = { pane: "w1:p2", workspace: "w1", terminal: "term1", source: "pane-output", status: "idle" }) {
   const dir = await mkdtemp(path.join(os.tmpdir(), "herdr-selection-"));
   t.after(() => rm(dir, { recursive: true, force: true }));
   const args = [helper, "--workspace", "w1", "--orchestrator", "w1:p1"];
@@ -16,18 +16,24 @@ async function run(t, panes, selection) {
     const file = path.join(dir, "selection.json");
     await writeFile(file, JSON.stringify(selection));
     args.push("--selection", file);
+    if (inspection) {
+      const proof = path.join(dir, "inspection.json");
+      await writeFile(proof, JSON.stringify(inspection));
+      args.push("--inspection", proof);
+    }
   }
   return spawnSync("python3", args, { input: JSON.stringify({ result: { panes } }), encoding: "utf8" });
 }
 const answered = { source: "clarify", outcome: "submitted", status: "answered", pane_id: "w1:p2" };
 
-test("overview excludes the orchestrator and busy or unknown agents from eligible candidates", async t => {
+test("overview lists Hermes panes without trusting reported availability", async t => {
   const r = await run(t, [pane("w1:p1"), pane("w1:p2"), pane("w1:p3", { agent_status: "working" }), pane("w1:p4", { agent: "" })]);
   assert.equal(r.status, 0, r.stderr);
-  const candidates = r.stdout.split("Eligible executor candidates")[1];
+  const candidates = r.stdout.split("Hermes candidates — availability unverified")[1];
   assert.ok(candidates, r.stdout);
   assert.match(candidates, /w1:p2/);
-  assert.doesNotMatch(candidates, /w1:p1|w1:p3|w1:p4/);
+  assert.match(candidates, /w1:p3/);
+  assert.doesNotMatch(candidates, /w1:p1|w1:p4/);
 });
 
 test("answered selection and explicit launch pane both validate without controlling Herdr", async t => {
@@ -49,7 +55,7 @@ for (const [name, panes, selection] of [
   ["unanswered", [pane("w1:p2")], { ...answered, status: "unanswered" }],
   ["implicit source", [pane("w1:p2")], { ...answered, source: "sole-candidate" }],
   ["orchestrator", [pane("w1:p1")], { ...answered, pane_id: "w1:p1" }],
-  ["busy", [pane("w1:p2", { agent_status: "working" })], answered],
+
   ["missing", [], answered],
   ["duplicate", [pane("w1:p2"), pane("w1:p2")], answered],
   ["wrong workspace", [pane("w1:p2", { workspace_id: "w2" })], answered],
@@ -69,4 +75,17 @@ test("selection requires a known orchestrator identity rather than an arbitrary 
   const r = await run(t, [pane("w1:p2")], answered);
   assert.notEqual(r.status, 0);
   assert.match(r.stderr, /orchestrator/);
+});
+
+test("selection accepts stale working metadata only with fresh visible idle inspection", async t => {
+  const r = await run(t, [pane("w1:p1"), pane("w1:p2", { agent_status: "working" })], answered);
+  assert.equal(r.status, 0, r.stderr);
+});
+
+test("idle metadata alone cannot authorize selection or injection", async t => {
+  for (const inspection of [null, { pane: "w1:p2", workspace: "w1", terminal: "term1", source: "pane-output", status: "working" },
+    { pane: "w1:p2", workspace: "w1", terminal: "replaced", source: "pane-output", status: "idle" }]) {
+    const r = await run(t, [pane("w1:p1"), pane("w1:p2")], answered, inspection);
+    assert.notEqual(r.status, 0);
+  }
 });

@@ -4,7 +4,9 @@ Load before pane control in `$HERDR_ENV=1`; it owns selection, delivery and
 lifecycle, not scope or authority. Load
 [environment-passthrough.md](environment-passthrough.md) only for child-tool
 Herdr context.
-Require Herdr, Python 3, and a live Hermes executor with the configured model keys.
+Require Herdr, Node 22+, Python 3, and a live Hermes executor with the configured model keys.
+Activity uses the packaged `herdr-pane-state.mjs` parser, not `agent_status` or
+lifecycle counters. Structured metadata still binds pane/workspace/terminal IDs.
 
 ## Select and claim
 
@@ -27,15 +29,23 @@ an existing `exec` name, or broad autonomous authority never supplies consent.
    ```
 
 2. Show the overview. An explicit launch pane ID may be used directly; otherwise
-   `clarify` lists up to four idle/done, non-orchestrator Hermes panes with pane ID,
-   label, state and cwd. Other accepts a literal pane ID. No answer stops.
+   `clarify` lists up to four non-orchestrator Hermes panes with pane ID,
+   label, reported state and cwd; availability is unverified. Other accepts a
+   literal pane ID. No answer stops.
 3. Capture fresh pane JSON and use `write_file` for actual selection evidence:
    `{"source":"launch","pane_id":"<literal-id>"}` or
    `{"source":"clarify","outcome":"submitted","status":"answered","pane_id":"<literal-id>"}`.
-   Validate through `terminal` with `--selection <scratch>/selection.json`; require
-   exit 0 before control and reject stale/busy, foreign, duplicate, missing or
-   unknown panes. Evidence is not future liveness: retain the result and recheck
-   state. Offer one corrective form only; otherwise block.
+   Through `terminal`, inspect the selected literal pane:
+
+   ```sh
+   node <this-skill-dir>/scripts/herdr_lifecycle_watch.mjs --inspect --pane <pane-id> --workspace "$HERDR_WORKSPACE_ID" > <scratch>/inspection.json
+   ```
+
+   Validate the selection helper with `--selection <scratch>/selection.json
+   --inspection <scratch>/inspection.json`. Require exit 0 and matching visible
+   `idle` before control; reject drafts, dialogs, unknown output and identity drift.
+   Inspection files do not prove future liveness: re-inspect before each injection.
+   Offer one corrective form only; otherwise block.
 4. Claim only the selected live agent with `herdr agent rename <pane-id> exec`
    (or use `exec` on an explicitly approved new agent start). If occupied, try
    `exec2`, then `exec3`; do not take over another pane. Read back the agent's
@@ -57,11 +67,11 @@ Do not use `send-keys` to type or submit normal task text. Reserve
 `herdr agent send-keys <pane-id> <key>...` for explicitly authorized interactive
 controls; never use keys to bypass a blocked prompt or overwrite input.
 
-For each implement, review, or correction role, from a verified idle/done session:
+For each implement, review, or correction role, from a verified visible idle session:
 
 1. Send `/new --yes <goal-name>` without `--wait`; `--yes` bypasses reset
    confirmation. Use an outcome name such as `review-source-identity`.
-2. Read back acceptance and idle, unambiguous input. Do not reset a blocked or
+2. Read back acceptance and visible idle, unambiguous input. Do not reset a blocked or
    working session.
 3. Send `/busy queue` without `--wait` and read back acceptance before model/task
    delivery. Accidental follow-up input then queues instead of redirecting work.
@@ -80,8 +90,10 @@ For each implement, review, or correction role, from a verified idle/done sessio
 
 Do not install `herdr integration install hermes` for routine monitoring. That
 integration supplies a resumable session ID for server-restart recovery; Herdr's
-own screen detection supplies working/idle/blocked. Installation changes the
-profile and needs operator approval and restart.
+own screen detection may still report stale working/idle/blocked. The gateway
+plugin's session binding and activity detection are separate facts; installing
+one does not repair the other. Installation changes the profile and needs
+operator approval and restart.
 
 ## Explicit stop requests
 

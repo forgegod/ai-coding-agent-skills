@@ -5,6 +5,7 @@ import { appendFileSync, closeSync, openSync, realpathSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { inspectPane, waitForPane } from "./herdr-pane-state.mjs";
 
 export function goal(phase, chg) {
   return `/goal draft Execute only phase ${phase} of ${chg} using autonomous-implementation-review, phased-plan-execution, and phased-plan-closeout. I authorize the orchestrator to reserve this phase and create its worktree, commit its reviewed implementation, fast-forward the target, commit its completion/archive records, and remove its clean dedicated worktree after verification. Stop after verified target completion and cleanup; do not push or start another phase.`;
@@ -18,7 +19,7 @@ function validate(options) {
   if (!/^docs\/changes\/active\/CHG-[A-Za-z0-9_-]+\.md$/.test(options.chg ?? "")) throw new Error("invalid literal active CHG path");
 }
 
-export function handoff(options, { run, record, env = process.env, sessionName = `phase-${options.phase}-${randomUUID()}` }) {
+export function handoff(options, { run, record, env = process.env, sessionName = `phase-${options.phase}-${randomUUID()}`, now, sleep }) {
   const timeout = "120000";
   const pane = env.HERDR_PANE_ID;
   const workspace = env.HERDR_WORKSPACE_ID;
@@ -35,15 +36,12 @@ export function handoff(options, { run, record, env = process.env, sessionName =
     return output;
   };
   const agent = (allowed) => {
-    const state = JSON.parse(cli("agent", "get", pane)).result?.agent;
-    if (!state || state.pane_id !== pane || state.workspace_id !== workspace || state.agent !== "hermes" || !state.terminal_id ||
-        (terminal && state.terminal_id !== terminal) || realpathSync(state.foreground_cwd ?? "") !== realpathSync(options.repo)) {
-      throw new Error("caller pane identity/cwd changed or is unverified");
-    }
-    if (!allowed.includes(state.agent_status)) throw new Error(`unsafe caller state: ${state.agent_status}`);
-    terminal = state.terminal_id;
+    const state = inspectPane({ pane, workspace, cwd: options.repo }, run, terminal);
+    if (!allowed.includes(state.status)) throw new Error(`unsafe visible caller state: ${state.status}`);
+    terminal = state.terminal;
     return state;
   };
+  const settled = () => waitForPane({ pane, workspace, cwd: options.repo }, run, terminal, ["idle"], { now, sleep });
   const target = () => {
     const git = (...args) => run("git", ["-C", options.repo, ...args]).trim();
     if (git("branch", "--show-current") !== options.branch || git("rev-parse", "HEAD") !== options.head || git("status", "--porcelain=v1")) {
@@ -51,6 +49,7 @@ export function handoff(options, { run, record, env = process.env, sessionName =
     }
   };
   const read = () => cli("agent", "read", pane, "--source", "recent-unwrapped", "--lines", "100");
+
   const prompt = (text) => cli("agent", "prompt", pane, text);
   const literal = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const ack = (pattern, allowed = ["idle", "done"]) => {
@@ -59,7 +58,8 @@ export function handoff(options, { run, record, env = process.env, sessionName =
     cli("pane", "wait-output", pane, "--regex", pattern, "--source", "recent-unwrapped", "--lines", "100", "--timeout", timeout);
     const output = read();
     if (!new RegExp(pattern).test(output)) throw new Error("missing fresh acknowledgment on readback");
-    agent(allowed);
+    if (!allowed.includes("working")) settled();
+    else agent(allowed);
     return output;
   };
   try {
@@ -68,15 +68,12 @@ export function handoff(options, { run, record, env = process.env, sessionName =
     if (!/^[a-zA-Z0-9:_-]+$/.test(pane) || !/^[a-zA-Z0-9:_-]+$/.test(workspace)) throw new Error("invalid caller IDs");
     if (!/^[a-zA-Z0-9_-]+$/.test(sessionName)) throw new Error("invalid session name");
     target();
-    const initial = agent(["working"]);
-    if (!Number.isSafeInteger(initial.state_change_seq) || !Number.isSafeInteger(initial.completion_seq)) throw new Error("missing caller lifecycle/completion sequence");
+    agent(["working"]);
     stage = "armed";
     emit({ head: options.head, branch: options.branch, chg: options.chg, phase: options.phase });
-    cli("agent", "wait", pane, "--until", "idle", "--until", "done", "--until", "blocked", "--timeout", timeout);
-    const settled = agent(["idle", "done"]);
-    if (!Number.isSafeInteger(settled.state_change_seq) || settled.state_change_seq <= initial.state_change_seq ||
-        !Number.isSafeInteger(settled.completion_seq) || settled.completion_seq <= initial.completion_seq) throw new Error("stale caller settlement");
+    settled();
     target();
+    agent(["idle"]);
     stage = "new-attempted";
     emit();
     prompt(`/new --yes ${sessionName}`);
@@ -104,7 +101,7 @@ export function handoff(options, { run, record, env = process.env, sessionName =
     const readback = ack(goalPattern, ["working", "idle", "done", "blocked"]);
     const state = agent(["working", "idle", "done", "blocked"]);
     stage = "goal-accepted";
-    emit({ state: state.agent_status, readback });
+    emit({ state: state.status, source: state.source, readback });
   } catch (error) {
     emit({ failed: true, error: error.message });
     throw error;

@@ -1,7 +1,7 @@
 ---
 name: phased-plan-next
 description: Select the next phase and hand it to this Herdr pane.
-version: 0.1.1
+version: 0.2.0
 author: Raphael (forgegod), Hermes Agent
 license: MIT
 metadata:
@@ -94,10 +94,15 @@ explicit executor selection under `autonomous-implementation-review`.
    selection and receipt path. Scheduled is not delivered; do not claim otherwise.
    If the receipt is not populated yet, report scheduled/unconfirmed and end;
    do not hold the turn open waiting for the helper's settlement check.
-6. The helper requires an observed working caller, then a fresh settled lifecycle
-   transition with advanced state and completion counters before it sends anything.
-   It rechecks pane identity and clean target,
-   then submits three separate prompts, in this order:
+6. The helper uses `scripts/herdr-pane-state.mjs` to inspect the live bottom
+   composer/footer through `agent read --source detection`. Structured `agent get`
+   binds pane/workspace/terminal identity and target cwd only: `agent_status`,
+   `state_change_seq`, and `completion_seq` can be stale after gateway changes.
+   Require visible working first, then two visible idle samples before reset,
+   even when metadata says idle throughout. Never skip settlement or use `agent wait`.
+   Historical `Working` or `∴ Thought for` text is not activity proof. Unknown UI,
+   drafts, queued input, dialogs and identity drift stop without input. The helper
+   rechecks the clean target and submits three separate prompts, in this order:
 
    ```text
    /new --yes <unique-phase-session-name>
@@ -106,7 +111,7 @@ explicit executor selection under `autonomous-implementation-review`.
    ```
 
    All three prompts are sent without `--wait`; explicit fresh CLI acknowledgments
-   and idle/done state are required before the next. A slash command need not
+   and visible idle state are required before the next. A slash command need not
    enter `working`; `/goal draft` can spend more than Herdr's five-second prompt
    activity gate in auxiliary drafting. Bounded `pane wait-output --regex` waits
    scope queue and goal acknowledgments to this unique new-session marker, then
@@ -133,8 +138,10 @@ must reload the CHG/DOX and revalidate ownership before any implementation write
 
 ## Pitfalls
 
-- Herdr screen detection can lag actual activity. If the helper cannot observe
-  the caller working, it refuses to reset rather than trusting stale idle.
+- The parser supports the English classic CLI `☤ ❯` composer/footer shape: a busy
+  queue placeholder plus a live timer/spinner, or empty input plus frozen `⏲`.
+  Other skins, locales, TUI layouts or truncated captures fail closed; do not
+  bypass them with metadata or transcript-wide keyword matching.
 - Pane IDs are not agent-process locks. Leave the pane untouched during the short
   handoff; state checks reduce races but cannot make external input atomic.
 - Installation does not grant execution authority. Review this package separately

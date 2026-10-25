@@ -11,7 +11,8 @@ Herdr pane-selection helper.
 | --- | --- |
 | `autonomous-implementation-review/SKILL.md` | Bounded implementation, review, and verification loop. |
 | `autonomous-implementation-review/scripts/herdr_panes.py` | Read-only overview and fail-closed validation of supplied operator selection against fresh pane JSON. |
-| `autonomous-implementation-review/scripts/herdr_lifecycle_watch.mjs` | Passive, sequence-aware Herdr lifecycle watcher and its arming gate; never sends pane input. |
+| `autonomous-implementation-review/scripts/herdr_lifecycle_watch.mjs` | Passive output-based Herdr lifecycle watcher, read-only inspection and arming gate; never sends pane input. |
+| `autonomous-implementation-review/scripts/herdr-pane-state.mjs` | Canonical live-composer/footer parser and identity-bound observation; next ships a test-synchronized standalone copy. |
 | `autonomous-implementation-review/references/environment-passthrough.md` | Profile-scoped Hermes child-environment configuration for Herdr context. |
 | `autonomous-implementation-review/references/herdr.md` | On-demand Herdr selection, delivery, lifecycle, and stop mechanics. |
 | `autonomous-implementation-review/references/lifecycle-watch.md` | Passive watcher arming, outcomes, and operator-only recovery. |
@@ -28,12 +29,12 @@ Herdr pane-selection helper.
 - The orchestrator delegates Git/CHG writes to `phased-plan-closeout`; executors never stage, commit, integrate, retire worktrees, or edit the CHG path. Keep the command protocol out of this skill.
 - The orchestrator dispatches code/prerequisite fixes to the executor, never edits worker code itself, and honors the operator's explicit launch authority and stop decisions.
 - Keep external tool and model references as prerequisites, not bundled dependencies.
-- Bound discovery and reuse valid evidence. For dispatched Herdr work, arm `herdr_lifecycle_watch.mjs` before delivery and leave the turn after dispatch. It reads only `herdr agent get`, records one outcome, and never sends pane input or starts another goal. `settled` is not success; `inconclusive_fast` is not completion. Source changes do not authorize installed-profile updates.
+- Bound discovery and reuse valid evidence. Arm `herdr_lifecycle_watch.mjs` before delivery and leave the turn after dispatch. It reads `agent get` for identity and `agent read --source detection` for live activity, records one outcome, and never sends input or starts another goal. Frozen status/counters are not activity proof; unknown output blocks injection. Selection requires matching fresh output inspection, and `settled` is not success. Source changes do not authorize installed-profile updates.
 
 ## Verification
 
 Run `npm test` and `npm run build`. Confirm the generated package advertises
-`SKILL.md`, `references/herdr.md`, `references/lifecycle-watch.md`, `scripts/herdr_panes.py`, and
-`scripts/herdr_lifecycle_watch.mjs`.
+`SKILL.md`, `references/herdr.md`, `references/lifecycle-watch.md`, `scripts/herdr_panes.py`,
+`scripts/herdr_lifecycle_watch.mjs`, and `scripts/herdr-pane-state.mjs`.
 
 Parent contract: `../AGENTS.md`.

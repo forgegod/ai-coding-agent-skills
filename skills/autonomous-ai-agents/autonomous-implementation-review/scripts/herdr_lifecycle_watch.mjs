@@ -4,12 +4,9 @@ import { execFileSync } from "node:child_process";
 import { appendFileSync, closeSync, fsyncSync, openSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { inspectPane } from "./herdr-pane-state.mjs";
 
 const terminalStates = new Set(["idle", "done"]);
-const knownStates = new Set(["idle", "done", "working", "blocked", "unknown"]);
-
-/** A failed read that may be retried once. Identity and contract errors are never transient. */
-class TransientError extends Error {}
 
 function flags(args, allowed) {
   const values = {};
@@ -49,76 +46,6 @@ export function validate(options) {
   };
 }
 
-function parseAgent(output) {
-  let data;
-  try {
-    data = JSON.parse(output);
-  } catch {
-    throw new TransientError("Herdr returned invalid JSON");
-  }
-  if (data.error) throw new TransientError(`Herdr error: ${JSON.stringify(data.error)}`);
-  const agent = data.result?.agent;
-  if (!agent || typeof agent !== "object") throw new TransientError("Herdr returned no agent state");
-  return agent;
-}
-
-function lifecycleValue(agent, field) {
-  if (!Number.isSafeInteger(agent[field]) || agent[field] < 0) throw new Error(`missing ${field}`);
-  return agent[field];
-}
-
-function inspect(options, run, terminalId = null) {
-  let agent;
-  try {
-    agent = parseAgent(run("herdr", ["agent", "get", options.pane]));
-  } catch (error) {
-    throw error instanceof TransientError ? error : new TransientError(`Herdr read failed: ${error.message}`);
-  }
-  if (agent.pane_id !== options.pane || agent.workspace_id !== options.workspace || agent.agent !== "hermes") {
-    throw new Error("pane identity changed or is not Hermes");
-  }
-  if (typeof agent.terminal_id !== "string" || !agent.terminal_id) throw new Error("missing terminal identity");
-  if (terminalId && agent.terminal_id !== terminalId) throw new Error("terminal identity changed");
-  if (!knownStates.has(agent.agent_status)) throw new Error(`unknown agent state: ${agent.agent_status}`);
-  return {
-    pane: agent.pane_id,
-    workspace: agent.workspace_id,
-    terminal: agent.terminal_id,
-    status: agent.agent_status,
-    stateChangeSeq: lifecycleValue(agent, "state_change_seq"),
-    completionSeq: lifecycleValue(agent, "completion_seq"),
-  };
-}
-
-/** One read. A transient failure is retried once; the second failure is final. */
-function sample(options, run, terminalId = null) {
-  try {
-    return inspect(options, run, terminalId);
-  } catch (error) {
-    if (!(error instanceof TransientError)) throw error;
-    return inspect(options, run, terminalId);
-  }
-}
-
-function changedBefore(previous, current) {
-  return current.stateChangeSeq < previous.stateChangeSeq || current.completionSeq < previous.completionSeq;
-}
-
-function terminalOutcome(baseline, current, sawWorking) {
-  const advancedState = current.stateChangeSeq > baseline.stateChangeSeq;
-  const advancedCompletion = current.completionSeq > baseline.completionSeq;
-  if (current.status === "blocked" && advancedState) return "blocked";
-  if (!terminalStates.has(current.status)) return null;
-  if (!sawWorking) return advancedCompletion ? "inconclusive_fast" : null;
-  if (advancedState && advancedCompletion) return "settled";
-  return advancedState ? "inconclusive" : null;
-}
-
-function sameTerminal(left, right) {
-  return left.terminal === right.terminal && left.status === right.status &&
-    left.stateChangeSeq === right.stateChangeSeq && left.completionSeq === right.completionSeq;
-}
-
 /**
  * Observe one dispatched task without sending any pane input.
  *
@@ -133,7 +60,7 @@ export async function watch(options, deps) {
   const record = deps.record ?? (() => {});
   const startedAt = now();
   const deadlineAt = config.deadlineMs === null ? null : startedAt + config.deadlineMs;
-  const baseline = sample(config, run);
+  const baseline = inspectPane(config, run);
   if (!terminalStates.has(baseline.status)) throw new Error(`watcher requires idle/done baseline, got ${baseline.status}`);
   record({ outcome: "armed", at: startedAt, baseline });
   let sawWorking = false;
@@ -155,23 +82,23 @@ export async function watch(options, deps) {
   while (true) {
     if (timedOut()) return timeoutEvent();
     if (!await pause(config.intervalMs)) return timeoutEvent();
-    const current = sample(config, run, baseline.terminal);
-    if (changedBefore(latest, current)) throw new Error("lifecycle counters moved backwards");
+    const current = inspectPane(config, run, baseline.terminal);
     latest = current;
+    if (timedOut()) return timeoutEvent();
     if (current.status === "unknown") {
       const event = { outcome: "inconclusive", at: now(), baseline, final: current, sawWorking };
       record(event);
       return event;
     }
-    if (current.status === "working" && current.stateChangeSeq > baseline.stateChangeSeq) sawWorking = true;
+    if (current.status === "working") sawWorking = true;
 
-    const outcome = terminalOutcome(baseline, current, sawWorking);
+    const outcome = current.status === "blocked" ? "blocked" : terminalStates.has(current.status) && sawWorking ? "settled" : null;
     if (!outcome) continue;
     if (!await pause(config.debounceMs)) return timeoutEvent();
-    const stable = sample(config, run, baseline.terminal);
-    if (changedBefore(latest, stable)) throw new Error("lifecycle counters moved backwards during debounce");
+    const stable = inspectPane(config, run, baseline.terminal);
     latest = stable;
-    if (!sameTerminal(current, stable)) continue;
+    if (timedOut()) return timeoutEvent();
+    if (current.status !== stable.status) continue;
     const event = { outcome, at: now(), baseline, final: stable, sawWorking };
     record(event);
     return event;
@@ -221,6 +148,12 @@ function parseWait(args) {
 }
 
 export async function main(args, { run = (bin, argv) => execFileSync(bin, argv, { encoding: "utf8", timeout: 15000, stdio: ["ignore", "pipe", "pipe"] }), log = console.log, ...watchDeps } = {}) {
+  if (args.includes("--inspect")) {
+    const options = flags(args.filter(arg => arg !== "--inspect"), ["pane", "workspace"]);
+    const result = inspectPane(options, run);
+    log(JSON.stringify(result));
+    return result;
+  }
   if (args.includes("--wait-armed")) {
     const waiting = parseWait(args.filter(arg => arg !== "--wait-armed"));
     const event = waitArmed(waiting.receipt, waiting.timeoutMs, watchDeps);
