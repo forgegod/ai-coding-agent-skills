@@ -2,7 +2,11 @@
 
 export function parsePaneOutput(raw) {
   const lines = raw.replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, "").trimEnd().split(/\r?\n/);
-  const index = lines.findLastIndex(line => /^(?:☤\s+)?❯(?:\s|$)/.test(line));
+  const composerText = line => {
+    const match = line.match(/^(?:☤\s+)?❯(?:\s(.*))?$/) ?? line.match(/^.+\s❯(?:\s(.*))?$/);
+    return match ? (match[1] ?? "").trim() : null;
+  };
+  const index = lines.findLastIndex(line => composerText(line) !== null);
   if (index < 0) return { status: "unknown" };
   const after = lines.slice(index + 1).filter(line => line.trim() && !/^─+$/.test(line.trim()));
   // Only recognize the live bottom composer/footer, never old transcript examples.
@@ -10,8 +14,8 @@ export function parsePaneOutput(raw) {
   const panel = lines.slice(Math.max(0, index - 8), index).join("\n");
   if (/approval required|sudo password|credential input|confirm reset/i.test(panel)) return { status: "blocked" };
   if (/Queue · [1-9][0-9]* queued|Subagents · [1-9][0-9]* live|↩ resumes when subagent finishes/.test(panel)) return { status: "unknown" };
-  const composer = lines[index].replace(/^(?:☤\s+)?❯\s*/, "").trim();
-  const busy = /⏱/.test(after[0]) || /^── [\u2800-\u28ff] .+/m.test(panel);
+  const composer = composerText(lines[index]);
+  const busy = /⏱|\bctrl\+c\s+stop\b|⌃c\s+stop/i.test(after[0]) || /^── [\u2800-\u28ff] .+/m.test(panel);
   if (composer === "type to queue a message for after this turn" && busy) return { status: "working" };
   // Hermes can retain the queue placeholder after a completed turn. A frozen
   // footer still proves the composer is empty; arbitrary draft text stays unknown.

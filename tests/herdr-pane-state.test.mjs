@@ -3,18 +3,21 @@ import assert from "node:assert/strict";
 
 const moduleUrl = new URL("../skills/autonomous-ai-agents/autonomous-implementation-review/scripts/herdr-pane-state.mjs", import.meta.url);
 const footer = "☤ sol · 1K/500K · [░░] 1%";
-const screen = (body, composer, timer) => `${body}\n☤ ❯ ${composer}\n────────────────\n${footer} · ${timer}`;
+const screen = (body, composer, footerState) => `${body}\n☤ ❯ ${composer}\n────────────────\n${footer} · ${footerState}`;
+const namedPromptScreen = (body, composer, footerState) => `${body}\nan arbitrary session title ❯${composer ? ` ${composer}` : ""}\n────────────────\n${footer} · ${footerState}`;
 
 // Captured classic CLI shape, not a transcript-wide keyword match.
 export const workingScreen = screen("── ⠹ Working… · 58s ──", "type to queue a message for after this turn", "⏱ 58s");
-export const idleScreen = screen("∴ Thought for 3s\nDone.", "", "⏲ 59s");
+export const idleScreen = screen("∴ Thought for 3s\nDone.", "", "⏲ 0s");
 
 test("pane text, not stale metadata or old thought text, determines activity", async () => {
   const { parsePaneOutput } = await import(moduleUrl);
   assert.equal(parsePaneOutput(workingScreen).status, "working");
   assert.equal(parsePaneOutput(idleScreen).status, "idle");
+  assert.equal(parsePaneOutput(namedPromptScreen("Done.", "", "⏲ 0s")).status, "idle");
+  assert.equal(parsePaneOutput(namedPromptScreen("Done.", "type to queue a message for after this turn", "⏲ 0s · ctrl+c stop")).status, "working");
   assert.equal(parsePaneOutput(screen("── ⠙ 💻 herdr agent get · 28s ──", "type to queue a message for after this turn", "⏱ 28s")).status, "working");
-  assert.equal(parsePaneOutput(screen("Done.", "type to queue a message for after this turn", "⏲ 59s")).status, "idle");
+  assert.equal(parsePaneOutput(screen("Done.", "type to queue a message for after this turn", "⏲ 0s")).status, "idle");
   assert.equal(parsePaneOutput(screen("∴ Thought for 3s", "type to queue a message for after this turn", "")).status, "unknown");
   assert.equal(parsePaneOutput(`\u001b[32m${workingScreen}\u001b[0m`).status, "working");
 });

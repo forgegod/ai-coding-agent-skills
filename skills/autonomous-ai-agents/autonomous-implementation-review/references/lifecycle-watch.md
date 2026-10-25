@@ -40,9 +40,10 @@ visible `idle` samples. Stable `blocked` is not completion. Identity drift or an
 API error fails closed; unfamiliar UI is inconclusive. Never use old transcript
 `Working`/`∴ Thought for` lines to infer live activity.
 
-The supported English classic CLI has a `☤ ❯` bottom composer and `☤` status footer.
-Working needs the busy-queue placeholder plus a live `⏱`/spinner; idle needs an
-empty composer and frozen `⏲`. Drafts, queued input and live subagents block
+The supported English CLI has either a `☤ ❯` composer or a named-session prompt
+ending in `❯`, plus a `☤` status footer. Working needs the busy-queue placeholder
+plus a live `⏱`/spinner or `ctrl+c stop` hint; idle needs an empty composer and
+frozen `⏲` without that stop hint. Drafts, queued input and live subagents block
 automatic injection. Other skins, locales, TUI layouts, truncation or overlays
 require operator recovery, not an automatic fallback to metadata.
 
