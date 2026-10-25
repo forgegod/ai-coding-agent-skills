@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.10.0
+version: 0.10.2
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -21,7 +21,7 @@ metadata:
 
 # Autonomous Implementation Review
 
-Roles are not externally independent; high-risk work needs external review.
+High-risk work needs external review.
 
 ## Preconditions and roles
 
@@ -35,19 +35,20 @@ Roles are not externally independent; high-risk work needs external review.
   Reviewers are read-only. Missing reservation authority blocks mutable phase work.
 - This automated role loop is Herdr-only. Require `$HERDR_ENV=1` and load
   [references/herdr.md](references/herdr.md) before reservation or pane control.
-  It owns selection, role setup, delivery, waits and stops. No implicit pane consent,
-  `delegate_task` role substitute, or fallback worker.
+  Use an explicitly selected different Herdr pane; this pane remains the orchestrator.
+  Issue #141194 blocks handoff proof. Until closed, only operator approval of pane
+  authorizes next packet.
+  No implicit consent or `delegate_task` fallback.
   Outside Herdr, stop and offer an operator-approved manual phase workflow.
 - Configured implementer/reviewer values are session-only Hermes model keys,
   not executables. Transport/model failure blocks: never shell-execute keys,
   change global config or silently substitute a model.
-- Isolate writing agents' worktrees, branches, outputs and mutable services;
-  prefer one worker for dependent work. Set finite turn/time/cost budgets.
-  No secrets, destructive production tasks, or unresolved interactive decisions.
-  Browser work needs explicit scoped access and verified connection, not personal
-  browser state. Scratch holds temporary logs; dirty worktrees stay outside caches.
-- If a source checkout is in use, compare installed skill version with source once;
-  report drift. Source edits do not update installed skills or authorize installation.
+- Isolate writers' worktrees, branches, outputs and mutable services; use one for
+  dependent work and finite budgets. No secrets, destructive tasks or unresolved
+  decisions; browser work needs explicit scoped access/verified connection, never
+  personal state. Scratch is temporary; dirty worktrees stay outside caches.
+- For a source checkout, compare installed skill version once and report drift;
+  source edits neither update installed skills nor authorize installation.
 
 ## Goal and repository truth
 
@@ -77,8 +78,8 @@ are resolved. Reuse evidence unless invalidated; batch independent lookups.
    and report format. Require focused tests and paths/results/risks; link
    logs/diffs instead of repeatedly copying them.
 3. On watcher `settled`, inspect the candidate and run relevant checks; lifecycle is
-   not success. Any other watcher outcome stops for the operator; never inject a
-   status prompt, reset, or goal. Dispatch failed prerequisites to a fresh
+   not success. Any other outcome stops. A reviewer/correction needs fresh handoff
+   approval; never inject a status prompt, reset, or goal. Dispatch failed prerequisites to a fresh
    implementer session; the orchestrator does not edit worker code.
 4. Use closeout's review-boundary recipe to freeze the full candidate. Dispatch a
    fresh reviewer role through Herdr with base/digest, paths/diff, acceptance

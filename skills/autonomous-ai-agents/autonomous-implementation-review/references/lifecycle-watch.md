@@ -32,6 +32,9 @@ It uses `herdr agent get <pane-id>` before and after `agent read <pane-id> --sou
 The packaged `herdr-pane-state.mjs` binds literal identities and reads activity
 from the current bottom composer/footer. `agent_status`, `state_change_seq`, and
 `completion_seq` are not activity evidence: they can remain frozen while Hermes works.
+Nor can pane output identify the bound Hermes session. While issue #141194 remains
+open, a watcher receipt never authorizes a role handoff; explicit operator approval
+of the literal next target pane is the only continuation authority.
 `settled` requires observed post-baseline visible `working`, then two matching
 visible `idle` samples. Stable `blocked` is not completion. Identity drift or an
 API error fails closed; unfamiliar UI is inconclusive. Never use old transcript

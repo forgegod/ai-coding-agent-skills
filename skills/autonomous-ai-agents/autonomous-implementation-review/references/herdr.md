@@ -1,12 +1,11 @@
 # Herdr executor transport
 
-Load before pane control in `$HERDR_ENV=1`; it owns selection, delivery and
-lifecycle, not scope or authority. Load
-[environment-passthrough.md](environment-passthrough.md) only for child-tool
-Herdr context.
-Require Herdr, Node 22+, Python 3, and a live Hermes executor with the configured model keys.
-Activity uses the packaged `herdr-pane-state.mjs` parser, not `agent_status` or
-lifecycle counters. Structured metadata still binds pane/workspace/terminal IDs.
+Load before pane control in `$HERDR_ENV=1`; it owns selection, delivery and lifecycle,
+not scope/authority. Load [environment-passthrough.md](environment-passthrough.md)
+only for child-tool context. Require Herdr, Node 22+, Python 3 and a live executor.
+Use packaged `herdr-pane-state.mjs`, not `agent_status`/lifecycle counters; metadata
+still binds pane/workspace/terminal IDs, not the Hermes session. See Hermes issue
+[#141194](https://github.com/NousResearch/hermes-agent/issues/141194).
 
 ## Select and claim
 
@@ -15,8 +14,9 @@ Before reservation or any mutating pane command (including rename, `/new`,
 cancelled, skipped, unanswered, or undelivered form is a blocker. A sole candidate,
 an existing `exec` name, or broad autonomous authority never supplies consent.
 
-1. Require `$HERDR_WORKSPACE_ID` and the actual orchestrator pane ID; do not infer
-   it from focus. Capture JSON to a fresh session-scratch path through `terminal`:
+1. Require `HERDR_ENV=1`, `HERDR_WORKSPACE_ID`, and `HERDR_PANE_ID` through
+   `terminal`. The executor pane ID must differ from `HERDR_PANE_ID`; missing
+   caller identity blocks control, never infer it from focus. Capture JSON:
 
    ```sh
    herdr pane list --workspace "$HERDR_WORKSPACE_ID" > <scratch>/panes.json
@@ -25,7 +25,7 @@ an existing `exec` name, or broad autonomous authority never supplies consent.
    Inspect it with `read_file`, then run the read-only overview through `terminal`:
 
    ```sh
-   python3 <this-skill-dir>/scripts/herdr_panes.py --workspace "$HERDR_WORKSPACE_ID" --orchestrator <pane-id> < <scratch>/panes.json
+   python3 <this-skill-dir>/scripts/herdr_panes.py --workspace "$HERDR_WORKSPACE_ID" --orchestrator "$HERDR_PANE_ID" < <scratch>/panes.json
    ```
 
 2. Show the overview. An explicit launch pane ID may be used directly; otherwise
@@ -43,20 +43,19 @@ an existing `exec` name, or broad autonomous authority never supplies consent.
 
    Validate the selection helper with `--selection <scratch>/selection.json
    --inspection <scratch>/inspection.json`. Require exit 0 and matching visible
-   `idle` before control; reject drafts, dialogs, unknown output and identity drift.
-   Inspection files do not prove future liveness: re-inspect before each injection.
-   Offer one corrective form only; otherwise block.
+   `idle` before control; reject drafts, dialogs, unknown output and identity drift;
+   re-inspect before each injection. Output only rejects unsafe visible input and
+   never proves the bound session or authorizes a handoff. Offer one corrective form;
+   otherwise block.
 4. Claim only the selected live agent with `herdr agent rename <pane-id> exec`
    (or use `exec` on an explicitly approved new agent start). If occupied, try
    `exec2`, then `exec3`; do not take over another pane. Read back the agent's
    `name`, not its display `label`, from fresh JSON. It is temporary ownership,
    cleared when the agent exits. Continue controlling by pane ID.
 
-Keep the fixed topology: this pane is orchestrator, the selected pane executor.
-Never reset, rename, or control the orchestrator as a worker. Plain-text composer
-examples such as `Try "explain this codebase"` may be stripped italic placeholders,
-not drafts; neither a capture nor `agent_status` proves an empty buffer. Never
-clear an apparent draft; choose another pane or ask if input state is ambiguous.
+Fixed topology: this pane is orchestrator, selected pane executor. Never reset,
+rename, or control the orchestrator as a worker. A capture or `agent_status` cannot
+prove empty input; never clear an apparent draft—choose another pane or ask.
 
 ## Deliver each role
 
@@ -67,7 +66,13 @@ Do not use `send-keys` to type or submit normal task text. Reserve
 `herdr agent send-keys <pane-id> <key>...` for explicitly authorized interactive
 controls; never use keys to bypass a blocked prompt or overwrite input.
 
-For each implement, review, or correction role, from a verified visible idle session:
+While issue #141194 remains open, explicit per-handoff operator approval is the only handoff authority.
+Before every role, `clarify` needs fresh submitted approval naming
+literal pane ID and goal. It permits only the following setup and one packet; different
+pane/goal, no answer or other outcome stops/reselects. Idle/selection/session/watcher
+evidence never replaces approval.
+
+For each approved role, from a verified visible idle session:
 
 1. Send `/new --yes <goal-name>` without `--wait`; `--yes` bypasses reset
    confirmation. Use an outcome name such as `review-source-identity`.
@@ -86,14 +91,11 @@ For each implement, review, or correction role, from a verified visible idle ses
    is read-only; the implementer does not stage, commit, or change the CHG path.
    Do not run `herdr agent wait` or inject another prompt while the watcher runs.
 7. After the watcher exits, apply its one receipt. `settled` permits factual
-   verification; every other outcome stops without pane input.
+   verification, not the next handoff; every other outcome stops without pane input.
 
-Do not install `herdr integration install hermes` for routine monitoring. That
-integration supplies a resumable session ID for server-restart recovery; Herdr's
-own screen detection may still report stale working/idle/blocked. The gateway
-plugin's session binding and activity detection are separate facts; installing
-one does not repair the other. Installation changes the profile and needs
-operator approval and restart.
+Do not install `herdr integration install hermes` for monitoring. It only adds
+server-restart recovery; it cannot repair stale screen detection or session binding.
+Installation changes the profile and needs operator approval/restart.
 
 ## Explicit stop requests
 

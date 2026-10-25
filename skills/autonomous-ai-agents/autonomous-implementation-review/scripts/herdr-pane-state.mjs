@@ -1,6 +1,4 @@
-// Canonical copy; phased-plan-next packages an identical copy for standalone installs.
 // Activity is visible UI evidence, not agent_status or lifecycle counters.
-import { realpathSync } from "node:fs";
 
 export function parsePaneOutput(raw) {
   const lines = raw.replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, "").trimEnd().split(/\r?\n/);
@@ -15,7 +13,9 @@ export function parsePaneOutput(raw) {
   const composer = lines[index].replace(/^(?:☤\s+)?❯\s*/, "").trim();
   const busy = /⏱/.test(after[0]) || /^── [\u2800-\u28ff] .+/m.test(panel);
   if (composer === "type to queue a message for after this turn" && busy) return { status: "working" };
-  if (composer === "" && !busy && /⏲/.test(after[0])) return { status: "idle" };
+  // Hermes can retain the queue placeholder after a completed turn. A frozen
+  // footer still proves the composer is empty; arbitrary draft text stays unknown.
+  if ((composer === "" || composer === "type to queue a message for after this turn") && !busy && /⏲/.test(after[0])) return { status: "idle" };
   return { status: "unknown" };
 }
 
@@ -31,7 +31,6 @@ export function inspectPane(options, run, expectedTerminal = null) {
         typeof a.terminal_id !== "string" || !a.terminal_id || (expectedTerminal && expectedTerminal !== a.terminal_id)) {
       throw new Error("pane/workspace/terminal identity changed or is not Hermes");
     }
-    if (options.cwd && realpathSync(a.foreground_cwd ?? "") !== realpathSync(options.cwd)) throw new Error("pane cwd changed or is unverified");
     return a;
   };
   const before = get();
@@ -40,26 +39,4 @@ export function inspectPane(options, run, expectedTerminal = null) {
   if (before.terminal_id !== after.terminal_id) throw new Error("terminal identity changed during output read");
   return { pane: options.pane, workspace: options.workspace, terminal: after.terminal_id,
     source: "pane-output", ...parsePaneOutput(output) };
-}
-
-// Synchronous bounded wait for the reset helper. No input, counters, or agent wait.
-export function waitForPane(options, run, expectedTerminal, allowed, {
-  now = Date.now,
-  sleep = ms => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms),
-  timeoutMs = 120000,
-} = {}) {
-  const deadline = now() + timeoutMs;
-  while (now() < deadline) {
-    const first = inspectPane(options, run, expectedTerminal);
-    if (first.status === "blocked" || first.status === "unknown") throw new Error(`unsafe visible pane state: ${first.status}`);
-    if (allowed.includes(first.status)) {
-      sleep(Math.min(500, Math.max(0, deadline - now())));
-      if (now() >= deadline) break;
-      const stable = inspectPane(options, run, expectedTerminal);
-      if (now() >= deadline) break;
-      if (stable.status === first.status) return stable;
-      if (stable.status === "blocked" || stable.status === "unknown") throw new Error(`unsafe visible pane state: ${stable.status}`);
-    } else sleep(Math.min(200, Math.max(0, deadline - now())));
-  }
-  throw new Error("visible pane settlement timed out");
 }
