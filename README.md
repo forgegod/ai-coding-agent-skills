@@ -258,8 +258,9 @@ metadata binds identity, not activity. Unknown output blocks injection. It refus
 missing caller context rather than guessing from
 focus. Outside Herdr, with ambiguous selection, or on a transport blocker, it
 reports the selected action without injection. Keep the composer untouched during
-handoff. The selecting turn reports a scratch receipt path, not premature success;
-failed or partial delivery is never retried automatically. Preview stays read-only.
+handoff. The selecting turn confirms the helper armed with foreground `--wait-armed`
+before reporting the scratch receipt path; a missing file is not an empty receipt.
+Armed is not delivery, and failed or partial delivery is never retried automatically. Preview stays read-only.
 
 #### Close a verified phase
 

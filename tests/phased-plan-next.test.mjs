@@ -18,6 +18,7 @@ test("next selects through overview and owns only the explicit current-pane hand
     /\/new --yes[\s\S]*\/busy queue[\s\S]*\/goal draft/,
     /persist_on_release/, /do not.*wait.*own.*turn/is,
     /scheduled.*not.*delivered/is, /scripts\/handoff\.mjs/,
+    /--wait-armed/, /Background-start acknowledgment is not receipt creation/,
   ]) assert.match(source, pattern);
 });
 
@@ -201,4 +202,21 @@ test("preview has no side effects, CLI refuses receipt reuse and source-tree rec
   assert.throws(() => execFileSync(process.execPath, [script.pathname, ...args, "--dispatch"], { stdio: "pipe" }), /EEXIST/);
   assert.equal(readFileSync(receipt, "utf8"), "existing receipt");
   assert.throws(() => f.helper.main([...args.slice(0, -2), "--receipt", path.join(f.options.repo, "receipt.jsonl")]), /outside the target/);
+});
+
+test("wait-armed reads a durable armed receipt and treats a missing file as not armed", async t => {
+  const helper = await import("../skills/software-development/phased-plan-next/scripts/handoff.mjs");
+  const scratch = mkdtempSync(path.join(os.tmpdir(), "next-wait-armed-"));
+  t.after(() => rmSync(scratch, { recursive: true, force: true }));
+  const receipt = path.join(scratch, "handoff.jsonl");
+  writeFileSync(receipt, JSON.stringify({ stage: "armed", failed: false }) + "\n");
+  assert.equal(helper.waitArmed(receipt, 0).stage, "armed");
+  writeFileSync(receipt, JSON.stringify({ stage: "preflight", failed: true, error: "unsafe visible caller state: idle" }) + "\n");
+  assert.throws(() => helper.waitArmed(receipt, 0), /unsafe visible caller state/);
+  assert.throws(() => helper.waitArmed(path.join(scratch, "missing.jsonl"), 0), /did not arm/);
+  writeFileSync(receipt, JSON.stringify({ stage: "armed" }) + "\n");
+  const script = new URL("../skills/software-development/phased-plan-next/scripts/handoff.mjs", import.meta.url);
+  assert.equal(JSON.parse(execFileSync(process.execPath, [script.pathname, "--wait-armed", "--receipt", receipt, "--timeout-ms", "0"], { encoding: "utf8" })).stage, "armed");
+  writeFileSync(receipt, JSON.stringify({ stage: "preflight", failed: true, error: "unsafe visible caller state: idle" }) + "\n");
+  assert.throws(() => execFileSync(process.execPath, [script.pathname, "--wait-armed", "--receipt", receipt, "--timeout-ms", "0"], { encoding: "utf8", stdio: "pipe" }), /unsafe visible caller state/);
 });

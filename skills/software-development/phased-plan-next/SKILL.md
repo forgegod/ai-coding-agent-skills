@@ -1,7 +1,7 @@
 ---
 name: phased-plan-next
 description: Select the next phase and hand it to this Herdr pane.
-version: 0.2.0
+version: 0.2.1
 author: Raphael (forgegod), Hermes Agent
 license: MIT
 metadata:
@@ -89,11 +89,22 @@ explicit executor selection under `autonomous-implementation-review`.
    persist_on_release=true)`. The bounded helper must outlive the selecting
    session's reset. This one handoff is the only authorized persistent job; do
    not use a cron, subagent, polling loop, arbitrary sleep, or another agent pane.
-   Read its initial receipt to distinguish armed from blocked. Do not foreground
-   wait for your own turn to finish: end the selecting turn promptly with the
-   selection and receipt path. Scheduled is not delivered; do not claim otherwise.
-   If the receipt is not populated yet, report scheduled/unconfirmed and end;
-   do not hold the turn open waiting for the helper's settlement check.
+   Background-start acknowledgment is not receipt creation: the helper creates
+   the file only after argument checks, and process stdout can stay buffered.
+   In the same turn, wait only for arming. Run this in the foreground, not as a
+   background job and not through `read_file`:
+
+   ```text
+   node <this-skill-dir>/scripts/handoff.mjs --wait-armed --receipt <same-receipt> --timeout-ms 10000
+   ```
+
+   Require exit 0 and JSON `stage` `armed` without `failed`. That proves the
+   helper created the receipt and passed preflight; it is not delivery. A missing
+   file, timeout, or preflight failure is unconfirmed or blocked: stop that
+   background process and do not claim a scheduled handoff. Do not foreground
+   wait for settlement or your own turn to finish. After a confirmed arm, end
+   the selecting turn promptly with the selection and receipt path. Scheduled is
+   not delivered; do not claim otherwise.
 6. The helper uses `scripts/herdr-pane-state.mjs` to inspect the live bottom
    composer/footer through `agent read --source detection`. Structured `agent get`
    binds pane/workspace/terminal identity and target cwd only: `agent_status`,
@@ -147,7 +158,9 @@ must reload the CHG/DOX and revalidate ownership before any implementation write
 - Installation does not grant execution authority. Review this package separately
   from the generic read-only planning entry point.
 - Receipts are temporary transport evidence, not progress authority. Active CHGs
-  remain the only material-work progress records.
+  remain the only material-work progress records. A background-process start
+  does not create the receipt; `--wait-armed` is the only arming check. A missing
+  file is not an empty receipt and is not delivery.
 
 ## Verification
 

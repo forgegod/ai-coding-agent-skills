@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // One bounded, explicit current-pane handoff. No Git writes or fallback targeting.
 import { execFileSync } from "node:child_process";
-import { appendFileSync, closeSync, openSync, realpathSync } from "node:fs";
+import { appendFileSync, closeSync, fsyncSync, openSync, readFileSync, realpathSync } from "node:fs";
 import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -17,6 +17,38 @@ function validate(options) {
   if (!/^(?:[0-9a-f]{40}|[0-9a-f]{64})$/.test(options.head ?? "")) throw new Error("head must be a full Git SHA");
   if (!/^[1-9][0-9]*$/.test(options.phase ?? "")) throw new Error("phase must be a positive integer");
   if (!/^docs\/changes\/active\/CHG-[A-Za-z0-9_-]+\.md$/.test(options.chg ?? "")) throw new Error("invalid literal active CHG path");
+}
+
+function positiveInteger(value, name, { minimum = 1 } = {}) {
+  if (!/^[0-9]+$/.test(String(value)) || !Number.isSafeInteger(Number(value)) || Number(value) < minimum) {
+    throw new Error(`${name} must be an integer at least ${minimum}`);
+  }
+  return Number(value);
+}
+
+function firstEvent(receipt) {
+  try {
+    const line = readFileSync(receipt, "utf8").split("\n").find(Boolean);
+    return line ? JSON.parse(line) : null;
+  } catch (error) {
+    if (error.code === "ENOENT" || error instanceof SyntaxError) return null;
+    throw error;
+  }
+}
+
+/** Block until dispatch created the receipt and recorded `armed`. Missing is not a result. */
+export function waitArmed(receipt, timeoutMs = 10000, { sleep, now = Date.now } = {}) {
+  if (!path.isAbsolute(receipt ?? "")) throw new Error("receipt must be an absolute path");
+  const deadline = now() + positiveInteger(timeoutMs, "timeout-ms", { minimum: 0 });
+  const pause = sleep ?? (milliseconds => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, milliseconds));
+  while (true) {
+    const event = firstEvent(receipt);
+    if (event?.stage === "armed" && event.failed !== true) return event;
+    if (event?.failed === true) throw new Error(event.error || "handoff failed before arming");
+    const remaining = deadline - now();
+    if (remaining <= 0) throw new Error("handoff did not arm before timeout");
+    pause(Math.min(200, remaining));
+  }
 }
 
 export function handoff(options, { run, record, env = process.env, sessionName = `phase-${options.phase}-${randomUUID()}`, now, sleep }) {
@@ -109,6 +141,18 @@ export function handoff(options, { run, record, env = process.env, sessionName =
 }
 
 export function main(args) {
+  if (args.includes("--wait-armed")) {
+    const values = {};
+    const rest = args.filter(arg => arg !== "--wait-armed");
+    for (let i = 0; i < rest.length; i++) {
+      const key = rest[i].slice(2);
+      if (!rest[i].startsWith("--") || !["receipt", "timeout-ms"].includes(key) || values[key] !== undefined || !rest[i + 1]) throw new Error(`invalid argument: ${rest[i]}`);
+      values[key] = rest[++i];
+    }
+    const event = waitArmed(values.receipt, values["timeout-ms"] ?? 10000);
+    console.log(JSON.stringify(event));
+    return event;
+  }
   const options = {};
   let dispatch = false;
   for (let i = 0; i < args.length; i++) {
@@ -128,7 +172,10 @@ export function main(args) {
   }
   const fd = openSync(options.receipt, "wx", 0o600);
   try {
-    const record = (event) => appendFileSync(fd, JSON.stringify(event) + "\n");
+    const record = (event) => {
+      appendFileSync(fd, JSON.stringify(event) + "\n");
+      fsyncSync(fd);
+    };
     handoff(options, {
       record,
       run: (bin, argv) => execFileSync(bin, argv, { encoding: "utf8", timeout: 130000, maxBuffer: 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] }),
