@@ -53,6 +53,7 @@ test("autonomous-implementation-review packages its selection helper", async () 
   const source = await readFile(path.join(directory, "SKILL.md"), "utf8");
   const helper = await readFile(path.join(directory, "scripts", "herdr_panes.py"), "utf8");
   const transport = await readFile(path.join(directory, "references", "herdr.md"), "utf8");
+  const lifecycle = await readFile(path.join(directory, "references", "lifecycle-watch.md"), "utf8");
   const environment = await readFile(path.join(directory, "references", "environment-passthrough.md"), "utf8");
   assert.ok(source.length < 6500, "keep the normal orchestration path compact");
   assert.ok(transport.length < 6500, "transport reference must not accumulate duplicated procedures");
@@ -73,9 +74,13 @@ test("autonomous-implementation-review packages its selection helper", async () 
     /agent's\s+`name`, not its display `label`/, /scripts\/herdr_panes\.py/,
     /herdr agent prompt <pane-id> "<text>"/, /\/new --yes <goal-name>/,
     /\/busy queue/, /\/model <configured-key>/,
-    /herdr agent wait <pane-id> --until idle --until done --until blocked/,
+    /lifecycle-watch\.md/,
     /not an immediate\s+foreground-turn interrupt/, /Do not install `herdr integration install hermes`/]) {
     assert.match(transport, expected);
+  }
+  for (const expected of [/herdr_lifecycle_watch\.mjs/, /never runs `agent prompt`/,
+    /inconclusive_fast/, /no lifecycle deadline/, /state_change_seq/, /completion_seq/]) {
+    assert.match(lifecycle, expected);
   }
   assert.match(helper, /herdr pane list/);
   assert.match(environment, /terminal\.env_passthrough/);

@@ -111,7 +111,8 @@ explicit executor selection under `autonomous-implementation-review`.
    activity gate in auxiliary drafting. Bounded `pane wait-output --regex` waits
    scope queue and goal acknowledgments to this unique new-session marker, then
    readback verifies `Goal set` with the exact goal text. This text wait verifies
-   command acceptance, never executor completion. No `/model`, key
+   command acceptance, never executor completion. This handoff is not a passive
+   task monitor; do not reuse it to watch executor work or inject status requests. No `/model`, key
    presses, multiline-paste shortcut, or automatic retry is part of this sequence.
 7. If any check, acknowledgment, identity, or wait fails, the helper records the
    last attempted stage and stops. A partial reset remains a partial reset; do not

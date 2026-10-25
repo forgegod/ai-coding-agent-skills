@@ -69,31 +69,14 @@ For each implement, review, or correction role, from a verified idle/done sessio
    Local slash commands may not enter `working`. Never add `--global`, modify
    config, interpolate the selector into a shell command, or silently substitute
    an unavailable model. Report rejection and ask for a usable key.
-5. Send the compact role packet without `--wait`. Review is read-only; the
-   implementer does not stage, commit, or change the CHG path.
-6. Wait through the lifecycle API, using the selected ID:
-
-   ```text
-   herdr agent wait <pane-id> --until idle --until done --until blocked --timeout <time-budget-ms>
-   ```
-
-   Herdr timeout is milliseconds; `terminal.timeout` is seconds. For example,
-   use Herdr `--timeout 240000` with `terminal(timeout=300)`. For longer waits,
-   run one tracked background wait and consume its result via `process_manage`;
-   never substitute sleeps, pane captures, or concurrent waits.
-
-   A just-delivered packet can race lifecycle detection: an immediate `idle` or
-   `done` that still carries the pre-dispatch completion/state sequence is not
-   role settlement. Read the pane once to reconcile that impossible result. If
-   it visibly contains an active turn, do not send another packet or treat it as
-   finished; wait again through the lifecycle API after detection catches up.
-
-`idle`/`done` permit reading the report and verifying the actual diff/checks;
-they do not prove task completion. On `blocked`, inspect with `herdr agent get`
-and `herdr agent read`, then surface the decision; do not answer speculatively.
-On timeout, inspect state and report before another action; do not resend a task
-merely because the wait expired. Do not poll terminal text or file changes to
-infer executor completion.
+5. Load [lifecycle-watch.md](lifecycle-watch.md). Its foreground `--wait-armed`
+   command must exit 0 before the role packet; otherwise stop the background
+   watcher and do not send it.
+6. Send the compact role packet once, without `--wait`, then end the turn. Review
+   is read-only; the implementer does not stage, commit, or change the CHG path.
+   Do not run `herdr agent wait` or inject another prompt while the watcher runs.
+7. After the watcher exits, apply its one receipt. `settled` permits factual
+   verification; every other outcome stops without pane input.
 
 Do not install `herdr integration install hermes` for routine monitoring. That
 integration supplies a resumable session ID for server-restart recovery; Herdr's

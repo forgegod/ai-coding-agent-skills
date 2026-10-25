@@ -12,7 +12,7 @@ const obligations = [
   ["explicit consent before mutation", auto + "references/herdr.md", /Before reservation or any mutating pane command/],
   ["timeout is not consent", auto + "references/herdr.md", /timed-out[\s\S]*never supplies consent/],
   ["fresh session, queue and model", auto + "references/herdr.md", /\/new --yes[\s\S]*\/busy queue[\s\S]*\/model/],
-  ["lifecycle monitoring", auto + "references/herdr.md", /herdr agent wait/],
+  ["passive lifecycle monitoring", auto + "references/lifecycle-watch.md", /herdr_lifecycle_watch\.mjs[\s\S]*inconclusive_fast/],
   ["Herdr only, no fallback worker", auto + "SKILL.md", /automated role loop is Herdr-only[\s\S]*delegate_task/],
   ["forced-final recovery", auto + "SKILL.md", /forced final reply cannot run checks, update the CHG, or resume itself/],
   ["bounded fix cycles", auto + "SKILL.md", /two fix\/review cycles/],

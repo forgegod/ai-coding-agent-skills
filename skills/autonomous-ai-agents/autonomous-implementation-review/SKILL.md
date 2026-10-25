@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.8.3
+version: 0.9.0
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -21,8 +21,7 @@ metadata:
 
 # Autonomous Implementation Review
 
-Use fresh role sessions; the orchestrator verifies results. Role separation is not
-external independence; high-risk work may need external review.
+Roles are not externally independent; high-risk work needs external review.
 
 ## Preconditions and roles
 
@@ -77,8 +76,9 @@ are resolved. Reuse evidence unless invalidated; batch independent lookups.
    scope/non-goals, workspace/base, paths, CHG/CAP links, gates, constraints, budget
    and report format. Require focused tests and paths/results/risks; link
    logs/diffs instead of repeatedly copying them.
-3. After lifecycle settlement, inspect staged/unstaged/untracked content and verify
-   relevant checks; idle/done is not success. Dispatch failed prerequisites to a fresh
+3. On watcher `settled`, inspect the candidate and run relevant checks; lifecycle is
+   not success. Any other watcher outcome stops for the operator; never inject a
+   status prompt, reset, or goal. Dispatch failed prerequisites to a fresh
    implementer session; the orchestrator does not edit worker code.
 4. Use closeout's review-boundary recipe to freeze the full candidate. Dispatch a
    fresh reviewer role through Herdr with base/digest, paths/diff, acceptance

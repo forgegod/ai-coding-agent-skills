@@ -6,14 +6,22 @@ const read = relative => readFile(new URL(`../skills/${relative}`, import.meta.u
 
 test("transport requires consent before mutation and documents safe lifecycle units", async () => {
   const s = await read("autonomous-ai-agents/autonomous-implementation-review/references/herdr.md");
+  const watcher = await read("autonomous-ai-agents/autonomous-implementation-review/references/lifecycle-watch.md");
   assert.match(s, /Before reservation or any mutating pane command/);
   assert.match(s, /timed.out.*cancelled.*unanswered/is);
   assert.match(s, /sole candidate.*exec.*never.*consent/is);
   assert.match(s, /--orchestrator/);
   assert.match(s, /--selection/);
   assert.doesNotMatch(s, /\| python3/);
-  assert.match(s, /milliseconds.*seconds/s);
-  assert.match(s, /process_manage/);
+  assert.match(s, /lifecycle-watch\.md/);
+  assert.match(watcher, /herdr_lifecycle_watch\.mjs/);
+  assert.match(s, /--wait-armed/);
+  assert.match(s, /end the turn/);
+  assert.match(watcher, /--wait-armed/);
+  assert.match(watcher, /notify=true/);
+  assert.match(watcher, /end the turn/);
+  assert.match(watcher, /inconclusive_fast/);
+  assert.match(watcher, /never runs[\s\S]*agent prompt/);
 });
 
 test("execution bounds discovery and separates repository-derived bootstrap from gates", async () => {
