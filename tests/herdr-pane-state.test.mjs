@@ -77,6 +77,38 @@ test("an unreadable pane reports why it is not idle", async () => {
   assert.equal(parsePaneOutput(workingScreen).reason, "busy");
 });
 
+test("unreadable frames are retryable while ambiguous input is decisive", async () => {
+  const { parsePaneOutput, retryableUnknown } = await import(moduleUrl);
+  // The frame could not be read: a redraw in flight may be gone a sample later.
+  assert.equal(retryableUnknown(parsePaneOutput("no composer line at all").reason), true);
+  assert.equal(retryableUnknown(parsePaneOutput(screen("Done.", "", "")).reason), true);
+  // The screen was read and its input is ambiguous: never retry, never inject.
+  assert.equal(retryableUnknown(parsePaneOutput(screen("", "my unsent draft", "⏲ 2s")).reason), false);
+  assert.equal(retryableUnknown(parsePaneOutput(screen("Queue · 1 queued", "", "⏲ 2s")).reason), false);
+  // Recognized states carry no unknown reason at all.
+  assert.equal(retryableUnknown(parsePaneOutput(idleScreen).reason), false);
+});
+
+test("an unreadable frame keeps a bounded, control-free excerpt", async () => {
+  const { frameExcerpt } = await import(moduleUrl);
+  const painted = "\u001b[32m⚙  /new --yes demo\u001b[0m\n\n   \n(^_^)v New session started: demo\n";
+  assert.deepEqual(frameExcerpt(painted), ["⚙  /new --yes demo", "(^_^)v New session started: demo"]);
+  assert.ok(frameExcerpt(Array.from({ length: 40 }, (_, index) => `line ${index}`).join("\n")).length <= 6);
+  for (const line of frameExcerpt(`${"x".repeat(500)}\n`)) assert.equal(line.length, 201);
+  assert.deepEqual(frameExcerpt("\n\n\n"), []);
+});
+
+test("inspection carries the frame excerpt only for an unreadable pane", async () => {
+  const { inspectPane } = await import(moduleUrl);
+  const agent = JSON.stringify({ result: { agent: { pane_id: "w1:p1", workspace_id: "w1", terminal_id: "term1", agent: "hermes", agent_status: "idle" } } });
+  const unreadable = inspectPane({ pane: "w1:p1", workspace: "w1" }, (bin, args) => args[1] === "read" ? "no composer line at all" : agent);
+  assert.equal(unreadable.reason, "no-composer");
+  assert.deepEqual(unreadable.frame, ["no composer line at all"]);
+  const readable = inspectPane({ pane: "w1:p1", workspace: "w1" }, (bin, args) => args[1] === "read" ? idleScreen : agent);
+  assert.equal(readable.status, "idle");
+  assert.ok(!("frame" in readable));
+});
+
 test("inspection binds output to unchanged literal identities while ignoring lifecycle counters", async () => {
   const { inspectPane } = await import(moduleUrl);
   let gets = 0;

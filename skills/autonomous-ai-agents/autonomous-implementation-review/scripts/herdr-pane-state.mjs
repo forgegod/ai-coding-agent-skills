@@ -15,8 +15,42 @@ const BLOCKED_COMPOSER = new Map([
   ["⚙", "connection"],
 ]);
 
+// An `unknown` status carries two different meanings and a watcher must not
+// treat them alike. These reasons say the frame itself could not be read: a
+// repaint in flight, a truncated read, or a layout no rule recognizes. Every
+// other reason describes a readable screen whose input is ambiguous, where no
+// observation can prove the pane safe to inject into.
+const RETRYABLE_UNKNOWN = new Set(["no-composer", "no-footer", "no-activity-marker"]);
+
+export function retryableUnknown(reason) {
+  return RETRYABLE_UNKNOWN.has(reason);
+}
+
+const ansiPattern = /\x1b\[[0-?]*[ -/]*[@-~]/g;
+
+/**
+ * Bounded, control-free tail of the frame that produced an `unknown` status.
+ *
+ * A repaint destroys the evidence within milliseconds, so a later read cannot
+ * reproduce an unreadable frame. The watcher records this excerpt with its
+ * verdict instead of losing the only trace of what it could not parse. Keep it
+ * short: it is the same visible tail the operator already sees.
+ *
+ * @param {string} raw pane output
+ * @returns {string[]} at most maxLines lines, each at most maxChars characters
+ */
+export function frameExcerpt(raw, { maxLines = 6, maxChars = 200 } = {}) {
+  return String(raw ?? "")
+    .replace(ansiPattern, "")
+    .split(/\r?\n/)
+    .map(line => line.trimEnd())
+    .filter(line => line.trim())
+    .slice(-maxLines)
+    .map(line => (line.length > maxChars ? `${line.slice(0, maxChars)}…` : line));
+}
+
 export function parsePaneOutput(raw) {
-  const lines = raw.replace(/\x1b\[[0-?]*[ -/]*[@-~]/g, "").trimEnd().split(/\r?\n/);
+  const lines = String(raw).replace(ansiPattern, "").trimEnd().split(/\r?\n/);
   const composerText = line => {
     const match = line.match(/^(?:☤\s+)?❯(?:\s(.*))?$/) ?? line.match(/^.+\s❯(?:\s(.*))?$/);
     return match ? (match[1] ?? "").trim() : null;
@@ -61,6 +95,7 @@ export function inspectPane(options, run, expectedTerminal = null, timeoutMs = u
   const output = run("herdr", ["agent", "read", options.pane, "--source", "detection", "--lines", "100"], timeoutMs);
   const after = get();
   if (before.terminal_id !== after.terminal_id) throw new Error("terminal identity changed during output read");
+  const parsed = parsePaneOutput(output);
   return { pane: options.pane, workspace: options.workspace, terminal: after.terminal_id,
-    source: "pane-output", ...parsePaneOutput(output) };
+    source: "pane-output", ...parsed, ...(parsed.status === "unknown" ? { frame: frameExcerpt(output) } : {}) };
 }

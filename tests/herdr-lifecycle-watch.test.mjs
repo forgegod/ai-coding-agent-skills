@@ -6,7 +6,11 @@ import path from "node:path";
 import { main, resumeEvidence, waitArmed, watch } from "../skills/autonomous-ai-agents/autonomous-implementation-review/scripts/herdr_lifecycle_watch.mjs";
 
 // A pending human prompt owns the composer glyph, as Hermes renders it.
-const screen = status => `∴ Thought for 3s\n${status === "blocked" ? "╭─ ⚠ Dangerous Command ─────╮" : ""}\n${status === "working" ? "── ⠙ Working… ──" : ""}\n${status === "blocked" ? "⚠" : "☤"} ❯ ${status === "working" ? "type to queue a message for after this turn" : status === "unknown" ? "draft" : ""}\n──────\n☤ sol · 1K/500K · [░░] 1% · ${status === "working" ? "⏱" : "⏲"} 2s`;
+// `mid-paint` is a frame captured mid-redraw during streaming output: the
+// command echo is painted, the composer and footer rows are not yet, so the
+// read carries no `❯` line at all. This is the shape a poll catches in flight.
+const midPaint = "⚙  /new --yes implement-phase\n  (model reset to config default: gpt-5.6-terra-900k)\n(^_^)v New session started: implement-phase";
+const screen = status => status === "mid-paint" ? midPaint : `∴ Thought for 3s\n${status === "blocked" ? "╭─ ⚠ Dangerous Command ─────╮" : ""}\n${status === "working" ? "── ⠙ Working… ──" : ""}\n${status === "blocked" ? "⚠" : "☤"} ❯ ${status === "working" ? "type to queue a message for after this turn" : status === "unknown" ? "draft" : ""}\n──────\n☤ sol · 1K/500K · [░░] 1% · ${status === "working" ? "⏱" : "⏲"} 2s`;
 const agent = terminal => JSON.stringify({ result: { agent: { pane_id: "w1:p1", workspace_id: "w1", agent: "hermes", terminal_id: terminal, agent_status: "idle", state_change_seq: 10, completion_seq: 5 } } });
 
 function monitor(states, options = {}) {
@@ -29,6 +33,8 @@ for (const [name, states, outcome] of [
   ["reports approval without injecting input", ["idle", "working", "blocked", "blocked"], "blocked"],
   ["reports an unsampled-work approval", ["idle", "blocked", "blocked"], "blocked"],
   ["fails closed on unrecognized UI or a draft", ["idle", "unknown"], "inconclusive"],
+  ["absorbs one unreadable redraw frame and still settles", ["idle", "working", "mid-paint", "working", "idle", "idle"], "settled"],
+  ["stops on a persistent unreadable frame", ["idle", "working", "mid-paint"], "inconclusive"],
 ]) test(`watcher ${name}`, async () => {
   const f = monitor(states);
   const result = await f.watch();
@@ -39,6 +45,41 @@ for (const [name, states, outcome] of [
 
 test("watcher rejects visible busy baseline even though metadata is idle", async () => {
   await assert.rejects(monitor(["working"]).watch(), /requires idle\/done baseline/);
+});
+
+// Regression: one unpainted frame must not discard a healthy role. The old
+// watcher stopped on the first unknown sample, which is how a mid-redraw read
+// aborted a 15-minute phase just before its executor finished successfully.
+test("a readable ambiguous frame stops at once without spending the tolerance", async () => {
+  const f = monitor(["idle", "working", "unknown"]);
+  const result = await f.watch();
+  assert.equal(result.outcome, "inconclusive");
+  assert.equal(result.final.reason, "composer-text");
+  assert.equal(result.consecutiveUnknown, 1);
+  // One baseline read plus exactly two samples: ambiguous input is never retried.
+  assert.equal(f.calls.filter(call => call[2] === "read").length, 3);
+});
+
+test("an unreadable frame is recorded with its excerpt before the verdict", async t => {
+  const scratch = mkdtempSync(path.join(os.tmpdir(), "herdr-lifecycle-frame-"));
+  t.after(() => rmSync(scratch, { recursive: true, force: true }));
+  const receipt = path.join(scratch, "watch.jsonl");
+  const f = monitor(["idle", "working", "mid-paint"]);
+  const result = await main(["--pane", "w1:p1", "--workspace", "w1", "--receipt", receipt,
+    "--interval-ms", "100", "--unknown-tolerance", "2"], { ...f.deps, run: f.run, log() {} });
+  assert.equal(result.outcome, "inconclusive");
+  assert.equal(result.final.reason, "no-composer");
+  assert.equal(result.consecutiveUnknown, 2);
+  assert.match(result.final.frame.join("\n"), /New session started/);
+  const recorded = readFileSync(receipt, "utf8").trim().split("\n").map(line => JSON.parse(line));
+  assert.deepEqual(recorded.map(event => event.outcome), ["armed", "unreadable", "inconclusive"]);
+  assert.equal(recorded[1].consecutiveUnknown, 1);
+  assert.match(recorded[1].final.frame.join("\n"), /New session started/);
+});
+
+test("watcher refuses a tolerance below one", async () => {
+  await assert.rejects(main(["--pane", "w1:p1", "--workspace", "w1", "--receipt", "/receipt.jsonl",
+    "--unknown-tolerance", "0"], { log() {} }), /at least 1/);
 });
 
 test("watcher rejects terminal drift and read failures", async () => {

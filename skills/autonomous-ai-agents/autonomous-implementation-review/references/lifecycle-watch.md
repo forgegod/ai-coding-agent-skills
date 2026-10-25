@@ -24,7 +24,7 @@ Require exit 0 and JSON `outcome` `armed`. The baseline is visibly `idle`, with 
 The setup `/status` readback belongs to herdr.md step 4, before arming; while this
 watcher runs it stays forbidden.
 
-4. On the exit notification, read the receipt once with `read_file`; the notification carries the same outcome. If the watcher ended `inconclusive`, the role may still be running. Run one fresh `--inspect` and compare its literal pane, workspace, and terminal IDs with the receipt's `final` identity. Only when all three match and the status is `working` may you resume:
+4. On the exit notification, read the receipt once with `read_file`; the notification carries the same outcome. If the watcher ended `inconclusive`, the role may still be running. Run one fresh `--inspect` and compare its literal pane, workspace, and terminal IDs with the receipt's `final` identity. A verdict that followed `unreadable` events means frames could not be parsed, not that the pane looked unfamiliar: the recorded excerpt shows what was on screen. Only when all three match and the status is `working` may you resume:
 
 ```text
 node <this-skill-dir>/scripts/herdr_lifecycle_watch.mjs --pane <pane-id> --workspace <workspace-id> --receipt <new-fresh-scratch>/lifecycle.jsonl --resume-from <prior-receipt-path>
@@ -53,10 +53,24 @@ ending in `❯`, plus a `☤` status footer. Working needs the busy-queue placeh
 plus a live `⏱`/spinner or `ctrl+c stop` hint; idle needs an empty composer and
 frozen `⏲` without that stop hint. Drafts, queued input and live subagents block
 automatic injection. Other skins, locales, TUI layouts, truncation or overlays
-require operator recovery, not an automatic fallback to metadata. An `unknown`
-status carries a `reason`: `no-composer` or `no-footer` means unfamiliar UI,
-`composer-text` means visible composer text, and `queued-input` means queued or
-live subagent input.
+require operator recovery, not an automatic fallback to metadata.
+
+An `unknown` status carries a `reason` in two classes, and the watcher treats them
+differently. `composer-text` and `queued-input` are readable screens whose input is
+ambiguous: they stop the watch at once, because no observation can prove such a
+pane safe to inject into. `no-composer`, `no-footer` and `no-activity-marker` mean
+the frame itself could not be read. A repaint in flight hides the composer and
+footer rows for milliseconds, so one such sample is not evidence of an unfamiliar
+UI: the watcher tolerates `--unknown-tolerance <n>` consecutive unreadable frames
+(default 3, minimum 1), records each as an `unreadable` event, and resets the
+streak on the next recognized sample. A streak that reaches the tolerance still
+stops the watch, so an unrecognized pane cannot be monitored forever.
+
+Every recorded unreadable sample keeps a bounded `frame` excerpt, at most six
+control-free lines. The pane repaints within milliseconds, so a later `agent read`
+cannot reproduce the frame: without that excerpt a receipt asserts a state no
+surviving evidence supports. Receipts are created mode 0600, and the excerpt is the
+same visible tail the operator already sees.
 
 A pending human prompt is detected by the glyph Hermes puts in front of the
 composer, not by panel prose. The glyphs are the same in every locale, while the
@@ -71,7 +85,7 @@ pending prompt and must stay injectable.
 | `settled` | Working seen, then stable completion. | Verify artifacts. Not success by itself. |
 | `blocked` | Stable post-baseline block. | Stop. Use the native approval surface. |
 | `timed_out` | Explicit deadline elapsed. | Stop. Do not resend. |
-| `inconclusive` | Current output is unrecognized or has ambiguous input. | Stop, or resume once with `--resume-from`. |
+| `inconclusive` | Ambiguous input, or unreadable frames past the tolerance. | Stop, or resume once with `--resume-from`. |
 | `monitor_failed` | Identity or API failure. | Stop. |
 
 A fast task that is never sampled working cannot settle. With frozen metadata,
@@ -85,4 +99,4 @@ role. A later `inconclusive` is not success, and the same receipt cannot be
 resumed twice. A role switch still needs the orchestrator's separate, explicitly
 approved handoff after factual verification.
 
-For every non-`settled` outcome, capture `herdr agent get`, `herdr agent read`, and external artifacts. Never inject a status request while watching. Waiting is an external process, so it spends neither executor tokens nor goal turns. A deadline bounds polling and debounce; it cannot become a late `settled`.
+For every non-`settled` outcome, read the recorded events first: a transient unreadable frame is already preserved there with its excerpt, and a later `agent read` cannot reproduce it. Then capture `herdr agent get`, `herdr agent read`, and external artifacts. Never inject a status request while watching. Waiting is an external process, so it spends neither executor tokens nor goal turns. A deadline bounds polling and debounce; it cannot become a late `settled`.

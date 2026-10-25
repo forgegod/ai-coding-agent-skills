@@ -4,10 +4,11 @@ import { execFileSync } from "node:child_process";
 import { appendFileSync, closeSync, fsyncSync, openSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { inspectPane } from "./herdr-pane-state.mjs";
+import { inspectPane, retryableUnknown } from "./herdr-pane-state.mjs";
 
 const terminalStates = new Set(["idle", "done"]);
 const callTimeoutMs = 15000;
+const defaultUnknownTolerance = 3;
 // herdr_panes.py owns these; naming them here stops cross-script flag guessing.
 const foreignFlags = ["--selection", "--inspection", "--validate-selection"];
 
@@ -25,8 +26,11 @@ function usage() {
     "  --interval-ms <n>    poll interval (default 2000, minimum 100)",
     "  --debounce-ms <n>    settle confirmation window (default 2000, minimum 0)",
     "  --deadline-ms <n>    optional lifecycle deadline",
+    "  --unknown-tolerance <n>  consecutive unreadable frames tolerated (default 3, minimum 1)",
     "  --resume-from <abs>  resume one inconclusive receipt; binds its pane/terminal identity",
     "",
+    "An unreadable frame (a repaint in flight) is retried up to the tolerance and",
+    "recorded with its frame excerpt. Ambiguous input stops at once.",
     "herdr_panes.py owns --selection and --inspection. This script never validates a selection.",
   ].join("\n");
 }
@@ -75,6 +79,9 @@ export function validate(options) {
     intervalMs: options.intervalMs === undefined ? 2000 : positiveInteger(options.intervalMs, "interval-ms", { minimum: 100 }),
     debounceMs: options.debounceMs === undefined ? 2000 : positiveInteger(options.debounceMs, "debounce-ms", { minimum: 0 }),
     deadlineMs: options.deadlineMs === undefined || options.deadlineMs === null ? null : positiveInteger(options.deadlineMs, "deadline-ms"),
+    unknownTolerance: options.unknownTolerance === undefined
+      ? defaultUnknownTolerance
+      : positiveInteger(options.unknownTolerance, "unknown-tolerance", { minimum: 1 }),
     resumeFrom: options.resumeFrom ?? null,
   };
 }
@@ -120,7 +127,12 @@ export function resumeEvidence(receipt) {
 /**
  * Observe one dispatched task without sending any pane input.
  *
- * @param {{pane:string, workspace:string, receipt:string, intervalMs?:number, debounceMs?:number, deadlineMs?:number, resumeFrom?:string|null}} options
+ * An unreadable frame (reason classified as retryable) is tolerated for
+ * `unknownTolerance` consecutive samples and recorded as an `unreadable` event
+ * with its frame excerpt. Ambiguous input stops at once, and a streak that
+ * reaches the tolerance stops, so an unfamiliar pane still fails closed.
+ *
+ * @param {{pane:string, workspace:string, receipt:string, intervalMs?:number, debounceMs?:number, deadlineMs?:number, unknownTolerance?:number, resumeFrom?:string|null}} options
  * @param {{run:(bin:string,args:string[],timeoutMs?:number)=>string, sleep?:(ms:number)=>Promise<void>, now?:()=>number, record?:(event:object)=>void}} deps
  */
 export async function watch(options, deps) {
@@ -166,6 +178,13 @@ export async function watch(options, deps) {
     return !timedOut();
   };
 
+  let unknownStreak = 0;
+  const inconclusive = sample => {
+    const event = { outcome: "inconclusive", at: now(), baseline, final: sample, sawWorking, consecutiveUnknown: unknownStreak };
+    record(event);
+    return event;
+  };
+
   while (true) {
     if (timedOut()) return timeoutEvent();
     if (!await pause(config.intervalMs)) return timeoutEvent();
@@ -173,10 +192,23 @@ export async function watch(options, deps) {
     latest = current;
     if (timedOut()) return timeoutEvent();
     if (current.status === "unknown") {
-      const event = { outcome: "inconclusive", at: now(), baseline, final: current, sawWorking };
-      record(event);
-      return event;
+      // A repaint in flight can hide the composer and footer rows for
+      // milliseconds. Aborting on one such frame discards a healthy role, so an
+      // unreadable frame is retried up to the tolerance while its excerpt is
+      // recorded. Ambiguous input stops at once: a readable screen whose
+      // composer may hold operator text can never be proven safe. A streak that
+      // reaches the tolerance stops too, so a genuinely unfamiliar pane fails
+      // closed instead of being watched forever.
+      if (!retryableUnknown(current.reason)) {
+        unknownStreak = 1;
+        return inconclusive(current);
+      }
+      unknownStreak += 1;
+      if (unknownStreak >= config.unknownTolerance) return inconclusive(current);
+      record({ outcome: "unreadable", at: now(), final: current, sawWorking, consecutiveUnknown: unknownStreak });
+      continue;
     }
+    unknownStreak = 0;
     if (current.status === "working") sawWorking = true;
 
     const outcome = current.status === "blocked" ? "blocked" : terminalStates.has(current.status) && sawWorking ? "settled" : null;
@@ -218,7 +250,7 @@ export function waitArmed(receipt, timeoutMs = 10000, { sleep, now = Date.now } 
 }
 
 function parseWatch(args) {
-  const values = flags(args, ["pane", "workspace", "receipt", "interval-ms", "debounce-ms", "deadline-ms", "resume-from"]);
+  const values = flags(args, ["pane", "workspace", "receipt", "interval-ms", "debounce-ms", "deadline-ms", "unknown-tolerance", "resume-from"]);
   return validate({
     pane: values.pane,
     workspace: values.workspace,
@@ -226,6 +258,7 @@ function parseWatch(args) {
     intervalMs: values["interval-ms"],
     debounceMs: values["debounce-ms"],
     deadlineMs: values["deadline-ms"],
+    unknownTolerance: values["unknown-tolerance"],
     resumeFrom: values["resume-from"],
   });
 }

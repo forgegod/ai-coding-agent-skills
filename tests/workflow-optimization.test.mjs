@@ -17,6 +17,8 @@ const obligations = [
   ["turn-budget recovery", auto + "SKILL.md", /Iteration budget exhausted[\s\S]*never self-continues or[\s\S]*orchestrator[\s\S]*alone decides/],
   ["bounded fix cycles", auto + "SKILL.md", /two fix\/review cycles/],
   ["deterministic watcher resume", auto + "references/lifecycle-watch.md", /--resume-from[\s\S]*inherits[\s\S]*terminal identity/],
+  ["bounded unreadable-frame tolerance", auto + "references/lifecycle-watch.md", /unknown-tolerance[\s\S]*consecutive unreadable frames[\s\S]*stops the watch/],
+  ["unreadable frame evidence", auto + "references/lifecycle-watch.md", /`unreadable` event[\s\S]*`frame` excerpt/],
   ["secrets and browser isolation", auto + "SKILL.md", /secrets[\s\S]*browser/],
   ["bootstrap separate from gates", execution, /bootstrap separately[\s\S]*phase gate/],
   ["visual handoff", execution, /capability-wireframes[\s\S]*canonical HTML\/PNG/],
