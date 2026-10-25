@@ -21,11 +21,15 @@ test("transport requires consent before mutation and documents safe lifecycle un
   assert.match(watcher, /notify=true/);
   assert.match(watcher, /end the turn/);
   assert.match(watcher, /inconclusive_fast/);
+  assert.match(watcher, /--resume-from/);
   assert.match(watcher, /never runs[\s\S]*agent prompt/);
   assert.match(s, /issue #141194/i);
   assert.match(s, /per-handoff operator approval/i);
   assert.match(s, /only handoff authority/i);
   assert.match(watcher, /watcher receipt never authorizes a role handoff/i);
+  const orchestration = await read("autonomous-ai-agents/autonomous-implementation-review/SKILL.md");
+  assert.match(orchestration, /Iteration budget exhausted/);
+  assert.match(orchestration, /never self-continues or\s+switches role/is);
 });
 
 test("execution bounds discovery and separates repository-derived bootstrap from gates", async () => {

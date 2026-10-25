@@ -3,9 +3,10 @@ import assert from "node:assert/strict";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { main, waitArmed, watch } from "../skills/autonomous-ai-agents/autonomous-implementation-review/scripts/herdr_lifecycle_watch.mjs";
+import { main, resumeEvidence, waitArmed, watch } from "../skills/autonomous-ai-agents/autonomous-implementation-review/scripts/herdr_lifecycle_watch.mjs";
 
-const screen = status => `∴ Thought for 3s\n${status === "blocked" ? "⚠ approval required" : ""}\n${status === "working" ? "── ⠙ Working… ──" : ""}\n☤ ❯ ${status === "working" ? "type to queue a message for after this turn" : status === "unknown" ? "draft" : ""}\n──────\n☤ sol · 1K/500K · [░░] 1% · ${status === "working" ? "⏱" : "⏲"} 2s`;
+// A pending human prompt owns the composer glyph, as Hermes renders it.
+const screen = status => `∴ Thought for 3s\n${status === "blocked" ? "╭─ ⚠ Dangerous Command ─────╮" : ""}\n${status === "working" ? "── ⠙ Working… ──" : ""}\n${status === "blocked" ? "⚠" : "☤"} ❯ ${status === "working" ? "type to queue a message for after this turn" : status === "unknown" ? "draft" : ""}\n──────\n☤ sol · 1K/500K · [░░] 1% · ${status === "working" ? "⏱" : "⏲"} 2s`;
 const agent = terminal => JSON.stringify({ result: { agent: { pane_id: "w1:p1", workspace_id: "w1", agent: "hermes", terminal_id: terminal, agent_status: "idle", state_change_seq: 10, completion_seq: 5 } } });
 
 function monitor(states, options = {}) {
@@ -65,6 +66,16 @@ test("a slow final read cannot produce settled past the watcher deadline", async
   assert.equal(result.outcome, "timed_out");
 });
 
+test("reads are bounded by the remaining deadline", async () => {
+  const f = monitor(["idle", "working", "idle", "idle"]);
+  const timeouts = [];
+  await watch({ pane: "w1:p1", workspace: "w1", receipt: "/receipt.jsonl", intervalMs: 100, debounceMs: 100, deadlineMs: 1000 }, {
+    ...f.deps, run: (bin, args, timeoutMs) => { timeouts.push(timeoutMs); return f.run(bin, args); },
+  });
+  assert.ok(timeouts.length > 0);
+  assert.ok(timeouts.every(value => value > 0 && value <= 1000), JSON.stringify(timeouts));
+});
+
 test("CLI records failures and refuses receipt reuse", async t => {
   const scratch = mkdtempSync(path.join(os.tmpdir(), "herdr-lifecycle-cli-"));
   t.after(() => rmSync(scratch, { recursive: true, force: true }));
@@ -96,6 +107,19 @@ test("CLI records armed before terminal outcome", async t => {
   assert.deepEqual(output.map(e => e.outcome), ["armed", "settled"]);
 });
 
+test("CLI prints usage instead of failing on --help", async () => {
+  const lines = [];
+  const result = await main(["--help"], { log: line => lines.push(line) });
+  assert.equal(result.outcome, "help");
+  assert.match(lines.join("\n"), /--wait-armed/);
+  assert.match(lines.join("\n"), /--resume-from/);
+});
+
+test("CLI names the owning script when a selection flag is passed here", async () => {
+  await assert.rejects(main(["--selection", "/tmp/s.json", "--inspection", "/tmp/i.json"], { log() {} }),
+    /--selection belongs to herdr_panes\.py/);
+});
+
 test("wait-armed reads durable receipt and fails closed", async t => {
   const scratch = mkdtempSync(path.join(os.tmpdir(), "herdr-wait-armed-"));
   t.after(() => rmSync(scratch, { recursive: true, force: true }));
@@ -105,4 +129,64 @@ test("wait-armed reads durable receipt and fails closed", async t => {
   writeFileSync(receipt, JSON.stringify({ outcome: "monitor_failed", error: "pane identity changed" }) + "\n");
   assert.throws(() => waitArmed(receipt, 0), /pane identity changed/);
   assert.throws(() => waitArmed(path.join(scratch, "missing"), 0), /did not arm/);
+});
+
+const inconclusive = identity => JSON.stringify({
+  outcome: "inconclusive",
+  at: 1,
+  baseline: { ...identity, status: "working" },
+  final: { ...identity, status: "unknown" },
+  sawWorking: true,
+}) + "\n";
+
+test("resume inherits the earlier terminal identity and working evidence", async t => {
+  const scratch = mkdtempSync(path.join(os.tmpdir(), "herdr-lifecycle-resume-"));
+  t.after(() => rmSync(scratch, { recursive: true, force: true }));
+  const prior = path.join(scratch, "prior.jsonl");
+  writeFileSync(prior, inconclusive({ pane: "w1:p1", workspace: "w1", terminal: "term-1" }));
+  const f = monitor(["idle", "idle"]);
+  const result = await watch({ pane: "w1:p1", workspace: "w1", receipt: "/receipt.jsonl", resumeFrom: prior, intervalMs: 100, debounceMs: 100 }, f.deps
+    ? { run: f.run, ...f.deps } : { run: f.run });
+  assert.equal(result.outcome, "settled");
+  assert.equal(result.sawWorking, true);
+});
+
+test("resume refuses a changed terminal", async t => {
+  const scratch = mkdtempSync(path.join(os.tmpdir(), "herdr-lifecycle-resume-drift-"));
+  t.after(() => rmSync(scratch, { recursive: true, force: true }));
+  const prior = path.join(scratch, "prior.jsonl");
+  writeFileSync(prior, inconclusive({ pane: "w1:p1", workspace: "w1", terminal: "term-old" }));
+  const f = monitor(["idle"]);
+  await assert.rejects(watch({ pane: "w1:p1", workspace: "w1", receipt: "/receipt.jsonl", resumeFrom: prior, intervalMs: 100 }, { run: f.run, ...f.deps }), /identity/);
+});
+
+test("resume refuses a non-inconclusive prior outcome", t => {
+  const scratch = mkdtempSync(path.join(os.tmpdir(), "herdr-lifecycle-resume-settled-"));
+  t.after(() => rmSync(scratch, { recursive: true, force: true }));
+  const prior = path.join(scratch, "prior.jsonl");
+  writeFileSync(prior, JSON.stringify({ outcome: "settled", at: 1, baseline: { pane: "w1:p1", workspace: "w1", terminal: "term-1" }, final: {}, sawWorking: true }) + "\n");
+  assert.throws(() => resumeEvidence(prior), /not resumable/);
+});
+
+test("resume refuses a mismatched pane or workspace", async t => {
+  const scratch = mkdtempSync(path.join(os.tmpdir(), "herdr-lifecycle-resume-match-"));
+  t.after(() => rmSync(scratch, { recursive: true, force: true }));
+  const prior = path.join(scratch, "prior.jsonl");
+  writeFileSync(prior, inconclusive({ pane: "w1:p9", workspace: "w1", terminal: "term-1" }));
+  const deps = { run: () => agent("term-1"), now: () => 0, sleep: async () => {} };
+  await assert.rejects(watch({ pane: "w1:p1", workspace: "w1", receipt: "/receipt.jsonl", resumeFrom: prior, intervalMs: 100 }, deps),
+    /pane does not match/);
+  const other = path.join(scratch, "other.jsonl");
+  writeFileSync(other, inconclusive({ pane: "w1:p1", workspace: "w9", terminal: "term-1" }));
+  await assert.rejects(watch({ pane: "w1:p1", workspace: "w1", receipt: "/receipt.jsonl", resumeFrom: other, intervalMs: 100 }, deps),
+    /workspace does not match/);
+});
+
+test("resume evidence requires a complete recorded event", t => {
+  const scratch = mkdtempSync(path.join(os.tmpdir(), "herdr-lifecycle-resume-partial-"));
+  t.after(() => rmSync(scratch, { recursive: true, force: true }));
+  const partial = path.join(scratch, "partial.jsonl");
+  writeFileSync(partial, '{"outcome":"armed","at":1,"baseline":{}}\n{"outcome":"incon');
+  assert.throws(() => resumeEvidence(partial), /truncated/);
+  assert.throws(() => resumeEvidence(path.join(scratch, "missing.jsonl")), /does not exist/);
 });

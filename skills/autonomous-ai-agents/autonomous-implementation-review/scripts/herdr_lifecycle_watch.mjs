@@ -7,15 +7,43 @@ import { pathToFileURL } from "node:url";
 import { inspectPane } from "./herdr-pane-state.mjs";
 
 const terminalStates = new Set(["idle", "done"]);
+const callTimeoutMs = 15000;
+// herdr_panes.py owns these; naming them here stops cross-script flag guessing.
+const foreignFlags = ["--selection", "--inspection", "--validate-selection"];
 
-function flags(args, allowed) {
+function usage() {
+  return [
+    "Usage: herdr_lifecycle_watch.mjs <mode> [options]",
+    "",
+    "Modes:",
+    "  --pane <id> --workspace <id> --receipt <abs-path>  watch one dispatched role (background)",
+    "  --inspect --pane <id> --workspace <id>             print one read-only pane inspection",
+    "  --wait-armed --receipt <abs-path>                  wait until a watcher records \"armed\"",
+    "  --help                                             print this message",
+    "",
+    "Watch options:",
+    "  --interval-ms <n>    poll interval (default 2000, minimum 100)",
+    "  --debounce-ms <n>    settle confirmation window (default 2000, minimum 0)",
+    "  --deadline-ms <n>    optional lifecycle deadline",
+    "  --resume-from <abs>  resume one inconclusive receipt; binds its pane/terminal identity",
+    "",
+    "herdr_panes.py owns --selection and --inspection. This script never validates a selection.",
+  ].join("\n");
+}
+
+function flags(args, allowed, booleans = new Set()) {
   const values = {};
   for (let index = 0; index < args.length; index++) {
-    const key = args[index].slice(2);
-    if (!args[index].startsWith("--") || !allowed.includes(key) || values[key] !== undefined || !args[index + 1]) {
-      throw new Error(`invalid argument: ${args[index]}`);
+    const token = args[index];
+    if (!token.startsWith("--") || !allowed.includes(token.slice(2)) || values[token.slice(2)] !== undefined) {
+      throw new Error(`invalid argument: ${token}`);
     }
-    values[key] = args[++index];
+    if (booleans.has(token.slice(2))) {
+      values[token.slice(2)] = true;
+      continue;
+    }
+    if (!args[index + 1]) throw new Error(`invalid argument: ${token}`);
+    values[token.slice(2)] = args[++index];
   }
   return values;
 }
@@ -36,6 +64,10 @@ export function validate(options) {
   identifier(options.pane, "pane ID");
   identifier(options.workspace, "workspace ID");
   if (!path.isAbsolute(options.receipt ?? "")) throw new Error("receipt must be an absolute path");
+  if (options.resumeFrom !== undefined && options.resumeFrom !== null) {
+    if (!path.isAbsolute(options.resumeFrom)) throw new Error("resume-from must be an absolute path");
+    if (options.resumeFrom === options.receipt) throw new Error("resume-from and receipt must be different paths");
+  }
   return {
     pane: options.pane,
     workspace: options.workspace,
@@ -43,14 +75,53 @@ export function validate(options) {
     intervalMs: options.intervalMs === undefined ? 2000 : positiveInteger(options.intervalMs, "interval-ms", { minimum: 100 }),
     debounceMs: options.debounceMs === undefined ? 2000 : positiveInteger(options.debounceMs, "debounce-ms", { minimum: 0 }),
     deadlineMs: options.deadlineMs === undefined || options.deadlineMs === null ? null : positiveInteger(options.deadlineMs, "deadline-ms"),
+    resumeFrom: options.resumeFrom ?? null,
+  };
+}
+
+/**
+ * Read the resumable evidence from one earlier watcher receipt.
+ *
+ * Only an `inconclusive` receipt is resumable: every other outcome already
+ * carries a decision. The last complete line is the only trusted event.
+ *
+ * @param {string} receipt
+ * @returns {{pane:string, workspace:string, terminal:string, sawWorking:boolean}}
+ */
+export function resumeEvidence(receipt) {
+  let text;
+  try {
+    text = readFileSync(receipt, "utf8");
+  } catch (error) {
+    if (error.code === "ENOENT") throw new Error("resume receipt does not exist");
+    throw error;
+  }
+  const lines = text.split("\n").filter(Boolean);
+  if (!lines.length) throw new Error("resume receipt has no recorded event");
+  let event;
+  try {
+    event = JSON.parse(lines[lines.length - 1]);
+  } catch {
+    throw new Error("resume receipt is truncated");
+  }
+  if (event?.outcome !== "inconclusive") throw new Error("resume receipt outcome is not resumable");
+  const identity = event.final ?? event.baseline;
+  if (!identity || typeof identity.terminal !== "string" || !identity.terminal) {
+    throw new Error("resume receipt has no terminal identity");
+  }
+  return {
+    pane: identity.pane,
+    workspace: identity.workspace,
+    terminal: identity.terminal,
+    sawWorking: event.sawWorking === true,
   };
 }
 
 /**
  * Observe one dispatched task without sending any pane input.
  *
- * @param {{pane:string, workspace:string, receipt:string, intervalMs?:number, debounceMs?:number, deadlineMs?:number}} options
- * @param {{run:(bin:string,args:string[])=>string, sleep?:(ms:number)=>Promise<void>, now?:()=>number, record?:(event:object)=>void}} deps
+ * @param {{pane:string, workspace:string, receipt:string, intervalMs?:number, debounceMs?:number, deadlineMs?:number, resumeFrom?:string|null}} options
+ * @param {{run:(bin:string,args:string[],timeoutMs?:number)=>string, sleep?:(ms:number)=>Promise<void>, now?:()=>number, record?:(event:object)=>void}} deps
  */
 export async function watch(options, deps) {
   const config = validate(options);
@@ -60,10 +131,26 @@ export async function watch(options, deps) {
   const record = deps.record ?? (() => {});
   const startedAt = now();
   const deadlineAt = config.deadlineMs === null ? null : startedAt + config.deadlineMs;
-  const baseline = inspectPane(config, run);
-  if (!terminalStates.has(baseline.status)) throw new Error(`watcher requires idle/done baseline, got ${baseline.status}`);
-  record({ outcome: "armed", at: startedAt, baseline });
-  let sawWorking = false;
+  // Never outlive the operator's deadline by more than one read.
+  const budget = () => deadlineAt === null
+    ? callTimeoutMs
+    : Math.max(1, Math.min(callTimeoutMs, deadlineAt - now()));
+  const prior = config.resumeFrom === null ? null : resumeEvidence(config.resumeFrom);
+  if (prior && prior.pane !== config.pane) throw new Error("resume receipt pane does not match --pane");
+  if (prior && prior.workspace !== config.workspace) throw new Error("resume receipt workspace does not match --workspace");
+  if (deadlineAt !== null && now() >= deadlineAt) {
+    const event = { outcome: "timed_out", at: now(), baseline: null, final: null, sawWorking: false };
+    record(event);
+    return event;
+  }
+  // A resumed watch keeps the earlier terminal identity, so a recycled pane fails closed.
+  const baseline = inspectPane(config, run, prior ? prior.terminal : null, budget());
+  if (!prior && !terminalStates.has(baseline.status)) {
+    throw new Error(`watcher requires idle/done baseline, got ${baseline.status}`);
+  }
+  record({ outcome: "armed", at: startedAt, baseline, resumed: prior !== null });
+  // A resumed watch inherits the earlier working evidence; a fresh watch must observe it.
+  let sawWorking = prior ? (baseline.status === "working" || prior.sawWorking) : false;
   let latest = baseline;
   const timedOut = () => deadlineAt !== null && now() >= deadlineAt;
   const timeoutEvent = () => {
@@ -82,7 +169,7 @@ export async function watch(options, deps) {
   while (true) {
     if (timedOut()) return timeoutEvent();
     if (!await pause(config.intervalMs)) return timeoutEvent();
-    const current = inspectPane(config, run, baseline.terminal);
+    const current = inspectPane(config, run, baseline.terminal, budget());
     latest = current;
     if (timedOut()) return timeoutEvent();
     if (current.status === "unknown") {
@@ -95,7 +182,7 @@ export async function watch(options, deps) {
     const outcome = current.status === "blocked" ? "blocked" : terminalStates.has(current.status) && sawWorking ? "settled" : null;
     if (!outcome) continue;
     if (!await pause(config.debounceMs)) return timeoutEvent();
-    const stable = inspectPane(config, run, baseline.terminal);
+    const stable = inspectPane(config, run, baseline.terminal, budget());
     latest = stable;
     if (timedOut()) return timeoutEvent();
     if (current.status !== stable.status) continue;
@@ -131,7 +218,7 @@ export function waitArmed(receipt, timeoutMs = 10000, { sleep, now = Date.now } 
 }
 
 function parseWatch(args) {
-  const values = flags(args, ["pane", "workspace", "receipt", "interval-ms", "debounce-ms", "deadline-ms"]);
+  const values = flags(args, ["pane", "workspace", "receipt", "interval-ms", "debounce-ms", "deadline-ms", "resume-from"]);
   return validate({
     pane: values.pane,
     workspace: values.workspace,
@@ -139,6 +226,7 @@ function parseWatch(args) {
     intervalMs: values["interval-ms"],
     debounceMs: values["debounce-ms"],
     deadlineMs: values["deadline-ms"],
+    resumeFrom: values["resume-from"],
   });
 }
 
@@ -147,7 +235,15 @@ function parseWait(args) {
   return { receipt: values.receipt, timeoutMs: values["timeout-ms"] ?? 10000 };
 }
 
-export async function main(args, { run = (bin, argv) => execFileSync(bin, argv, { encoding: "utf8", timeout: 15000, stdio: ["ignore", "pipe", "pipe"] }), log = console.log, ...watchDeps } = {}) {
+export async function main(args, { run = (bin, argv, timeoutMs = callTimeoutMs) => execFileSync(bin, argv, { encoding: "utf8", timeout: timeoutMs, stdio: ["ignore", "pipe", "pipe"] }), log = console.log, ...watchDeps } = {}) {
+  if (args.includes("--help")) {
+    log(usage());
+    return { outcome: "help" };
+  }
+  const foreign = args.find(arg => foreignFlags.includes(arg));
+  if (foreign) {
+    throw new Error(`${foreign} belongs to herdr_panes.py; this script never validates a selection`);
+  }
   if (args.includes("--inspect")) {
     const options = flags(args.filter(arg => arg !== "--inspect"), ["pane", "workspace"]);
     const result = inspectPane(options, run);

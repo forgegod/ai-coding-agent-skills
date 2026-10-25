@@ -4,6 +4,12 @@ import assert from "node:assert/strict";
 const moduleUrl = new URL("../skills/autonomous-ai-agents/autonomous-implementation-review/scripts/herdr-pane-state.mjs", import.meta.url);
 const footer = "☤ sol · 1K/500K · [░░] 1%";
 const screen = (body, composer, footerState) => `${body}\n☤ ❯ ${composer}\n────────────────\n${footer} · ${footerState}`;
+// Hermes shows a pending human prompt as a glyph in front of the composer.
+const promptScreen = glyph => `╭─ ${glyph} Sudo Password Required ─────╮\n${glyph} ❯ \n────────────────\n${footer} · ⏲ 0s`;
+// Screens as the Python CLI actually paints them: the panel title is inlined in
+// the top rule, and the composer carries the prompt glyph.
+const approvalScreen = `╭─ ⚠️  Dangerous Command ─────────────╮\n│ rm -rf build │\n│ 1. Allow once │\n│ 4. Deny │\n╰────────────────────────────╯\n⚠ ❯ \n────────────────\n${footer} · ⏲ 0s`;
+const secretScreen = `╭─ 🔑 Skill Setup Required ───────────╮\n│ Enter secret below (hidden) │\n╰────────────────────────────╯\n🔑 ❯ \n────────────────\n${footer} · ⏲ 0s`;
 const namedPromptScreen = (body, composer, footerState) => `${body}\nan arbitrary session title ❯${composer ? ` ${composer}` : ""}\n────────────────\n${footer} · ${footerState}`;
 
 // Captured classic CLI shape, not a transcript-wide keyword match.
@@ -27,7 +33,48 @@ test("drafts, approvals, queued input and unfamiliar output never authorize inje
   for (const output of [screen("", "my unsent draft", "⏲ 2s"), `${idleScreen}\nunknown overlay`, "Working\n∴ Thought for 3s", screen("", "", ""), screen("Queue · 1 queued", "", "⏲ 2s")]) {
     assert.equal(parsePaneOutput(output).status, "unknown", output);
   }
-  assert.equal(parsePaneOutput(screen("⚠ approval required", "", "⏲ 2s")).status, "blocked");
+});
+
+test("a pending human prompt is blocked, and the composer glyph names which one", async () => {
+  const { parsePaneOutput } = await import(moduleUrl);
+  // The glyph Hermes puts in front of the composer while it waits on a human.
+  const expected = new Map([["🔐", "password-prompt"], ["🔑", "credential-prompt"], ["⚠", "approval"], ["✎", "clarify"], ["?", "clarify"], ["⚙", "connection"]]);
+  for (const [glyph, reason] of expected) {
+    const result = parsePaneOutput(promptScreen(glyph));
+    assert.equal(result.status, "blocked", glyph);
+    assert.equal(result.reason, reason, glyph);
+  }
+  // A prompt blocks even when the modal panel squeezed the footer off screen.
+  const noFooter = `╭─ 🔐 Sudo Password Required ─────╮\n🔐 ❯ \n`;
+  assert.equal(parsePaneOutput(noFooter).status, "blocked");
+  // Transcript text that merely names a prompt is not a pending prompt: the
+  // pane is genuinely idle and must stay injectable.
+  assert.equal(parsePaneOutput(screen("Sudo Password Required", "", "⏲ 2s")).status, "idle");
+});
+
+test("the real approval and secret panels block, whatever their title text", async () => {
+  const { parsePaneOutput } = await import(moduleUrl);
+  // The Python CLI titles these panels "Dangerous Command" and "Skill Setup
+  // Required": matching panel prose missed both and reported a pending
+  // approval as idle, which would inject into a pane awaiting a human.
+  assert.deepEqual(parsePaneOutput(approvalScreen), { status: "blocked", reason: "approval" });
+  assert.deepEqual(parsePaneOutput(secretScreen), { status: "blocked", reason: "credential-prompt" });
+});
+
+test("an unreadable pane reports why it is not idle", async () => {
+  const { parsePaneOutput } = await import(moduleUrl);
+  const reasons = new Map([
+    [screen("", "my unsent draft", "⏲ 2s"), "composer-text"],
+    [screen("", "Summarize what's in this folder", "⏲ 2s"), "composer-text"],
+    [screen("Queue · 1 queued", "", "⏲ 2s"), "queued-input"],
+    [screen("Done.", "", ""), "no-activity-marker"],
+    ["no composer line at all", "no-composer"],
+  ]);
+  for (const [output, reason] of reasons) {
+    assert.equal(parsePaneOutput(output).reason, reason, output);
+  }
+  assert.equal(parsePaneOutput(idleScreen).reason, "idle");
+  assert.equal(parsePaneOutput(workingScreen).reason, "busy");
 });
 
 test("inspection binds output to unchanged literal identities while ignoring lifecycle counters", async () => {

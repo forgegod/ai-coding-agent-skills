@@ -64,7 +64,9 @@ test("autonomous-implementation-review packages its selection helper", async () 
   assert.match(source, /orchestrator does not edit worker code/);
   assert.match(source, /orchestrator follows `phased-plan-closeout`/);
   assert.match(source, /executor\s+must not edit or commit the CHG path/);
-  assert.match(source, /forced final reply cannot run checks, update the CHG, or resume itself/i);
+  assert.match(source, /Iteration budget exhausted/);
+  assert.match(source, /orchestrator.*alone decides/i);
+  assert.match(source, /--resume-from/);
   assert.match(source, /existing worktree/);
   assert.doesNotMatch(source, /durable handoff record|<handoff-record path>|scratch handoff/i);
   assert.doesNotMatch(source, /git .*merge|git .*commit|git .*worktree remove/);
@@ -79,7 +81,7 @@ test("autonomous-implementation-review packages its selection helper", async () 
     assert.match(transport, expected);
   }
   for (const expected of [/herdr_lifecycle_watch\.mjs/, /never runs `agent prompt`/,
-    /inconclusive_fast/, /no lifecycle deadline/, /state_change_seq/, /completion_seq/]) {
+    /inconclusive_fast/, /--resume-from/, /no lifecycle deadline/, /state_change_seq/, /completion_seq/]) {
     assert.match(lifecycle, expected);
   }
   assert.match(helper, /herdr pane list/);

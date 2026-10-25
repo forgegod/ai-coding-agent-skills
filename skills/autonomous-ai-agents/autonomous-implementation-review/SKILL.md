@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.10.2
+version: 0.10.3
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -43,10 +43,8 @@ High-risk work needs external review.
 - Configured implementer/reviewer values are session-only Hermes model keys,
   not executables. Transport/model failure blocks: never shell-execute keys,
   change global config or silently substitute a model.
-- Isolate writers' worktrees, branches, outputs and mutable services; use one for
-  dependent work and finite budgets. No secrets, destructive tasks or unresolved
-  decisions; browser work needs explicit scoped access/verified connection, never
-  personal state. Scratch is temporary; dirty worktrees stay outside caches.
+- Isolate writers and mutable services; use finite budgets. No secrets, destructive
+  tasks or unresolved choices; browser access must be scoped.
 - For a source checkout, compare installed skill version once and report drift;
   source edits neither update installed skills nor authorize installation.
 
@@ -73,14 +71,15 @@ are resolved. Reuse evidence unless invalidated; batch independent lookups.
 
 1. Reserve through closeout; standalone work uses project isolation/Git policy.
 2. Through the Herdr recipe, start a fresh outcome-named implementer session,
-   accepted `/busy queue` and configured model. Send a compact packet: outcome,
-   scope/non-goals, workspace/base, paths, CHG/CAP links, gates, constraints, budget
-   and report format. Require focused tests and paths/results/risks; link
-   logs/diffs instead of repeatedly copying them.
+   accepted `/busy queue` and configured model. Send outcome, scope/non-goals,
+   workspace/base, paths, links, gates, constraints, budget and report format.
+   Require focused tests and paths/results/risks; link logs/diffs.
 3. On watcher `settled`, inspect the candidate and run relevant checks; lifecycle is
-   not success. Any other outcome stops. A reviewer/correction needs fresh handoff
-   approval; never inject a status prompt, reset, or goal. Dispatch failed prerequisites to a fresh
-   implementer session; the orchestrator does not edit worker code.
+   not success. Under `lifecycle-watch.md`, one `inconclusive` receipt may be resumed
+   once with `--resume-from`; the role stays incomplete until it settles. Otherwise
+   non-`settled` stops. Reviewer/correction needs fresh approval; never inject
+   status/reset/goal. Dispatch failed prerequisites to a fresh implementer session;
+   the orchestrator does not edit worker code.
 4. Use closeout's review-boundary recipe to freeze the full candidate. Dispatch a
    fresh reviewer role through Herdr with base/digest, paths/diff, acceptance
    criteria, gate evidence and implementation report. Keep the candidate frozen.
@@ -99,11 +98,12 @@ are resolved. Reuse evidence unless invalidated; batch independent lookups.
 
 ## Executor turn-cap recovery
 
-The forced final reply cannot run checks, update the CHG, or resume itself. Inspect
-its report and workspace, then dispatch a fresh bounded session for the exact
-unfinished action in the existing worktree. A cap is not completion or a user
-decision. Split oversized packets, not raise caps. Post-completion corrections
-require reopening through closeout first.
+`Iteration budget exhausted` means the role did not finish. The
+implementer/reviewer only returns factual state; it never self-continues or
+switches role. The orchestrator inspects report and workspace, then alone decides
+whether to stop or dispatch a fresh bounded, same-role packet for the exact
+unfinished action in the existing worktree. A cap is not completion or authority:
+split oversized packets, not raise caps. Reopen corrections through closeout.
 
 ## Pitfalls and verification
 
