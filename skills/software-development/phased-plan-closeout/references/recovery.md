@@ -13,6 +13,14 @@ names, or abbreviated SHAs. An invalid argument is an invocation error, not
 evidence of corrupt history or missing ownership; correct that read-only call
 using the captured identity, without weakening or bypassing the guard.
 
+A checkout conversion (`eol=crlf`, `text`) is not a candidate change: Git
+stores the normalized blob and considers the working tree clean, so the guard
+fingerprints the clean-filter blob. If a candidate fails the allowlist only on a
+file Git reports clean, do not edit that file, its `.gitattributes` rule, the
+repository line-ending config, or the allowlist to force approval. A candidate
+that edits `.gitattributes` changes how every other file normalizes, so it is
+refused by design and needs an explicit recovery decision.
+
 ## In-progress phase
 
 On the recorded target branch, through `terminal`, get the latest first-parent

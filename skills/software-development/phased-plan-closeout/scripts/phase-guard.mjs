@@ -16,11 +16,18 @@ function gitRaw(repo, ...args) {
     env: { ...process.env, GIT_OPTIONAL_LOCKS: "0" },
   });
 }
+function gitStdin(repo, args, input) {
+  return execFileSync("git", ["-C", repo, ...args], {
+    encoding: "utf8", input, stdio: ["pipe", "pipe", "pipe"],
+    env: { ...process.env, GIT_OPTIONAL_LOCKS: "0" },
+  });
+}
 function git(repo, ...args) {
   return gitRaw(repo, ...args).trim();
 }
 function sha(value) {
-  requireThat(/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(value ?? ""), "Expected a full commit SHA");
+  requireThat(/^(?:[a-f0-9]{40}|[a-f0-9]{64})$/.test(value ?? ""),
+    "Expected a full commit SHA; resolve refs with git rev-parse <ref>");
   return value;
 }
 function checkout(repo, branch, head) {
@@ -205,6 +212,7 @@ function workingEntries(repo, baseEntries) {
   const names = new Set([...baseEntries, ...index].map(([name]) => name));
   for (const name of gitRaw(repo, "ls-files", "--others", "--exclude-standard", "-z").split("\0").filter(Boolean)) names.add(name);
   const entries = [];
+  const regular = [];
   for (const name of names) {
     const parts = name.split("/");
     for (let i = 1; i < parts.length; i++) {
@@ -216,10 +224,24 @@ function workingEntries(repo, baseEntries) {
     if (!info) continue;
     requireThat(info.isFile() || info.isSymbolicLink(), "Candidate contains an unsupported file type");
     const mode = info.isSymbolicLink() ? "120000" : (info.mode & 0o111) ? "100755" : "100644";
-    const input = info.isSymbolicLink() ? readlinkSync(file, { encoding: "buffer" }) : readFileSync(file);
-    // Git's raw blob framing; no filters, object writes, or subprocess per file.
-    const oid = createHash(objectFormat).update(`blob ${input.length}\0`).update(input).digest("hex");
-    entries.push([name, mode, oid]);
+    if (info.isSymbolicLink()) {
+      // A symlink stores its target path verbatim; no clean filter applies.
+      const input = readlinkSync(file, { encoding: "buffer" });
+      entries.push([name, mode, createHash(objectFormat).update(`blob ${input.length}\0`).update(input).digest("hex")]);
+    } else {
+      regular.push([name, mode]);
+    }
+  }
+  // Regular files are fingerprinted through Git's clean filter so a checkout
+  // conversion (eol=crlf, text) hashes to the blob Git would actually stage.
+  // One batched subprocess keeps the process count independent of file count.
+  if (regular.length) {
+    const names = regular.map(([name]) => name);
+    requireThat(!names.some(name => name.includes("\n")), "Candidate path contains a newline");
+    const oids = gitStdin(repo, ["hash-object", "--stdin-paths"], `${names.join("\n")}\n`)
+      .split("\n").filter(Boolean);
+    requireThat(oids.length === regular.length, "Git did not hash every candidate path");
+    regular.forEach(([name, mode], position) => entries.push([name, mode, oids[position]]));
   }
   return entries;
 }
@@ -249,6 +271,11 @@ function candidate(o) {
   const old = new Map(before.map(([name, ...rest]) => [name, JSON.stringify(rest)]));
   const current = new Map(entries.map(([name, ...rest]) => [name, JSON.stringify(rest)]));
   const changed = [...new Set([...old.keys(), ...current.keys()])].filter(name => old.get(name) !== current.get(name)).sort();
+  // An attribute edit changes how every other file normalizes, so the base and
+  // working fingerprints would no longer share one normalization rule. Refuse it
+  // instead of letting the allowlist comparison silently change meaning.
+  requireThat(!changed.some(name => path.posix.basename(name) === ".gitattributes"),
+    "Candidate changes .gitattributes; attribute edits need an explicit recovery procedure");
   const allowlist = o["allow-path"];
   requireThat(new Set(allowlist).size === allowlist.length && JSON.stringify(changed) === JSON.stringify([...allowlist].sort()), "Candidate paths do not match the exact allowlist");
   const digest = digestEntries(entries);

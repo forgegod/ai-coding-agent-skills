@@ -135,6 +135,7 @@ test("symbolic HEAD rejection is an invocation error, not failed completion evid
   const args = ["row", "--expect", "done", "--evidence-commit", f.implementation];
   const bad = invoke(f, ...args, "--ref", "HEAD");
   assert.equal(bad.status, 1);
-  assert.equal(bad.error, "Expected a full commit SHA");
+  assert.match(bad.error, /^Expected a full commit SHA/);
+  assert.match(bad.error, /git rev-parse/);
   assert.equal(invoke(f, ...args, "--ref", f.completion).status, 0);
 });

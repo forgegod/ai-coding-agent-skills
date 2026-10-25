@@ -11,6 +11,10 @@ const chg = "docs/changes/active/CHG-001-example.md";
 const record = (state = "in-progress", second = "pending") => `# Example\n\n| # | Phase | Status | Verification gate |\n| --- | --- | --- | --- |\n| 1 | Implement | ${state} | npm test |\n| 2 | Integrate | ${second} | npm test |\n`;
 const git = (cwd, ...args) => execFileSync("git", ["-C", cwd, ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, GIT_CONFIG_NOSYSTEM: "1", GIT_CONFIG_GLOBAL: os.devNull } }).trim();
 
+// The guard resolves blobs with Git's own clean filter, so it must see the same
+// Git configuration the fixture used to build its index.
+const gitEnv = { GIT_CONFIG_NOSYSTEM: "1", GIT_CONFIG_GLOBAL: os.devNull };
+
 async function fixture(t, state = "in-progress", second = "pending", createWorker = true, objectFormat = "sha1") {
   const scratch = await mkdtemp(path.join(os.tmpdir(), "phase-guard-"));
   t.after(() => rm(scratch, { recursive: true, force: true }));
@@ -40,7 +44,7 @@ async function fixture(t, state = "in-progress", second = "pending", createWorke
 }
 
 function invoke(args, env = {}) {
-  const result = spawnSync(process.execPath, [guard, ...args], { encoding: "utf8", env: { ...process.env, ...env } });
+  const result = spawnSync(process.execPath, [guard, ...args], { encoding: "utf8", env: { ...process.env, ...gitEnv, ...env } });
   assert.equal(result.signal, null);
   assert.ok(result.stdout.trim(), result.stderr);
   return { status: result.status, ...JSON.parse(result.stdout) };
@@ -518,4 +522,40 @@ syncBuiltinESMExports();\n`);
   }
   assert.equal(counts[0], counts[1], `Git subprocesses grew with files: ${counts}`);
   assert.ok(counts[0] <= 10, `Expected bounded Git metadata calls, saw ${counts[0]}`);
+});
+
+test("candidate ignores a checkout eol conversion but refuses a changed .gitattributes", async t => {
+  const f = await fixture(t);
+  const scratch = path.dirname(f.target);
+  const repo = path.join(scratch, "eol");
+  await mkdir(repo);
+  git(repo, "init", "-b", "main");
+  git(repo, "config", "user.email", "fixture@example.invalid");
+  git(repo, "config", "user.name", "Fixture");
+  git(repo, "config", "commit.gpgsign", "false");
+  git(repo, "config", "core.autocrlf", "false");
+  // A native CRLF fixture: Git stores LF and checks out CRLF.
+  await writeFile(path.join(repo, ".gitattributes"), "crlf.keymap text eol=crlf\n");
+  await writeFile(path.join(repo, "crlf.keymap"), "line one\nline two\n");
+  git(repo, "add", "--", ".gitattributes", "crlf.keymap");
+  git(repo, "commit", "-m", "Add CRLF fixture");
+  const base = git(repo, "rev-parse", "HEAD");
+  // Check the fixture out as CRLF, exactly as a working tree with eol=crlf has it.
+  await rm(path.join(repo, "crlf.keymap"));
+  git(repo, "checkout", "--", "crlf.keymap");
+  assert.match(await readFile(path.join(repo, "crlf.keymap"), "utf8"), /\r\n/);
+  assert.equal(git(repo, "status", "--porcelain"), "", "fixture checkout must look clean to Git");
+
+  // The untouched CRLF fixture is not a candidate change: only the edited file is.
+  await writeFile(path.join(repo, "source.ts"), "export const changed = true;\n");
+  const allowed = ["candidate", "--repo", repo, "--base", base, "--boundary", "worktree", "--allow-path", "source.ts"];
+  const ok = invoke(allowed);
+  assert.equal(ok.status, 0, JSON.stringify(ok));
+  assert.deepEqual(ok.paths, ["source.ts"]);
+
+  // Editing .gitattributes changes how other files normalize, so refuse it.
+  await writeFile(path.join(repo, ".gitattributes"), "crlf.keymap text eol=crlf\nsource.ts text eol=crlf\n");
+  const drifted = invoke([...allowed, "--allow-path", ".gitattributes"]);
+  assert.equal(drifted.status, 1, JSON.stringify(drifted));
+  assert.match(drifted.error, /\.gitattributes/);
 });
