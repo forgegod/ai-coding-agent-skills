@@ -19,6 +19,7 @@ const obligations = [
   ["deterministic watcher resume", auto + "references/lifecycle-watch.md", /--resume-from[\s\S]*inherits[\s\S]*terminal identity/],
   ["bounded unreadable-frame tolerance", auto + "references/lifecycle-watch.md", /unknown-tolerance[\s\S]*consecutive unreadable frames[\s\S]*stops the watch/],
   ["unreadable frame evidence", auto + "references/lifecycle-watch.md", /`unreadable` event[\s\S]*`frame` excerpt/],
+  ["receipt verdict is the last JSON object", auto + "references/lifecycle-watch.md", /last JSON object is the verdict[\s\S]*earlier `unreadable` lines are samples[\s\S]*precede `settled`/],
   ["secrets and browser isolation", auto + "SKILL.md", /secrets[\s\S]*browser/],
   ["bootstrap separate from gates", execution, /bootstrap separately[\s\S]*phase gate/],
   ["visual handoff", execution, /capability-wireframes[\s\S]*canonical HTML\/PNG/],
@@ -35,6 +36,11 @@ const obligations = [
 for (const [name, file, pattern] of obligations) {
   test(`retained workflow obligation: ${name}`, async () => assert.match(await read(file), pattern));
 }
+
+test("exit notification is not the lifecycle verdict", async () => {
+  const watcher = await read(auto + "references/lifecycle-watch.md");
+  assert.doesNotMatch(watcher, /notification carries the same outcome/);
+});
 
 test("routine entry points shrink without loading recovery on a fresh phase", async () => {
   const main = await Promise.all([auto + "SKILL.md", close + "SKILL.md", execution].map(read));

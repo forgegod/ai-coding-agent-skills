@@ -24,7 +24,7 @@ Require exit 0 and JSON `outcome` `armed`. The baseline is visibly `idle`, with 
 The setup `/status` readback belongs to herdr.md step 4, before arming; while this
 watcher runs it stays forbidden.
 
-4. On the exit notification, read the receipt once with `read_file`; the notification carries the same outcome. If the watcher ended `inconclusive`, the role may still be running. Run one fresh `--inspect` and compare its literal pane, workspace, and terminal IDs with the receipt's `final` identity. A verdict that followed `unreadable` events means frames could not be parsed, not that the pane looked unfamiliar: the recorded excerpt shows what was on screen. Only when all three match and the status is `working` may you resume:
+4. On the exit notification, read the receipt once with `read_file`. The last JSON object is the verdict; earlier `unreadable` lines are samples and can precede `settled`. If the watcher ended `inconclusive`, the role may still be running. Run one fresh `--inspect` and compare its literal pane, workspace, and terminal IDs with the receipt's `final` identity. A verdict that followed `unreadable` events means frames could not be parsed, not that the pane looked unfamiliar: the recorded excerpt shows what was on screen. Only when all three match and the status is `working` may you resume:
 
 ```text
 node <this-skill-dir>/scripts/herdr_lifecycle_watch.mjs --pane <pane-id> --workspace <workspace-id> --receipt <new-fresh-scratch>/lifecycle.jsonl --resume-from <prior-receipt-path>
