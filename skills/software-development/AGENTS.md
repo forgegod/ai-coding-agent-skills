@@ -14,8 +14,8 @@ Own optional, portable agent workflows for maintaining the canonical capability 
 | `phased-plan-design/SKILL.md`     | CHG phase design for material changes and gates. |
 | `phased-plan-execution/SKILL.md`  | One verified CAP/CHG phase at a time. |
 | `phased-plan-closeout/`   | Orchestrator-only Git/CHG protocol, read-only phase guard, and next-goal handoff. |
-| `phased-plan-overview/SKILL.md`   | Active-CHG inspection, resume selection, and next-goal command. |
-| `phased-plan-next/SKILL.md` | Read-only overview-based selection and the next goal for operator submission. |
+| `phased-plan-overview/SKILL.md`   | Active-CHG inspection and resume selection. It does not print a launch command. |
+| `phased-plan-next/SKILL.md` | Explicit or unambiguous CHG selection and the next goal for operator submission. |
 | `phased-plan-refactoring/SKILL.md` | Verified CHG splitting and resequencing. |
 
 ## Local Contracts
@@ -33,9 +33,9 @@ Own optional, portable agent workflows for maintaining the canonical capability 
 - `phased-plan-closeout/references/recovery.md` owns interrupted/reserved/completed recovery. Keep normal entry points compact, load recovery only on its stated conditions, and preserve the requirement-location map in `tests/workflow-optimization.test.mjs` when moving guidance.
 - Recovery classifies phase rows and registration before choosing guards. Use captured full SHAs and exact reservation-derived refs; a retained integrated branch is not a worktree, and `locate` is not an absence test. Report invocation/query errors, unresolved ownership, and transport blockers separately. `tests/phase-recovery-guidance.test.mjs` executes the canonical read-only recipes in isolated Git fixtures and checks instruction boundaries, not model obedience.
 - Derive fresh-worktree bootstrap from project exports/scripts/CI and record it separately from acceptance gates. Completion prose needs factual review distinct from implementation approval; receipts never predeclare cleanup or erase failed attempts.
-- Launch examples state the exact operator-authorized local Git scope and stay identical across README, overview, and orchestration. Displaying them is not authorization. Missing/competing ownership or invalid readback preserves work and requires an explicit recovery handoff.
-- Overview is bounded read-only selection: one Git snapshot and record-validation pass, conditional recovery of the relevant phase, and named Herdr environment checks. It does not rerun implementation gates or inspect host/source trees to prove transport support; unresolved evidence ends in a blocker, not broader discovery.
-- `phased-plan-next` reuses overview's repository-selection and recovery rules and only presents the canonical single-phase goal for the operator to send. Transport checks belong to execution; next requires no Herdr context, session reset, pane monitoring, dispatch helper, or receipt. Invoking it grants no execution authority. Autonomous orchestration alone owns role handoff to an explicitly selected non-orchestrator Herdr pane.
+- Launch examples state the exact operator-authorized local Git scope and stay identical across README, `phased-plan-next`, and orchestration. Overview does not print a launch command. Displaying a template is not authorization. Missing/competing ownership or invalid readback preserves work and requires an explicit recovery handoff.
+- Overview is bounded read-only selection: one Git snapshot and record-validation pass, conditional recovery of the relevant phase, and one host classification. `$HERDR_ENV=1` with a non-empty `$HERDR_WORKSPACE_ID` is the Herdr class. Exactly one of those set is a transport blocker and does not invalidate selection. Neither set is not a blocker. It reports armed Code-tab status and prints no launch command. It does not rerun implementation gates, install files, or inspect host/source trees to prove transport support.
+- `phased-plan-next` accepts an explicit active CHG path or unique id, otherwise reuses overview's repository-selection and recovery rules, and presents one goal for the operator to send. A named CHG does not override another record's reservation or cleanup. Transport blockers and cleanup-only recovery get no goal. Missing Herdr context does not block the Herdr-shaped goal. Next requires no session reset, pane monitoring, dispatch helper, or receipt. Invoking it grants no execution authority. Autonomous orchestration alone owns role handoff to an explicitly selected non-orchestrator Herdr pane.
 
 ## Work Guidance
 

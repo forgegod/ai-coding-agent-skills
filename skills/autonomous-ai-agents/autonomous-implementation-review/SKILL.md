@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.10.6
+version: 0.10.7
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -39,10 +39,10 @@ High-risk work needs external review.
   Issue #141194 blocks handoff proof. Until closed, only operator approval of pane
   authorizes next packet.
   No implicit consent or `delegate_task` fallback.
-  Outside Herdr, stop and offer an operator-approved manual phase workflow.
-- Configured implementer/reviewer values are session-only Hermes model keys,
-  not executables. Transport/model failure blocks: never shell-execute keys,
-  change global config or silently substitute a model.
+  Outside Herdr, stop unless the operator sent `code-tab-phase-roles`; then load
+  `references/claude-code-roles.md`. Do not mix that token with Herdr.
+- Model keys are session selectors, not executables. A rejected key blocks;
+  never shell-execute it or change global config.
 - Isolate writers and mutable services; use finite budgets. No secrets, destructive
   tasks or unresolved choices; browser access must be scoped.
 - For a source checkout, compare installed skill version once and report drift;
@@ -62,7 +62,7 @@ CHG/workspace truth, using `session_search` only for missing evidence, not scrat
 Use `/goal`, not `/loop`. The operator controls pause/resume/clear and `/subgoal`.
 Compression is automatic; for earlier compression the operator runs `/goal pause`,
 `/compress here 2`, inspects `/context`, then `/goal resume` in the orchestrator.
-Printed commands do not execute; resume does not reset context.
+Printed commands do not execute.
 
 Stop discovery once scope, authority, executor, ownership, bootstrap and gates
 resolve. Reuse valid evidence; batch independent lookups.

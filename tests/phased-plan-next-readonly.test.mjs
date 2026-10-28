@@ -12,6 +12,9 @@ test("next only presents a goal for operator submission after bounded overview s
   assert.match(source, /selection procedure, decision table/);
   assert.match(source, /ownership\/cleanup rules, and stopping rule/);
   assert.match(source, /print exactly one/);
+  assert.match(source, /active-chg-path/);
+  assert.match(source, /does not override another record's reservation/);
+  assert.match(source, /Several independent records are choices/);
   assert.match(source, /Only the operator sending/);
   assert.match(source, /invoking this skill does not authorize execution/i);
   assert.match(source, /Do not reset sessions, submit prompts, change queue mode, or monitor panes/);

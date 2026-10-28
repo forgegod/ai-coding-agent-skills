@@ -9,7 +9,6 @@ const autonomousResearch = fileURLToPath(new URL("../docs/research/hermes-autono
 test("all launch examples carry the same bounded operator authorization", async () => {
   const files = [readme,
     fileURLToPath(new URL("../skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md", import.meta.url)),
-    fileURLToPath(new URL("../skills/software-development/phased-plan-overview/SKILL.md", import.meta.url)),
     fileURLToPath(new URL("../skills/software-development/phased-plan-next/SKILL.md", import.meta.url))];
   const prompts = [];
   for (const file of files) {
@@ -81,7 +80,8 @@ test("autonomous goal documentation distinguishes orchestration from polling", a
   assert.match(source, /The operator fills the numeric phase ID/);
   assert.match(source, /supports Herdr only/);
   assert.match(source, /operator sends `\/goal pause`/i);
-  assert.match(source, /`\/phased-plan-overview` first/);
+  assert.match(source, /prints no launch command/);
+  assert.match(source, /\/phased-plan-next <active-chg-path>/);
   assert.match(source, /returns the exact bounded command below for the operator to send/);
   assert.match(source, /\[Hermes workflow research record\]\(docs\/research\/hermes-autonomous-goal-workflow\.md\)/);
   assert.match(source, /phased-plan-design/);

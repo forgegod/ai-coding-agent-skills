@@ -23,7 +23,7 @@ Herdr pane-selection helper.
 - Never infer autonomous commit authority or a pane selection from labels, focus, or agent identity.
 - Planning-only requests end after design. An approved plan is a prerequisite, not authorization to reserve a phase or dispatch the implementation/review loop.
 - Explicit launch selection or an answered form precedes reservation and every pane mutation; a timeout is not consent. The helper validates supplied evidence, not its authenticity or future liveness.
-- The automated role loop is Herdr-only (`$HERDR_ENV=1`); role handoff and passive monitoring belong here, not to read-only phase selection. Require literal caller identity from `HERDR_PANE_ID` and a different explicitly selected executor pane; never reset or control the orchestrator as a worker. `delegate_task` is research-only and never substitutes for session-scoped model selection. Other environments use an explicitly approved manual workflow, not a guessed transport.
+- The automated role loop is Herdr-only (`$HERDR_ENV=1`); role handoff and passive monitoring belong here, not to read-only phase selection. Require literal caller identity from `HERDR_PANE_ID` and a different explicitly selected executor pane; never reset or control the orchestrator as a worker. `delegate_task` is research-only and never substitutes for session-scoped model selection. The operator-sent `code-tab-phase-roles` command is the only non-Herdr path and loads `references/claude-code-roles.md`; absence of Herdr is not that command. Do not mix the two hosts.
 - The helper accepts Herdr pane-list JSON and optional operator-selection evidence; it must not control panes or send input.
 - For CAP/CHG work, the tracked CHG is the sole mutable progress authority; do not create profile-local continuation documents.
 - The orchestrator delegates Git/CHG writes to `phased-plan-closeout`; executors never stage, commit, integrate, retire worktrees, or edit the CHG path. Keep the command protocol out of this skill.
@@ -35,7 +35,7 @@ Herdr pane-selection helper.
 ## Verification
 
 Run `npm test` and `npm run build`. Confirm the generated package advertises
-`SKILL.md`, `references/herdr.md`, `references/lifecycle-watch.md`, `scripts/herdr_panes.py`,
+`SKILL.md`, `references/claude-code-roles.md`, `references/herdr.md`, `references/lifecycle-watch.md`, `scripts/herdr_panes.py`,
 `scripts/herdr_lifecycle_watch.mjs`, and `scripts/herdr-pane-state.mjs`.
 
 Parent contract: `../AGENTS.md`.

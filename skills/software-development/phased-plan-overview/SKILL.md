@@ -1,13 +1,13 @@
 ---
 name: phased-plan-overview
 description: Select a resumable CAP/CHG phase from the target branch.
-version: 1.4.1
+version: 1.6.0
 author: AI Software Blueprint
 license: MIT
 metadata:
   hermes:
     tags: [planning, overview, product, change-records]
-    related_skills: [application-records, autonomous-implementation-review, phased-plan-execution, phased-plan-refactoring, phased-plan-closeout]
+    related_skills: [application-records, autonomous-implementation-review, phased-plan-execution, phased-plan-next, phased-plan-refactoring, phased-plan-closeout]
 ---
 
 # Phased Plan Overview
@@ -54,11 +54,9 @@ this run; repeat only a failed/incomplete check or one invalidated by changed st
 4. **Resolve only the relevant ownership/cleanup case** using the decision table.
    Load `phased-plan-closeout` only when reservation or completion recovery is needed;
    its Git identity guards remain authoritative. Never create or remove a worktree.
-5. **Resolve transport once.** `$HERDR_ENV=1` and a non-empty `$HERDR_WORKSPACE_ID`
-   identify the supported environment for this handoff; inspect only those named
-   variables through `terminal`. Otherwise report the transport blocker with the
-   selected phase. An installed binary alone is not proof of an active Herdr session.
-   Executor selection, model setup, and live pane checks belong to execution.
+5. **Classify host once.** Inspect only `$HERDR_ENV` and `$HERDR_WORKSPACE_ID`
+   through `terminal`. `$HERDR_ENV=1` plus a non-empty workspace id is Herdr.
+   Exactly one set is a transport blocker; selection stands. Neither set is not a blocker. Report armed Code-tab status; `references/claude-code-host.md` is not printed here. Else unbound. This skill prints no launch command.
 
 ## Decision table
 
@@ -86,16 +84,9 @@ Do not repeat the full phase table, command transcript, or historical audit unle
 Report selection and transport separately: a transport blocker does not invalidate
 a verified selection. Name the failed layer and next action; never imply delivery.
 
-For a selected implementation phase with no blocker in the supported Herdr
-environment, print exactly one command and do not dispatch it. Only the operator
-sending it grants the listed authority:
-
-   ```text
-   /goal draft Execute only phase <phase-number> of <active-chg-path> using autonomous-implementation-review, phased-plan-execution, and phased-plan-closeout. I authorize the orchestrator to reserve this phase and create its worktree, commit its reviewed implementation, fast-forward the target, commit its completion/archive records, and remove its clean dedicated worktree after verification. Stop after verified target completion and cleanup; do not push or start another phase.
-   ```
-
-The orchestrator follows `phased-plan-closeout`; the executor must not edit or
-commit the CHG path. Cleanup-only recovery gets no new-phase launch command.
+Do not print a launch command. When a phase is selected, name its active CHG
+path for `phased-plan-next`. The orchestrator follows `phased-plan-closeout`; the executor must not edit or commit the CHG path.
+Cleanup-only recovery gets no new-phase goal.
 With no active CHG, a material request routes to `application-records` then
 `phased-plan-design`; non-material work does not create a CHG.
 

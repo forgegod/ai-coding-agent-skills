@@ -1,7 +1,7 @@
 ---
 name: phased-plan-next
-description: Select the next phase and present its bounded goal.
-version: 0.3.0
+description: Select one active CHG and present its bounded goal.
+version: 0.4.0
 author: Raphael (forgegod), Hermes Agent
 license: MIT
 metadata:
@@ -12,16 +12,17 @@ metadata:
 
 # Phased Plan Next
 
-Select the next resumable CHG phase using `phased-plan-overview`, then present its
-bounded goal for the operator to send. This skill is read-only: it neither starts
-the phase nor controls a Herdr pane.
+Select one active CHG using `phased-plan-overview`, then present its bounded goal
+for the operator to send. This skill is read-only: it neither starts the phase
+nor controls a Herdr pane.
 
 ## When to use and authority
 
-Use on `/phased-plan-next` or a request for the next goal to proceed. Invoking
-this skill does not authorize execution, reservation, Git writes, or pane control.
-Only the operator sending the displayed goal grants its listed single-phase
-authority, subject to project policy. A printed goal is not a submitted goal.
+Use on `/phased-plan-next`, `/phased-plan-next <active-chg-path>`, or a request
+that names one active CHG and asks for its goal. Invoking this skill does not
+authorize execution, reservation, Git writes, or pane control. Only the operator
+sending the displayed goal grants its listed single-phase authority, subject to
+project policy. A printed goal is not a submitted goal.
 
 ## Prerequisites
 
@@ -34,16 +35,25 @@ authority, subject to project policy. A printed goal is not a submitted goal.
 
 ## Procedure
 
-1. Run overview's selection once. Retain target checkout, named branch and full
-   SHA, selected active CHG path/phase, CAPs, gate, validator result, and recovery
-   evidence. Do not rerun implementation gates. Ambiguity, invalid records,
-   dirty/detached target, conflicting ownership, or cleanup-only recovery means
-   report the exact next action and stop. With no active CHG, report overview's
-   design route; do not invent a goal.
-2. For an unblocked implementation phase, print exactly one canonical goal below,
-   replacing the phase number and literal active CHG path. Present the retained
-   target/selection evidence alongside it; do not submit or schedule the command.
-3. Stop after presentation. Do not reset sessions, submit prompts, change queue
+1. An operator-named active CHG path, or a unique `CHG-<number>`, is the
+   selection passed to overview. It must resolve to one
+   `docs/changes/active/CHG-*.md`. An archive path, a missing record, or
+   several matches stops before overview. A named CHG does not override
+   another record's reservation or outstanding cleanup.
+2. Run overview's selection once with that name, or with none. Retain target
+   checkout, named branch and full SHA, selected active CHG path/phase, CAPs,
+   gate, validator result, host class, and recovery evidence. Do not rerun
+   implementation gates. Ambiguity, invalid records, dirty/detached target,
+   conflicting ownership, or cleanup-only recovery means report the exact next
+   action and stop. With no active CHG, report overview's design route; do not
+   invent a goal. Several independent records are choices, not a guessed priority.
+3. For an unblocked implementation phase, print exactly one command and do not
+   dispatch it. Herdr, or an unbound host: the canonical goal below. Armed
+   Code-tab and not Herdr: the command in overview's `references/claude-code-host.md`,
+   not the goal below. A transport blocker gets no goal. Replace the phase
+   number and literal active CHG path. Present the retained evidence alongside
+   it; do not submit or schedule the command.
+4. Stop after presentation. Do not reset sessions, submit prompts, change queue
    mode, or monitor panes. The operator decides when and where to send the goal.
 
 ## Canonical goal

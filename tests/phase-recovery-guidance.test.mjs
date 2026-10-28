@@ -91,6 +91,7 @@ test("overview separates transport from selection and next defers transport to e
   assert.match(overview, /Report selection and transport separately/);
   assert.match(overview, /does not invalidate a verified selection/);
   const next = (await read("phased-plan-next/SKILL.md")).replace(/\s+/g, " ");
+  assert.match(overview, /Neither set is not a blocker/);
   assert.match(next, /defer its transport checks to execution/);
   assert.match(next, /Missing Herdr context does not block goal presentation/);
 });

@@ -43,7 +43,8 @@ test("execution entry points reject planning-only authority", async () => {
 
 test("overview, commit, and wireframe skills retain their narrower boundaries", async () => {
   assert.match(await source("phased-plan-overview"), /This skill is read-only/);
-  assert.match(await source("phased-plan-overview"), /print exactly one command and do not dispatch it/);
+  assert.match(await source("phased-plan-overview"), /prints no launch command/);
+  assert.doesNotMatch(await source("phased-plan-overview"), /\/goal draft/);
   assert.match(await source("git-commit-message"), /A request to commit is not acceptance of a plan the user has not seen/);
   assert.match(await source("capability-wireframes"), /Keep pre-implementation visual work in the CHG review package/);
 });

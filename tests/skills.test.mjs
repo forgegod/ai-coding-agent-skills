@@ -172,9 +172,8 @@ test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
   assert.match(records, /does not change phase state, archive a CHG, or prescribe phase lifecycle/i);
   const overview = sources.get("phased-plan-overview");
   assert.match(overview, /docs\/changes\/active/i);
-  assert.match(overview, /\/goal draft Execute only phase <phase-number> of <active-chg-path>/);
-  assert.match(overview, /Stop after verified target completion and cleanup; do not push or start another phase/);
-  assert.match(overview, /print exactly one\s+command and do not dispatch it/);
+  assert.doesNotMatch(overview, /\/goal draft/);
+  assert.match(overview, /prints no launch command/);
   assert.match(overview, /Historical evidence for earlier completed phases is allowed/);
   assert.match(overview, /Treat an `in-progress` target row as the reserved phase/);
   assert.match(overview, /committed or dirty\s+worktree CHG change/);
@@ -228,6 +227,10 @@ test("phase overview bounds discovery, recovery, and the final handoff", async (
   assert.match(source, /Do not search host directories or inspect Herdr\/Hermes source/);
   assert.match(source, /\$HERDR_ENV=1/);
   assert.match(source, /\$HERDR_WORKSPACE_ID/);
+  assert.match(source, /Neither set is not a blocker/);
+  assert.match(source, /references\/claude-code-host\.md/);
+  assert.match(source, /prints no launch command/);
+  assert.doesNotMatch(source, /print exactly one command and do not dispatch it/);
   assert.match(source, /single active CHG is unambiguous/);
   assert.match(source, /## Decision table/);
   assert.match(source, /No in-progress row; cleanup proved complete/);

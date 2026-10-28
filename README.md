@@ -14,7 +14,7 @@ Portable engineering workflows for AI coding agents. This repository owns the sk
 | [phased-plan-execution](skills/software-development/phased-plan-execution/SKILL.md) | Execute and prove one CHG phase. |
 | [phased-plan-closeout](skills/software-development/phased-plan-closeout/SKILL.md) | Integrate a verified phase and hand off the next goal. |
 | [phased-plan-overview](skills/software-development/phased-plan-overview/SKILL.md) | Inspect active changes and select work to resume. |
-| [phased-plan-next](skills/software-development/phased-plan-next/SKILL.md) | Select work and present its bounded goal for the operator to send. |
+| [phased-plan-next](skills/software-development/phased-plan-next/SKILL.md) | Select one active CHG and present its bounded goal. |
 | [phased-plan-refactoring](skills/software-development/phased-plan-refactoring/SKILL.md) | Split or resequence work at verified boundaries. |
 
 ## Install with Hermes
@@ -57,10 +57,11 @@ nine-package example does not establish scanner approval for it:
 hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/autonomous-implementation-review" --category autonomous-ai-agents
 ```
 
-`phased-plan-next` is read-only and included in the generic loop. It uses overview
-to select a phase and prints the bounded goal; it never submits it, resets a
-session, or monitors a pane. Executing the displayed goal separately requires
-the related execution, closeout, and autonomous orchestration skills.
+`phased-plan-next` is read-only and included in the generic loop. It selects an
+explicit or unambiguous active CHG and prints the bounded goal; it never submits
+it, resets a session, or monitors a pane. Overview inspects and prints no launch
+command. Executing the displayed goal separately requires the related execution,
+closeout, and autonomous orchestration skills.
 
 Source edits do not update installed copies. After an authorized publication,
 install through the normal hub and start a new session, or use the reviewed local
@@ -209,10 +210,10 @@ under an explicitly agreed manual workflow; do not invent a fallback transport.
 
 #### Start a selected CHG phase
 
-If the active CHG or phase is not already selected, run
-`/phased-plan-overview` first. It remains read-only: it lists active records,
-applies the selection rules, and, only after a phase is selected or unambiguous,
-returns the exact bounded command below for the operator to send.
+If the active CHG is not already chosen, inspect with `/phased-plan-overview`.
+It remains read-only and prints no launch command. To select a CHG and receive
+the goal, run `/phased-plan-next` or `/phased-plan-next <active-chg-path>`.
+Only after that CHG's phase is selected, it returns the exact bounded command below for the operator to send.
 
 The operator fills the numeric phase ID and literal active CHG path and sends
 this command only if they authorize its listed local Git operations. Displaying
@@ -236,8 +237,10 @@ commit authority, request a read-only assessment, not this completion goal.
 
 #### Present the next goal
 
-Invoke `/phased-plan-next` to apply overview's repository selection and blocker
-rules and print the filled single-phase command above. Selection is read-only:
+Invoke `/phased-plan-next` or `/phased-plan-next <active-chg-path>` to apply
+overview's repository selection and blocker rules and print the filled
+single-phase command above. An omitted CHG is used only when one active record
+is unambiguous. Selection is read-only:
 no session reset, prompt submission, queue-mode change, pane monitoring, or Git
 write is authorized by the invocation. Missing Herdr context does not prevent
 presenting a goal; transport is checked only when execution is requested.
@@ -410,6 +413,14 @@ for `application-records`, or explicitly invoke `/application-records`. Verify t
 loaded skill path and content rather than relying only on the model's claim.
 
 Reference: [Claude Code skills](https://code.claude.com/docs/en/skills).
+
+That copy installs skills only. It does not install Code-tab subagents and does
+not receive Hermes scanner approval for them. Role templates are
+`templates/phase-implementer.md` and `templates/phase-reviewer.md` in the
+overview package. Copy them into the target project's `.claude/agents/` only
+after review, and refuse an existing file. Set distinct non-`inherit` `model`
+values and keep the parent session in Manual mode before use. Absence of Herdr
+does not select this path.
 
 ### Codex
 
