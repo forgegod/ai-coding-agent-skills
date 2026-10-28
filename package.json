@@ -9,12 +9,13 @@
   },
   "scripts": {
     "test": "node --test tests/*.test.mjs",
-    "build": "node scripts/build-well-known-skills.mjs --out dist",
+    "build": "node scripts/build-distribution.mjs --out dist",
     "install:local": "node scripts/install-local-skills.mjs",
     "test:local-update": "node tests/local-update-integration.mjs",
     "test:security": "npm run build && python3 -B tests/security_scan_test.py && python3 -B scripts/check-skill-security.py"
   },
   "dependencies": {
+    "fflate": "0.8.3",
     "yaml": "^2.9.1"
   }
 }

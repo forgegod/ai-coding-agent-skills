@@ -6,6 +6,30 @@ import { fileURLToPath } from "node:url";
 const readme = fileURLToPath(new URL("../README.md", import.meta.url));
 const autonomousResearch = fileURLToPath(new URL("../docs/research/hermes-autonomous-goal-workflow.md", import.meta.url));
 
+test("Claude instructions lead with native GUI installation and cite primary sources", async () => {
+  const source = await readFile(readme, "utf8");
+  const section = source.split("## Install with Claude Desktop\n")[1]?.split("\n## ")[0];
+  assert.ok(section, "README needs a simple Claude Desktop installation entry point");
+  assert.match(section, /Customize.*Plugins/);
+  assert.match(section, /Add marketplace/);
+  assert.match(section, /forgegod\/ai-coding-agent-skills/);
+  assert.match(section, /software-development/);
+  assert.match(section, /autonomous-orchestration/);
+  assert.match(section, /docs\/claude-installation\.md/);
+  assert.match(source, /Advanced: native directory installation/);
+  const guide = await readFile(new URL("../docs/claude-installation.md", import.meta.url), "utf8");
+  for (const url of ["https://claude.com/docs/plugins/overview", "https://support.claude.com/en/articles/12512180-use-skills-in-claude", "https://support.claude.com/en/articles/12512198-creating-custom-skills", "https://code.claude.com/docs/en/plugins/manifest-reference", "https://code.claude.com/docs/en/plugins/marketplace-reference"]) {
+    assert.ok(guide.includes(url), `missing primary source ${url}`);
+  }
+  assert.match(guide, /Upload plugin/);
+  assert.match(guide, /Upload a skill/);
+  assert.match(guide, /not.*Hermes scanner approval/i);
+  assert.match(guide, /Desktop.*not.*verified/i);
+  assert.match(guide, /2\.1\.273/);
+  assert.match(guide, /software-development:application-records/);
+  assert.match(guide, /No agents, hooks, MCP servers/);
+});
+
 test("all launch examples carry the same bounded operator authorization", async () => {
   const files = [readme,
     fileURLToPath(new URL("../skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md", import.meta.url)),

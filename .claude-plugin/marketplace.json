@@ -1,0 +1,37 @@
+{
+  "name": "ai-coding-agent-skills",
+  "owner": {
+    "name": "Raphael (forgegod)"
+  },
+  "description": "Community engineering skills. Orchestration is a separate operator-reviewed option.",
+  "plugins": [
+    {
+      "name": "software-development",
+      "version": "1.0.0",
+      "description": "Nine engineering skills for records, wireframes, commits, and phased work. Execution requires a capable coding host.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/software-development/application-records",
+        "./skills/software-development/capability-wireframes",
+        "./skills/software-development/git-commit-message",
+        "./skills/software-development/phased-plan-closeout",
+        "./skills/software-development/phased-plan-design",
+        "./skills/software-development/phased-plan-execution",
+        "./skills/software-development/phased-plan-next",
+        "./skills/software-development/phased-plan-overview",
+        "./skills/software-development/phased-plan-refactoring"
+      ]
+    },
+    {
+      "name": "autonomous-orchestration",
+      "version": "1.0.0",
+      "description": "Optional implementation/review orchestration. Review before enabling; requires the general skills and separately configured execution roles.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/autonomous-ai-agents/autonomous-implementation-review"
+      ]
+    }
+  ]
+}

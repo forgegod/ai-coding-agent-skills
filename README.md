@@ -2,6 +2,10 @@
 
 Portable engineering workflows for AI coding agents. This repository owns the skill sources and their static distribution endpoint; adopting projects own their DOX contracts, product behavior, and change progress.
 
+Start here: [Claude Desktop (no terminal)](#install-with-claude-desktop) ·
+[Hermes](#install-with-hermes) ·
+[Other agents / advanced directory installation](#advanced-native-directory-installation).
+
 ## Catalog
 
 | Skill | Purpose |
@@ -16,6 +20,39 @@ Portable engineering workflows for AI coding agents. This repository owns the sk
 | [phased-plan-overview](skills/software-development/phased-plan-overview/SKILL.md) | Inspect active changes and select work to resume. |
 | [phased-plan-next](skills/software-development/phased-plan-next/SKILL.md) | Select one active CHG and present its bounded goal. |
 | [phased-plan-refactoring](skills/software-development/phased-plan-refactoring/SKILL.md) | Split or resequence work at verified boundaries. |
+
+## Install with Claude Desktop
+
+**Recommended: use Claude's built-in plugin installer.** No Git, shell commands,
+or hidden-folder copying is needed for installation.
+
+1. Open **Customize → Plugins → Add → Add marketplace**.
+2. Choose **Add from a repository** and enter `forgegod/ai-coding-agent-skills`.
+3. Select **software-development**, review its contents, and click **Add**.
+4. Start a new conversation or task and check that its skills appear in the skill picker.
+
+This installs the nine general engineering skills. **autonomous-orchestration**
+is a separate, optional plugin: review it and its execution prerequisites before
+adding it. Neither plugin installs execution roles or changes permissions.
+
+Prefer a file upload? The [download page](https://forgegod.github.io/ai-coding-agent-skills/downloads/index.html)
+offers ready-made plugin ZIPs and individual skill ZIPs. Upload a plugin with
+**Customize → Plugins → Add → Upload plugin**, or an individual skill with
+**Customize → Skills → + → Create skill → Upload a skill**. Do not upload GitHub's
+whole-repository ZIP. Plugin installation requires a paid Claude plan; individual
+skills also support Free plans with code execution enabled, subject to organization policy.
+
+The repository route requires the marketplace revision to be published to GitHub;
+download links require its matching Pages deployment. A local build alone publishes
+neither. Local ZIPs are generated in `dist/downloads/` for pre-release testing.
+
+**Installation is not execution compatibility.** Chat, Cowork, and Claude Code have
+different tools. Git/worktree workflows need a capable coding host and project access;
+they are not made runnable in ordinary Chat merely by installing a skill.
+
+See [Claude installation, updates, compatibility, and verification](docs/claude-installation.md).
+Primary sources: [Anthropic's plugin installation guide](https://claude.com/docs/plugins/overview)
+and [custom skill installation](https://support.claude.com/en/articles/12512180-use-skills-in-claude).
 
 ## Install with Hermes
 
@@ -347,7 +384,11 @@ hermes skills install forgegod/ai-coding-agent-skills/skills/software-developmen
 
 Other Agent Skills-compatible agents can consume the same SKILL.md packages using their own installation mechanism. Well-known discovery and Hermes-specific metadata support depend on the client.
 
-## Install with Claude Code, Codex, Kilo, or Pi
+## Advanced: native directory installation
+
+For Claude, prefer the [built-in plugin or ZIP installer](#install-with-claude-desktop).
+The following Claude Code, Codex, Kilo, and Pi recipes are advanced alternatives,
+not additional steps after plugin installation. Avoid duplicate installations.
 
 These recipes use each agent's native skill directories. They assume the agent
 and Git are already installed, and use a POSIX shell (Linux, macOS, or Windows
@@ -573,7 +614,8 @@ Skills are execution aids. The target project's root and child AGENTS.md files r
 
 ## Development and publishing
 
-Requires Node 22 or newer; the YAML parser is the only npm dependency.
+Requires Node 22 or newer. Runtime build dependencies are the YAML parser and
+`fflate` for deterministic ZIP generation; no system ZIP command is needed.
 
 ```sh
 npm ci
@@ -582,6 +624,13 @@ npm run build
 ```
 
 Canonical source is `skills/<category>/<name>/`. `dist/` is generated and ignored. The generator emits the complete `.well-known/skills/` inventory, with an explicit file list for each package.
+
+The same build emits `dist/downloads/`: ten complete skill ZIPs, two plugin ZIPs,
+an HTML download page, and a JSON inventory with SHA-256 checksums. The checked-in
+`.claude-plugin/marketplace.json` selects canonical source packages directly;
+no generated skill copies are committed. Its two explicit skill lists separate
+general use from opt-in orchestration. Bump the affected plugin's version when
+its bundled content changes. See the [Claude release checks](docs/claude-installation.md#maintainer-verification).
 
 The optional `npm run test:local-update` probe requires the installed `hermes`
 CLI and internet access. It installs all local packages into a disposable scratch
