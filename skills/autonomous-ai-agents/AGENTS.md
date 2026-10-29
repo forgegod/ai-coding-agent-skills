@@ -16,7 +16,10 @@ Herdr pane-selection helper.
 | `autonomous-implementation-review/references/environment-passthrough.md` | Profile-scoped Hermes child-environment configuration for Herdr context. |
 | `autonomous-implementation-review/references/herdr.md` | On-demand Herdr selection, delivery, lifecycle, and stop mechanics. |
 | `autonomous-implementation-review/references/lifecycle-watch.md` | Passive watcher arming, outcomes, and operator-only recovery. |
-| `autonomous-implementation-review/references/openspec.md` | Opt-in OpenSpec change/task-group orchestration boundary; no phase table or distributed lock. |
+| `autonomous-implementation-review/references/openspec.md` | OpenSpec change and task-group boundary. No second task list and no distributed lock. |
+| `autonomous-implementation-review/references/claude-code-host.md` | Code-tab arming check and the exact host command. |
+| `autonomous-implementation-review/templates/phase-implementer.md` | Unarmed implementer template. The operator copies it into the target project after review. |
+| `autonomous-implementation-review/templates/phase-reviewer.md` | Unarmed read-only reviewer template. The operator copies it into the target project after review. |
 
 ## Local Contracts
 
@@ -26,9 +29,8 @@ Herdr pane-selection helper.
 - Explicit launch selection or an answered form precedes reservation and every pane mutation; a timeout is not consent. The helper validates supplied evidence, not its authenticity or future liveness.
 - The automated role loop is Herdr-only (`$HERDR_ENV=1`); role handoff and passive monitoring belong here, not to read-only phase selection. Require literal caller identity from `HERDR_PANE_ID` and a different explicitly selected executor pane; never reset or control the orchestrator as a worker. `delegate_task` is research-only and never substitutes for session-scoped model selection. The operator-sent `code-tab-phase-roles` command is the only non-Herdr path and loads `references/claude-code-roles.md`; absence of Herdr is not that command. Do not mix the two hosts.
 - The helper accepts Herdr pane-list JSON and optional operator-selection evidence; it must not control panes or send input.
-- For CAP/CHG work, the tracked CHG is the sole mutable progress authority; do not create profile-local continuation documents.
-- For explicitly adopted OpenSpec scope, `references/openspec.md` bounds the loop to one authorized native change and one named task group on the same Herdr or operator-sent `code-tab-phase-roles` hosts. The orchestrator is the sole Git/`tasks.md` writer and uses `openspec-change-integration`, not `phased-plan-closeout`; no CHG record, reservation, or phase guard applies, and stock apply checkbox writes stay mediated.
-- For CAP/CHG scope, the orchestrator delegates Git/CHG writes to `phased-plan-closeout`; executors never stage, commit, integrate, retire worktrees, or edit the CHG path. OpenSpec scope uses its integration boundary instead. Keep the command protocols out of this skill.
+- For explicitly adopted OpenSpec scope, `references/openspec.md` bounds the loop to one authorized native change and one named task group on Herdr or the operator-sent `code-tab-phase-roles` host. The orchestrator is the sole Git/`tasks.md` writer and uses `openspec-change-integration`. Stock apply checkbox writes stay mediated. GitHub issues and pull requests document and review; they are not the task list.
+- The orchestrator does not delegate Git writes to a removed phase skill. Executors never stage, commit, integrate, retire checkouts, or edit `tasks.md`. Keep the command protocols in the integration skill.
 - The orchestrator dispatches code/prerequisite fixes to the executor, never edits worker code itself, and honors the operator's explicit launch authority and stop decisions.
 - Model selection is not delivery evidence: after `/model <key>`, follow it with `/status` and require a visible `Agent Running` card whose `Model:` names that key before arming. A missing card, mismatched route or rejected selection stops the role; the setup readback is not idle proof, and a running watcher still never injects a status request.
 - Keep external tool and model references as prerequisites, not bundled dependencies.
@@ -38,7 +40,8 @@ Herdr pane-selection helper.
 
 Run `npm test` and `npm run build`. Confirm the generated package advertises
 `SKILL.md`, `references/claude-code-roles.md`, `references/herdr.md`,
-`references/lifecycle-watch.md`, `references/openspec.md`, `scripts/herdr_panes.py`,
-`scripts/herdr_lifecycle_watch.mjs`, and `scripts/herdr-pane-state.mjs`.
+`references/lifecycle-watch.md`, `references/openspec.md`, `references/claude-code-host.md`, `scripts/herdr_panes.py`,
+`scripts/herdr_lifecycle_watch.mjs`, `scripts/herdr-pane-state.mjs`,
+`templates/phase-implementer.md`, and `templates/phase-reviewer.md`.
 
 Parent contract: `../AGENTS.md`.

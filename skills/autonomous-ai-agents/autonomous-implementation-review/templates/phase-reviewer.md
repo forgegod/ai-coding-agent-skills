@@ -1,6 +1,6 @@
 ---
 name: phase-reviewer
-description: Review one frozen CHG candidate. Use only when the parent dispatches a read-only review.
+description: Review one frozen OpenSpec candidate. Use only when the parent dispatches a read-only review.
 tools: Read, Grep, Glob, Bash
 disallowedTools: Agent, Edit, Write
 model: inherit

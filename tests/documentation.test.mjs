@@ -12,7 +12,7 @@ test("Claude instructions lead with native GUI installation and cite primary sou
   assert.match(section, /Customize.*Plugins/);
   assert.match(section, /Add marketplace/);
   assert.match(section, /forgegod\/ai-coding-agent-skills/);
-  assert.match(section, /software-development/);
+  assert.match(section, /openspec-development/);
   assert.match(section, /autonomous-orchestration/);
   assert.match(section, /docs\/claude-installation\.md/);
   assert.match(source, /Advanced: native directory installation/);
@@ -25,23 +25,22 @@ test("Claude instructions lead with native GUI installation and cite primary sou
   assert.match(guide, /not.*Hermes scanner approval/i);
   assert.match(guide, /Desktop UI upload\s+have not been verified/);
   assert.match(guide, /2\.1\.273/);
-  assert.match(guide, /software-development:application-records/);
+  assert.match(guide, /openspec-development:openspec-change-integration/);
   assert.match(guide, /No agents, hooks, MCP servers/);
 });
 
 test("all launch examples carry the same bounded operator authorization", async () => {
   const files = [readme,
-    fileURLToPath(new URL("../skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md", import.meta.url)),
-    fileURLToPath(new URL("../skills/software-development/phased-plan-next/SKILL.md", import.meta.url))];
+    fileURLToPath(new URL("../skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md", import.meta.url))];
   const prompts = [];
   for (const file of files) {
     const source = await readFile(file, "utf8");
-    const promptsInFile = [...source.matchAll(/^\s*(\/goal draft Execute only phase .+)$/gm)].map((match) => match[1]);
+    const promptsInFile = [...source.matchAll(/^\s*(\/goal draft Execute only the authorized task group .+)$/gm)].map((match) => match[1]);
     assert.equal(promptsInFile.length, 1, file);
     const prompt = promptsInFile[0];
-    assert.match(prompt, /phased-plan-closeout/);
+    assert.match(prompt, /openspec-change-integration/);
     assert.match(prompt, /I authorize the orchestrator/);
-    for (const action of [/reserve/, /commit/, /fast-forward/, /clean dedicated worktree/, /after verification/, /do not push or start another phase/]) assert.match(prompt, action);
+    for (const action of [/isolated checkout/, /commit/, /tasks\.md/, /do not push/, /do not .*start another change/]) assert.match(prompt, action);
     prompts.push(prompt);
   }
   assert.ok(prompts.every((prompt) => prompt === prompts[0]), "launch contract drift");
@@ -51,12 +50,11 @@ test("normal installer loop documents all generic software-development skills", 
   const source = await readFile(readme, "utf8");
   const loop = source.match(/^for skill in (.+); do$/m)?.[1]?.split(/\s+/);
   assert.ok(loop, "document a normal installer loop");
-  assert.equal(loop.length, 9);
-  assert.deepEqual(loop, ["application-records", "capability-wireframes", "git-commit-message", "phased-plan-design", "phased-plan-execution", "phased-plan-closeout", "phased-plan-overview", "phased-plan-next", "phased-plan-refactoring"]);
-  assert.match(source, /nine-package example/);
-  assert.match(source, /collection of \*\*eleven\*\* categorized Agent Skills packages/);
-  assert.match(source, /`phased-plan-next` is read-only and included in the generic loop/);
-  assert.doesNotMatch(source, /phased-plan-next.*can reset/i);
+  assert.equal(loop.length, 3);
+  assert.deepEqual(loop, ["openspec-change-integration", "git-commit-message", "capability-wireframes"]);
+  assert.match(source, /three-package example/);
+  assert.match(source, /collection of \*\*four\*\* categorized Agent Skills packages/);
+  assert.doesNotMatch(source, /phased-plan-next/);
 });
 
 test("OpenSpec installation and orchestration use the explicitly selected workflow", async () => {
@@ -64,7 +62,7 @@ test("OpenSpec installation and orchestration use the explicitly selected workfl
   assert.equal(source.includes("hermes -p hermes-dev skills install \"well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-change-integration\" --category software-development"), true, "document the independent OpenSpec Hermes install route");
   const marketplace = JSON.parse(await readFile(new URL("../.claude-plugin/marketplace.json", import.meta.url), "utf8"));
   const orchestration = marketplace.plugins.find(({ name }) => name === "autonomous-orchestration");
-  for (const workflow of ["software-development", "openspec-development"]) assert.equal(orchestration.description.includes(workflow), true, workflow);
+  for (const workflow of ["openspec-development"]) assert.equal(orchestration.description.includes(workflow), true, workflow);
   assert.equal(orchestration.description.includes("requires the general skills"), false);
   const guide = await readFile(new URL("../docs/claude-installation.md", import.meta.url), "utf8");
   assert.equal(/general-skill prerequisites/.test(guide), false, "role prerequisites must follow workflow selection");
@@ -94,7 +92,7 @@ test("directory-discovery instructions separate installation telemetry from auth
   const source = await readFile(readme, "utf8");
   assert.match(source, /## Discovery on skill directories/);
   assert.match(source, /npx skills add forgegod\/ai-coding-agent-skills --list/);
-  assert.match(source, /--skill application-records --agent claude-code/);
+  assert.match(source, /--skill openspec-change-integration --agent claude-code/);
   assert.match(source, /anonymous installation telemetry/);
   assert.match(source, /DISABLE_TELEMETRY=1/);
   assert.match(source, /https:\/\/skillsllm\.com\/submit/);
@@ -107,19 +105,12 @@ test("directory-discovery instructions separate installation telemetry from auth
 test("autonomous goal documentation distinguishes orchestration from polling", async () => {
   const source = await readFile(readme, "utf8");
   assert.match(source, /### Run the autonomous implementation-review goal/);
-  assert.match(source, /#### Choose the progress authority first/);
-  assert.match(source, /#### Start a selected CHG phase/);
-  assert.match(source, /\/goal draft Execute only phase <phase-number> of <active-chg-path>/);
-  assert.match(source, /Stop after verified target completion and cleanup; do not push or start another phase/);
-  assert.match(source, /The operator fills the numeric phase ID/);
+  assert.match(source, /\/goal draft Execute only the authorized task group of openspec\/changes\/<name>/);
+  assert.match(source, /Stop after the named task group; do not push/);
   assert.match(source, /supports Herdr only/);
   assert.match(source, /operator sends `\/goal pause`/i);
-  assert.match(source, /prints no launch command/);
-  assert.match(source, /\/phased-plan-next <active-chg-path>/);
-  assert.match(source, /returns the exact bounded command below for the operator to send/);
   assert.match(source, /docs\/openspec-workflow\.md/);
-  assert.match(source, /phased-plan-design/);
-  assert.match(source, /phased-plan-execution/);
+  assert.doesNotMatch(source, /phased-plan-/);
   assert.match(source, /#### Start bounded standalone work/);
   assert.match(source, /#### What persists across sessions and machines/);
   assert.match(source, /Scratch logs, patches, and agent reports are temporary evidence only/);
@@ -145,5 +136,5 @@ test("operational documentation has no research dependencies or adoption-history
     assert.equal(await stat(new URL(`../${relative}`, import.meta.url)).then(() => true, (error) => { if (error.code !== "ENOENT") throw error; return false; }), false, relative);
   }
   const workflow = await readFile(new URL("../docs/openspec-workflow.md", import.meta.url), "utf8");
-  for (const pattern of [/explicit\s+project\s+selection/i, /installation.*does not/i, /tasks\.md/, /post-merge/, /CAP\/CHG/]) assert.match(workflow, pattern);
+  for (const pattern of [/tasks\.md/, /post-merge|integrated/, /documentation/, /parallel/i, /openspec-propose/, /field-notes/, /pull request reviews that SHA/, /\/openspec-change-integration/, /risk-focused/, /does not\s+establish ISO/, /independent review/, /Do not generate a ULID/]) assert.match(workflow, pattern);
 });

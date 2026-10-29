@@ -1,7 +1,8 @@
 # Claude Code host
 
-Load only when overview classified an armed Code-tab host. This is not a Herdr
-transport and does not authorize execution. Displaying the command does not send it.
+Load only when the operator sent `code-tab-phase-roles` and Herdr is not active.
+This is not a Herdr transport and does not authorize execution. Displaying the
+command does not send it.
 
 ## Armed files
 
@@ -26,5 +27,5 @@ Print this command exactly. Do not dispatch it. Do not also print the Herdr
 `/goal draft` command.
 
 ```text
-Execute only phase <phase-number> of <active-chg-path> using code-tab-phase-roles, phased-plan-execution, and phased-plan-closeout. I authorize this Claude Code parent session to reserve this phase and create its worktree, commit its reviewed implementation, fast-forward the target, commit its completion/archive records, and remove its clean dedicated worktree after verification. Dispatch implementation and review only through the project subagents phase-implementer and phase-reviewer. Stop after verified target completion and cleanup; do not push or start another phase.
+Execute only the authorized task group of openspec/changes/<name> using code-tab-phase-roles and openspec-change-integration. I authorize this Claude Code parent session to use an isolated checkout, commit the reviewed implementation, and update that change's tasks.md after checking evidence. Dispatch implementation and review only through the project subagents phase-implementer and phase-reviewer. Stop after the named task group; do not push, open a pull request, merge, or start another change.
 ```

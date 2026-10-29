@@ -4,61 +4,59 @@ import { readFile } from "node:fs/promises";
 
 const skills = new URL("../skills/", import.meta.url);
 const read = async (relative) => readFile(new URL(relative, skills), "utf8");
-const entry = { commit: "software-development/git-commit-message/", wireframes: "software-development/capability-wireframes/", orchestration: "autonomous-ai-agents/autonomous-implementation-review/" };
+const entry = {
+  commit: "software-development/git-commit-message/",
+  wireframes: "software-development/capability-wireframes/",
+  orchestration: "autonomous-ai-agents/autonomous-implementation-review/",
+  integration: "software-development/openspec-change-integration/",
+};
 
-// Instruction-contract regressions, not proof of model obedience. Each shared
-// skill keeps its legacy CAP/CHG procedure and adds one explicit early opt-in
-// route to a bounded OpenSpec reference.
-test("shared skills route explicitly adopted OpenSpec scope before their legacy procedure", async () => {
+test("companion skills route OpenSpec work before generic procedure", async () => {
   for (const [name, directory] of Object.entries(entry)) {
+    if (name === "integration") continue;
     const source = await read(`${directory}SKILL.md`);
-    const version = source.match(/^version:\s*(\d+)\.(\d+)\.(\d+)$/m);
-    assert.ok(version, `${name} needs a semantic version`);
-    assert.match(source, new RegExp(`references/openspec\\.md`), `${name} does not route to its OpenSpec reference`);
-    assert.match(source, /explicit(?:ly)?\b[^.]*OpenSpec|OpenSpec[^.]*explicit(?:ly)?\b/i, `${name} route is not conditioned on explicit project policy`);
+    assert.match(source, /references\/openspec\.md/, `${name} does not route to its OpenSpec reference`);
     const route = source.indexOf("references/openspec.md");
-    const legacy = name === "commit" ? source.indexOf("## Preview") : name === "wireframes" ? source.indexOf("## Procedure") : source.indexOf("## Procedure");
-    assert.ok(route > 0 && route < legacy, `${name} must route before the legacy procedure`);
+    const procedure = source.indexOf("## Procedure");
+    assert.ok(route > 0 && route < procedure, `${name} must route before its procedure`);
+    assert.doesNotMatch(source, /phased-plan-|application-records/);
   }
 });
 
-test("git-commit-message keeps its legacy preview and CHG boundaries while adding OpenSpec batches", async () => {
+test("git-commit-message keeps its preview and uses the integration skill for change batches", async () => {
   const source = await read(`${entry.commit}SKILL.md`);
-  assert.match(source, /^version: 4\.6\.0$/m);
-  assert.match(source, /phased-plan-closeout.*controls/s);
+  assert.match(source, /^version: 4\.7\.0$/m);
+  assert.match(source, /openspec-change-integration/);
   assert.match(source, /In normal operation, present a preview and stop/i);
   assert.match(source, /Outside\s+explicitly enabled autonomous mode, a preview is not permission to commit/i);
+  assert.doesNotMatch(source, /phased-plan-closeout/);
   const reference = await read(`${entry.commit}references/openspec.md`);
   assert.ok(reference.length > 900, "OpenSpec commit reference must stay substantive");
   for (const expected of [
-    /explicitly selects OpenSpec/i,
     /openspec-change-integration/,
     /sole Git and `openspec\/changes\/<name>\/tasks\.md` writer/,
     /path allowlists/,
-    /Do not create a CHG record, phase table, phase-guard preflight/,
     /preview, its single-turn stop, explicit acceptance/,
-    /never opted a project in|never opts a project in/,
-    /push, PR creation, merge/,
+    /push, pull-request creation, merge/,
+    /documentation or review/,
   ]) assert.match(reference, expected);
   assert.doesNotMatch(reference, /~(?:[A-Za-z0-9._-]+)?\/\.hermes|\/home\//);
 });
 
-test("capability-wireframes keeps CAP output and adds stable OpenSpec keys", async () => {
+test("capability-wireframes uses stable keys and change-owned proposals", async () => {
   const source = await read(`${entry.wireframes}SKILL.md`);
-  assert.match(source, /^version: 1\.3\.0$/m);
-  assert.match(source.replace(/\s+/g, " "), /Keep pre-implementation visual work in the CHG review package/);
+  assert.match(source, /^version: 1\.4\.0$/m);
   assert.match(source, /docs\/product\/wireframes\//);
-  assert.match(source, /CAP-NNNN/);
+  assert.match(source, /openspec\/changes\/<name>\//);
+  assert.doesNotMatch(source, /CAP-NNNN|application-records/);
   const reference = await read(`${entry.wireframes}references/openspec.md`);
   assert.ok(reference.length > 900, "OpenSpec wireframe reference must stay substantive");
   for (const expected of [
-    /explicitly selects OpenSpec/i,
-    /docs\/product\/wireframes\/<capability>\//,
+    /docs\/product\/wireframes\//,
     /stable (?:capability|screen|key)/i,
-    /change-owned/,
-    /openspec\/changes\/<name>\//,
+    /change-owned|openspec\/changes\/<name>\//,
     /openspec\/specs\//,
-    /no fabricated CAP|not allocate `CAP-NNNN`|no CAP record is required/i,
+    /no fabricated CAP|Do not allocate `CAP-NNNN`|No capability record is required/i,
     /manifest/,
     /PNG/,
     /generate\.mjs/,
@@ -67,31 +65,40 @@ test("capability-wireframes keeps CAP output and adds stable OpenSpec keys", asy
   assert.doesNotMatch(reference, /~(?:[A-Za-z0-9._-]+)?\/\.hermes|\/home\//);
 });
 
-test("autonomous-implementation-review bounds OpenSpec orchestration to supported hosts", async () => {
+test("autonomous-implementation-review bounds orchestration to one change and supported hosts", async () => {
   const source = await read(`${entry.orchestration}SKILL.md`);
-  assert.match(source, /^version: 0\.11\.0$/m);
-  assert.match(source, /A planning-only request stops after design; do not reserve or dispatch phase 1/);
+  assert.match(source, /^version: 0\.13\.0$/m);
+  assert.match(source, /A planning-only request stops after proposal\/spec\/design\/tasks/);
   assert.match(source, /This automated role loop is Herdr-only/);
-  assert.match(source, /orchestrator follows `phased-plan-closeout`/);
-  assert.match(source, /\/goal draft Execute only phase <phase-number> of <active-chg-path>/);
-  assert.equal([...source.matchAll(/^\s*\/goal draft Execute only phase .+$/gm)].length, 1, "the legacy launch template stays the only phase template");
+  assert.match(source, /openspec-change-integration/);
+  assert.match(source, /\/goal draft Execute only the authorized task group of openspec\/changes\/<name>/);
+  assert.equal([...source.matchAll(/^\s*\/goal draft Execute only .+$/gm)].length, 1);
+  assert.doesNotMatch(source, /phased-plan-|application-records/);
   const reference = await read(`${entry.orchestration}references/openspec.md`);
   assert.ok(reference.length > 900, "OpenSpec orchestration reference must stay substantive");
   for (const expected of [
-    /explicitly selects OpenSpec/i,
     /one authorized native OpenSpec change/,
     /task group/,
     /\$HERDR_ENV=1/,
     /code-tab-phase-roles/,
-    /no new host,\s*\n?\s*CLI launcher|defines no new host/i,
+    /defines no new host/,
     /openspec-change-integration/,
-    /phased-plan-closeout`, `phase-guard\.mjs`, reservations/,
     /sole Git and `tasks\.md` writer/,
-    /apply. checkbox writes are mediated|checkbox writes are mediated/i,
-    /stop(?:s)? after the named task group/,
+    /checkbox writes are mediated/i,
+    /stops after the named task group/,
   ]) assert.match(reference, expected);
   assert.doesNotMatch(reference, /~(?:[A-Za-z0-9._-]+)?\/\.hermes|\/home\//);
-  assert.doesNotMatch(reference, /^\s*\/goal draft Execute only phase /m);
+  assert.doesNotMatch(reference, /^\s*\/goal draft Execute only /m);
+});
+
+test("integration treats GitHub as documentation and review, not a task lock", async () => {
+  const source = await read(`${entry.integration}SKILL.md`);
+  assert.match(source, /Parallel specification and documentation/);
+  assert.match(source, /not an execution lock|not a lock|not admission/i);
+  assert.match(source, /document <name>/);
+  assert.match(source, /A longer prompt is not required/);
+  assert.match(source, /same capability spec/);
+  assert.doesNotMatch(source, /phased-plan-|application-records/);
 });
 
 test("the autonomous category contract owns the OpenSpec orchestration boundary", async () => {
@@ -101,5 +108,5 @@ test("the autonomous category contract owns the OpenSpec orchestration boundary"
   assert.match(contract, /sole\s+Git\/`tasks\.md`/);
   assert.match(contract, /`code-tab-phase-roles`/);
   assert.match(contract, /Herdr/);
-  assert.match(contract, /no CHG record|never a CHG record/);
+  assert.doesNotMatch(contract, /phased-plan-closeout/);
 });

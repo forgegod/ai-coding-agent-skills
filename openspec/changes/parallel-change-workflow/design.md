@@ -15,7 +15,7 @@ proposal, design, tasks (checkbox-only changes excluded outside fences), metadat
 all change delta specs, with regular-file modes. A changed task or gate invalidates
 approval; changed candidate SHA invalidates review.
 
-Receipt checks bind change/ULID/issue, candidate/review, merged revision and verified
+Receipt checks bind change name, issue, candidate/review, merged revision and verified
 target, require successful exact-revision gates and evidence references, and refuse
 unverified intervening product changes. Merge ancestry initially requires candidate
 reachability; squash/rebase content mapping is not implemented. No helper authenticates

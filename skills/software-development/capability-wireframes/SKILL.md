@@ -1,158 +1,104 @@
 ---
 name: capability-wireframes
-description: Use when a material feature changes a primary human-facing surface and needs a static CAP-linked wireframe.
-version: 1.3.0
+description: Use when a human-facing surface needs a stable visual review.
+version: 1.4.0
 author: AI Software Blueprint
 license: MIT
 metadata:
   hermes:
     tags: [product, wireframes, ux, capability, documentation]
-    related_skills: [application-records]
+    related_skills: [openspec-change-integration]
 ---
 
 # Capability Wireframes
 
-## Overview
+Use a static wireframe when an OpenSpec change creates or changes a primary
+human-facing surface. The wireframe makes the intended interaction reviewable.
+It is not a behavior spec, not executable evidence, and not a second task list.
 
-Use a static, CAP-linked wireframe for every material capability that creates or
-changes a primary human-facing surface. The wireframe makes the intended
-interaction reviewable and remains a visual reference for the implemented
-capability.
-
-## Scope selection
-
-When the adopting project's policy explicitly selects OpenSpec for the scope,
-read [references/openspec.md](references/openspec.md) before applying the CAP
-layout below. Stable capability and screen keys under
-`docs/product/wireframes/<capability>/` then replace CAP ownership, proposals
-stay change-owned, and no CAP record is fabricated. The CAP procedure below
-remains the default for projects that have not migrated.
-
-A CHG may own a review package at `docs/changes/reviews/CHG-<number>/`. It stays
-review-only, including after closure. The implementation slice creates or updates
-the separate canonical CAP wireframe with runtime behavior and executable evidence.
-Never use the product inventory to make a proposal look like current behavior.
-
-The portable layout is:
-
-```text
-docs/product/wireframes/
-├── generate.mjs                    # canonical repository-owned generator
-├── manifest.json                   # generated machine-readable inventory
-├── index.html                      # generated human entry point
-├── html/CAP-NNNN-<slug>.html       # generated per-CAP review source
-└── exports/CAP-NNNN-<slug>.png     # renderer output for the same screen
-```
-
-The project chooses the visual system and screenshot renderer. Do not copy a
-reference project's framework, component library, or machine-local paths into
-an adopting repository.
+Stable capability and screen keys survive change archival. Do not allocate a
+new identity for each change, and do not fabricate a capability record. Read
+[references/openspec.md](references/openspec.md) before editing a shared screen.
 
 ## When to Use
 
-Use this skill when a material change adds or changes a primary screen, pane,
-dialog, or multi-step interaction used by a human operator, end user, or
-administrator.
+Use this skill when a change adds or changes a primary screen, pane, dialog, or
+multi-step interaction used by a person.
 
 Do not use it for invisible server behaviour, APIs, configuration-only changes,
-or a minor cosmetic adjustment that does not alter interaction, hierarchy, or
-meaning. When uncertain, include the wireframe: it is cheaper than shipping an
-unreviewed workflow.
+or a cosmetic adjustment that does not alter interaction, hierarchy, or meaning.
+
+## Layout
+
+```text
+docs/product/wireframes/
+├── generate.mjs
+├── manifest.json
+├── index.html
+├── <capability>/html/<screen>.html
+└── <capability>/exports/<screen>.png
+```
+
+The project chooses the visual system and screenshot renderer. Do not copy a
+reference project's framework or machine-local paths into an adopting repository.
+`openspec/specs/` links the stable HTML page. Link the manifest entry rather
+than duplicating paths.
+
+Pre-implementation visuals stay under `openspec/changes/<name>/`, review-only,
+outside the manifest and outside product links. Reference them from the proposal,
+design or tasks. Do not copy proposal files into the product directory.
 
 ## Contracts
 
-- Every CAP declares `**Primary surface:** human` or `none`. Each human-facing
-  CAP has exactly one manifest screen; a `none` CAP has none. Require the manifest,
-  generator, and index whenever any human-facing CAP or the wireframe directory
-  exists. Do not create empty directories just to activate the workflow.
-- One screen has one stable CAP ID. Name HTML and PNG files
-  `CAP-NNNN-<slug>` to match the capability record.
-- `docs/product/wireframes/generate.mjs` is the
-  only editable screen-definition source. It produces the HTML, `index.html`,
-  and `manifest.json`; do not hand-edit those generated outputs.
-- HTML is the portable review source; PNG is a renderer export of that same
-  HTML at the manifest viewport. `manifest.json` inventories the stable CAP ID,
-  non-empty title, HTML path, PNG path, and positive integer viewport width/height
-  for every screen. IDs are unique, HTML/PNG names match, and both on-disk
-  artifact directories agree with the manifest in both directions.
-- `index.html` links every screen. Each qualifying CAP links its matching HTML
-  and PNG under a `## Links` section.
-- Wireframes illustrate the intended interface. They are not implementation,
-  executable evidence, or a replacement for the CAP's falsifiable behaviour
-  and tests.
+- Reuse the project's existing `generate.mjs`. Inspect its actual interface
+  before editing it. It is the only editable screen-definition source for current
+  visuals. Regenerate HTML, `index.html`, and `manifest.json`; never hand-edit them.
+- HTML is the review source. PNG is the renderer export of that same HTML at the
+  manifest viewport. Where the project defines no manifest contract, each entry
+  has a unique stable key, a non-empty title, HTML and PNG paths, and positive
+  integer viewport width and height. Directories agree with the manifest both ways.
+- The implementation slice updates the stable screen and links it from the spec
+  delta and tests. A later change of the same surface updates that screen; it
+  does not mint a second key.
+- Wireframes illustrate the intended interface. They do not replace OpenSpec
+  scenarios or executable tests.
 - Use synthetic, non-sensitive sample content. Never place real identities,
   credentials, tokens, or production data in a screen or export.
-- Preserve the adopting product's established visual language. If none exists,
-  establish a small shared shell and reusable primitives before adding screens;
-  do not make every CAP page a separate visual design.
-
-### Proposal-to-capability handoff
-
-- **OpenSpec scope:** Follow `references/openspec.md` for change-owned proposals,
-  stable keys, and the generator/manifest boundary instead of allocating a CAP ID.
-  The CAP handoff below applies only to CAP-managed scope.
-- **Pending CHG:** Read both product and change DOX plus the wireframe child if
-  present before selecting a destination. Put design sources, HTML, screenshots,
-  and prose in `docs/changes/reviews/CHG-<number>/`. Its `README.md` declares
-  `**Status:** review-only` and links the artifacts; the owning CHG links that
-  README. Never put loose assets in active/archive directories, allocate a future
-  CAP ID, add a proposal to the product manifest, or link review files from a CAP.
-- **Implementation slice:** Create or update the CAP and its canonical screen
-  definition, including when changing an existing CAP. Regenerate inventory,
-  index, and HTML, render PNG, and link both outputs under the CAP's `## Links`
-  in the same slice as the primary surface and behavior tests. Do not simply move
-  or rename proposal files into the product directory.
-- **Closure:** Keep review packages at their same paths as frozen review-only
-  receipts for done/cancelled CHGs. Repair links when archiving the owner; remove
-  the package if its owner is removed. Follow `docs/changes/README.md` for ownership.
-- **Pencil relationship:** A Pencil file may be retained as an upstream visual
-  design source or review record. It never replaces the repository-owned HTML
-  generator and PNG export for an implemented CAP.
+- A design-tool file may be a review source. It never replaces the repository
+  generator and PNG export.
+- Two changes may propose different screens at once. They do not share a working
+  copy of the manifest. Two changes to the same screen are an overlap: reconcile
+  the current screen in the change that integrates second.
 
 ## Procedure
 
-1. **Classify the surface.** In the active CHG, identify the primary screen and
-   the task it enables. State data, permission, and failure boundaries in the
-   CHG while pending, then in the CAP once implementation begins; represent
-   their visible consequences in the wireframe.
-2. **Use the correct lifecycle boundary.** Keep pre-implementation visual work
-   in the CHG review package. In the implementation vertical slice, add or update the
-   CAP-linked screen before runtime UI work. Show the normal state, controls,
-   hierarchy, relevant empty/error/permission state, and the action that
-   completes or blocks the task. Do not turn the page into a prose copy of the
-   CAP.
-3. **Generate deterministic artifacts.** Keep screen definitions and shared
-   layout in the repository-owned generator. Regenerate `html/`, `index.html`,
-   and `manifest.json`; render the matching PNG into `exports/`. Do not
-   hand-edit generated outputs.
-4. **Link the capability.** Add both relative paths in the CAP's `## Links`
-   section. Update `docs/product/README.md` with the wireframe index when the
-   repository adopts the feature for the first time.
-5. **Keep it current.** When a later CAP change alters interaction, information
-   hierarchy, visibility, or a user-observable failure state, update the screen
-   and PNG in the same change. Do not churn wireframes for internal refactors.
+1. Classify the primary screen in the selected change. While implementation has
+   not started, keep the visual in the change package.
+2. On the implementation slice, add or update the stable screen before runtime
+   UI work. Show the normal state, controls, hierarchy, and the empty, error, or
+   permission states the scenarios require.
+3. Regenerate inventory, index, and HTML, then render PNG.
+4. Link the stable page from the capability spec.
+5. When a later change alters interaction or a user-observable failure state,
+   update the same screen in that change.
 
 ## Verification
 
-- `manifest.json` enumerates every `html/CAP-*.html` and
-  `exports/CAP-*.png` pair.
+- `manifest.json` enumerates every current HTML/PNG pair, and the directories
+  contain no extra current screens.
 - `index.html` links every manifest screen.
-- Every qualifying CAP has valid relative links to its HTML and PNG artifacts.
-- The generated HTML opens without a project build step, and the PNG is a
-  current rendering of that HTML.
-- Review packages retain a linked review-only README and an owning CHG, stay
-  outside product CAP links and the manifest, and do not claim unimplemented CAPs.
-- The visual handoff gate runs generation and rendering and inspects the result.
-  Structural validation cannot prove render freshness, approval, or honest
-  primary-surface classification.
-- Run the project's product-record validation and the affected behaviour tests.
+- Every human-facing capability spec links its stable page.
+- Change-owned proposals stay outside the manifest and product links.
+- The generated HTML opens without a project build step, and the PNG is a current
+  rendering of that HTML. Structural validation does not prove render freshness.
+- A wireframe is not cited as passing behavior evidence.
 
 ## Pitfalls
 
-- Do not treat a polished wireframe as proof that authorization, validation, or
-  privacy behaviour exists. The implementation and behaviour tests prove it.
-- Do not render only the happy path when an empty, denied, validation, or
-  destructive state changes what a person can safely do.
-- Do not maintain HTML and PNG manually as independent artifacts; they drift.
-- Do not require a wireframe for a feature with no primary human-facing
-  surface.
+- Treating a proposal image or a polished page as proof of authorization,
+  validation, or privacy behaviour.
+- Encoding a change name into the stable screen key, so archival orphans the page.
+- Rendering only the happy path when an empty, denied, or destructive state
+  changes what a person can safely do.
+- Hand-editing generated HTML or PNG, or maintaining a second inventory beside
+  the manifest.

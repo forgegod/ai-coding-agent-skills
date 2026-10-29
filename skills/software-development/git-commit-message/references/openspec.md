@@ -1,9 +1,9 @@
 # OpenSpec commit batches
 
-Load this only when the adopting project's policy explicitly selects OpenSpec for
-the work. Merely finding an `openspec/` directory, a GitHub remote, an installed
-package, or an OpenSpec-aware host never opts a project in. Without that explicit
-policy use the CAP/CHG procedure in `SKILL.md`, including its step 2 CHG exception.
+Load this when the commit belongs to an OpenSpec change. Finding an `openspec/`
+directory, a GitHub remote, or an installed package does not by itself authorize
+a commit. Work that is not part of a change uses the grouping rule in `SKILL.md`
+and does not invent a change package.
 
 ## Ownership
 
@@ -13,12 +13,10 @@ policy use the CAP/CHG procedure in `SKILL.md`, including its step 2 CHG excepti
 - `openspec-change-integration` owns the OpenSpec batch adapter and its path allowlists.
   The orchestrator declares exact allowed paths from approved scope and project
   policy; the read-only helper does not generate an implementation allowlist.
-  Planning edits, the implementation candidate, and the record-only receipt/archive
-  stay in separate batches.
-- Do not create a CHG record, phase table, phase-guard preflight or synthetic
-  `docs/changes/` record for OpenSpec scope. `change-guard.mjs` supplies the
-  committed-evidence check; this skill only shapes, previews and commits accepted
-  batches.
+  Planning edits, the implementation candidate, and a later documentation or
+  evidence batch stay separate.
+- `change-guard.mjs` supplies the committed-evidence check when that check is in
+  scope. This skill only shapes, previews and commits accepted batches.
 
 ## Commit gates
 
@@ -29,7 +27,8 @@ policy use the CAP/CHG procedure in `SKILL.md`, including its step 2 CHG excepti
   never enables it.
 - Name every changed path left out of a batch and why. If staging produced by
   another actor does not match the accepted batch, stop and present a new preview.
-- Local commit authority never includes push, PR creation, merge, protection
-  changes, issue closure or archival notification. Those need separate
+- Local commit authority never includes push, pull-request creation, merge,
+  protection changes, issue writes or archival notification. Those need separate
   authorization and orchestrator readback. A checked task is progress, not
-  integrated behavior.
+  integrated behavior. An issue or pull request is a documentation or review
+  record, not a batch boundary.

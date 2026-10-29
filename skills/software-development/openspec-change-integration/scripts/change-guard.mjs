@@ -180,9 +180,8 @@ function evidence(file) {
   } finally { closeSync(descriptor); }
 }
 function identity(value, o) {
-  requireThat(/^[0-7][0-9A-HJKMNP-TV-Z]{25}$/.test(o["change-id"] ?? ""), "Expected an exact uppercase change ULID");
   requireThat(/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/issues\/[1-9][0-9]*$/.test(o.issue ?? ""), "Expected a canonical GitHub issue URL");
-  requireThat(value.change === o.change && value.changeId === o["change-id"] && value.issueUrl === o.issue, "Evidence change/issue identity mismatch");
+  requireThat(value.change === o.change && value.issueUrl === o.issue, "Evidence change/issue identity mismatch");
 }
 function gates(value, ref) {
   requireThat(Array.isArray(value) && value.length > 0, "Missing executed gate evidence");
@@ -296,7 +295,7 @@ function main() {
   requireThat(["candidate", "review", "receipt"].includes(command), "Expected candidate, review or receipt command");
   for (const key of REFUSED_ENV) requireThat(process.env[key] === undefined, "Git topology overrides are unsupported");
   const args = process.argv.slice(3);
-  const names = ["repo", "change", ...(command === "receipt" ? ["target", "receipt", "change-id", "issue", "receipt-path", "max-closure-commits"] : ["base", "head", "plan", "expect-plan", ...(command === "review" ? ["change-id", "issue", "review"] : [])])];
+  const names = ["repo", "change", ...(command === "receipt" ? ["target", "receipt", "issue", "receipt-path", "max-closure-commits"] : ["base", "head", "plan", "expect-plan", ...(command === "review" ? ["issue", "review"] : [])])];
   const seen = new Set();
   for (const arg of args) {
     const match = /^--([A-Za-z][A-Za-z-]*)(?:=|$)/.exec(arg);

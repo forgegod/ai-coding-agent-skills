@@ -3,46 +3,28 @@
   "owner": {
     "name": "Raphael (forgegod)"
   },
-  "description": "Community engineering skills. Orchestration and OpenSpec adoption are separate operator-reviewed options.",
+  "description": "OpenSpec companion skills. Orchestration is a separate operator-reviewed option.",
   "plugins": [
     {
-      "name": "software-development",
-      "version": "1.1.1",
-      "description": "Nine engineering skills for records, wireframes, commits, and phased work. Execution requires a capable coding host.",
+      "name": "openspec-development",
+      "version": "0.4.0",
+      "description": "Integration, commits, and wireframes for OpenSpec changes. Does not install OpenSpec or write GitHub state.",
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/software-development/application-records",
-        "./skills/software-development/capability-wireframes",
+        "./skills/software-development/openspec-change-integration",
         "./skills/software-development/git-commit-message",
-        "./skills/software-development/phased-plan-closeout",
-        "./skills/software-development/phased-plan-design",
-        "./skills/software-development/phased-plan-execution",
-        "./skills/software-development/phased-plan-next",
-        "./skills/software-development/phased-plan-overview",
-        "./skills/software-development/phased-plan-refactoring"
+        "./skills/software-development/capability-wireframes"
       ]
     },
     {
       "name": "autonomous-orchestration",
-      "version": "1.1.1",
-      "description": "Optional implementation/review orchestration. Requires the selected workflow bundle (software-development or openspec-development) and separately configured execution roles.",
+      "version": "1.3.0",
+      "description": "Optional implementation/review orchestration. Requires openspec-development and separately configured execution roles.",
       "source": "./",
       "strict": false,
       "skills": [
         "./skills/autonomous-ai-agents/autonomous-implementation-review"
-      ]
-    },
-    {
-      "name": "openspec-development",
-      "version": "0.1.2",
-      "description": "Optional OpenSpec workflow bundle for integration, commits, and wireframes. Does not install OpenSpec or convert CAP/CHG records.",
-      "source": "./",
-      "strict": false,
-      "skills": [
-        "./skills/software-development/capability-wireframes",
-        "./skills/software-development/git-commit-message",
-        "./skills/software-development/openspec-change-integration"
       ]
     }
   ]

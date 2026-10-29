@@ -13,17 +13,13 @@ const escapeHtml = (value) => value.replace(/[&<>"']/g, (char) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
 })[char]);
 
-// Deliberately narrower than Claude's schema: this catalog ships skills only.
-// The two workflow bundles deliberately share commit and wireframe disciplines;
-// every other package belongs to exactly one bundle.
-const pluginNames = ["software-development", "autonomous-orchestration", "openspec-development"];
-const sharedSkillNames = new Set(["capability-wireframes", "git-commit-message"]);
+// One workflow bundle and one optional orchestration bundle. Every canonical
+// package belongs to exactly one bundle.
+const pluginNames = ["openspec-development", "autonomous-orchestration"];
+const sharedSkillNames = new Set();
 const expectedBundleSkills = {
-  "software-development": ["application-records", "capability-wireframes", "git-commit-message",
-    "phased-plan-closeout", "phased-plan-design", "phased-plan-execution", "phased-plan-next",
-    "phased-plan-overview", "phased-plan-refactoring"],
-  "autonomous-orchestration": ["autonomous-implementation-review"],
   "openspec-development": ["openspec-change-integration", "git-commit-message", "capability-wireframes"],
+  "autonomous-orchestration": ["autonomous-implementation-review"],
 };
 
 function validateMarketplace(marketplace, packages) {
@@ -36,7 +32,7 @@ function validateMarketplace(marketplace, packages) {
       !marketplace.owner.name.trim() || typeof marketplace.description !== "string" ||
       !marketplace.description.trim() || !Array.isArray(marketplace.plugins) ||
       marketplace.plugins.length !== pluginNames.length) {
-    fail("expected a named, skills-only catalog with three plugins");
+    fail("expected a named, skills-only catalog with two plugins");
   }
   const selected = new Set();
   const bundlesByName = new Map();
@@ -153,10 +149,8 @@ export async function buildDistribution({ root = scriptRoot, output }) {
     const manifest = { name: plugin.name, version: plugin.version, description: plugin.description,
       author: marketplace.owner, license: "MIT" };
     const scope = plugin.name === "openspec-development"
-      ? "This bundle supports the explicitly selected OpenSpec workflow. It does not install OpenSpec, its CLI, or its native skills, and it does not convert CAP/CHG records."
-      : plugin.name === "autonomous-orchestration"
-        ? "Orchestration is a separate opt-in and requires the selected workflow bundle (software-development or openspec-development) and separately reviewed project role configuration."
-        : "The orchestration and OpenSpec workflow bundles are separate opt-ins; installing this bundle does not enable either.";
+      ? "This bundle supports OpenSpec changes. It does not install OpenSpec, its CLI, or its native skills, and it does not write GitHub state."
+      : "Orchestration is a separate opt-in and requires the openspec-development bundle plus separately reviewed project role configuration.";
     const readme = `# ${plugin.name}\n\n${plugin.description}\n\n` +
       "Upload this ZIP through Claude's Customize → Plugins → Add → Upload plugin. Review the bundled instructions and scripts before enabling. Installation does not grant execution authority or Hermes scanner approval.\n\n" +
       "These are community engineering workflows. Chat, Cowork, and Claude Code do not have equivalent execution capabilities. Git workflows require a project checkout, Git, Node 22+ for packaged guards, and the target project's tooling and permissions. Hermes-specific tool names must be mapped to available host tools.\n\n" +
@@ -186,7 +180,7 @@ export async function buildDistribution({ root = scriptRoot, output }) {
 <body><h1>Claude skill downloads</h1>
 <p>Community packages, not official Anthropic skills or Hermes scanner-approved installations. Review before enabling. Installation does not grant execution authority.</p>
 <p><a href="https://github.com/forgegod/ai-coding-agent-skills#install-with-claude-desktop">Installation instructions and execution requirements</a></p>
-<h2>Plugin bundles</h2><p>Use software-development for CAP/CHG scope or openspec-development for explicitly selected OpenSpec scope. Upload through Customize → Plugins → Add → Upload plugin. Orchestration is a separate opt-in for either workflow; no bundle selects a project's record system or installs OpenSpec itself.</p><ul>${list(plugins)}</ul>
+<h2>Plugin bundles</h2><p>Use openspec-development for OpenSpec changes. Upload through Customize → Plugins → Add → Upload plugin. Orchestration is a separate opt-in; neither bundle installs OpenSpec or writes GitHub state.</p><ul>${list(plugins)}</ul>
 <h2>Individual skills</h2><p>Upload one ZIP through Customize → Skills → + → Create skill → Upload a skill. Do not unzip it. Related workflows may require other skills.</p><ul>${list(skills)}</ul>
 <p><a href="index.json">Download inventory and SHA-256 checksums</a> · <a href="../index.html">Home</a></p>
 </body></html>\n`);

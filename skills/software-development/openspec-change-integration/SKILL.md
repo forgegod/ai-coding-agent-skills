@@ -1,7 +1,7 @@
 ---
 name: openspec-change-integration
 description: Review and integrate explicitly selected OpenSpec changes.
-version: 0.1.1
+version: 0.4.0
 author: Raphael (forgegod), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -20,25 +20,27 @@ GitHub API client, and installing OpenSpec or this package never selects it.
 
 ## When to Use
 
-- The project's contributor contract explicitly selects OpenSpec and this
-  integration boundary for the selected change; selection is per project and per
-  scope, never implied by installation or by a neighbouring repository.
-- An operator authorizes bounded implementation, review, integration or recovery.
-- Do not use to migrate a project merely because OpenSpec is installed. Do not run
-  CAP/CHG phase skills beside OpenSpec for the same scope.
-- A planning-only request ends at proposal/spec/design/tasks; approved planning
-  does not authorize implementation, commits, issue writes or publication.
+- The project's contributor contract uses OpenSpec for the selected change.
+  Installing this package does not select that workflow or transfer another
+  project's records.
+- An operator authorizes bounded specification, implementation, review,
+  documentation or recovery. A planning-only request ends at
+  proposal/spec/design/tasks.
+- Do not use to create a second task tracker, or to require a GitHub issue
+  before specification.
 
 ## Prerequisites
 
 - Node 22+ and Git for the packaged read-only `scripts/change-guard.mjs` helper.
 - A separately reviewed OpenSpec CLI/native workflow installation; this package
   does not install it or assert host execution support.
-- Explicit project policy naming target, required gates, approval/ownership,
-  evidence retention and source/deployment completion boundaries.
-- For collaborative work: real issue, full change ULID, attributable approved plan
-  commit/digest, one accountable operator and one designated orchestrator.
-  Offline local bootstrap may record a pending issue, never invented remote state.
+- Explicit project policy naming target, required gates, evidence retention and
+  source/deployment completion boundaries.
+- For a documentation or review record: a real issue or pull request the operator
+  asked to write. Offline work may leave that link pending. Never invent remote
+  state. When the operator asks to document, follow
+  [references/ticket.md](references/ticket.md): one risk-focused issue, no task
+  list. The OpenSpec change name is the identity. Do not generate a ULID.
 
 ## Authority and writers
 
@@ -48,59 +50,106 @@ The stock OpenSpec apply action normally updates tasks: mediate that behavior in
 its handoff so it cannot compete with the designated writer. A checked task means
 implementation progress, not merge, deployment or acceptance.
 
-Use operator-serialized starts/handoffs per change. Read issue assignment,
-activation and PR state before shared writes and read the exact target after them.
-Assignees, comments and refs detect observed conflicts; they are not a lock.
-Missing authority, ambiguous ownership or unknown write outcomes block mutations.
-A selection snapshot never grants permission for a later action.
+Use operator-serialized starts and handoffs per change. Assignees, comments and
+refs detect observed conflicts; they are not a lock. Missing authority or an
+unknown write outcome blocks the mutation. A selection snapshot never grants
+permission for a later action.
+
+## Parallel specification and documentation
+
+OpenSpec owns the proposal, delta specs, design and `tasks.md`. This skill does
+not author a second specification. Independent changes may be specified and
+implemented concurrently in separate checkouts, one orchestrator each. A
+dependent change may be specified against an explicit prerequisite; its
+implementation waits for that prerequisite's accepted integrated revision, not
+for a ticket state.
+
+When two active changes touch the same capability spec, reconcile the overlap
+before either merges. A clean Git merge is not compatibility evidence.
+
+GitHub issues and pull requests are documentation and review records. Create or
+update them only when the operator sends a prompt that names this skill, as in
+`references/ticket.md`. Link the OpenSpec change and, for a review, the exact
+candidate SHA. Do not put the task list in the issue, and do not invent a ticket so a helper command will run. Do not write that the issue is ISO/IEC
+27001 compliant. Closing an issue does not archive a change. Archiving a change
+does not close an issue unless that documentation write is separately authorized.
+
+Before a pull request is merged, and before its branch is deleted, require a
+verdict from `/autonomous-implementation-review` by a reviewer that did not
+implement that candidate. The verdict binds the exact SHA. Disposition every
+finding. The implementer cannot review its own candidate. That verdict is not
+a GitHub approving review and not risk acceptance. If the host cannot run a
+different reviewer, stop.
+
+The helper's review and receipt commands cite a documentation issue URL when
+those evidence records are produced. That URL is not admission. Do not call
+those commands without an operator-provided issue.
+
+## Short invocation
+
+The operator does not repeat the documentation constraints. This skill applies
+them. On Hermes the whole request is:
+
+```text
+/openspec-change-integration document <name>
+```
+
+`<name>` is the OpenSpec change directory, such as `pin-note`. Other hosts use
+their spelling of this skill, then the same `document <name>` words.
+
+That verb means: load `references/ticket.md`, create or update one issue for
+`openspec/changes/<name>/`, link that change name, and stop. Do not generate a
+ULID. Do not copy `tasks.md`. Do not implement, commit, open a pull request, or assign the issue to lock the work. A longer prompt is not required and does not add authority.
 
 ## Procedure
 
-1. Read the contributor contract and selected native change artifacts. Confirm
+1. If the request is `document <name>`, perform only the short invocation above.
+   Read back the issue. Stop. Do not continue this procedure.
+2. Read the contributor contract and selected native change artifacts. Confirm
    explicit authority, approved scope, dependencies, risk and gates. Do not invent
-   CAP records or a second phase table. The native `tasks.md` is the task authority.
-2. Check recovery first: use `references/recovery.md` for dirty/unowned work,
+   a second task table or a GitHub ticket. The native `tasks.md` is the task authority.
+3. Check recovery first: use `references/recovery.md` for dirty/unowned work,
    competing activation, an existing PR, an uncertain API outcome or a prior merge.
    Preserve work; do not start another executor or replay merged implementation.
-3. Use a separate clone/worktree and isolated mutable test resources per change.
+4. Use a separate clone/worktree and isolated mutable test resources per change.
    Independent changes may run concurrently; dependent execution waits for accepted
    integrated prerequisite evidence. One implementation writer per change initially.
-4. Prepare native proposal/spec/design/tasks and obtain approval bound to an
+5. Prepare native proposal/spec/design/tasks and obtain approval bound to an
    immutable plan commit and digest. Only checkbox progress edits preserve that
    digest; scope, acceptance, gates and dependencies changing require reapproval.
    Only the orchestrator may create commits, with explicit local commit authority.
-5. Implement only the authorized change/task group. Retain actual gate output and
+6. Implement only the authorized change/task group. Retain actual gate output and
    report failed prerequisites. If role orchestration is explicitly requested,
    load `autonomous-implementation-review` and its OpenSpec reference; unsupported
    hosts stop rather than inventing model/session commands.
-6. Freeze a clean committed candidate. Use `references/guard.md` for candidate
+7. Freeze a clean committed candidate. Use `references/guard.md` for candidate
    and review checks. Independently review its exact full SHA, delta specs,
    implementation, executable evidence and current-behavior changes. Review is a
    gate within this change, not a new change for every comment. Allow at most two
    correction/re-review cycles; then stop for operator disposition. A changed
    candidate invalidates review; confirmed defects are not silently waived.
-7. Before publication/integration, load `references/integration.md`. Re-read actual
-   target, assignment, activation, required checks and protections. Refresh shared
-   capability specs against current target and explicitly reconcile semantic
-   overlap. Include implemented behavior/specs/visuals in the implementation PR;
-   a clean Git merge alone is not compatibility proof.
-8. Publish/integrate only with separately explicit authority and protected PRs.
-   Required up-to-date combined checks or a correctly configured merge queue are
+8. Before an authorized publication, load `references/integration.md`. Re-read the
+   actual target and shared capability specs. Reconcile semantic overlap. Include
+   implemented behavior, specs and current visuals in the review record. A clean
+   Git merge alone is not compatibility proof. A pull request is that review
+   record, not the task list.
+9. Publish or integrate only with separately explicit authority. When the project
+   uses a protected pull request or merge queue, required up-to-date checks are
    project prerequisites, not supplied by this skill. The initial guard requires
-   reviewed candidate ancestry: squash/rebase integration is unsupported, not a
-   reason to weaken checks or silently change repository settings.
-9. Read back the real integrated commit and containing target. Execute the actual
+   reviewed candidate ancestry: squash or rebase integration is unsupported, not
+   a reason to weaken checks or silently change repository settings.
+10. Read back the real integrated commit and containing target. Execute the actual
    required gates on a named integrated/containing revision and retain output.
    Failure blocks completion and requires an explicit repair/revert decision.
-10. Only after successful integrated verification, prepare an append-only truthful
+11. Only after successful integrated verification, prepare an append-only truthful
     receipt and record-only archive PR. Use the receipt check and independently
     review factual claims. Do not reapply deltas already incorporated in current
     specs; reconcile differing current specs explicitly. An archive requiring new
     current-spec changes needs renewed verification, not a record-only exception.
-11. Verify the closure merge and cleanup by exact readback. Close the issue only
-    when its declared source/deployment acceptance boundary is satisfied. Evidence
-    publication ends here: no extra PR solely attesting the previous receipt PR,
-    no next change, automatic release or implied cleanup authority.
+12. Verify closure and cleanup by exact readback. A documentation issue closes
+    only when that write is authorized and its acceptance boundary is satisfied.
+    Evidence publication ends here: no extra pull request solely attesting the
+    previous receipt, no next change, automatic release or implied cleanup.
 
 ## Pitfalls
 
@@ -113,8 +162,7 @@ A selection snapshot never grants permission for a later action.
   independent review or protected integration. Config guidance is not enforcement.
 - Do not commit prospective merge results or put closing keywords on an
   intermediate implementation PR when later acceptance is still required.
-- Preserve exact IDs, failures and rejected candidates. Never repair a malformed
-  ULID, rename a conflicting run, unassign an operator or discard dirty work.
+- Preserve exact IDs, failures and rejected candidates. Never rename a conflicting run, unassign an operator or discard dirty work.
 - A shared-profile package must not update/remove its installed copy while
   operating in a project. Source adoption is not installed-profile permission.
 

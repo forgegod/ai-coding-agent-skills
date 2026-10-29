@@ -22,9 +22,9 @@ test("Pages artifact includes the hidden endpoint and Claude downloads", async (
   execFileSync("sh", ["-c", archive.run], { cwd: scratch, env: { ...process.env, RUNNER_TEMP: scratch } });
   const inventory = execFileSync("tar", ["-tf", path.join(scratch, "artifact.tar")], { encoding: "utf8" });
   assert.match(inventory, /\.well-known\/skills\/index\.json/);
-  assert.match(inventory, /downloads\/software-development\.plugin\.zip/);
+  assert.match(inventory, /downloads\/openspec-development\.plugin\.zip/);
   assert.match(inventory, /downloads\/autonomous-orchestration\.plugin\.zip/);
-  assert.match(inventory, /downloads\/application-records\.zip/);
+  assert.match(inventory, /downloads\/openspec-change-integration\.zip/);
   assert.match(inventory, /downloads\/index\.html/);
   assert.doesNotMatch(inventory, /(?:^|\/)AGENTS\.md$/m);
 });

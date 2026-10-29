@@ -58,16 +58,16 @@ test("autonomous-implementation-review packages its selection helper", async () 
   assert.ok(source.length < 6500, "keep the normal orchestration path compact");
   assert.ok(transport.length < 6500, "transport reference must not accumulate duplicated procedures");
   assert.match(source, /references\/herdr\.md/);
-  assert.match(source, /\/goal draft Execute only phase <phase-number> of <active-chg-path>/);
+  assert.match(source, /\/goal draft Execute only the authorized task group of openspec\/changes\/<name>/);
   assert.match(source, /automated role loop is Herdr-only/);
   assert.match(source, /Dispatch failed prerequisites to a fresh\s+implementer session/);
   assert.match(source, /orchestrator does not edit worker code/);
-  assert.match(source, /orchestrator follows `phased-plan-closeout`/);
-  assert.match(source, /executor\s+must not edit or commit the CHG path/);
+  assert.match(source, /openspec-change-integration/);
+  assert.match(source, /must not edit `tasks\.md`/);
   assert.match(source, /Iteration budget exhausted/);
   assert.match(source, /orchestrator.*alone decides/i);
   assert.match(source, /--resume-from/);
-  assert.match(source, /existing worktree/);
+  assert.match(source, /existing checkout/);
   assert.doesNotMatch(source, /durable handoff record|<handoff-record path>|scratch handoff/i);
   assert.doesNotMatch(source, /git .*merge|git .*commit|git .*worktree remove/);
   assert.match(source, /Use `\/goal`, not `\/loop`/);
@@ -133,131 +133,22 @@ test("every SKILL.md name matches its directory", async () => {
   }
 });
 
-test("skills/ packages a self-contained CAP/CHG phase workflow", async () => {
-  const names = [
-    "application-records",
-    "phased-plan-design",
-    "phased-plan-execution",
-    "phased-plan-closeout",
-    "phased-plan-overview",
-    "phased-plan-refactoring",
-  ];
-  const sources = new Map();
+test("skills/ packages the OpenSpec companion set without a second phase tracker", async () => {
+  const names = ["openspec-change-integration", "git-commit-message", "capability-wireframes"];
   for (const name of names) {
-    const file = path.join(skillsRoot, "software-development", name, "SKILL.md");
-    const source = await readFile(file, "utf8");
-    sources.set(name, source);
-    assert.doesNotMatch(source, /(?:~\/.hermes|\/home\/)/, `${name} depends on agent-private paths`);
+    const source = await readFile(path.join(skillsRoot, "software-development", name, "SKILL.md"), "utf8");
+    assert.doesNotMatch(source, /(?:~\/\.hermes|\/home\/)/, `${name} depends on agent-private paths`);
+    assert.doesNotMatch(source, /phased-plan-|application-records/);
   }
-
-  const records = sources.get("application-records");
-  const phaseSkills = [
-    "phased-plan-design",
-    "phased-plan-execution",
-    "phased-plan-closeout",
-    "phased-plan-overview",
-    "phased-plan-refactoring",
-  ];
-  for (const name of phaseSkills) {
-    assert.match(records, new RegExp(`\\b${name}\\b`), `application-records does not route to ${name}`);
-  }
-  assert.match(sources.get("phased-plan-design"), /active CHG/i);
-  assert.match(sources.get("phased-plan-execution"), /CHG phase table/i);
-  for (const name of ["phased-plan-design", "phased-plan-execution", "phased-plan-overview", "phased-plan-refactoring"]) {
-    const source = sources.get(name);
-    assert.match(source, /phased-plan-closeout/);
-    assert.match(source, /executor must not\s+edit or\s+commit the CHG path/i);
-    assert.doesNotMatch(source, /reset that\s+path|follow its declared rebase|git .*merge --|git .*commit -/i);
-  }
-  assert.match(records, /does not change phase state, archive a CHG, or prescribe phase lifecycle/i);
-  const overview = sources.get("phased-plan-overview");
-  assert.match(overview, /docs\/changes\/active/i);
-  assert.doesNotMatch(overview, /\/goal draft/);
-  assert.match(overview, /prints no launch command/);
-  assert.match(overview, /Historical evidence for earlier completed phases is allowed/);
-  assert.match(overview, /Treat an `in-progress` target row as the reserved phase/);
-  assert.match(overview, /committed or dirty\s+worktree CHG change/);
-  assert.match(sources.get("phased-plan-refactoring"), /one progress authority/i);
-  const closeout = await readFile(
-    path.join(skillsRoot, "software-development", "phased-plan-closeout", "SKILL.md"),
-    "utf8",
-  );
-  assert.match(closeout, /name: phased-plan-closeout/);
-  assert.match(closeout, /argument-hint: "\[--reserve \| --commit-ff\]"/);
-  assert.match(closeout, /orchestrator is the sole Git\/CHG writer/);
-  assert.match(closeout, /identical reservation\/target\/worktree CHG blobs/);
-  assert.match(closeout, /phase-guard\.mjs preflight/);
-  assert.match(closeout, /phase-guard\.mjs row/);
-  assert.match(closeout, /done \(<command> exit 0 @ <implementation-sha>\)/);
-  assert.match(closeout, /references\/record-writes\.md/);
-  const recordWrites = await readFile(path.join(skillsRoot, "software-development/phased-plan-closeout/references/record-writes.md"), "utf8");
-  assert.match(recordWrites, /git-commit-message/);
-  const commands = [...recordWrites.matchAll(/^[ \t]*```text\n([\s\S]*?)\n[ \t]*```/gm)].map((match) => match[1]).join("\n");
-  assert.match(commands, /phase-guard\.mjs paths --repo <target> --base <base-sha> --allow-path <path>/);
-  assert.match(commands, /phase-guard\.mjs paths --repo <target> --ref <record-sha> --base <base-sha> --expect-content <reviewed-content-digest> --allow-path <path>/);
-  assert.match(recordWrites, /operator-approved recovery decision/);
-  for (const name of ["phased-plan-design", "phased-plan-refactoring"]) {
-    assert.match(sources.get(name), /references\/record-writes\.md/);
-    assert.match(sources.get(name), /unwritten proposal/);
-    assert.match(sources.get(name), /target-only/);
-  }
-  assert.match(closeout, /phase\/.*full-reservation-sha/);
-  const recovery = await readFile(path.join(skillsRoot, "software-development/phased-plan-closeout/references/recovery.md"), "utf8");
-  assert.match(closeout, /references\/recovery\.md/);
-  assert.match(recovery, /phase-guard\.mjs locate/);
-  assert.match(closeout, /git -C <target> merge --ff-only <reviewed-sha>/);
-  assert.match(closeout, /git -C <target> worktree remove <worktree-path>/);
+  const integration = await readFile(path.join(skillsRoot, "software-development/openspec-change-integration/SKILL.md"), "utf8");
+  assert.match(integration, /tasks\.md/);
+  assert.match(integration, /documentation and review records|documentation or review/i);
   const rootAgent = await readFile(path.join(root, "AGENTS.md"), "utf8");
   assert.match(rootAgent, /shared agent profile/);
   const workflowContract = await readFile(path.join(skillsRoot, "software-development", "AGENTS.md"), "utf8");
-  assert.match(workflowContract, /single Git\/CHG writer/);
+  assert.match(workflowContract, /tasks\.md/);
   const autonomousContract = await readFile(path.join(skillsRoot, "autonomous-ai-agents", "AGENTS.md"), "utf8");
   assert.match(autonomousContract, /`delegate_task` is research-only/i);
-});
-
-test("phase overview bounds discovery, recovery, and the final handoff", async () => {
-  const source = await readFile(
-    path.join(skillsRoot, "software-development/phased-plan-overview/SKILL.md"),
-    "utf8",
-  );
-  assert.ok(source.length < 7000, "keep overview guidance bounded");
-  assert.match(source, /## Scope and stopping rule/);
-  assert.match(source, /Do not rerun implementation tests, lint, builds, or visual gates/);
-  assert.match(source, /Do not scan archives or upstream assessments/);
-  assert.match(source, /Do not search host directories or inspect Herdr\/Hermes source/);
-  assert.match(source, /\$HERDR_ENV=1/);
-  assert.match(source, /\$HERDR_WORKSPACE_ID/);
-  assert.match(source, /Neither set is not a blocker/);
-  assert.match(source, /references\/claude-code-host\.md/);
-  assert.match(source, /prints no launch command/);
-  assert.doesNotMatch(source, /print exactly one command and do not dispatch it/);
-  assert.match(source, /single active CHG is unambiguous/);
-  assert.match(source, /## Decision table/);
-  assert.match(source, /No in-progress row; cleanup proved complete/);
-  assert.match(source, /do not run it for an already removed worktree/);
-  assert.match(source, /merged leftover branch ref alone is not outstanding cleanup/);
-  assert.match(source, /Run the repository's record validator once/);
-  assert.match(source, /Stop gathering evidence once/);
-  assert.match(source, /## Final answer/);
-  assert.match(source, /Do not repeat the full phase table/);
-});
-
-test("skills package separate review storage and a visual handoff gate", async () => {
-  const sources = {};
-  for (const name of ["application-records", "capability-wireframes", "phased-plan-design", "phased-plan-execution"]) {
-    sources[name] = await readFile(path.join(skillsRoot, "software-development", name, "SKILL.md"), "utf8");
-  }
-  for (const name of ["application-records", "capability-wireframes"]) {
-    assert.match(sources[name], /docs\/changes\/reviews\/CHG-/);
-    assert.match(sources[name], /review-only/);
-    assert.match(sources[name], /README\.md/);
-  }
-  assert.match(sources["capability-wireframes"], /Primary surface/);
-  assert.match(sources["capability-wireframes"], /existing CAP|existing capabilit/i);
-  for (const name of ["phased-plan-design", "phased-plan-execution"]) {
-    assert.match(sources[name], /visual handoff/i);
-    assert.match(sources[name], /review package/i);
-  }
 });
 
 test("git-commit-message requires confirmation except in explicit autonomous mode", async () => {
@@ -273,8 +164,9 @@ test("git-commit-message requires confirmation except in explicit autonomous mod
   assert.match(source, /explicitly enabled autonomous mode/);
   assert.match(source, /do not wait for a separate confirmation/);
   assert.match(source, /never infer it from an agent's name, identity, or[\s\S]*ability to act autonomously/);
-  assert.match(source, /phased-plan-closeout.*controls/s);
-  assert.match(source, /Do not combine its record-only target commits with implementation/);
+  assert.match(source, /openspec-change-integration/);
+  assert.match(source, /Do not combine a documentation or evidence batch with implementation/);
+  assert.doesNotMatch(source, /phased-plan-closeout/);
   assert.match(source, /Repository commit-message rules override/);
   assert.doesNotMatch(source, /(?:~\/\.hermes|\/home\/)/);
 });

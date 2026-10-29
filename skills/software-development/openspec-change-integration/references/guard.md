@@ -27,11 +27,10 @@ Options are single-valued: a repeated flag such as two `--head` values is refuse
 instead of silently taking the last one.
 
 The change name uses lowercase kebab-case. Collaborative evidence also requires
-a literal uppercase canonical ULID (first character 0–7) and canonical
-`https://github.com/<owner>/<repo>/issues/<positive-number>` URL. Supply the
-operator-selected values independently; JSON must match, not redefine them.
-The helper does not authenticate approval, reviewer identity, PR state or gate
-execution. Evidence links must be independently retrieved, matched to actual
+a canonical `https://github.com/<owner>/<repo>/issues/<positive-number>` URL.
+Supply the operator-selected values independently; JSON must match, not redefine
+them. Do not add a ULID. The helper does not authenticate approval, reviewer
+identity, PR state or gate execution. Evidence links must be independently retrieved, matched to actual
 objects/output and retained under project policy. It does not infer required
 gates from a list: compare that list with the approved project's gate policy.
 
@@ -75,14 +74,14 @@ referenced policy/risk inputs still require their own immutable approval identit
 ## Independent review
 
 ```sh
-node <guard> review --repo <repo> --change <name> --base <base-sha> --head <candidate-sha> --plan <approved-plan-sha> --expect-plan <approved-digest> --change-id <ULID> --issue <issue-url> --review <review-json-path>
+node <guard> review --repo <repo> --change <name> --base <base-sha> --head <candidate-sha> --plan <approved-plan-sha> --expect-plan <approved-digest> --issue <issue-url> --review <review-json-path>
 ```
 
 The review JSON is a regular, non-symlink file up to one MiB, read through one
 descriptor with the size and identity checked before use. Required fields:
 
 - `schemaVersion`: numeric `1`.
-- `change`, `changeId`, `issueUrl`: exact selected change, ULID and issue URL.
+- `change`, `issueUrl`: exact selected change name and issue URL.
 - `head`, `planDigest`: exact reviewed candidate SHA and approved plan digest.
 - `verdict`: `pass`; `findings`: an empty array, after every finding is resolved.
 - `reviewer`, `reference`: non-empty identity and retrievable review reference.
@@ -102,10 +101,10 @@ independent review. Changed SHA requires a new review and real gate execution.
 ## Post-merge receipt
 
 ```sh
-node <guard> receipt --repo <repo> --change <name> --target <actual-target-sha> --change-id <ULID> --issue <issue-url> --receipt <receipt-json-path>
+node <guard> receipt --repo <repo> --change <name> --target <actual-target-sha> --issue <issue-url> --receipt <receipt-json-path>
 ```
 
-Receipt JSON requires `schemaVersion: 1`, exact `change`, `changeId`, `issueUrl`,
+Receipt JSON requires `schemaVersion: 1`, exact `change`, `issueUrl`,
 `base`, `head`, `plan`, `planDigest`, `integrated`, `verified`, `review`,
 `integrationReference` and `gates`. `review` embeds the complete accepted review
 shape above. `integrationReference` is the exact canonical PR URL in the selected

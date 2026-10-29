@@ -1,17 +1,17 @@
 schema: spec-driven
 context: |
-  docs/openspec-workflow.md defines the explicitly selectable OpenSpec workflow.
-  Native tasks own this authorized source change's progress. CAP/CHG consumers keep
-  their selected contracts; source artifacts do not establish runtime adoption.
-  Source adoption grants no push, live issue creation, installed-profile update or
-  sibling-repository authority. A pending bootstrap issue is not collaborative admission.
+  docs/openspec-workflow.md defines the SDLC for this distribution.
+  Native tasks own an authorized change's progress. GitHub issues and pull
+  requests document and review; they are not the task list. Installing skills
+  does not select the workflow for another project or transfer its records.
+  Source work grants no push, live issue creation, or installed-profile update.
 rules:
   proposal:
     - State scope, non-goals, compatibility and operator authority explicitly.
   specs:
     - State observable requirements with executable acceptance scenarios.
   tasks:
-    - Keep independently mergeable changes small; do not recreate a CHG phase table.
+    - Keep independently mergeable changes small; do not recreate a second task table.
     - Distinguish verified local implementation from unperformed publication/integration.
 operations:
   apply:

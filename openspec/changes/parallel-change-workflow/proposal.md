@@ -4,15 +4,17 @@
 
 Provide an explicitly selectable parallel-change workflow with independently
 mergeable OpenSpec changes, reviewed candidates and truthful integrated evidence.
-CAP/CHG blueprint contracts remain a separate supported workflow; no consuming
-environment is assumed to have adopted OpenSpec.
+This distribution publishes that workflow only. Other projects' older records
+stay where they are; no consuming environment is assumed to have selected
+OpenSpec.
 
 ## What Changes
 
 - Define native OpenSpec proposal/spec/design/tasks for explicitly selected scope.
 - Add an opt-in integration skill with read-only committed evidence checks.
-- Adapt commit, visual and supported-host role skills without changing legacy entry points.
-- Build a separate OpenSpec bundle while preserving complete CAP/CHG packages.
+- Adapt commit, visual and supported-host role skills to the OpenSpec change.
+- Publish only the OpenSpec companion packages and the separate orchestration
+  package. Do not publish a second phase skill set.
 
 ## Capabilities
 

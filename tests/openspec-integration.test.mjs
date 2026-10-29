@@ -23,7 +23,7 @@ test("OpenSpec package documents explicit authority, writer separation and read-
   for (const pattern of [/candidate --repo/, /review --repo/, /receipt --repo/, /schemaVersion/, /planDigest/, /exitCode/, /does not authenticate/, /fences/, /append-only/]) assert.match(reference, pattern);
   for (const pattern of [/valid UTF-8/, /refs\/replace/, /grafts/, /fsmonitor/, /Every commit in `verified\.\.target`/, /--receipt-path/, /duplicate/i, /raw blob bytes/]) assert.match(reference, pattern);
   assert.doesNotMatch(skill, /adoption history|reviewer found|previously reported/i);
-  assert.match(skill, /version: 0\.1\.1/);
+  assert.match(skill, /version: 0\.4\.0/);
   assert.doesNotMatch(skill, /\/home\/|~\/.hermes/);
 });
 
@@ -53,7 +53,7 @@ async function fixture(t, options = {}) {
 
 function invoke(f, command = "candidate", extra = []) {
   const common = command === "receipt" ? ["--target", f.target ?? f.head] : ["--base", f.base, "--head", f.head, "--plan", f.plan ?? f.base];
-  const identity = command === "candidate" ? [] : ["--change-id", "01ARZ3NDEKTSV4RRFFQ69G5FAV", "--issue", "https://github.com/example/project/issues/1"];
+  const identity = command === "candidate" ? [] : ["--issue", "https://github.com/example/project/issues/1"];
   const result = spawnSync(process.execPath, [guard, command, "--repo", f.repo, "--change", f.name ?? change, ...common, ...identity, ...extra], { encoding: "utf8", env: { ...env, ...f.env } });
   return { status: result.status, ...(result.stdout.trim() ? JSON.parse(result.stdout) : { error: result.stderr }) };
 }
@@ -240,7 +240,7 @@ test("OpenSpec candidate supports Git SHA-256 repositories", async (t) => {
 });
 
 function reviewFor(f, snapshot) {
-  return { schemaVersion: 1, change, changeId: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  return { schemaVersion: 1, change,
     issueUrl: "https://github.com/example/project/issues/1", head: f.head,
     planDigest: snapshot.planDigest, verdict: "pass", findings: [],
     reviewer: "independent-fixture", reference: "https://example.invalid/review/1",
@@ -260,7 +260,7 @@ test("OpenSpec review binds exact candidate, plan and successful gate evidence",
     (r) => { r.findings = [{ severity: "high", message: "unresolved" }]; },
     (r) => { r.gates[0].exitCode = 1; },
     (r) => { r.gates[0].commit = f.base; },
-    (r) => { r.changeId = "01arz3ndektsv4rrffq69g5fav"; },
+    (r) => { r.change = "other-change"; },
     (r) => { r.issueUrl = "https://github.com/example/project/pull/1"; },
     (r) => { r.issueUrl = "https://github.com/other/project/issues/1"; },
     (r) => { r.gates = []; },
@@ -281,7 +281,7 @@ async function integrated(t, options = {}) {
   git(f.repo, "switch", "main");
   git(f.repo, "merge", "--no-ff", "change/fixture", "-m", "Integrate candidate");
   f.target = git(f.repo, "rev-parse", "HEAD");
-  const receipt = { schemaVersion: 1, change, changeId: "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  const receipt = { schemaVersion: 1, change,
     issueUrl: "https://github.com/example/project/issues/1", base: f.base, head: f.head,
     plan: f.base, planDigest: snapshot.planDigest, integrated: f.target, verified: f.target,
     integrationReference: "https://github.com/example/project/pull/2", review: reviewFor(f, snapshot),

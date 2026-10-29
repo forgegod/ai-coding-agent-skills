@@ -2,7 +2,7 @@
 name: git-commit-message
 description: Preview batches; autonomous commits skip confirmation.
 argument-hint: "[--tier 1|2|3]"
-version: 4.6.0
+version: 4.7.0
 metadata:
   hermes:
     tags: [git, commit]
@@ -23,12 +23,11 @@ not the required preview or verification.
 
 ## Scope selection
 
-When the adopting project's policy explicitly selects OpenSpec for this work,
-read [references/openspec.md](references/openspec.md) before step 2 and keep the
+When the commit belongs to an OpenSpec change, read
+[references/openspec.md](references/openspec.md) before step 2 and keep the
 preview, acceptance, and verification rules below. The orchestrator is then the
 sole writable owner of batch boundaries through `openspec-change-integration`.
-Without that explicit policy, the CHG exception in step 2 is the only
-integration route.
+Other work uses the grouping rule in step 2 and does not invent a change package.
 
 ## Procedure
 
@@ -37,16 +36,12 @@ integration route.
    and `git diff --staged`. Include untracked files from `git status`. If every
    view is empty, report "No changes" and stop.
 2. Build dependency-aware logical batches before staging:
-   - For CHG creation/restructuring or phase execution, `phased-plan-closeout`
-     controls the explicit record/implementation batches and their path allowlists.
-     Do not combine its record-only target commits with implementation or assign
-     Git writes to an executor. This exception precedes the general grouping rule.
-   - For explicitly OpenSpec-managed scope, `openspec-change-integration` owns
-     the batches and their path allowlists; follow
-     [references/openspec.md](references/openspec.md). Do not create a CHG
-     record, phase table, or phase-guard check for that scope.
-   - Otherwise keep one observable change with its tests, current-state CAP/docs,
-     and required configuration in the same batch; exclude CHG lifecycle records.
+   - For an OpenSpec change, `openspec-change-integration` owns the batches and
+     their path allowlists; follow [references/openspec.md](references/openspec.md).
+     Do not combine a documentation or evidence batch with implementation, and
+     do not assign Git writes to an executor.
+   - Otherwise keep one observable change with its tests, current-behavior docs,
+     and required configuration in the same batch.
    - Keep unrelated topics separate. Do not split a vertical slice merely to
      make smaller commits.
    - A verified implementation may precede a separate documentation/record
