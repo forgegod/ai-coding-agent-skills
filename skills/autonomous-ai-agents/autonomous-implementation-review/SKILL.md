@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.10.7
+version: 0.11.0
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -28,6 +28,7 @@ High-risk work needs external review.
 - Read DOX, manifests, code/tests, branch/status, criteria, gates and authority.
   Existing phases use `phased-plan-execution`; new/reshaped material work uses
   `application-records`/`phased-plan-design`. No records for non-material work.
+  Explicitly adopted OpenSpec scope loads `references/openspec.md` first.
   A planning-only request stops after design; do not reserve or dispatch phase 1.
   Require explicit phase-execution authority before step 1.
 - The orchestrator follows `phased-plan-closeout` for CHG/Git writes. The executor
@@ -42,7 +43,7 @@ High-risk work needs external review.
   Outside Herdr, stop unless the operator sent `code-tab-phase-roles`; then load
   `references/claude-code-roles.md`. Do not mix that token with Herdr.
 - Model keys are session selectors, not executables. A rejected key blocks;
-  never shell-execute it or change global config.
+  never shell-execute it or edit global config.
 - Isolate writers and mutable services; use finite budgets. No secrets, destructive
   tasks or unresolved choices; browser access must be scoped.
 - For a source checkout, compare installed skill version once and report drift;
@@ -57,11 +58,11 @@ Operator launch (display alone grants no authority; assessment is read-only):
 ```
 
 `/goal draft` starts execution; the operator inspects `/goal show`. Resume from
-CHG/workspace truth, using `session_search` only for missing evidence, not scratch plans.
+real state; use `session_search` only for missing evidence, not scratch plans.
 
 Use `/goal`, not `/loop`. The operator controls pause/resume/clear and `/subgoal`.
 Compression is automatic; for earlier compression the operator runs `/goal pause`,
-`/compress here 2`, inspects `/context`, then `/goal resume` in the orchestrator.
+`/compress here 2`, inspects `/context`, then `/goal resume`.
 Printed commands do not execute.
 
 Stop discovery once scope, authority, executor, ownership, bootstrap and gates

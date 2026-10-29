@@ -11,31 +11,71 @@ import { discoverSkillPackages } from "../scripts/build-well-known-skills.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const marketplacePath = path.join(root, ".claude-plugin/marketplace.json");
 
-test("Claude marketplace selects canonical packages with orchestration opt-in", async () => {
+const expectedBundles = {
+  "software-development": {
+    version: "1.1.1",
+    skills: [
+      "application-records",
+      "capability-wireframes",
+      "git-commit-message",
+      "phased-plan-closeout",
+      "phased-plan-design",
+      "phased-plan-execution",
+      "phased-plan-next",
+      "phased-plan-overview",
+      "phased-plan-refactoring",
+    ],
+  },
+  "autonomous-orchestration": {
+    version: "1.1.1",
+    skills: ["autonomous-implementation-review"],
+  },
+  "openspec-development": {
+    version: "0.1.2",
+    skills: ["capability-wireframes", "git-commit-message", "openspec-change-integration"],
+  },
+};
+const sharedSkills = ["capability-wireframes", "git-commit-message"];
+
+test("Claude marketplace selects exact canonical packages for three isolated bundles", async () => {
   const source = await readFile(marketplacePath, "utf8").catch(() => null);
   assert.ok(source, "repository must provide .claude-plugin/marketplace.json");
   const marketplace = JSON.parse(source);
   assert.equal(marketplace.name, "ai-coding-agent-skills");
   assert.equal(marketplace.owner.name, "Raphael (forgegod)");
-  assert.deepEqual(marketplace.plugins.map(({ name }) => name), ["software-development", "autonomous-orchestration"]);
+  assert.deepEqual(marketplace.plugins.map(({ name }) => name), Object.keys(expectedBundles));
   const packages = await discoverSkillPackages({ root });
-  const selected = [];
+  const selected = new Map();
   for (const plugin of marketplace.plugins) {
     assert.equal(plugin.source, "./");
     assert.equal(plugin.strict, false);
-    assert.match(plugin.version, /^\d+\.\d+\.\d+$/);
+    assert.equal(plugin.version, expectedBundles[plugin.name].version);
     assert.ok(plugin.description);
     assert.deepEqual(Object.keys(plugin).sort(), ["description", "name", "skills", "source", "strict", "version"]);
-    for (const directory of plugin.skills) {
+    const names = plugin.skills.map((directory) => {
       const pkg = packages.find((entry) => `./skills/${entry.relativePath.split(path.sep).join("/")}` === directory);
       assert.ok(pkg, `unknown canonical package: ${directory}`);
-      assert.equal(pkg.name === "autonomous-implementation-review", plugin.name === "autonomous-orchestration");
-      selected.push(pkg.name);
+      return pkg.name;
+    });
+    assert.deepEqual(names, expectedBundles[plugin.name].skills, `${plugin.name} must not gain or lose packages`);
+    for (const name of names) {
+      const bundles = selected.get(name) ?? [];
+      assert.ok(
+        bundles.length === 0 || sharedSkills.includes(name),
+        `${name} may only be shared between the workflow bundles`,
+      );
+      selected.set(name, [...bundles, plugin.name]);
     }
   }
-  assert.deepEqual(selected.sort(), packages.map(({ name }) => name).sort());
+  assert.deepEqual([...selected.keys()].sort(), packages.map(({ name }) => name).sort());
+  for (const name of sharedSkills) {
+    assert.deepEqual(selected.get(name), ["software-development", "openspec-development"]);
+  }
+  assert.deepEqual(selected.get("openspec-change-integration"), ["openspec-development"]);
+  assert.deepEqual(selected.get("autonomous-implementation-review"), ["autonomous-orchestration"]);
   assert.equal(marketplace.plugins[0].skills.length, 9);
   assert.equal(marketplace.plugins[1].skills.length, 1);
+  assert.equal(marketplace.plugins[2].skills.length, 3);
 });
 
 test("distribution builds complete skill and plugin ZIPs from canonical bytes", async (t) => {
@@ -62,6 +102,12 @@ test("distribution builds complete skill and plugin ZIPs from canonical bytes", 
     const archive = unzipSync(await readFile(path.join(output, "downloads", entry.file)));
     const manifest = JSON.parse(Buffer.from(archive[".claude-plugin/plugin.json"]).toString());
     const configured = marketplace.plugins.find(({ name }) => name === entry.name);
+    if (entry.name === "autonomous-orchestration") {
+      const instructions = Buffer.from(archive["README.md"]).toString();
+      assert.equal(instructions.includes("selected workflow"), true, "orchestration must support either selected workflow");
+      for (const workflow of ["software-development", "openspec-development"]) assert.equal(instructions.includes(workflow), true, workflow);
+      assert.equal(/requires the software-development bundle/.test(instructions), false, "OpenSpec scope must not require CAP/CHG installation");
+    }
     assert.equal(manifest.name, entry.name);
     assert.equal(manifest.version, configured.version);
     assert.deepEqual(Object.keys(manifest).sort(), ["author", "description", "license", "name", "version"]);
@@ -79,6 +125,23 @@ test("distribution builds complete skill and plugin ZIPs from canonical bytes", 
     }
     assert.deepEqual(Object.keys(archive).sort(), expected.sort());
   }
+  const pluginPackages = async (entry) => {
+    const archive = unzipSync(await readFile(path.join(output, "downloads", entry.file)));
+    return [...new Set(Object.keys(archive)
+      .filter((key) => key.startsWith("skills/"))
+      .map((key) => key.split("/")[1]))].sort();
+  };
+  assert.deepEqual(await pluginPackages(catalog.plugins[0]), expectedBundles["software-development"].skills.slice().sort());
+  assert.deepEqual(await pluginPackages(catalog.plugins[1]), ["autonomous-implementation-review"]);
+  assert.deepEqual(await pluginPackages(catalog.plugins[2]), ["capability-wireframes", "git-commit-message", "openspec-change-integration"]);
+  const integrationArchive = unzipSync(await readFile(path.join(output, "downloads", catalog.plugins[2].file)));
+  assert.ok(integrationArchive["skills/openspec-change-integration/scripts/change-guard.mjs"], "OpenSpec ZIP must ship its guard");
+  assert.deepEqual(
+    Buffer.from(integrationArchive["skills/git-commit-message/SKILL.md"]),
+    await readFile(path.join(root, "skills/software-development/git-commit-message/SKILL.md")),
+    "shared package bytes must match canonical source",
+  );
+  assert.ok(!("skills/phased-plan-next/SKILL.md" in integrationArchive), "OpenSpec bundle must exclude legacy phase skills");
   const html = await readFile(path.join(output, "downloads/index.html"), "utf8");
   for (const entry of [...catalog.plugins, ...catalog.skills]) assert.ok(html.includes(`href="${entry.file}"`));
   assert.match(html, /operator review/i);
@@ -230,6 +293,12 @@ test("invalid marketplace cannot replace a previous distribution", async (t) => 
     ["omitted skill", (m) => { m.plugins[0].skills.pop(); }],
     ["duplicate skill", (m) => { m.plugins[0].skills.push(m.plugins[0].skills[0]); }],
     ["implicit orchestration", (m) => { m.plugins[0].skills.push(...m.plugins[1].skills); m.plugins[1].skills = []; }],
+    ["missing OpenSpec bundle", (m) => { m.plugins.pop(); }],
+    ["unexpected OpenSpec skill", (m) => { m.plugins[2].skills.push("./skills/software-development/phased-plan-next"); }],
+    ["duplicate OpenSpec package", (m) => { m.plugins[2].skills.push(m.plugins[2].skills[1]); }],
+    ["integration leaked into general bundle", (m) => { m.plugins[0].skills.push(m.plugins[2].skills[2]); }],
+    ["unshared skill duplicated across bundles", (m) => { m.plugins[2].skills.push(m.plugins[0].skills[0]); }],
+    ["shared skill removed from OpenSpec bundle", (m) => { m.plugins[2].skills.shift(); }],
     ["remote source", (m) => { m.plugins[0].source = "https://example.org"; }],
     ["active hooks", (m) => { m.plugins[0].hooks = {}; }],
     ["missing version", (m) => { delete m.plugins[0].version; }],

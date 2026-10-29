@@ -9,7 +9,7 @@ Own optional, versioned agent playbooks that contributors can install and reuse 
 | Path                  | Owns                                                          |
 | --------------------- | ------------------------------------------------------------- |
 | `autonomous-ai-agents/` | Autonomous implementation-and-review-loop playbook. |
-| `software-development/` | Product-record, wireframe, and CAP/CHG phase-workflow playbooks. |
+| `software-development/` | CAP/CHG playbooks, shared commit/visual disciplines, and the opt-in OpenSpec integration boundary. |
 
 ## Local Contracts
 
@@ -17,6 +17,7 @@ Own optional, versioned agent playbooks that contributors can install and reuse 
 - Durable product policy lives in the adopting project's DOX chain and owning documentation contracts. A portable skill may define a canonical artifact layout and lifecycle, but not project-specific behaviour or policy.
 - Skills follow the Agent Skills `SKILL.md` format and remain safe to read without a Hermes installation.
 - Do not add credentials, profile-local paths, or agent-private state to repository skills.
+- Workflow selection is explicit project policy, not tool presence or installation. OpenSpec uses its native change/task artifacts; CAP/CHG phase skills do not run beside them for the same scope. Preserve complete packages and installed profiles when editing source.
 
 ## Work Guidance
 

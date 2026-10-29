@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Own optional, portable agent workflows for maintaining the canonical capability (CAP) and change-progress (CHG) record structure, CAP-linked wireframe artifacts, and CHG-backed phase execution.
+Own optional, portable CAP/CHG workflows, shared wireframe/commit disciplines, and explicitly selected OpenSpec integration. Workflow selection belongs to the adopting project, not installed package presence.
 
 ## Ownership
 
@@ -11,6 +11,7 @@ Own optional, portable agent workflows for maintaining the canonical capability 
 | `application-records/SKILL.md`    | Canonical CAP/CHG material-change lifecycle and wireframe handoff. |
 | `capability-wireframes/SKILL.md`  | Static HTML/PNG wireframes for primary human-facing CAP surfaces. |
 | `git-commit-message/SKILL.md` | Dependency-aware logical Git batches, a preview before apply (or autonomous execution), and tiered Conventional Commit messages. |
+| `openspec-change-integration/` | Opt-in orchestrator-only OpenSpec review/integration/receipt protocol and read-only committed-evidence guard. |
 | `phased-plan-design/SKILL.md`     | CHG phase design for material changes and gates. |
 | `phased-plan-execution/SKILL.md`  | One verified CAP/CHG phase at a time. |
 | `phased-plan-closeout/`   | Orchestrator-only Git/CHG protocol, read-only phase guard, and next-goal handoff. |
@@ -20,12 +21,14 @@ Own optional, portable agent workflows for maintaining the canonical capability 
 
 ## Local Contracts
 
-- These skills use `docs/product/capabilities/CAP-*.md` for current behaviour and `docs/changes/{active,archive}/CHG-*.md` for implementation progress.
+- CAP/CHG skills use `docs/product/capabilities/CAP-*.md` for current behaviour and `docs/changes/{active,archive}/CHG-*.md` for implementation progress. Explicitly selected OpenSpec scope instead uses `openspec/specs/` and native change `tasks.md`; never both mutable authorities.
+- `openspec-change-integration` owns the OpenSpec Git/progress boundary. Its read-only guard checks immutable committed planning/candidate/evidence inputs and ancestry across independent clones; it neither acquires a lock nor proves GitHub authority or execution truth. Starts/handoffs are operator-serialized per change. Actual remote review, CI, merge and ownership need exact readback; post-merge receipts remain Git-tracked.
+- Shared commits and wireframes select their OpenSpec references only under explicit project policy; otherwise use the CAP/CHG recipes below. OpenSpec proposal assets are change-owned; current visuals use stable capability keys and links, not fabricated CAP records.
 - `capability-wireframes` owns the portable canonical `docs/product/wireframes/` layout and explicit CAP surface declarations. Review packages stay separate under `docs/changes/reviews/CHG-<number>/`; `application-records` and the phase skills maintain their ownership, implementation handoff, and stable-path retention. Visual artifacts never replace executable behavior evidence.
 - `application-records` decides when CAP/CHG records apply and their artifact semantics; the packaged `phased-plan-*` skills exclusively own CHG phase design, lifecycle transitions, execution, closeout, overview, and restructuring.
-- The active CHG phase table is the only mutable progress authority for material work. Profile-private plans, temporary notes, and tracker checklists do not schedule implementation.
+- For CAP/CHG scope, the active CHG phase table is the only mutable progress authority for material work. For explicitly selected OpenSpec scope, native tasks are that authority. Profile-private plans, temporary notes, and tracker checklists do not schedule implementation.
 - Design ends at a validated plan/proposal, not phase 1. Record-edit/commit consent and execution/reservation authority are separate; routing or loading a related skill never supplies the latter. Specification/test phases are execution too. `tests/planning-boundary.test.mjs` guards these instruction boundaries, not model obedience.
-- The orchestrator follows `phased-plan-closeout` as the single Git/CHG writer. Its `references/record-writes.md` recipe also governs target-only creation/restructuring before phases; executors never stage, commit, or edit the CHG path. Other skills delegate rather than copying its protocol.
+- For CAP/CHG scope, the orchestrator follows `phased-plan-closeout` as the single Git/CHG writer. Its `references/record-writes.md` recipe also governs target-only creation/restructuring before phases; executors never stage, commit, or edit the CHG path. OpenSpec-selected scope uses `openspec-change-integration` instead. Other skills delegate rather than copying either protocol.
 - `phased-plan-closeout/scripts/phase-guard.mjs` is a read-only Node 22+/Git helper. Real Git fixtures verify reservation-derived worktree identity, blob/history/topology refusal, exact path/content/parent readback across hooks, and completion evidence tied to the reviewed tip. It does not acquire a lock, authorize writes, or repair failures.
 - Worktree creation uses the guard's `create-preview` argument array after reservation; it refuses collisions and stale/dirty targets, never creates anything, and does not replace authorization or recovery. Keep `.mjs` packaging independent of a consumer's module settings.
 - The guard's `candidate` boundaries bind raw worktree content (including untracked source) to the reviewed index and commit; mismatches preserve work and invalidate approval. `references/review-boundary.md` owns that recipe. Preview precedes any index write.

@@ -14,6 +14,18 @@ const escapeHtml = (value) => value.replace(/[&<>"']/g, (char) => ({
 })[char]);
 
 // Deliberately narrower than Claude's schema: this catalog ships skills only.
+// The two workflow bundles deliberately share commit and wireframe disciplines;
+// every other package belongs to exactly one bundle.
+const pluginNames = ["software-development", "autonomous-orchestration", "openspec-development"];
+const sharedSkillNames = new Set(["capability-wireframes", "git-commit-message"]);
+const expectedBundleSkills = {
+  "software-development": ["application-records", "capability-wireframes", "git-commit-message",
+    "phased-plan-closeout", "phased-plan-design", "phased-plan-execution", "phased-plan-next",
+    "phased-plan-overview", "phased-plan-refactoring"],
+  "autonomous-orchestration": ["autonomous-implementation-review"],
+  "openspec-development": ["openspec-change-integration", "git-commit-message", "capability-wireframes"],
+};
+
 function validateMarketplace(marketplace, packages) {
   const fail = (message) => { throw new Error(`Invalid Claude marketplace: ${message}`); };
   const keys = (value, expected) => value && typeof value === "object" &&
@@ -22,28 +34,45 @@ function validateMarketplace(marketplace, packages) {
       marketplace.name !== "ai-coding-agent-skills" ||
       !keys(marketplace.owner, ["name"]) || typeof marketplace.owner.name !== "string" ||
       !marketplace.owner.name.trim() || typeof marketplace.description !== "string" ||
-      !marketplace.description.trim() || !Array.isArray(marketplace.plugins) || marketplace.plugins.length !== 2) {
-    fail("expected a named, skills-only catalog with two plugins");
+      !marketplace.description.trim() || !Array.isArray(marketplace.plugins) ||
+      marketplace.plugins.length !== pluginNames.length) {
+    fail("expected a named, skills-only catalog with three plugins");
   }
   const selected = new Set();
+  const bundlesByName = new Map();
   for (const [index, plugin] of marketplace.plugins.entries()) {
     if (!keys(plugin, ["name", "version", "description", "source", "strict", "skills"]) ||
-        plugin.name !== ["software-development", "autonomous-orchestration"][index] ||
+        plugin.name !== pluginNames[index] ||
         typeof plugin.version !== "string" || !/^\d+\.\d+\.\d+$/.test(plugin.version) ||
         typeof plugin.description !== "string" || !plugin.description.trim() ||
         plugin.source !== "./" || plugin.strict !== false ||
         !Array.isArray(plugin.skills) || !plugin.skills.length) fail("invalid plugin metadata or components");
+    const bundle = [];
     for (const directory of plugin.skills) {
       const pkg = packages.find((entry) => `./skills/${entry.relativePath.split(path.sep).join("/")}` === directory);
-      if (!pkg || selected.has(pkg.name)) fail(`unknown or duplicate skill: ${directory}`);
+      if (!pkg) fail(`unknown skill: ${directory}`);
+      if (bundle.includes(pkg.name)) fail(`duplicate skill within ${plugin.name}: ${directory}`);
       if ((pkg.name === "autonomous-implementation-review") !== (plugin.name === "autonomous-orchestration")) {
         fail("orchestration must remain a separate opt-in");
       }
+      if (pkg.name === "openspec-change-integration" && plugin.name !== "openspec-development") {
+        fail("the OpenSpec integration must remain a separate opt-in");
+      }
       if (pkg.description.length > 200) fail(`${pkg.name} exceeds Claude's 200-character description limit`);
       selected.add(pkg.name);
+      bundle.push(pkg.name);
     }
+    const expected = expectedBundleSkills[plugin.name];
+    if (bundle.length !== expected.length ||
+        !bundle.every((name) => expected.includes(name))) {
+      fail(`${plugin.name} must select exactly: ${expected.join(", ")}`);
+    }
+    for (const name of bundle) bundlesByName.set(name, [...(bundlesByName.get(name) ?? []), plugin.name]);
   }
-  if (selected.size !== packages.length) fail("every canonical skill must be selected exactly once");
+  if (selected.size !== packages.length) fail("every canonical skill must be selected by a bundle");
+  for (const [name, names] of bundlesByName) {
+    if (names.length > 1 && !sharedSkillNames.has(name)) fail(`${name} may not appear in multiple bundles`);
+  }
 }
 
 async function info(file) {
@@ -123,10 +152,16 @@ export async function buildDistribution({ root = scriptRoot, output }) {
   const plugins = marketplace.plugins.map((plugin) => {
     const manifest = { name: plugin.name, version: plugin.version, description: plugin.description,
       author: marketplace.owner, license: "MIT" };
+    const scope = plugin.name === "openspec-development"
+      ? "This bundle supports the explicitly selected OpenSpec workflow. It does not install OpenSpec, its CLI, or its native skills, and it does not convert CAP/CHG records."
+      : plugin.name === "autonomous-orchestration"
+        ? "Orchestration is a separate opt-in and requires the selected workflow bundle (software-development or openspec-development) and separately reviewed project role configuration."
+        : "The orchestration and OpenSpec workflow bundles are separate opt-ins; installing this bundle does not enable either.";
     const readme = `# ${plugin.name}\n\n${plugin.description}\n\n` +
       "Upload this ZIP through Claude's Customize → Plugins → Add → Upload plugin. Review the bundled instructions and scripts before enabling. Installation does not grant execution authority or Hermes scanner approval.\n\n" +
-      "These are community engineering workflows. Chat, Cowork, and Claude Code do not have equivalent execution capabilities. Git workflows require a project checkout, Git, Node 22+ for the phase guard, and the target project's tooling and permissions. Hermes-specific tool names must be mapped to available host tools.\n\n" +
-      "Orchestration is a separate opt-in and requires the software-development bundle and separately reviewed project role configuration. No agents, hooks, connectors, or permission changes are installed by this package.\n\n" +
+      "These are community engineering workflows. Chat, Cowork, and Claude Code do not have equivalent execution capabilities. Git workflows require a project checkout, Git, Node 22+ for packaged guards, and the target project's tooling and permissions. Hermes-specific tool names must be mapped to available host tools.\n\n" +
+      `${scope}\n\n` +
+      "No agents, hooks, connectors, or permission changes are installed by this package.\n\n" +
       "Instructions: https://github.com/forgegod/ai-coding-agent-skills#install-with-claude-desktop\n" +
       "Upstream: https://claude.com/docs/plugins/overview\n\nMIT; see LICENSE. Canonical skill authors and metadata are preserved.\n";
     const files = { ".claude-plugin/plugin.json": Buffer.from(json(manifest)), "README.md": Buffer.from(readme), LICENSE: license };
@@ -143,13 +178,15 @@ export async function buildDistribution({ root = scriptRoot, output }) {
   await mkdir(downloads, { recursive: true });
   for (const [file, bytes] of archives) await writeFile(path.join(downloads, file), bytes);
   await writeFile(path.join(downloads, "index.json"), json(catalog));
-  const list = (entries) => entries.map(({ name, file }) => `<li><a href="${escapeHtml(file)}" download>${escapeHtml(name)}</a>${name === "autonomous-orchestration" || name === "autonomous-implementation-review" ? " — optional; operator review required" : ""}</li>`).join("\n");
+  const optional = new Set(["autonomous-orchestration", "autonomous-implementation-review"]);
+  const adoption = new Set(["openspec-development", "openspec-change-integration"]);
+  const list = (entries) => entries.map(({ name, file }) => `<li><a href="${escapeHtml(file)}" download>${escapeHtml(name)}</a>${optional.has(name) ? " — optional; operator review required" : adoption.has(name) ? " — optional OpenSpec workflow; operator review required" : ""}</li>`).join("\n");
   await writeFile(path.join(downloads, "index.html"), `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Claude skill downloads</title></head>
 <body><h1>Claude skill downloads</h1>
 <p>Community packages, not official Anthropic skills or Hermes scanner-approved installations. Review before enabling. Installation does not grant execution authority.</p>
 <p><a href="https://github.com/forgegod/ai-coding-agent-skills#install-with-claude-desktop">Installation instructions and execution requirements</a></p>
-<h2>Plugin bundles</h2><p>Recommended: software-development. Upload through Customize → Plugins → Add → Upload plugin. Orchestration is a separate opt-in and requires the general bundle plus separately configured roles.</p><ul>${list(plugins)}</ul>
+<h2>Plugin bundles</h2><p>Use software-development for CAP/CHG scope or openspec-development for explicitly selected OpenSpec scope. Upload through Customize → Plugins → Add → Upload plugin. Orchestration is a separate opt-in for either workflow; no bundle selects a project's record system or installs OpenSpec itself.</p><ul>${list(plugins)}</ul>
 <h2>Individual skills</h2><p>Upload one ZIP through Customize → Skills → + → Create skill → Upload a skill. Do not unzip it. Related workflows may require other skills.</p><ul>${list(skills)}</ul>
 <p><a href="index.json">Download inventory and SHA-256 checksums</a> · <a href="../index.html">Home</a></p>
 </body></html>\n`);

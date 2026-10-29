@@ -12,6 +12,7 @@ const packages = {
   "application-records": "software-development/application-records",
   "capability-wireframes": "software-development/capability-wireframes",
   "git-commit-message": "software-development/git-commit-message",
+  "openspec-change-integration": "software-development/openspec-change-integration",
   "phased-plan-design": "software-development/phased-plan-design",
   "phased-plan-execution": "software-development/phased-plan-execution",
   "phased-plan-closeout": "software-development/phased-plan-closeout",
@@ -33,7 +34,7 @@ async function setup(t) {
   return { readme, helper, scratch, home, env: { ...process.env, HOME: home, PI_CODING_AGENT_DIR: "" } };
 }
 
-test("documented recipes copy ten complete packages to all four native user locations", async (t) => {
+test("documented recipes copy eleven complete packages to all four native user locations", async (t) => {
   const f = await setup(t);
   for (const [heading, directory] of [["Claude Code", ".claude/skills"], ["Codex", ".agents/skills"], ["Kilo", ".kilo/skills"], ["Pi", ".pi/agent/skills"]]) {
     const section = f.readme.split(`### ${heading}\n`)[1]?.split(/\n### |\n## /)[0];
@@ -47,7 +48,7 @@ test("documented recipes copy ten complete packages to all four native user loca
       assert.deepEqual(await readFile(path.join(destination, name, "SKILL.md")), await readFile(path.join(root, "skills", packages[name], "SKILL.md")));
     }
     assert.deepEqual(await readdir(path.join(destination, "phased-plan-next")), ["SKILL.md"]);
-    for (const [name, file] of [["autonomous-implementation-review", "references/environment-passthrough.md"], ["autonomous-implementation-review", "references/herdr.md"], ["autonomous-implementation-review", "references/lifecycle-watch.md"], ["autonomous-implementation-review", "scripts/herdr_lifecycle_watch.mjs"], ["phased-plan-closeout", "scripts/phase-guard.mjs"], ["phased-plan-closeout", "references/record-writes.md"]]) {
+    for (const [name, file] of [["autonomous-implementation-review", "references/environment-passthrough.md"], ["autonomous-implementation-review", "references/herdr.md"], ["autonomous-implementation-review", "references/lifecycle-watch.md"], ["autonomous-implementation-review", "scripts/herdr_lifecycle_watch.mjs"], ["openspec-change-integration", "scripts/change-guard.mjs"], ["phased-plan-closeout", "scripts/phase-guard.mjs"], ["phased-plan-closeout", "references/record-writes.md"]]) {
       assert.deepEqual(await readFile(path.join(destination, name, file)), await readFile(path.join(root, "skills", packages[name], file)));
     }
     for (const name of ["autonomous-implementation-review"]) {

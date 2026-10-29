@@ -2,6 +2,20 @@
 
 Portable engineering workflows for AI coding agents. This repository owns the skill sources and their static distribution endpoint; adopting projects own their DOX contracts, product behavior, and change progress.
 
+## Workflow selection
+
+The collection supports the CAP/CHG blueprint workflow and an opt-in
+[OpenSpec parallel-change workflow](docs/openspec-workflow.md). A project's DOX
+contract selects its record authority; finding or installing skills does not
+change that contract. OpenSpec is not assumed to be active in the current
+blueprint or installed skill environment.
+
+The `openspec-development` bundle contains integration, commits and wireframes,
+not the OpenSpec CLI/native skills. It supports small independently mergeable
+changes, isolated checkouts and retained post-merge evidence. Do not run CAP/CHG
+and OpenSpec as progress authorities for the same scope. Installation does not
+convert records, publish packages, update other profiles or grant Git/GitHub authority.
+
 Start here: [Claude Desktop (no terminal)](#install-with-claude-desktop) ·
 [Hermes](#install-with-hermes) ·
 [Other agents / advanced directory installation](#advanced-native-directory-installation).
@@ -14,6 +28,7 @@ Start here: [Claude Desktop (no terminal)](#install-with-claude-desktop) ·
 | [application-records](skills/software-development/application-records/SKILL.md) | Canonical CAP/CHG lifecycle and evidence. |
 | [capability-wireframes](skills/software-development/capability-wireframes/SKILL.md) | CAP-linked HTML/PNG visual handoff. |
 | [git-commit-message](skills/software-development/git-commit-message/SKILL.md) | Dependency-aware logical Git batches, a preview before apply (or autonomous execution), and tiered Conventional Commit messages. |
+| [openspec-change-integration](skills/software-development/openspec-change-integration/SKILL.md) | Explicit OpenSpec candidate review, protected integration and post-merge receipts. |
 | [phased-plan-design](skills/software-development/phased-plan-design/SKILL.md) | Design restart-safe CHG phases. |
 | [phased-plan-execution](skills/software-development/phased-plan-execution/SKILL.md) | Execute and prove one CHG phase. |
 | [phased-plan-closeout](skills/software-development/phased-plan-closeout/SKILL.md) | Integrate a verified phase and hand off the next goal. |
@@ -31,9 +46,14 @@ or hidden-folder copying is needed for installation.
 3. Select **software-development**, review its contents, and click **Add**.
 4. Start a new conversation or task and check that its skills appear in the skill picker.
 
-This installs the nine general engineering skills. **autonomous-orchestration**
-is a separate, optional plugin: review it and its execution prerequisites before
-adding it. Neither plugin installs execution roles or changes permissions.
+This installs the nine-skill general bundle, including the shared commit and
+wireframe disciplines. For an explicitly
+OpenSpec-adopted project, select **openspec-development** instead; it contains
+integration, commits and wireframes only, and requires OpenSpec separately.
+Do not enable both bundles' duplicate commit/wireframe skills in the same scope.
+**autonomous-orchestration** remains a separate optional plugin: review it and
+its host/role prerequisites before adding it to either workflow. None of these
+plugins installs execution roles, migrates a project or changes permissions.
 
 Prefer a file upload? The [download page](https://forgegod.github.io/ai-coding-agent-skills/downloads/index.html)
 offers ready-made plugin ZIPs and individual skill ZIPs. Upload a plugin with
@@ -78,7 +98,8 @@ To target a named profile, add `-p <profile>`; for example:
 hermes -p hermes-dev skills install well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/application-records --category software-development
 ```
 
-Install the nine generic software-development skills (POSIX shell; omit `-p hermes-dev` to use the active profile):
+Install the nine general-bundle skills for CAP/CHG scope, including the two shared
+commit/wireframe disciplines (POSIX shell; omit `-p hermes-dev` to use the active profile):
 
 ```sh
 for skill in application-records capability-wireframes git-commit-message phased-plan-design phased-plan-execution phased-plan-closeout phased-plan-overview phased-plan-next phased-plan-refactoring; do
@@ -93,6 +114,19 @@ nine-package example does not establish scanner approval for it:
 ```sh
 hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/autonomous-implementation-review" --category autonomous-ai-agents
 ```
+
+For explicitly selected OpenSpec scope, install its integration package and the
+two shared disciplines instead of the CAP/CHG phase bundle. The commands use the
+published endpoint, not this checkout; install only missing shared packages:
+
+```sh
+hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-change-integration" --category software-development
+hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/git-commit-message" --category software-development
+hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/capability-wireframes" --category software-development
+```
+
+OpenSpec's CLI/native workflows remain separate prerequisites. No command above
+selects that workflow for a project or grants execution authority.
 
 `phased-plan-next` is read-only and included in the generic loop. It selects an
 explicit or unambiguous active CHG and prints the bounded goal; it never submits
@@ -132,7 +166,7 @@ home. The local installer does not infer this base from the session's HERMES_HOM
 #### Install or refresh local packages
 
 For a reviewed checkout on the local machine, the repository script copies all
-ten complete packages to the default profile and every recognized named profile:
+eleven complete packages to the default profile and every recognized named profile:
 
 ```sh
 npm run install:local
@@ -235,6 +269,9 @@ under an explicitly agreed manual workflow; do not invent a fallback transport.
 
 #### Choose the progress authority first
 
+- **Explicitly selected OpenSpec scope:** use native change artifacts and
+  `openspec-change-integration` for one authorized change/task group. Follow its
+  supported-host reference rather than the CHG launch example below.
 - **Material change with no active CHG:** use `application-records`, then
   `phased-plan-design`, to create or revise the CHG. Resolve only the outcome or
   policy decisions that are genuinely unknown; the design skill creates the
@@ -326,9 +363,9 @@ only its documented repository-tracked location.
 - Scratch logs, patches, and agent reports are temporary evidence only. They are
   never required to resume work.
 
-The [Hermes workflow research record](docs/research/hermes-autonomous-goal-workflow.md)
-documents the evidence behind this boundary, the existing `/goal draft` option,
-and the future custom-shortcut proposal.
+For OpenSpec-selected projects, the [parallel-change workflow](docs/openspec-workflow.md)
+defines native task ownership, protected integration and post-merge evidence.
+The CHG commands above apply only to CAP/CHG-selected scope.
 
 #### Fresh-session busy-input protection
 
@@ -409,7 +446,7 @@ git clone https://github.com/forgegod/ai-coding-agent-skills.git ai-coding-agent
 ```
 
 After review, from the directory containing that checkout, define this helper in
-the same shell used for the agent-specific commands below. It copies all ten
+the same shell used for the agent-specific commands below. It copies all eleven
 package directories, preflights all name collisions, and never overwrites local
 edits.
 
@@ -419,7 +456,7 @@ skills_source="$PWD/ai-coding-agent-skills-review/skills"
 install_reviewed_skills() (
   set -eu
   destination="$1"
-  for package in autonomous-ai-agents/autonomous-implementation-review software-development/application-records software-development/capability-wireframes software-development/git-commit-message software-development/phased-plan-design software-development/phased-plan-execution software-development/phased-plan-closeout software-development/phased-plan-overview software-development/phased-plan-next software-development/phased-plan-refactoring; do
+  for package in autonomous-ai-agents/autonomous-implementation-review software-development/application-records software-development/capability-wireframes software-development/git-commit-message software-development/openspec-change-integration software-development/phased-plan-design software-development/phased-plan-execution software-development/phased-plan-closeout software-development/phased-plan-overview software-development/phased-plan-next software-development/phased-plan-refactoring; do
     skill="${package##*/}"
     test -f "$skills_source/$package/SKILL.md"
     if [ -e "$destination/$skill" ] || [ -L "$destination/$skill" ]; then
@@ -428,7 +465,7 @@ install_reviewed_skills() (
     fi
   done
   mkdir -p "$destination"
-  for package in autonomous-ai-agents/autonomous-implementation-review software-development/application-records software-development/capability-wireframes software-development/git-commit-message software-development/phased-plan-design software-development/phased-plan-execution software-development/phased-plan-closeout software-development/phased-plan-overview software-development/phased-plan-next software-development/phased-plan-refactoring; do
+  for package in autonomous-ai-agents/autonomous-implementation-review software-development/application-records software-development/capability-wireframes software-development/git-commit-message software-development/openspec-change-integration software-development/phased-plan-design software-development/phased-plan-execution software-development/phased-plan-closeout software-development/phased-plan-overview software-development/phased-plan-next software-development/phased-plan-refactoring; do
     skill="${package##*/}"
     cp -R "$skills_source/$package" "$destination/$skill"
   done
@@ -579,7 +616,7 @@ The verified SkillsLLM site is `https://skillsllm.com`. Its
 [submission page](https://skillsllm.com/submit) requires GitHub OAuth:
 
 1. Sign in as the operator and submit `https://github.com/forgegod/ai-coding-agent-skills`.
-2. Describe it as a collection of **ten** categorized Agent Skills packages and
+2. Describe it as a collection of **eleven** categorized Agent Skills packages and
    retain the README's installation and security boundaries.
 3. Confirm the platform accepts the collection layout, wait for its scanning and
    catalog policy checks, and read back the resulting listing before claiming success.
@@ -625,11 +662,11 @@ npm run build
 
 Canonical source is `skills/<category>/<name>/`. `dist/` is generated and ignored. The generator emits the complete `.well-known/skills/` inventory, with an explicit file list for each package.
 
-The same build emits `dist/downloads/`: ten complete skill ZIPs, two plugin ZIPs,
+The same build emits `dist/downloads/`: eleven complete skill ZIPs, three plugin ZIPs,
 an HTML download page, and a JSON inventory with SHA-256 checksums. The checked-in
 `.claude-plugin/marketplace.json` selects canonical source packages directly;
-no generated skill copies are committed. Its two explicit skill lists separate
-general use from opt-in orchestration. Bump the affected plugin's version when
+no generated skill copies are committed. Its explicit skill lists separate the
+CAP/CHG and OpenSpec workflows from opt-in orchestration. Bump every affected plugin's version when
 its bundled content changes. See the [Claude release checks](docs/claude-installation.md#maintainer-verification).
 
 The optional `npm run test:local-update` probe requires the installed `hermes`

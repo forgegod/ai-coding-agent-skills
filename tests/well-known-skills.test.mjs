@@ -12,6 +12,7 @@ const expectedSkillNames = [
   "autonomous-implementation-review",
   "capability-wireframes",
   "git-commit-message",
+  "openspec-change-integration",
   "phased-plan-closeout",
   "phased-plan-design",
   "phased-plan-execution",
@@ -47,7 +48,9 @@ test("well-known build publishes every skill and all advertised files", async ()
     }
 
     const autonomous = index.skills.find((skill) => skill.name === "autonomous-implementation-review");
-    assert.deepEqual(autonomous?.files, ["references/claude-code-roles.md", "references/environment-passthrough.md", "references/herdr.md", "references/lifecycle-watch.md", "scripts/herdr_lifecycle_watch.mjs", "scripts/herdr_panes.py", "scripts/herdr-pane-state.mjs", "SKILL.md"]);
+    assert.deepEqual(autonomous?.files, ["references/claude-code-roles.md", "references/environment-passthrough.md", "references/herdr.md", "references/lifecycle-watch.md", "references/openspec.md", "scripts/herdr_lifecycle_watch.mjs", "scripts/herdr_panes.py", "scripts/herdr-pane-state.mjs", "SKILL.md"]);
+    const integration = index.skills.find((skill) => skill.name === "openspec-change-integration");
+    assert.deepEqual(integration?.files, ["references/guard.md", "references/integration.md", "references/recovery.md", "scripts/change-guard.mjs", "SKILL.md"]);
     const closeout = index.skills.find((skill) => skill.name === "phased-plan-closeout");
     assert.deepEqual(closeout?.files, ["references/record-writes.md", "references/recovery.md", "references/review-boundary.md", "scripts/phase-guard.mjs", "SKILL.md"]);
     const next = index.skills.find((skill) => skill.name === "phased-plan-next");

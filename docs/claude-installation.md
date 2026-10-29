@@ -17,9 +17,15 @@ scripts before enabling; do not use another client to evade an unresolved securi
 5. Start a new conversation or Cowork task and look for the skills in the picker.
 
 The general plugin contains nine skills. The separate **autonomous-orchestration**
-plugin adds `autonomous-implementation-review` only. Add it only after reviewing
-its requirements; it does not automatically install its general-skill prerequisites.
-No agents, hooks, MCP servers, or permission changes are installed by either plugin.
+plugin adds `autonomous-implementation-review` only. It requires the selected
+workflow bundle (`software-development` or `openspec-development`) and separately
+configured roles; those prerequisites are not installed automatically.
+The opt-in **openspec-development** plugin adds `openspec-change-integration`,
+`git-commit-message`, and `capability-wireframes` for projects that have explicitly
+selected OpenSpec. It does not install OpenSpec or its CLI and does not convert
+CAP/CHG records. The commit and wireframe skills intentionally appear in both
+workflow bundles; do not enable duplicate copies of them.
+No agents, hooks, MCP servers, or permission changes are installed by any plugin.
 The bundled role templates remain inert support files.
 
 Plugins require a paid plan (Pro, Max, Team, or Enterprise). Organization policy
@@ -36,10 +42,11 @@ and [plugin availability](https://support.claude.com/en/articles/13837440-use-pl
 3. In Claude, select **Customize → Plugins → Add → Upload plugin** and choose the ZIP.
 4. Review the installed plugin and check its skill inventory.
 
-The optional `autonomous-orchestration.plugin.zip` uses the same route but needs
-separate review. Plugin ZIPs contain `.claude-plugin/plugin.json`, a standalone
-README and license, and complete `skills/<name>/` directories. Do not unzip before
-uploading, and do not upload GitHub's whole-repository ZIP.
+The optional `autonomous-orchestration.plugin.zip` and
+`openspec-development.plugin.zip` use the same route but need separate review.
+Plugin ZIPs contain `.claude-plugin/plugin.json`, a standalone README and license,
+and complete `skills/<name>/` directories. Do not unzip before uploading, and do
+not upload GitHub's whole-repository ZIP.
 
 Source: [Anthropic's plugin ZIP upload instructions](https://claude.com/docs/plugins/overview#find-and-add-a-plugin).
 
@@ -65,13 +72,15 @@ and [Create and package custom skills](https://support.claude.com/en/articles/12
 Open the plugin's skill list rather than trusting a model's statement that it has
 loaded something. The general plugin should list nine skills, including
 `application-records` and `phased-plan-next`, but not `autonomous-implementation-review`.
-The optional orchestration plugin should list only that latter skill.
+The optional orchestration plugin should list only that latter skill. The optional
+OpenSpec plugin should list exactly `openspec-change-integration`,
+`git-commit-message`, and `capability-wireframes`, and no phased-plan skill.
 
 Claude Code namespaces plugin skills: use `/software-development:application-records`
-or `/software-development:phased-plan-next`, not the bare slash-command names used
-by direct directory copies. Resolve related skill names within the installed
-plugins and support files relative to the loaded skill directory; Hermes's
-`skill_view`, `terminal`, and `patch` tools are not installed by these packages.
+or `/openspec-development:openspec-change-integration`, not the bare slash-command
+names used by direct directory copies. Resolve related skill names within the
+installed plugins and support files relative to the loaded skill directory;
+Hermes's `skill_view`, `terminal`, and `patch` tools are not installed by these packages.
 
 For an initial read-only check, ask Claude to describe the installed
 `application-records` workflow without creating or editing anything. This confirms
@@ -87,7 +96,7 @@ changing installation routes.
 | --- | --- | --- |
 | Desktop Chat / claude.ai | Skills and bundled reference material | Not a local repository executor merely because code execution is enabled. Do not assume access to local Git, worktrees, or project subagents. |
 | Cowork | Skills in its task environment | Check actual workspace access, tools, and permissions. This repository's Claude Code role protocol is not automatically a Cowork role protocol. |
-| Claude Code, including Desktop's Code tab | Coding-agent skill loading | A project checkout, Git, Node 22+ for the phase guard, project-specific tooling, and explicit execution authority. |
+| Claude Code, including Desktop's Code tab | Coding-agent skill loading | A project checkout, Git, Node 22+ for the packaged guards, project-specific tooling, and explicit execution authority. |
 
 The orchestration path additionally requires separately reviewed project subagents
 and model/permission configuration. Follow the [Claude Code host reference](../skills/software-development/phased-plan-overview/references/claude-code-host.md)
@@ -130,31 +139,34 @@ and [manage skills](https://support.claude.com/en/articles/12512180-use-skills-i
 
 `npm test` and `npm run build` validate the repository catalog and produce:
 
-- Ten individual ZIPs, each preserving every canonical package file byte-for-byte.
-- Two plugin ZIPs, with general skills separated from opt-in orchestration.
+- Eleven individual ZIPs, each preserving every canonical package file byte-for-byte.
+- Three plugin ZIPs, with general skills separated from opt-in orchestration and
+  OpenSpec adoption; the two workflow bundles intentionally share commit and
+  wireframe packages.
 - `dist/downloads/index.html` and `index.json`, including SHA-256 checksums.
 - The unchanged-format Hermes `.well-known/skills/` endpoint.
 
 `.claude-plugin/marketplace.json` is the checked-in source catalog. Its root-source,
 explicit-skill-list layout follows [Anthropic's own skills marketplace](https://github.com/anthropics/skills/blob/main/.claude-plugin/marketplace.json).
 There is deliberately no root `.claude-plugin/plugin.json`: that would conflict
-with the two entry-defined plugins. ZIP wrappers are generated from the same
+with the three entry-defined plugins. ZIP wrappers are generated from the same
 catalog and canonical files; generated output stays untracked. The Git marketplace
 uses a repository checkout, while ZIP exports contain only allowlisted package
 files plus their generated plugin metadata, README, and license.
 
 Bump the affected plugin version in the catalog whenever its selected skills or
 support files change; skill versions alone do not update the enclosing plugin.
-Tests reject omitted/duplicate packages, implicit orchestration inclusion, added
-active plugin components, unsafe paths, and symlinks, and verify archive bytes,
-repeatability, checksums, and Pages artifact inclusion. They do not prove model
-obedience, cloud acceptance, or scanner approval.
+Tests reject omitted/duplicate packages, implicit orchestration or OpenSpec
+inclusion, unshared packages in multiple bundles, added active plugin components,
+unsafe paths, and symlinks, and verify archive bytes, repeatability, checksums,
+and Pages artifact inclusion. They do not prove model obedience, cloud acceptance,
+or scanner approval.
 
-The local validation probe used Claude Code 2.1.312 with a disposable HOME and
-CLAUDE_CONFIG_DIR, without account credentials. Its native validator accepted the
-marketplace and both extracted plugin ZIPs; local marketplace installs reported
-nine general skills and one opt-in orchestration skill, with no active agents,
-hooks, or servers. Desktop installation and end-to-end workflow execution are not yet verified.
+Validate the marketplace and all three plugin exports with a disposable HOME and
+CLAUDE_CONFIG_DIR, without account credentials. Check exact inventories: nine
+CAP/CHG skills, one optional orchestration skill, and three OpenSpec bundle skills;
+no active agents, hooks or servers. Desktop acceptance and end-to-end workflow
+execution are not verified by package validation and require separate checks.
 
 Before release, repeat native validation with `claude plugin validate <path>` and
 install into an isolated scratch home, never a real agent profile. Run the

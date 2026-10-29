@@ -1,10 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, stat } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 const readme = fileURLToPath(new URL("../README.md", import.meta.url));
-const autonomousResearch = fileURLToPath(new URL("../docs/research/hermes-autonomous-goal-workflow.md", import.meta.url));
 
 test("Claude instructions lead with native GUI installation and cite primary sources", async () => {
   const source = await readFile(readme, "utf8");
@@ -24,7 +23,7 @@ test("Claude instructions lead with native GUI installation and cite primary sou
   assert.match(guide, /Upload plugin/);
   assert.match(guide, /Upload a skill/);
   assert.match(guide, /not.*Hermes scanner approval/i);
-  assert.match(guide, /Desktop.*not.*verified/i);
+  assert.match(guide, /Desktop UI upload\s+have not been verified/);
   assert.match(guide, /2\.1\.273/);
   assert.match(guide, /software-development:application-records/);
   assert.match(guide, /No agents, hooks, MCP servers/);
@@ -55,9 +54,20 @@ test("normal installer loop documents all generic software-development skills", 
   assert.equal(loop.length, 9);
   assert.deepEqual(loop, ["application-records", "capability-wireframes", "git-commit-message", "phased-plan-design", "phased-plan-execution", "phased-plan-closeout", "phased-plan-overview", "phased-plan-next", "phased-plan-refactoring"]);
   assert.match(source, /nine-package example/);
-  assert.match(source, /collection of \*\*ten\*\* categorized Agent Skills packages/);
+  assert.match(source, /collection of \*\*eleven\*\* categorized Agent Skills packages/);
   assert.match(source, /`phased-plan-next` is read-only and included in the generic loop/);
   assert.doesNotMatch(source, /phased-plan-next.*can reset/i);
+});
+
+test("OpenSpec installation and orchestration use the explicitly selected workflow", async () => {
+  const source = await readFile(readme, "utf8");
+  assert.equal(source.includes("hermes -p hermes-dev skills install \"well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-change-integration\" --category software-development"), true, "document the independent OpenSpec Hermes install route");
+  const marketplace = JSON.parse(await readFile(new URL("../.claude-plugin/marketplace.json", import.meta.url), "utf8"));
+  const orchestration = marketplace.plugins.find(({ name }) => name === "autonomous-orchestration");
+  for (const workflow of ["software-development", "openspec-development"]) assert.equal(orchestration.description.includes(workflow), true, workflow);
+  assert.equal(orchestration.description.includes("requires the general skills"), false);
+  const guide = await readFile(new URL("../docs/claude-installation.md", import.meta.url), "utf8");
+  assert.equal(/general-skill prerequisites/.test(guide), false, "role prerequisites must follow workflow selection");
 });
 
 test("local installation docs distinguish source, migration, profile scope, and scanning", async () => {
@@ -107,7 +117,7 @@ test("autonomous goal documentation distinguishes orchestration from polling", a
   assert.match(source, /prints no launch command/);
   assert.match(source, /\/phased-plan-next <active-chg-path>/);
   assert.match(source, /returns the exact bounded command below for the operator to send/);
-  assert.match(source, /\[Hermes workflow research record\]\(docs\/research\/hermes-autonomous-goal-workflow\.md\)/);
+  assert.match(source, /docs\/openspec-workflow\.md/);
   assert.match(source, /phased-plan-design/);
   assert.match(source, /phased-plan-execution/);
   assert.match(source, /#### Start bounded standalone work/);
@@ -126,16 +136,14 @@ test("autonomous goal documentation distinguishes orchestration from polling", a
   assert.doesNotMatch(source, /durable handoff record|<handoff-record path>|scratch handoff/i);
 });
 
-test("autonomous workflow research separates shipped Hermes features from proposals", async () => {
-  const source = await readFile(autonomousResearch, "utf8");
-  assert.match(source, /README\.md#start-a-selected-chg-phase/);
-  assert.doesNotMatch(source, /^\/goal draft Execute only phase /m, "research links the current launch contract rather than forking it");
-  assert.match(source, /\/goal draft <objective>/);
-  assert.match(source, /read-only launch helper/);
-  assert.match(source, /Custom Slash Commands \/ Shortcuts proposal #25335/);
-  assert.match(source, /Kanban RFC #16102/);
-  assert.match(source, /Pulse handoff proposal #31016/);
-  assert.match(source, /Mission \/ Project SSOT proposal #48011/);
-  assert.match(source, /sole mutable authority/);
-  assert.match(source, /never the only resumption source/);
+test("operational documentation has no research dependencies or adoption-history claims", async () => {
+  for (const relative of ["README.md", "AGENTS.md", "docs/openspec-workflow.md", "docs/claude-installation.md", "openspec/config.yaml", "scripts/AGENTS.md", "skills/AGENTS.md", "skills/software-development/AGENTS.md", "skills/autonomous-ai-agents/AGENTS.md", "skills/software-development/git-commit-message/references/openspec.md", "skills/software-development/capability-wireframes/references/openspec.md", "skills/autonomous-ai-agents/autonomous-implementation-review/references/openspec.md"]) {
+    const source = await readFile(new URL(`../${relative}`, import.meta.url), "utf8");
+    assert.equal(/docs\/research\/|openspec-adoption\.md|adoption branch|predates|subsequently authorized|previous adoption/i.test(source), false, relative);
+  }
+  for (const relative of ["docs/research", "docs/openspec-adoption.md"]) {
+    assert.equal(await stat(new URL(`../${relative}`, import.meta.url)).then(() => true, (error) => { if (error.code !== "ENOENT") throw error; return false; }), false, relative);
+  }
+  const workflow = await readFile(new URL("../docs/openspec-workflow.md", import.meta.url), "utf8");
+  for (const pattern of [/explicit\s+project\s+selection/i, /installation.*does not/i, /tasks\.md/, /post-merge/, /CAP\/CHG/]) assert.match(workflow, pattern);
 });

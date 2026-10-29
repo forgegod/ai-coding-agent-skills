@@ -2,7 +2,7 @@
 name: git-commit-message
 description: Preview batches; autonomous commits skip confirmation.
 argument-hint: "[--tier 1|2|3]"
-version: 4.5.0
+version: 4.6.0
 metadata:
   hermes:
     tags: [git, commit]
@@ -21,6 +21,15 @@ operation, do not stage or commit a suggested plan until the user applies its
 preview or returns changes. Autonomous mode changes that confirmation gate,
 not the required preview or verification.
 
+## Scope selection
+
+When the adopting project's policy explicitly selects OpenSpec for this work,
+read [references/openspec.md](references/openspec.md) before step 2 and keep the
+preview, acceptance, and verification rules below. The orchestrator is then the
+sole writable owner of batch boundaries through `openspec-change-integration`.
+Without that explicit policy, the CHG exception in step 2 is the only
+integration route.
+
 ## Procedure
 
 1. Inspect the whole boundary with `terminal`: run `git status --short`,
@@ -32,6 +41,10 @@ not the required preview or verification.
      controls the explicit record/implementation batches and their path allowlists.
      Do not combine its record-only target commits with implementation or assign
      Git writes to an executor. This exception precedes the general grouping rule.
+   - For explicitly OpenSpec-managed scope, `openspec-change-integration` owns
+     the batches and their path allowlists; follow
+     [references/openspec.md](references/openspec.md). Do not create a CHG
+     record, phase table, or phase-guard check for that scope.
    - Otherwise keep one observable change with its tests, current-state CAP/docs,
      and required configuration in the same batch; exclude CHG lifecycle records.
    - Keep unrelated topics separate. Do not split a vertical slice merely to

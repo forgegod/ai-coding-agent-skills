@@ -1,0 +1,25 @@
+schema: spec-driven
+context: |
+  docs/openspec-workflow.md defines the explicitly selectable OpenSpec workflow.
+  Native tasks own this authorized source change's progress. CAP/CHG consumers keep
+  their selected contracts; source artifacts do not establish runtime adoption.
+  Source adoption grants no push, live issue creation, installed-profile update or
+  sibling-repository authority. A pending bootstrap issue is not collaborative admission.
+rules:
+  proposal:
+    - State scope, non-goals, compatibility and operator authority explicitly.
+  specs:
+    - State observable requirements with executable acceptance scenarios.
+  tasks:
+    - Keep independently mergeable changes small; do not recreate a CHG phase table.
+    - Distinguish verified local implementation from unperformed publication/integration.
+operations:
+  apply:
+    guidance:
+      - Only the orchestrator updates task progress and Git; implementers report evidence.
+      - Plan approval is not execution or GitHub write permission.
+  archive:
+    guidance:
+      - Require actual integrated verification and a Git-tracked post-merge receipt.
+      - Never reapply an already-integrated delta over newer capability changes.
+      - This guidance is not enforcement; use explicit authority and integration checks.

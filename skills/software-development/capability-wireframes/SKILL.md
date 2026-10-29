@@ -1,7 +1,7 @@
 ---
 name: capability-wireframes
 description: Use when a material feature changes a primary human-facing surface and needs a static CAP-linked wireframe.
-version: 1.2.0
+version: 1.3.0
 author: AI Software Blueprint
 license: MIT
 metadata:
@@ -18,6 +18,15 @@ Use a static, CAP-linked wireframe for every material capability that creates or
 changes a primary human-facing surface. The wireframe makes the intended
 interaction reviewable and remains a visual reference for the implemented
 capability.
+
+## Scope selection
+
+When the adopting project's policy explicitly selects OpenSpec for the scope,
+read [references/openspec.md](references/openspec.md) before applying the CAP
+layout below. Stable capability and screen keys under
+`docs/product/wireframes/<capability>/` then replace CAP ownership, proposals
+stay change-owned, and no CAP record is fabricated. The CAP procedure below
+remains the default for projects that have not migrated.
 
 A CHG may own a review package at `docs/changes/reviews/CHG-<number>/`. It stays
 review-only, including after closure. The implementation slice creates or updates
@@ -79,6 +88,9 @@ unreviewed workflow.
 
 ### Proposal-to-capability handoff
 
+- **OpenSpec scope:** Follow `references/openspec.md` for change-owned proposals,
+  stable keys, and the generator/manifest boundary instead of allocating a CAP ID.
+  The CAP handoff below applies only to CAP-managed scope.
 - **Pending CHG:** Read both product and change DOX plus the wireframe child if
   present before selecting a destination. Put design sources, HTML, screenshots,
   and prose in `docs/changes/reviews/CHG-<number>/`. Its `README.md` declares

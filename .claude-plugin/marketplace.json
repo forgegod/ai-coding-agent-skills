@@ -3,11 +3,11 @@
   "owner": {
     "name": "Raphael (forgegod)"
   },
-  "description": "Community engineering skills. Orchestration is a separate operator-reviewed option.",
+  "description": "Community engineering skills. Orchestration and OpenSpec adoption are separate operator-reviewed options.",
   "plugins": [
     {
       "name": "software-development",
-      "version": "1.0.0",
+      "version": "1.1.1",
       "description": "Nine engineering skills for records, wireframes, commits, and phased work. Execution requires a capable coding host.",
       "source": "./",
       "strict": false,
@@ -25,12 +25,24 @@
     },
     {
       "name": "autonomous-orchestration",
-      "version": "1.0.0",
-      "description": "Optional implementation/review orchestration. Review before enabling; requires the general skills and separately configured execution roles.",
+      "version": "1.1.1",
+      "description": "Optional implementation/review orchestration. Requires the selected workflow bundle (software-development or openspec-development) and separately configured execution roles.",
       "source": "./",
       "strict": false,
       "skills": [
         "./skills/autonomous-ai-agents/autonomous-implementation-review"
+      ]
+    },
+    {
+      "name": "openspec-development",
+      "version": "0.1.2",
+      "description": "Optional OpenSpec workflow bundle for integration, commits, and wireframes. Does not install OpenSpec or convert CAP/CHG records.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/software-development/capability-wireframes",
+        "./skills/software-development/git-commit-message",
+        "./skills/software-development/openspec-change-integration"
       ]
     }
   ]

@@ -9,7 +9,7 @@ Maintain portable AI coding-agent playbooks and publish complete Agent Skills pa
 - `skills/` owns categorized skill source and its local DOX contracts.
 - `scripts/` owns deterministic endpoint/ZIP generation and the opt-in release security scan; `tests/` owns executable packaging and guard evidence.
 - `.github/` owns credential-free verification and GitHub Pages deployment with narrowly scoped deployment permissions.
-- Root owns this contract, README, package manifest, license, ignore rules, `.claude-plugin/marketplace.json`, and distribution documentation including `docs/claude-installation.md`.
+- Root owns this contract, README, package manifest, license, ignore rules, `.claude-plugin/marketplace.json`, distribution documentation including `docs/claude-installation.md`, the selectable workflow in `docs/openspec-workflow.md`, and project-local `openspec/` change artifacts.
 
 ## Local Contracts
 
@@ -20,9 +20,10 @@ Maintain portable AI coding-agent playbooks and publish complete Agent Skills pa
 - Community installation uses Hermes security scanning. Do not recommend bypassing scan failures with --force or claim built-in trust.
 - Document Claude Code, Codex, Kilo (modern and legacy), and Pi native user/project installation from their current upstream skill-discovery documentation. Native copying preserves complete packages, preflights collisions, and does not claim Hermes scanner approval or cross-host tool equivalence.
 - Lead Claude installation with the native marketplace GUI and ready-made ZIP uploads, citing Anthropic primary sources; keep directory copies as advanced alternatives. Separate installation, account sync, and host execution verification. No official catalog listing or Desktop acceptance is implied by local packaging tests.
-- The Claude marketplace selects canonical source via explicit root-relative skill lists: nine general skills and a separate opt-in orchestration entry. Do not add a root plugin manifest, automatic orchestration dependency, hooks, agents, or connectors. Bump the affected plugin version on bundled-content changes. Generated plugin wrappers and ZIPs stay untracked and preserve complete canonical package bytes.
+- The Claude marketplace selects canonical source via explicit root-relative skill lists: nine general-bundle skills for CAP/CHG scope, a separate opt-in orchestration entry, and an opt-in OpenSpec bundle containing integration, commits and wireframes only. Shared commit/wireframe packages may appear in both workflow bundles; duplicates within a bundle and unselected canonical packages fail. Do not add a root plugin manifest, automatic orchestration dependency, hooks, agents, or connectors. Bump every affected plugin version on bundled-content changes. Generated plugin wrappers and ZIPs stay untracked and preserve complete canonical package bytes.
 - Directory-discovery documentation distinguishes public package availability from actual indexing/submission. Preserve literal domains, confirm catalog policies, and do not invent listings, dummy root skills, telemetry installs, or authentication/submission success.
-- Publish all ten complete packages. The nine generic software-development packages, including read-only `phased-plan-next`, use normal installation; autonomous orchestration requires its own operator-reviewed install path. The scanner-blocked blueprint initializer is migration-local to AI Software Blueprint and is not part of this distribution.
+- Publish all eleven complete packages. Preserve the nine general-bundle packages and the separate autonomous orchestration package. `openspec-change-integration` is a separately selected workflow package, never implicit CAP/CHG conversion. The scanner-blocked blueprint initializer is migration-local to AI Software Blueprint and is not part of this distribution.
+- Workflow selection is explicit project policy as described in `docs/openspec-workflow.md`; source files and installation do not select OpenSpec for the blueprint or a consuming project. In OpenSpec-selected scope, native `tasks.md` is the sole mutable task authority. Explicitly authorized local implementation may leave issue binding pending; collaborative publication/integration requires a real issue and fresh authority checks. Post-merge receipts remain Git-tracked; no invented ticket or prospective success evidence. CAP/CHG packages remain available for that workflow, never a second live tracker for the same OpenSpec scope.
 - A skill installed in a shared agent profile must not remove or modify its installed package while operating on a target project.
 - Source migration preserves complete packages and provenance; generated output is disposable and untracked.
 - Changes in this repository may be committed and pushed when requested. Changes in other repositories require their own authorization.
@@ -34,7 +35,8 @@ Maintain portable AI coding-agent playbooks and publish complete Agent Skills pa
 - Tests use synthetic fixtures and local output; live endpoint and installer probes are release checks, not ordinary CI dependencies.
 - Exercise documented native copy commands in isolated scratch homes; do not modify real agent installations while testing documentation or claim client discovery was verified if that client is unavailable.
 - Documentation describes the current design. Git history carries migration history.
-- Operator-facing launch examples state their exact side-effect authority; displaying a template neither executes it nor grants permission. Keep canonical examples synchronized by tests and link them from research rather than copying them.
+- Operator-facing launch examples state their exact side-effect authority; displaying a template neither executes it nor grants permission. Keep canonical examples synchronized by tests.
+- Operational documentation states the supported workflows, their explicit selection and execution boundaries; it does not infer adoption from source artifacts or installation.
 
 ## Verification
 
