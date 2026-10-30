@@ -9,6 +9,16 @@ current launch examples stay functional.
 
 ## Integration boundary
 
+New changes in projects selecting this naming convention use a readable slug and
+one lowercase ULID. The agent generates it before upstream proposal scaffolding;
+the operator supplies only the slug. A read-only package helper emits the name,
+directory and `change/<full-name>` branch, or resolves existing active changes.
+Ambiguous short names require selection. Existing identities stay unchanged.
+The full name is the only identity; no second registry or issue-time ULID exists.
+Project instructions activate this pre-scaffold step, not an installed adapter
+fork or a claim that OpenSpec config is a pre-creation hook. Branch creation
+remains separately authorized. Unique names do not resolve semantic spec overlap.
+
 Add a self-contained Node 22+/Git read-only helper to the new integration package.
 Review a committed candidate, not a mutable index. A plan digest covers config,
 proposal, design, tasks (checkbox-only changes excluded outside fences), metadata and

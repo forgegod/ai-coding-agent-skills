@@ -71,7 +71,26 @@ risk-focused template and SHALL NOT claim ISO/IEC 27001 conformity.
 - **THEN** the issue records impact and authorization fields, and does not copy `tasks.md`
 
 ### Requirement: Change name is the identity
-The OpenSpec change directory name SHALL identify the change across the issue, pull request and evidence. The distribution SHALL NOT require a ULID.
+The full OpenSpec change directory name SHALL identify the change across the issue,
+pull request and evidence. Projects selecting the naming convention SHALL generate
+`<slug>-<lowercase-ulid>` once at creation, automatically from a short proposal
+request. The authorized branch SHALL be `change/<full-name>` through specification,
+implementation and review. Existing names SHALL remain valid and unchanged.
+
+#### Scenario: Short proposal request
+- **WHEN** the operator requests `/openspec-propose add-dark-mode` for a new change
+- **THEN** the agent generates the suffix before OpenSpec scaffolding and reuses the returned name without requiring the operator to type a ULID
+- **AND** naming does not authorize branch creation, implementation, commits or publication
+
+#### Scenario: Resume and ambiguous selection
+- **WHEN** an operator resumes by a short slug or current change context
+- **THEN** the agent resolves the existing full name without generating another suffix
+- **AND** ambiguous matches require operator selection, never newest-change guessing
+
+#### Scenario: Read-only naming helper
+- **WHEN** the helper generates an identity or resolves active change directories
+- **THEN** it emits the full name, path and branch without writing files, refs or installed profiles
+- **AND** malformed input, repeated options and symlinked discovery paths are refused
 
 #### Scenario: Second clone
 - **WHEN** another checkout already edits the same capability spec
