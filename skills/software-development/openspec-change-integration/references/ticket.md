@@ -10,7 +10,7 @@ Hermes prompt:
 ```
 
 The skill applies the rest. Link `openspec/changes/<name>/` by that change
-name. Do not generate a ULID. Use the body below. Do not copy `tasks.md`. Do
+name. Do not generate another suffix. Use the body below. Do not copy `tasks.md`. Do
 not implement, commit, open a pull request, or assign the issue to acquire a
 lock. Stop after the issue readback. The operator does not repeat those
 constraints.
@@ -19,11 +19,13 @@ Other hosts use their own spelling of this skill. The action is the same.
 
 ## Identity
 
-The OpenSpec change name is the identity. Link `openspec/changes/<name>/` from
-the issue, the pull request and the evidence. Do not generate a ULID. Before
-creating a change, search existing issues and `openspec/changes/` for the same
-request and adopt that change. A second name does not make a duplicate request
-independent.
+The full OpenSpec change name is the identity. Link `openspec/changes/<name>/`
+from the issue, the pull request and the evidence. Resolve a short slug using
+`naming.md` and ask on ambiguous matches. Documentation never generates a suffix
+or creates a missing change. Before proposing new work, inspect visible matching
+requests and adopt the existing change when it is the same work. A second name
+does not make a duplicate request independent; a local search cannot discover
+every unpushed proposal in another clone.
 
 Two operators in two clones can still edit the same capability spec. That
 overlap is stopped by comparing the specs and reconciling before either change

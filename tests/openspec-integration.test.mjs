@@ -23,11 +23,13 @@ test("OpenSpec package documents explicit authority, writer separation and read-
   for (const pattern of [/candidate --repo/, /review --repo/, /receipt --repo/, /schemaVersion/, /planDigest/, /exitCode/, /does not authenticate/, /fences/, /append-only/]) assert.match(reference, pattern);
   for (const pattern of [/valid UTF-8/, /refs\/replace/, /grafts/, /fsmonitor/, /Every commit in `verified\.\.target`/, /--receipt-path/, /duplicate/i, /raw blob bytes/]) assert.match(reference, pattern);
   assert.doesNotMatch(skill, /adoption history|reviewer found|previously reported/i);
-  assert.match(skill, /version: 0\.4\.0/);
+  assert.match(skill, /version: 0\.5\.0/);
   assert.doesNotMatch(skill, /\/home\/|~\/.hermes/);
 });
 
 async function fixture(t, options = {}) {
+  const name = options.name ?? change;
+  const changeRoot = `openspec/changes/${name}`;
   const scratch = await mkdtemp(path.join(os.tmpdir(), "openspec-guard-"));
   t.after(() => rm(scratch, { recursive: true, force: true }));
   const repo = path.join(scratch, "source");
@@ -48,7 +50,7 @@ async function fixture(t, options = {}) {
   await writeFile(path.join(repo, "implementation.txt"), "implemented\n");
   await writeFile(path.join(repo, changeRoot, "tasks.md"), options.headTasks ?? "# Tasks\n- [x] 1.1 Implement and test\n");
   const head = commit(repo, "Implement");
-  return { scratch, repo, base, head };
+  return { scratch, repo, base, head, name };
 }
 
 function invoke(f, command = "candidate", extra = []) {
@@ -85,6 +87,19 @@ test("OpenSpec candidate rejects changed plans, dirty work, symbolic SHAs and mi
   await writeFile(path.join(f.repo, changeRoot, "tasks.md"), "# Tasks\n- [x] 1.1 Different scope\n");
   f.head = commit(f.repo, "Alter the approved task");
   assert.match(invoke(f).error, /Planning content changed/);
+});
+
+test("OpenSpec guard binds a generated full name and rejects the short slug", async (t) => {
+  const { generateName } = await import("../skills/software-development/openspec-change-integration/scripts/change-name.mjs");
+  const identity = generateName("add-dark-mode");
+  const f = await fixture(t, { name: identity.name });
+  git(f.repo, "branch", "-m", identity.branch);
+  const before = [git(f.repo, "status", "--porcelain=v1"), await readFile(path.join(f.repo, ".git/index"))];
+  const result = invoke(f);
+  assert.equal(result.status, 0, result.error);
+  assert.match(result.planDigest, /^[a-f0-9]{64}$/);
+  assert.notEqual(invoke({ ...f, name: "add-dark-mode" }).status, 0);
+  assert.deepEqual([git(f.repo, "status", "--porcelain=v1"), await readFile(path.join(f.repo, ".git/index"))], before);
 });
 
 test("OpenSpec plan digest preserves checkbox progress but not examples inside fences", async (t) => {

@@ -26,10 +26,13 @@ make it pass.
 Options are single-valued: a repeated flag such as two `--head` values is refused
 instead of silently taking the last one.
 
-The change name uses lowercase kebab-case. Collaborative evidence also requires
+The full change name uses lowercase kebab-case, including the lowercase ULID
+suffix for new changes under the naming convention in `naming.md`. Existing
+unsuffixed names remain valid. The guard requires the exact name, not short-name
+resolution, and never generates an identity. Collaborative evidence also requires
 a canonical `https://github.com/<owner>/<repo>/issues/<positive-number>` URL.
 Supply the operator-selected values independently; JSON must match, not redefine
-them. Do not add a ULID. The helper does not authenticate approval, reviewer
+them. Never append another suffix. The helper does not authenticate approval, reviewer
 identity, PR state or gate execution. Evidence links must be independently retrieved, matched to actual
 objects/output and retained under project policy. It does not infer required
 gates from a list: compare that list with the approved project's gate policy.

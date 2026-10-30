@@ -1,7 +1,7 @@
 ---
 name: openspec-change-integration
 description: Review and integrate explicitly selected OpenSpec changes.
-version: 0.4.0
+version: 0.5.0
 author: Raphael (forgegod), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -40,7 +40,7 @@ GitHub API client, and installing OpenSpec or this package never selects it.
   asked to write. Offline work may leave that link pending. Never invent remote
   state. When the operator asks to document, follow
   [references/ticket.md](references/ticket.md): one risk-focused issue, no task
-  list. The OpenSpec change name is the identity. Do not generate a ULID.
+  list. The full OpenSpec change name is the identity; reuse it exactly.
 
 ## Authority and writers
 
@@ -56,6 +56,15 @@ unknown write outcome blocks the mutation. A selection snapshot never grants
 permission for a later action.
 
 ## Parallel specification and documentation
+
+When project policy selects collision-resistant naming, follow
+[references/naming.md](references/naming.md) before upstream proposal scaffolding:
+the operator supplies a slug; the agent runs `scripts/change-name.mjs` to generate
+one `<slug>-<lowercase-ulid>` name. Use `change/<full-name>` for the authorized
+branch through specification, implementation and review. Resolve existing changes
+without generating another suffix; ambiguous short names require selection.
+Existing names and branches stay unchanged. This is a project-instruction step,
+not an upstream CLI hook, adapter modification, branch grant or second tracker.
 
 OpenSpec owns the proposal, delta specs, design and `tasks.md`. This skill does
 not author a second specification. Independent changes may be specified and
@@ -94,12 +103,13 @@ them. On Hermes the whole request is:
 /openspec-change-integration document <name>
 ```
 
-`<name>` is the OpenSpec change directory, such as `pin-note`. Other hosts use
-their spelling of this skill, then the same `document <name>` words.
+`<name>` is the full OpenSpec change directory name. A short slug may be resolved
+through `references/naming.md`; ambiguous matches require selection. Other hosts
+use their spelling of this skill, then the same `document <name>` words.
 
 That verb means: load `references/ticket.md`, create or update one issue for
-`openspec/changes/<name>/`, link that change name, and stop. Do not generate a
-ULID. Do not copy `tasks.md`. Do not implement, commit, open a pull request, or assign the issue to lock the work. A longer prompt is not required and does not add authority.
+`openspec/changes/<name>/`, link the resolved full name, and stop. Do not generate
+another suffix. Do not copy `tasks.md`. Do not implement, commit, open a pull request, or assign the issue to lock the work. A longer prompt is not required and does not add authority.
 
 ## Procedure
 

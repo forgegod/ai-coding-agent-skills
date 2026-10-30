@@ -13,7 +13,7 @@ const marketplacePath = path.join(root, ".claude-plugin/marketplace.json");
 
 const expectedBundles = {
   "openspec-development": {
-    version: "0.4.0",
+    version: "0.5.0",
     skills: ["openspec-change-integration", "git-commit-message", "capability-wireframes"],
   },
   "autonomous-orchestration": {
@@ -117,6 +117,8 @@ test("distribution builds complete skill and plugin ZIPs from canonical bytes", 
   assert.deepEqual(await pluginPackages(catalog.plugins[1]), ["autonomous-implementation-review"]);
   const integrationArchive = unzipSync(await readFile(path.join(output, "downloads", catalog.plugins[0].file)));
   assert.ok(integrationArchive["skills/openspec-change-integration/scripts/change-guard.mjs"], "OpenSpec ZIP must ship its guard");
+  assert.ok(integrationArchive["skills/openspec-change-integration/scripts/change-name.mjs"], "OpenSpec ZIP must ship its naming helper");
+  assert.ok(integrationArchive["skills/openspec-change-integration/references/naming.md"], "OpenSpec ZIP must ship its naming procedure");
   assert.deepEqual(
     Buffer.from(integrationArchive["skills/git-commit-message/SKILL.md"]),
     await readFile(path.join(root, "skills/software-development/git-commit-message/SKILL.md")),

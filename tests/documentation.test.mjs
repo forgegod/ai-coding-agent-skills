@@ -136,5 +136,18 @@ test("operational documentation has no research dependencies or adoption-history
     assert.equal(await stat(new URL(`../${relative}`, import.meta.url)).then(() => true, (error) => { if (error.code !== "ENOENT") throw error; return false; }), false, relative);
   }
   const workflow = await readFile(new URL("../docs/openspec-workflow.md", import.meta.url), "utf8");
-  for (const pattern of [/tasks\.md/, /post-merge|integrated/, /documentation/, /parallel/i, /openspec-propose/, /field-notes/, /pull request reviews that SHA/, /\/openspec-change-integration/, /risk-focused/, /does not\s+establish ISO/, /independent review/, /Do not generate a ULID/]) assert.match(workflow, pattern);
+  for (const pattern of [/tasks\.md/, /post-merge|integrated/, /documentation/, /parallel/i, /openspec-propose/, /field-notes/, /pull request reviews that SHA/, /\/openspec-change-integration/, /risk-focused/, /does not\s+establish ISO/, /independent review/]) assert.match(workflow, pattern);
+});
+
+test("change naming is automatic project policy, not a second identity or installed adapter fork", async () => {
+  const root = new URL("../", import.meta.url);
+  const contract = await readFile(new URL("AGENTS.md", root), "utf8");
+  const workflow = await readFile(new URL("docs/openspec-workflow.md", root), "utf8");
+  assert.match(contract, /before.*openspec new change/i);
+  assert.match(contract, /change-name\.mjs/);
+  for (const pattern of [/\/openspec-propose add-dark-mode/, /<slug>-<ulid>/, /change\/<full-name>/, /automatically/, /ambiguous/i, /existing.*names/i, /not.*stock OpenSpec/i]) assert.match(workflow, pattern);
+  for (const relative of ["docs/openspec-workflow.md", "skills/software-development/AGENTS.md", "skills/software-development/openspec-change-integration/SKILL.md", "skills/software-development/openspec-change-integration/references/ticket.md", "skills/software-development/openspec-change-integration/references/guard.md"]) {
+    const source = await readFile(new URL(relative, root), "utf8");
+    assert.doesNotMatch(source, /Do not generate a ULID\.|Do not add a ULID\./, relative);
+  }
 });

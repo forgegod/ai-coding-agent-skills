@@ -27,11 +27,11 @@ idea
   |
   | optional                         documentation, only if asked
   v                                  |
-openspec-explore                     v
+/openspec-explore (/opsx:explore)    v
   |                              GitHub issue
   |                              links the change
   v                              does not copy tasks.md
-openspec-propose
+/openspec-propose (/opsx:propose)
   writes proposal, delta specs, design, tasks.md
   |
   +-- human-facing surface --> /capability-wireframes
@@ -45,7 +45,7 @@ isolated checkout
   |                             a reviewer that did not implement
   |
   v
-openspec-apply-change
+/openspec-apply-change (/opsx:apply)
   implementer reports evidence
   orchestrator checks tasks.md
   /git-commit-message commits accepted batches
@@ -64,8 +64,8 @@ read back the integrated revision
   run the required gates on that revision
   |
   v
-openspec-sync-specs, when current specs are not already correct
-openspec-archive-change
+/openspec-sync-specs (/opsx:sync), when current specs are not already correct
+/openspec-archive-change (/opsx:archive)
   |
   v
 close the issue only if that documentation write is authorized
@@ -76,23 +76,69 @@ They share neither an index nor a `tasks.md`. A parent issue may list both
 links. It does not own either task list.
 
 Host spelling differs. The pinned OpenSpec docs use `/opsx:propose` as the
-canonical command. Hermes loads the same action as `/openspec-propose`. The
-skill file is `openspec-propose`. `/opsx:apply` is the `openspec-apply-change`
-skill. Do not assume one spelling works in every host.
+canonical command. Hermes loads the same action as `/openspec-propose`.
+`/opsx:apply` is the `/openspec-apply-change` (`/opsx:apply`) skill. Do not assume one
+spelling works in every host.
 
 Core profile, which this document assumes:
 
 | Action | Skill | Command name in the OpenSpec docs |
 | --- | --- | --- |
-| Think before a plan | `openspec-explore` | `/opsx:explore` |
-| Create the change and its planning artifacts | `openspec-propose` | `/opsx:propose` |
-| Revise planning artifacts | `openspec-update-change` | `/opsx:update` |
-| Implement tasks | `openspec-apply-change` | `/opsx:apply` |
-| Merge accepted delta specs into current specs | `openspec-sync-specs` | `/opsx:sync` |
-| Move the finished change to the archive | `openspec-archive-change` | `/opsx:archive` |
+| Think before a plan | `/openspec-explore` | `/opsx:explore` |
+| Create the change and its planning artifacts | `/openspec-propose` | `/opsx:propose` |
+| Revise planning artifacts | `/openspec-update-change` | `/opsx:update` |
+| Implement tasks | `/openspec-apply-change` | `/opsx:apply` |
+| Merge accepted delta specs into current specs | `/openspec-sync-specs` | `/opsx:sync` |
+| Move the finished change to the archive | `/openspec-archive-change` | `/opsx:archive` |
 
-`openspec-verify-change` (`/opsx:verify`) is an expanded-profile check. It is
+`/openspec-verify-change` (`/opsx:verify`) is an expanded-profile check. It is
 advisory. It does not replace project gates and it does not archive.
+
+## Change names and branches
+
+The operator supplies a readable slug, not an identifier:
+
+```text
+/openspec-propose add-dark-mode
+```
+
+Before scaffolding, the agent automatically generates one lowercase ULID and
+uses `<slug>-<ulid>` as the full OpenSpec change name. For example, the following
+is a synthetic identity, not a command to create work:
+
+```text
+Name:   add-dark-mode-01arz3ndektsv4rrffq69g5fav
+Folder: openspec/changes/add-dark-mode-01arz3ndektsv4rrffq69g5fav/
+Branch: change/add-dark-mode-01arz3ndektsv4rrffq69g5fav
+```
+
+The branch convention is `change/<full-name>`. Keep the same branch through
+specification, implementation and review; do not add phase numbers, developer
+names, or status prefixes. Naming does not authorize branch creation. Check
+existing local/remote branches and worktrees before an authorized creation;
+reuse the confirmed branch or stop on conflicting ownership, never reset it.
+
+The full name stays immutable even if the proposal title changes. Reuse it for
+issues, pull requests, evidence, handoffs and retries. Do not generate a second
+ULID for those actions. Collaborators on one change share its identity and
+coordinate writers; independently created changes receive different identities.
+Existing change names and branches remain unchanged; no bulk rename is required.
+
+On resume, use an explicitly selected existing change or verified current change
+context. A short slug resolves only if unambiguous. If multiple packages match,
+show their full names and proposal summaries and ask the operator to select one.
+Never choose the newest automatically. No match is an error on resume, not
+permission to create another change. An explicitly new proposal may share a
+slug, but first inspect visible matching requests to avoid duplicating work.
+Unique names do not eliminate overlapping-spec reconciliation or acquire a lock.
+
+This is project policy, not stock OpenSpec behavior. The root `AGENTS.md` directs
+the agent to the packaged [naming procedure](../skills/software-development/openspec-change-integration/references/naming.md)
+before `openspec new change`. The helper generates/resolves names without writes;
+OpenSpec still owns proposal scaffolding. Config artifact instructions alone
+are not a pre-creation hook. Other projects must explicitly adopt the same rule
+in their contributor instructions; installation alone does not activate it.
+Do not patch installed adapters or add another propose skill.
 
 ## Demo: field-notes
 
@@ -100,13 +146,18 @@ advisory. It does not replace project gates and it does not archive.
 the issue and pull-request numbers below are placeholders. Do not create them
 unless the operator of that project asks.
 
+The narrative uses short labels for readability. Every concrete path and later
+command uses the full identity. The suffixes below are synthetic examples;
+actual proposals receive freshly generated ULIDs. Existing unsuffixed packages
+remain valid and are not renamed.
+
 The operator wants two deliveries that can be specified at the same time:
 
-| Change | What it is | Depends on |
-| --- | --- | --- |
-| `pin-note` | A person can pin one note from the note screen | nothing |
-| `export-notes` | A command writes the notes to a file | nothing |
-| `pin-note-sync` | A second device receives the pin | integrated `pin-note` |
+| Label | Full change name | What it is | Depends on |
+| --- | --- | --- | --- |
+| `pin-note` | `pin-note-01arz3ndektsv4rrffq69g5fav` | A person can pin one note from the note screen | nothing |
+| `export-notes` | `export-notes-01arz3ndektsv4rrffq69g5faw` | A command writes the notes to a file | nothing |
+| `pin-note-sync` | `pin-note-sync-01arz3ndektsv4rrffq69g5fax` | A second device receives the pin | integrated `pin-note` |
 
 `pin-note` and `export-notes` are parallel. `pin-note-sync` may be specified
 immediately, against the `pin-note` proposal, but its implementation waits for
@@ -122,8 +173,8 @@ The operator asks to explore the pin interaction, then to propose it.
 /opsx:propose pin-note
 ```
 
-On Hermes those are `/openspec-explore` and `/openspec-propose`. The propose
-skill scaffolds `openspec/changes/pin-note/` and writes the proposal, the delta
+On Hermes those are `/openspec-explore` (`/opsx:explore`) and `/openspec-propose` (`/opsx:propose`). Under the selected project policy the agent generates the suffix first. The propose
+skill scaffolds `openspec/changes/pin-note-01arz3ndektsv4rrffq69g5fav/` and writes the proposal, the delta
 spec, the design, and `tasks.md`. That is planning. It does not authorize
 implementation, a commit, or a ticket.
 
@@ -132,11 +183,11 @@ wireframe with a prompt, which loads `/capability-wireframes`:
 
 ```text
 /capability-wireframes
-Draft a proposal wireframe for the note screen of openspec/changes/pin-note.
+Draft a proposal wireframe for the note screen of openspec/changes/pin-note-01arz3ndektsv4rrffq69g5fav.
 Keep it in the change package. Do not update the product manifest.
 ```
 
-The proposal image stays under `openspec/changes/pin-note/` and outside the
+The proposal image stays under `openspec/changes/pin-note-01arz3ndektsv4rrffq69g5fav/` and outside the
 product manifest. The stable screen key is `notes` / `note-screen`. The
 implementation slice later updates `docs/product/wireframes/notes/` and links
 that page from `openspec/specs/notes/spec.md`. A second change must not mint
@@ -146,12 +197,12 @@ Documentation is a separate short invocation. It does not happen because a
 change exists, and the operator does not repeat the ticket rules:
 
 ```text
-/openspec-change-integration document pin-note
+/openspec-change-integration document pin-note-01arz3ndektsv4rrffq69g5fav
 ```
 
 `/openspec-change-integration` applies the risk-focused body, links
-`openspec/changes/pin-note/` by that change name, and stops. It does not
-generate a ULID, copy `tasks.md`, implement, commit, open a pull request, or
+`openspec/changes/pin-note-01arz3ndektsv4rrffq69g5fav/` by that existing change name, and stops. It does not
+generate another suffix, copy `tasks.md`, implement, commit, open a pull request, or
 assign the issue to lock the work.
 
 The body is the template in
@@ -160,8 +211,8 @@ It records request, blast radius, confidentiality, integrity, availability,
 authorization and recovery. That supports change-control evidence. It does not
 establish ISO/IEC 27001 conformity. Do not label the issue compliant.
 
-The OpenSpec change name is the identity. It correlates the issue, the pull
-request and the evidence. Do not generate a ULID. If `export-notes` is a
+The full OpenSpec change name is the identity. It correlates the issue, the pull
+request and the evidence. Reuse it exactly. If `export-notes` is a
 different request, it gets its own change name in its own checkout. If another
 clone is already editing `openspec/specs/notes/spec.md`, stop and reconcile. A
 new name is not permission to continue.
@@ -181,16 +232,18 @@ checkout, by naming the skill:
 
 ```text
 /openspec-change-integration
-Implement only task group 1 of openspec/changes/pin-note in this isolated
+Implement only task group 1 of openspec/changes/pin-note-01arz3ndektsv4rrffq69g5fav in this isolated
 checkout. You are the only writer. Do not push, open a pull request, or merge.
 ```
 
-It confirms recovery and refuses a second writer for that change.
+It confirms recovery and refuses a second writer for that change. The branch,
+when separately authorized, is `change/pin-note-01arz3ndektsv4rrffq69g5fav`.
+Keep it through specification, implementation and review.
 
-The implementer follows `/openspec-apply-change` for that group and reports
-commands, paths, and results. The orchestrator checks the matching boxes in
-`tasks.md` only after that evidence is in the frozen candidate. Stock apply
-must not tick those boxes itself.
+The implementer follows `/openspec-apply-change` (`/opsx:apply`) for that
+group and reports commands, paths, and results. The orchestrator checks the
+matching boxes in `tasks.md` only after that evidence is in the frozen
+candidate. Stock apply must not tick those boxes itself.
 
 Commits use `/git-commit-message`: preview the batch, stop, and commit only
 after the preview is accepted. The implementation batch does not include a
@@ -202,7 +255,7 @@ The operator starts that review with `/autonomous-implementation-review`:
 
 ```text
 /autonomous-implementation-review
-Review only candidate abc1111 of openspec/changes/pin-note.
+Review only candidate abc1111 of openspec/changes/pin-note-01arz3ndektsv4rrffq69g5fav.
 Use a reviewer session and model that did not implement this candidate.
 Read-only. Do not merge the pull request and do not delete the branch.
 ```
@@ -217,8 +270,8 @@ When the candidate is a clean commit, for example `abc1111`, and the operator
 asks for review, open a pull request whose body names that SHA and the change:
 
 ```text
-Title: pin-note
-Body:  Change: openspec/changes/pin-note/
+Title: Pin a note
+Body:  Change: openspec/changes/pin-note-01arz3ndektsv4rrffq69g5fav/
        Candidate: abc1111
        Documents: https://github.com/example/field-notes/issues/40
 ```
@@ -244,9 +297,8 @@ Do not delete the branch.
 ```
 
 Deleting the branch waits until the integrated evidence is recoverable and the
-operator authorizes deletion. Review alone is not that authorization. Do not
-restore a ULID directory or the old `change/<ULID>/phase-<n>` branch scheme. One OpenSpec change
-uses one checkout and one review pull request.
+operator authorizes deletion. Review alone is not that authorization. One OpenSpec
+change uses one checkout and one review pull request.
 
 ### Integrate, sync, archive
 
@@ -258,10 +310,10 @@ keep the output. A failed gate keeps the change open. It does not close issue
 After that verification succeeds:
 
 1. `/git-commit-message` commits the factual receipt as its own batch.
-2. `openspec-sync-specs` updates `openspec/specs/notes/spec.md` only if the
+2. `/openspec-sync-specs` (`/opsx:sync`) updates `openspec/specs/notes/spec.md` only if the
    delta is not already there. Do not reapply a delta over a newer spec.
-3. `openspec-archive-change` moves the package to
-   `openspec/changes/archive/YYYY-MM-DD-pin-note/`.
+3. `/openspec-archive-change` (`/opsx:archive`) moves the package to
+   `openspec/changes/archive/YYYY-MM-DD-pin-note-01arz3ndektsv4rrffq69g5fav/`.
 4. Close issue 40 only if the operator authorizes that documentation write and
    the declared acceptance boundary is met. Archival does not close it.
    Closing it does not archive the change.
@@ -386,7 +438,7 @@ permission to implement, commit, open a pull request or merge.
 
 ## Guard
 
-`openspec-change-integration` ships the read-only `scripts/change-guard.mjs`
+`/openspec-change-integration` ships the read-only `scripts/change-guard.mjs`
 helper. Its [guard](../skills/software-development/openspec-change-integration/references/guard.md),
 [integration](../skills/software-development/openspec-change-integration/references/integration.md)
 and [recovery](../skills/software-development/openspec-change-integration/references/recovery.md)
@@ -402,8 +454,8 @@ dirty work and uncertain API outcomes. Read back before retrying a write.
 
 | Plugin | Skills |
 | --- | --- |
-| `openspec-development` | `openspec-change-integration`, `git-commit-message`, `capability-wireframes` |
-| `autonomous-orchestration` | `autonomous-implementation-review` |
+| `openspec-development` | `/openspec-change-integration`, `/git-commit-message`, `/capability-wireframes` |
+| `autonomous-orchestration` | `/autonomous-implementation-review` |
 
 Orchestration is optional. It requires the workflow plugin, explicit role and
 model configuration, and a supported host. Package installation does not create

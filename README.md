@@ -17,6 +17,13 @@ OpenSpec propose, apply, sync and archive own the change package and current beh
 
 Independent OpenSpec changes may be specified and implemented in parallel, one orchestrator and one checkout each. A dependent implementation waits for the prerequisite's integrated revision. Overlapping capability specs are reconciled explicitly.
 
+With the project's [naming policy](docs/openspec-workflow.md#change-names-and-branches)
+selected, `/openspec-propose add-dark-mode` stays short: the agent generates
+`add-dark-mode-<lowercase-ulid>` once and reuses it for the change folder and the
+authorized `change/<full-name>` branch. Existing names stay unchanged; ambiguous
+short names require selection. This is project instruction, not a stock OpenSpec
+hook or an installed-profile modification.
+
 GitHub issues and pull requests document and review. They are not the task list and not an execution lock. Create them only when the operator asks. Do not invent a ticket.
 
 Installing these packages does not select the workflow for another project, transfer that project's records, or grant Git or GitHub authority.
