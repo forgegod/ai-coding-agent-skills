@@ -48,12 +48,32 @@ integration. The orchestrator alone updates these task checkboxes from evidence.
 
 ## Operator revision: queryable metadata
 
-- [ ] 6.1 Define identity-only Dataview-compatible frontmatter, proposal-time issue linking and vault move boundaries.
-- [ ] 6.2 Add offline metadata validation and regression coverage without weakening planning digests.
-- [ ] 6.3 Exercise pinned OpenSpec validation, task discovery and spec-update/archive in scratch; run repository tests/build.
+- [x] 6.1 Define identity-only Dataview-compatible frontmatter, proposal-time issue linking and vault move boundaries.
+- [x] 6.2 Add offline metadata validation and regression coverage without weakening planning digests.
+- [x] 6.3 Exercise pinned OpenSpec validation, task discovery and spec-update/archive in scratch; run repository tests/build.
+
+Verification: `npm test` passed 192 tests; `npm run build` produced four skill
+packages and two plugin bundles. `npm run validate:openspec` passed. The pinned
+`npm run test:openspec` probe validated actual artifacts in a copy, rejected delta
+frontmatter as expected, discovered synthetic task progress, preserved archive
+bytes and existing spec metadata, and detected the missing header on a newly
+created current spec before adding that project-owned header and revalidating.
+Native Claude validation passed for the marketplace and both extracted plugin
+bundles in scratch. No Obsidian GUI, live issue or Windows filesystem watcher was
+tested; the documented vault probe remains separate from local implementation.
+
+This revision continues the existing workflow change. It does not create a live
+issue, configure a vault, approve a plan, commit, push or archive the real change.
 
 ## Operator revision: stable references and proposal ticket
 
-- [ ] 7.1 Revise the proposal-time issue body around identity, impact, risk and authority without prospective review/outcome evidence.
-- [ ] 7.2 Audit workflow paths, use full change names for durable references, and clarify current visuals, package-relative links and byte-identical archival.
-- [ ] 7.3 Verify documentation regressions, all repository tests/build and generated plugin validation without publishing or modifying installed profiles.
+- [x] 7.1 Revise the proposal-time issue body around identity, impact, risk and authority without prospective review/outcome evidence.
+- [x] 7.2 Audit workflow paths, use full change names for durable references, and clarify current visuals, package-relative links and byte-identical archival.
+- [x] 7.3 Verify documentation regressions, all repository tests/build and generated plugin validation without publishing or modifying installed profiles.
+
+Verification: `npm test` passed 196 tests, including the proposal-time ticket,
+stable-reference, archive-link and local Markdown-target regressions. Build,
+pinned OpenSpec compatibility, native Claude marketplace/plugin validation and
+`git diff --check` passed. The path audit distinguishes native layouts, companion
+defaults, Git refs and package-relative helpers. No product files were moved and
+no issue, installed profile, vault, commit or push was created by this revision.
