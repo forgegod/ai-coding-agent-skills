@@ -80,10 +80,38 @@ no issue, installed profile, vault, commit or push was created by this revision.
 
 ## Operator revision: automatic delivery plumbing
 
-- [ ] 8.1 Rename the lifecycle package to `openspec-delivery`, add grounded `openspec-next` execution/inspect, and define short project-selected invocation defaults with operator overrides.
-- [ ] 8.2 Implement real-Git-tested workspace creation/reuse/location/retirement previews and document bootstrap, recovery, integrated verification and record-only closure workspaces.
-- [ ] 8.3 Synchronize contracts, native records, documentation, package/plugin inventories, versions and short launch examples; verify tests/build, metadata, pinned upstream compatibility and scratch plugin packaging without changing installed profiles or publishing.
+- [x] 8.1 Rename the lifecycle package to `openspec-delivery`, add grounded `openspec-next` execution/inspect, and define short project-selected invocation defaults with operator overrides.
+- [x] 8.2 Implement real-Git-tested workspace creation/reuse/location/retirement previews and document bootstrap, recovery, integrated verification and record-only closure workspaces.
+- [x] 8.3 Synchronize contracts, native records, documentation, package/plugin inventories, versions and short launch examples; verify tests/build, metadata, pinned upstream compatibility and scratch plugin packaging without changing installed profiles or publishing.
+
+Verification: `npm test` passed 211 tests; `npm run build` produced five complete
+skill packages and two plugin bundles. Metadata validation, pinned OpenSpec
+validation/task-discovery/spec-update/archive compatibility and `git diff --check`
+passed. Native Claude validation passed for the marketplace and both extracted
+plugin exports. A separate scratch-HOME local marketplace installation succeeded
+for `openspec-development` 1.0.0 and `autonomous-orchestration` 1.4.0; native plugin
+listing and the scratch registration file confirmed both versions and paths.
+
+Real Git fixtures exercise creation/reuse, dirty-work preservation, branch/path
+collisions, symlinked planning directories, graft-override refusal, target-based
+closure workspaces and clean retirement with refs retained. Receipt validation
+accepts an exact clean detached verification checkout while candidate/review
+checks still require a branch. Guidance binds task updates before final candidate
+review and retains approval/correction evidence without another progress ledger.
+
+No live issue, protected merge, Desktop UI, end-to-end model delivery or Hermes
+release-scanner verdict was tested. Live profiles, publication and the unchecked
+operational acceptance tasks remain outside this local revision. No source
+commit, push or real-change archive is implied by these local results.
 
 ## Operator revision: lifecycle ownership diagram
 
-- [ ] 9.1 Replace the lifecycle text picture with Mermaid, distinguish operator checkpoints from automatic agent work, and clarify that the isolated checkout is an agent-managed workspace rather than a manual prerequisite or lifecycle phase; verify documentation regressions, Mermaid syntax, tests/build and metadata.
+- [x] 9.1 Replace the lifecycle text picture with Mermaid, distinguish operator checkpoints from automatic agent work, and clarify that the isolated checkout is an agent-managed workspace rather than a manual prerequisite or lifecycle phase; verify documentation regressions, Mermaid syntax, tests/build and metadata.
+
+Verification: `npm test` passed 212 tests, including the diagram ownership,
+implementation-before-review and operator authorization checkpoint regression.
+Mermaid 12.2.0 parsed the actual lifecycle fence as `flowchart-v2` using scratch-only
+dependencies; no project dependency was added. `npm run build`, metadata validation
+and `git diff --check` passed. Diagram syntax was checked, not a GitHub/Desktop
+render or an executed lifecycle. This documentation revision performs no commit,
+remote write, live profile update or change archival.
