@@ -1,3 +1,8 @@
+---
+metadata_version: 1
+artifact: design
+change: parallel-change-workflow
+---
 # Design
 
 ## Decision
@@ -8,6 +13,26 @@ on-demand OpenSpec references only under explicit project adoption; legacy skill
 current launch examples stay functional.
 
 ## Integration boundary
+
+Proposal, design, tasks and current specs use the identity-only schema in
+`docs/openspec-metadata.md`. Delta specs remain native Markdown: upstream strict
+validation rejects frontmatter there, so their identities are path-derived.
+One verified proposal-time issue URL lives on the proposal, null while blocked;
+no PR metadata or separate index is needed. Metadata remains inside the plan
+digest. A read-only YAML checker validates types and path identities, including
+archive moves. Current specs use capability identity, not a change/issue link.
+The opt-in pinned CLI probe tests validation, task parsing and actual spec-update
+and archive operations in scratch. Same-files vault views follow file locations;
+static link repair and Windows/WSL watcher behavior need separate client probes.
+
+Cross-document references use the full change name and, when needed, artifact
+role rather than active/archive paths. Resolve locations only for tool use;
+same-package relative links move together. Current visual paths are a companion
+default, not native OpenSpec policy. Spec-sync links are resolved from their
+destination before final verification; archived packages remain byte-identical.
+The documentation issue is a proposal-time risk snapshot. Later reviews and
+outcomes are separately authorized factual records, not blank future evidence
+fields or an editable issue-body permalink presented as an immutable revision.
 
 New changes in projects selecting this naming convention use a readable slug and
 one lowercase ULID. The agent generates it before upstream proposal scaffolding;

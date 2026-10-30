@@ -19,20 +19,21 @@ Displaying them grants no Git or GitHub authority.
 ## Lifecycle picture
 
 OpenSpec skills own the change package. The four companion skills own the
-boundaries OpenSpec does not enforce. A GitHub issue or pull request is written
-only when the operator asks, and it never becomes the task list.
+boundaries OpenSpec does not enforce. Under the selected metadata policy, an
+authorized new proposal includes its documentation issue before approval. A pull
+request still needs separate authority. Neither becomes the task list.
 
 ```text
 idea
   |
-  | optional                         documentation, only if asked
+  | optional                         proposal-time documentation
   v                                  |
 /openspec-explore (/opsx:explore)    v
   |                              GitHub issue
   |                              links the change
   v                              does not copy tasks.md
 /openspec-propose (/opsx:propose)
-  writes proposal, delta specs, design, tasks.md
+  writes proposal, delta specs, design, tasks.md; binds verified issue URL
   |
   +-- human-facing surface --> /capability-wireframes
   |                            proposal image stays in the change
@@ -61,10 +62,10 @@ pull request reviews that SHA
   | separate integration authority
   v
 read back the integrated revision
-  run the required gates on that revision
+sync current specs/links if needed under explicit authority
+read back the resulting integrated revision and run its required gates
   |
   v
-/openspec-sync-specs (/opsx:sync), when current specs are not already correct
 /openspec-archive-change (/opsx:archive)
   |
   v
@@ -77,8 +78,8 @@ links. It does not own either task list.
 
 Host spelling differs. The pinned OpenSpec docs use `/opsx:propose` as the
 canonical command. Hermes loads the same action as `/openspec-propose`.
-`/opsx:apply` is the `/openspec-apply-change` (`/opsx:apply`) skill. Do not assume one
-spelling works in every host.
+`/openspec-apply-change` is the skill exposed as `/opsx:apply` in that command
+spelling. Do not assume one spelling works in every host.
 
 Core profile, which this document assumes:
 
@@ -94,6 +95,58 @@ Core profile, which this document assumes:
 `/openspec-verify-change` (`/opsx:verify`) is an expanded-profile check. It is
 advisory. It does not replace project gates and it does not archive.
 
+## Identity and path conventions
+
+The full change name is the stable reference in tickets, dependencies, handoffs
+and other documents. For example, cite `pin-note-01arz3ndektsv4rrffq69g5fav`, or
+`proposal of pin-note-01arz3ndektsv4rrffq69g5fav` when the artifact matters. Do not
+embed its active directory as the durable reference. The archive keeps the same
+identity; the date prefix belongs to the storage directory, not the change name.
+For cross-project references, include the repository identity as well.
+
+Names do not automatically become clickable links. An agent resolves the name
+against the selected checkout before using filesystem tools. The packaged naming
+helper resolves active changes only; for historical work, inspect dated archive
+directories for that exact name and reject ambiguous or duplicate locations.
+An active lookup miss is not permission to create a replacement change. Dataview
+can query the unchanged `change` field and generate the link to its current file.
+Bare `[[proposal]]` links are ambiguous because many changes use that filename.
+
+The following are layout patterns for tool use, not cross-document identities.
+Unless explicitly labeled distribution source, they are relative to the adopting
+project's root. `<name>` means the full existing change name; `<capability>` is
+the capability's stable key, which may contain nested path segments.
+
+| Owner | Location pattern | Meaning |
+| --- | --- | --- |
+| Native OpenSpec | `openspec/config.yaml` | Selected project configuration |
+| Native OpenSpec | `openspec/changes/<name>/.openspec.yaml` | Change metadata |
+| Native OpenSpec | `openspec/changes/<name>/proposal.md`, `design.md`, `tasks.md` | Change-owned artifacts; bare filenames here share that package root |
+| Native OpenSpec | `openspec/changes/<name>/specs/<capability>/spec.md` | Proposed requirement delta, not the current spec |
+| Native OpenSpec | `openspec/specs/<capability>/spec.md` | Current capability behavior |
+| Native OpenSpec | `openspec/changes/archive/YYYY-MM-DD-<name>/` | Archived package, with its internal layout preserved |
+| Companion convention | `wireframes/` within the selected change package | Review-only proposal assets, if that project selects this subdirectory |
+| Companion convention | `docs/product/wireframes/` | Current visual generator and output root; not an OpenSpec requirement |
+| Companion convention | `evidence/` within the selected change package | Git-tracked integration evidence; moves with the package |
+| Git ref, not a directory | `change/<full-name>` | Branch naming convention; not an artifact location |
+
+Project-local visual layouts win over the companion's default. This distribution
+ships the playbook, not a field-notes product tree or a ready-made screen generator.
+Support-file links in this document resolve relative to this document. A skill's
+`references/` and `scripts/` resolve relative to that installed skill package,
+not the target repository or an assumed agent-profile path.
+
+Use package-relative links only when source and target move together, such as a
+proposal linking its own wireframe. For references outside that package, use the
+full change name plus artifact role, or an optional verified immutable commit
+permalink for a specific published revision. Do not use a guessed future archive
+path, and do not push merely to obtain a URL. Before syncing a delta into a current
+spec, resolve visual references by stable capability/screen key and write links
+relative to the current spec's location; a copied delta-relative link has a
+different base. Fix links before final verification, not by editing a frozen
+archive. Link edits inside approved planning files require reapproval, just like
+other planning edits. The receipt guard permits only byte-identical package movement.
+
 ## Change names and branches
 
 The operator supplies a readable slug, not an identifier:
@@ -108,7 +161,6 @@ is a synthetic identity, not a command to create work:
 
 ```text
 Name:   add-dark-mode-01arz3ndektsv4rrffq69g5fav
-Folder: openspec/changes/add-dark-mode-01arz3ndektsv4rrffq69g5fav/
 Branch: change/add-dark-mode-01arz3ndektsv4rrffq69g5fav
 ```
 
@@ -146,8 +198,8 @@ Do not patch installed adapters or add another propose skill.
 the issue and pull-request numbers below are placeholders. Do not create them
 unless the operator of that project asks.
 
-The narrative uses short labels for readability. Every concrete path and later
-command uses the full identity. The suffixes below are synthetic examples;
+The narrative uses short labels for readability. Durable references and later
+commands use the full identity, not a moving directory. The suffixes below are synthetic examples;
 actual proposals receive freshly generated ULIDs. Existing unsuffixed packages
 remain valid and are not renamed.
 
@@ -173,40 +225,66 @@ The operator asks to explore the pin interaction, then to propose it.
 /opsx:propose pin-note
 ```
 
-On Hermes those are `/openspec-explore` (`/opsx:explore`) and `/openspec-propose` (`/opsx:propose`). Under the selected project policy the agent generates the suffix first. The propose
-skill scaffolds `openspec/changes/pin-note-01arz3ndektsv4rrffq69g5fav/` and writes the proposal, the delta
-spec, the design, and `tasks.md`. That is planning. It does not authorize
-implementation, a commit, or a ticket.
+On Hermes those are `/openspec-explore` (`/opsx:explore`) and `/openspec-propose`
+(`/opsx:propose`). The selected project policy generates the suffix first. The
+propose workflow creates change `pin-note-01arz3ndektsv4rrffq69g5fav` and writes
+its proposal, delta spec, design, and `tasks.md`. The selected proposal policy includes one
+documentation issue; without that bounded authority the link remains pending.
+Planning does not authorize implementation, a commit, or a pull request.
 
 The note screen is a primary human-facing surface. The operator asks for a
 wireframe with a prompt, which loads `/capability-wireframes`:
 
 ```text
 /capability-wireframes
-Draft a proposal wireframe for the note screen of openspec/changes/pin-note-01arz3ndektsv4rrffq69g5fav.
+Draft a proposal wireframe for the note screen of change pin-note-01arz3ndektsv4rrffq69g5fav.
 Keep it in the change package. Do not update the product manifest.
 ```
 
-The proposal image stays under `openspec/changes/pin-note-01arz3ndektsv4rrffq69g5fav/` and outside the
-product manifest. The stable screen key is `notes` / `note-screen`. The
-implementation slice later updates `docs/product/wireframes/notes/` and links
-that page from `openspec/specs/notes/spec.md`. A second change must not mint
-another key for the same screen.
+The proposal visual belongs to `pin-note-01arz3ndektsv4rrffq69g5fav`, outside the
+current-product manifest. Its local HTML/PNG links move with that package. Refer
+to it elsewhere by the full change name and screen key, not its current directory.
 
-Documentation is a separate short invocation. It does not happen because a
-change exists, and the operator does not repeat the ticket rules:
+For this example, the capability key is `notes` and the screen key is
+`note-screen`. They describe the long-lived product surface, not a change or a
+directory. When the project selects the companion's default layout, the concrete
+current files are:
+
+| Artifact | Project-root-relative location |
+| --- | --- |
+| Editable current-screen definition | `docs/product/wireframes/generate.mjs` |
+| Generated current inventory | `docs/product/wireframes/manifest.json` |
+| Generated current index | `docs/product/wireframes/index.html` |
+| Generated HTML for this screen | `docs/product/wireframes/notes/html/note-screen.html` |
+| PNG rendered from that HTML | `docs/product/wireframes/notes/exports/note-screen.png` |
+| Current capability spec | `openspec/specs/notes/spec.md` |
+
+These current-product paths do not move when a change is archived. They are not
+proposal destinations and are not claimed to exist in this distribution. During
+implementation, update the generator and render its outputs; do not promote a
+proposal by moving it into the product directory. Link the actual HTML/PNG from
+the current spec, relative to that spec, and validate the resolved targets.
+A directory is not an HTML page, and a manifest key is not automatically a
+clickable URL. A later change to this screen reuses the same stable keys.
+
+The selected proposal policy creates or reuses one documentation issue during
+the authorized proposal, then records its verified URL in proposal frontmatter
+before approval. The operator does not repeat the ticket rules. For an existing
+draft with a pending link, this separately authorized invocation completes only
+the documentation step:
 
 ```text
 /openspec-change-integration document pin-note-01arz3ndektsv4rrffq69g5fav
 ```
 
-`/openspec-change-integration` applies the risk-focused body, links
-`openspec/changes/pin-note-01arz3ndektsv4rrffq69g5fav/` by that existing change name, and stops. It does not
+`/openspec-change-integration` applies the proposal-time risk-focused body and
+identifies `pin-note-01arz3ndektsv4rrffq69g5fav` by its full name. It reads back
+the issue and binds its verified URL in the proposal when authorized, then stops. It does not
 generate another suffix, copy `tasks.md`, implement, commit, open a pull request, or
 assign the issue to lock the work.
 
-The body is the template in
-`skills/software-development/openspec-change-integration/references/ticket.md`.
+The body is the packaged [ticket template](../skills/software-development/openspec-change-integration/references/ticket.md)
+(this link points to distribution source, not a file expected in field-notes).
 It records request, blast radius, confidentiality, integrity, availability,
 authorization and recovery. That supports change-control evidence. It does not
 establish ISO/IEC 27001 conformity. Do not label the issue compliant.
@@ -232,7 +310,7 @@ checkout, by naming the skill:
 
 ```text
 /openspec-change-integration
-Implement only task group 1 of openspec/changes/pin-note-01arz3ndektsv4rrffq69g5fav in this isolated
+Implement only task group 1 of change pin-note-01arz3ndektsv4rrffq69g5fav in this isolated
 checkout. You are the only writer. Do not push, open a pull request, or merge.
 ```
 
@@ -255,7 +333,7 @@ The operator starts that review with `/autonomous-implementation-review`:
 
 ```text
 /autonomous-implementation-review
-Review only candidate abc1111 of openspec/changes/pin-note-01arz3ndektsv4rrffq69g5fav.
+Review only candidate abc1111 of change pin-note-01arz3ndektsv4rrffq69g5fav.
 Use a reviewer session and model that did not implement this candidate.
 Read-only. Do not merge the pull request and do not delete the branch.
 ```
@@ -271,7 +349,7 @@ asks for review, open a pull request whose body names that SHA and the change:
 
 ```text
 Title: Pin a note
-Body:  Change: openspec/changes/pin-note-01arz3ndektsv4rrffq69g5fav/
+Body:  Change: pin-note-01arz3ndektsv4rrffq69g5fav
        Candidate: abc1111
        Documents: https://github.com/example/field-notes/issues/40
 ```
@@ -307,13 +385,26 @@ target revision. Run the project's required gates on that named revision and
 keep the output. A failed gate keeps the change open. It does not close issue
 40, and it does not mean the merge should be replayed.
 
-After that verification succeeds:
+Before closing the change:
 
-1. `/git-commit-message` commits the factual receipt as its own batch.
-2. `/openspec-sync-specs` (`/opsx:sync`) updates `openspec/specs/notes/spec.md` only if the
-   delta is not already there. Do not reapply a delta over a newer spec.
-3. `/openspec-archive-change` (`/opsx:archive`) moves the package to
-   `openspec/changes/archive/YYYY-MM-DD-pin-note-01arz3ndektsv4rrffq69g5fav/`.
+1. `/openspec-sync-specs` (`/opsx:sync`) updates the current `notes` capability spec only if the
+   delta is not already there. Do not reapply a delta over a newer spec. Add the
+   project-owned `spec`/capability frontmatter to a newly created current spec;
+   keep deltas frontmatter-free and validate links from their final document base.
+   Run the target project's metadata check and `openspec validate --all --strict`.
+   `npm run validate:openspec` is this distribution's check, not a script installed
+   into field-notes by copying a skill.
+2. If spec sync, metadata or link correction changed the integrated tree, obtain
+   the authorized integrated revision and re-run required gates on it before
+   recording the receipt. `/git-commit-message` commits the factual receipt as
+   its own authorized batch; it names that actually verified revision.
+3. `/openspec-archive-change` (`/opsx:archive`) moves the completed package into
+   the dated archive layout. Continue referring to it as
+   `pin-note-01arz3ndektsv4rrffq69g5fav`; no cross-document path rewrite is needed.
+   Verify byte-identical movement and re-run metadata/upstream checks. Current
+   specs must already be correct for a record-only archive; use native
+   `--skip-specs` only for that verified case. If archival needs further spec or
+   link changes, stop the record-only closure and return to integrated verification.
 4. Close issue 40 only if the operator authorizes that documentation write and
    the declared acceptance boundary is met. Archival does not close it.
    Closing it does not archive the change.
@@ -332,7 +423,7 @@ two files is not combined-system evidence.
 | Concern | Authority |
 | --- | --- |
 | Current behavior | `openspec/specs/<capability>/spec.md`, backed by code and tests |
-| Proposed scope and behavior | `openspec/changes/<name>/proposal.md` and delta specs |
+| Proposed scope and behavior | Proposal and delta specs of the selected full change name |
 | Technical approach | Change-owned `design.md` where needed |
 | Implementation progress | Change-owned `tasks.md`, written only by the orchestrator |
 | Specification actions | OpenSpec propose, apply, sync and archive |
@@ -340,7 +431,7 @@ two files is not combined-system evidence.
 | Human-facing visuals | `/capability-wireframes` |
 | Independent review before merge | `/autonomous-implementation-review` |
 | Candidate identity, recovery and integrated evidence | `/openspec-change-integration` |
-| Documentation and human review | GitHub issue and pull request, only when the operator asks |
+| Documentation and human review | Proposal-time issue under explicit project policy; PR and later updates separately authorized |
 
 One concern has one authority. `tasks.md` is the only mutable task list. An
 issue is not a second plan. A pull request is not a progress file. A checked
@@ -400,9 +491,11 @@ Independent changes may be specified and implemented at the same time.
 GitHub is the documentation and review surface. It is not the specification
 system and not an execution lock.
 
-- Create or update an issue only when the operator asks to document a request.
-  Link the OpenSpec change. Do not copy `tasks.md` into the issue, and do not
-  invent a ticket.
+- During an authorized new proposal, create or reuse one documentation issue
+  under the explicitly selected proposal-time policy. Read it back and record
+  its URL before plan approval. Offline or unauthorized drafts use a null link
+  and remain pending. Later issue updates need separate authority. Link the
+  OpenSpec change. Do not copy `tasks.md` into the issue or invent a ticket.
 - Open a pull request only when the operator asks to review or integrate a
   frozen candidate. The review binds the exact commit, not the evolving request
   body. A changed candidate invalidates review.
@@ -433,12 +526,23 @@ system and not an execution lock.
    of the commit that contains it.
 5. Stop at the authorized change. No next change, release or cleanup is implied.
 
-Planning permission ends at the requested artifacts. Approval of a plan is not
+Planning permission ends at the requested artifacts and the bounded proposal-time
+issue write when explicitly selected by project policy. Approval of a plan is not
 permission to implement, commit, open a pull request or merge.
+
+## Metadata and vault views
+
+Follow [OpenSpec metadata and Obsidian](openspec-metadata.md) for identity-only
+YAML frontmatter, one stable `github_issue` on the proposal, validation commands
+and same-files vault integration. No PR list or progress properties are stored.
+Metadata stays covered by the plan digest; corrections after approval require
+reapproval. Archive moves retain the change identity. Current specs use their
+capability identity, not the originating change. A Dataview dashboard is a view,
+not another task authority or proof of client filesystem synchronization.
 
 ## Guard
 
-`/openspec-change-integration` ships the read-only `scripts/change-guard.mjs`
+`/openspec-change-integration` ships the read-only package-relative `scripts/change-guard.mjs`
 helper. Its [guard](../skills/software-development/openspec-change-integration/references/guard.md),
 [integration](../skills/software-development/openspec-change-integration/references/integration.md)
 and [recovery](../skills/software-development/openspec-change-integration/references/recovery.md)

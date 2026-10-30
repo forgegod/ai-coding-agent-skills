@@ -24,7 +24,7 @@ authorized `change/<full-name>` branch. Existing names stay unchanged; ambiguous
 short names require selection. This is project instruction, not a stock OpenSpec
 hook or an installed-profile modification.
 
-GitHub issues and pull requests document and review. They are not the task list and not an execution lock. Create them only when the operator asks. Do not invent a ticket.
+GitHub issues and pull requests document and review. They are not the task list and not an execution lock. Under the explicitly selected [metadata policy](docs/openspec-metadata.md), a new proposal includes one authorized documentation issue before approval; offline drafts keep a null link. PR creation remains separately authorized. Do not invent a ticket. Identity-only YAML frontmatter supports Dataview without copying progress or PR state.
 
 Installing these packages does not select the workflow for another project, transfer that project's records, or grant Git or GitHub authority.
 

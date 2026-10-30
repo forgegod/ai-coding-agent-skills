@@ -54,17 +54,19 @@ GitHub issues and pull requests SHALL be documentation and review records. They
 SHALL NOT be the specification authority, a task list, or an admission lock.
 Independent OpenSpec changes MAY be specified concurrently.
 
-#### Scenario: Specification without a ticket
-- **WHEN** an operator authorizes an OpenSpec change and does not ask to document it
-- **THEN** specification proceeds without creating an issue or pull request
+#### Scenario: Offline or unauthorized issue creation
+- **WHEN** local specification proceeds without authority or connectivity for its required issue
+- **THEN** the proposal keeps `github_issue: null` and remains pending before plan approval, without creating a pull request or fabricating an issue
 
 #### Scenario: Overlapping specifications
 - **WHEN** two active changes modify the same capability spec
 - **THEN** merge waits for explicit reconciliation
 
 ### Requirement: Risk-focused documentation issue
-When the operator asks to document a change, the issue body SHALL follow the
-risk-focused template and SHALL NOT claim ISO/IEC 27001 conformity.
+For projects selecting proposal-time documentation, an authorized new proposal
+SHALL create or reuse one verified issue before approval. The issue body SHALL
+follow the risk-focused template and SHALL NOT claim ISO/IEC 27001 conformity.
+Installation and metadata migration SHALL NOT grant issue-write authority.
 
 #### Scenario: Documented request
 - **WHEN** the operator sends the documentation prompt
@@ -96,6 +98,16 @@ implementation and review. Existing names SHALL remain valid and unchanged.
 - **WHEN** another checkout already edits the same capability spec
 - **THEN** work stops for reconciliation even if a new change name could be chosen
 
+#### Scenario: Durable reference across archive movement
+- **WHEN** a ticket or another document refers to an OpenSpec change
+- **THEN** it cites the full change name and optional artifact role, not the moving active/archive path
+- **AND** locating an archived package preserves that identity and does not invent a new name or claim that an active-only helper searches archives
+
+#### Scenario: Proposal-time documentation
+- **WHEN** the documentation issue is created during a proposal
+- **THEN** it records the request, blast radius, risk and authorization boundary without prospective review, merge or closure evidence
+- **AND** any later approval binds retained input revisions rather than treating an editable issue body as immutable
+
 ### Requirement: Independent reviewer before merge
 A pull request SHALL NOT be merged, and its branch SHALL NOT be deleted, until
 a reviewer that did not implement the candidate has reviewed that exact SHA and
@@ -104,3 +116,24 @@ findings are dispositioned.
 #### Scenario: Implementer reviews itself
 - **WHEN** the only available reviewer is the session that implemented the candidate
 - **THEN** merge and branch deletion stop
+
+### Requirement: Queryable identity metadata
+Proposals, designs, task files and current specs SHALL use the versioned YAML
+frontmatter contract. Delta specs SHALL remain native Markdown without frontmatter
+because pinned upstream strict validation rejects it; their identity is path-derived.
+Metadata SHALL describe identity and navigation, not task progress, approval or
+PR state, and SHALL remain included in the existing planning digest.
+
+#### Scenario: Stable proposal association
+- **WHEN** the proposal's documentation issue is read back successfully
+- **THEN** its full URL is recorded only on the proposal and remains unchanged by default
+- **AND** correcting metadata after plan approval requires reapproval
+
+#### Scenario: Archive and current spec identities
+- **WHEN** OpenSpec moves a completed change to its archive and updates current specs
+- **THEN** archived artifacts retain their original change identity and current specs carry only their capability identity
+- **AND** a same-files vault can query the new location without a second mutable tracker
+
+#### Scenario: Invalid metadata
+- **WHEN** metadata has duplicate YAML keys, wrong types, unsupported fields or identities inconsistent with its native path
+- **THEN** the read-only metadata check fails without repairing files or bypassing upstream validation

@@ -1,3 +1,8 @@
+---
+metadata_version: 1
+artifact: tasks
+change: parallel-change-workflow
+---
 # Parallel-change workflow tasks
 
 ## Local source implementation
@@ -40,3 +45,15 @@ integration. The orchestrator alone updates these task checkboxes from evidence.
 - [x] 5.1 Define automatic slug-plus-ULID creation, exact reuse, legacy compatibility and stable branch naming in project policy and companion guidance.
 - [x] 5.2 Implement and test read-only name generation and unambiguous resolution without changing upstream adapters or installed profiles.
 - [x] 5.3 Verify pinned OpenSpec compatibility in scratch, run repository tests/build and validate generated plugin packaging.
+
+## Operator revision: queryable metadata
+
+- [ ] 6.1 Define identity-only Dataview-compatible frontmatter, proposal-time issue linking and vault move boundaries.
+- [ ] 6.2 Add offline metadata validation and regression coverage without weakening planning digests.
+- [ ] 6.3 Exercise pinned OpenSpec validation, task discovery and spec-update/archive in scratch; run repository tests/build.
+
+## Operator revision: stable references and proposal ticket
+
+- [ ] 7.1 Revise the proposal-time issue body around identity, impact, risk and authority without prospective review/outcome evidence.
+- [ ] 7.2 Audit workflow paths, use full change names for durable references, and clarify current visuals, package-relative links and byte-identical archival.
+- [ ] 7.3 Verify documentation regressions, all repository tests/build and generated plugin validation without publishing or modifying installed profiles.

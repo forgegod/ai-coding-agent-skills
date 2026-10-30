@@ -1,3 +1,9 @@
+---
+metadata_version: 1
+artifact: proposal
+change: parallel-change-workflow
+github_issue: null
+---
 # Explicit OpenSpec parallel-change integration
 
 ## Why
@@ -15,6 +21,9 @@ OpenSpec.
 - Adapt commit, visual and supported-host role skills to the OpenSpec change.
 - Publish only the OpenSpec companion packages and the separate orchestration
   package. Do not publish a second phase skill set.
+- Add identity-only YAML frontmatter, proposal-time issue linking, read-only
+  metadata validation and an isolated upstream compatibility probe. Obsidian
+  views use the same files and stable identity across archive moves.
 
 ## Capabilities
 
@@ -29,8 +38,8 @@ None: consuming projects' record contracts are outside this source change.
 
 Canonical source, package catalog/build, tests and installation guidance change.
 No installed profile, live ticket, PR, GitHub setting, sibling repository or public
-endpoint is modified. A real issue and securely generated correlation ID are pending
-before collaborative admission; neither is fabricated for this local bootstrap.
+endpoint is modified. The existing change name stays unchanged. A real proposal
+issue remains pending before plan approval; metadata migration does not create it.
 
 ## Acceptance
 
