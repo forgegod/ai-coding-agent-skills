@@ -6,7 +6,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const guard = fileURLToPath(new URL("../skills/software-development/openspec-change-integration/scripts/change-guard.mjs", import.meta.url));
+const guard = fileURLToPath(new URL("../skills/software-development/openspec-delivery/scripts/change-guard.mjs", import.meta.url));
 const change = "fixture-change";
 const changeRoot = `openspec/changes/${change}`;
 const archived = `openspec/changes/archive/2026-10-29-${change}`;
@@ -23,7 +23,7 @@ test("OpenSpec package documents explicit authority, writer separation and read-
   for (const pattern of [/candidate --repo/, /review --repo/, /receipt --repo/, /schemaVersion/, /planDigest/, /exitCode/, /does not authenticate/, /fences/, /append-only/]) assert.match(reference, pattern);
   for (const pattern of [/valid UTF-8/, /refs\/replace/, /grafts/, /fsmonitor/, /Every commit in `verified\.\.target`/, /--receipt-path/, /duplicate/i, /raw blob bytes/]) assert.match(reference, pattern);
   assert.doesNotMatch(skill, /adoption history|reviewer found|previously reported/i);
-  assert.match(skill, /version: 0\.7\.0/);
+  assert.match(skill, /version: 1\.0\.0/);
   assert.doesNotMatch(skill, /\/home\/|~\/.hermes/);
 });
 
@@ -90,7 +90,7 @@ test("OpenSpec candidate rejects changed plans, dirty work, symbolic SHAs and mi
 });
 
 test("OpenSpec guard binds a generated full name and rejects the short slug", async (t) => {
-  const { generateName } = await import("../skills/software-development/openspec-change-integration/scripts/change-name.mjs");
+  const { generateName } = await import("../skills/software-development/openspec-delivery/scripts/change-name.mjs");
   const identity = generateName("add-dark-mode");
   const f = await fixture(t, { name: identity.name });
   git(f.repo, "branch", "-m", identity.branch);
@@ -343,6 +343,21 @@ test("OpenSpec receipt requires real integration ancestry and exact successful t
     await writeFile(f.file, JSON.stringify(invalid));
     assert.notEqual(invoke(f, "receipt", ["--receipt", f.file]).status, 0, JSON.stringify(invalid));
   }
+});
+
+test("receipt accepts an exact clean detached verification worktree but candidates still need a branch", async (t) => {
+  const f = await integrated(t);
+  const verification = path.join(f.scratch, "verification");
+  git(f.repo, "worktree", "add", "--detach", verification, f.target);
+  const detached = { ...f, repo: verification };
+  const result = invoke(detached, "receipt", ["--receipt", f.file]);
+  assert.equal(result.status, 0, result.error);
+  await writeFile(path.join(verification, "unfinished.txt"), "preserve\n");
+  assert.match(invoke(detached, "receipt", ["--receipt", f.file]).error, /Dirty/);
+  await rm(path.join(verification, "unfinished.txt"));
+  git(verification, "checkout", "--detach", f.head);
+  assert.match(invoke(detached, "receipt", ["--receipt", f.file]).error, /HEAD changed/);
+  assert.notEqual(invoke(detached).status, 0, "Candidate validation must still reject detached HEAD");
 });
 
 test("OpenSpec receipt refuses evidence that is not one regular bounded JSON object", async (t) => {

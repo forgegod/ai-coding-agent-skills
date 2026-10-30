@@ -19,9 +19,10 @@ runs with replace objects disabled plus repository-configured `core.fsmonitor`
 neutralized, so a repository cannot rewrite ancestry or execute a configured
 fsmonitor command. Optional Git locks are disabled so status inspection does not refresh the
 index. Repository-local `refs/replace/*` entries and non-empty `info/grafts` in the
-selected repository fail the check. The checkout must be clean and attached to the
-exact candidate/target branch tip; never clean/reset/stash someone else's work to
-make it pass.
+selected repository fail the check. Candidate/review checks require a clean attached
+checkout at the exact candidate SHA. Receipt checks also allow a clean detached
+verification checkout, but HEAD must still equal the exact named target SHA;
+never clean/reset/stash someone else's work to make a check pass.
 
 Options are single-valued: a repeated flag such as two `--head` values is refused
 instead of silently taking the last one.

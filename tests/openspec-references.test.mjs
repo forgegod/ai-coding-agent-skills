@@ -6,7 +6,7 @@ import path from "node:path";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const read = (file) => readFile(path.join(root, file), "utf8");
-const ticketPath = "skills/software-development/openspec-change-integration/references/ticket.md";
+const ticketPath = "skills/software-development/openspec-delivery/references/ticket.md";
 
 test("proposal issue is a stable identity and risk snapshot, not prospective lifecycle evidence", async () => {
   const source = await read(ticketPath);

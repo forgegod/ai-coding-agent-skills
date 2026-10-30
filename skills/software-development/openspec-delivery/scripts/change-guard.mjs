@@ -132,9 +132,9 @@ function planning(repo, ref, change) {
   }
   return { digest: hash.digest("hex"), complete };
 }
-function clean(repo, head) {
+function clean(repo, head, requireBranch = true) {
   requireThat(git(repo, "rev-parse", "HEAD").trim() === head, "Checkout HEAD changed");
-  requireThat(git(repo, "symbolic-ref", "--quiet", "HEAD").trim(), "Expected an attached branch");
+  if (requireBranch) requireThat(git(repo, "symbolic-ref", "--quiet", "HEAD").trim(), "Expected an attached branch");
   requireThat(!git(repo, "status", "--porcelain=v1", "--untracked-files=all").trim(), "Dirty checkout; preserve uncommitted work");
 }
 function candidate(o, requireCheckout = true) {
@@ -287,7 +287,9 @@ function receipt(o) {
     requireThat(entry && isRegular(entry), "Published receipt must be a committed regular file");
     requireThat(gitBytes(o.repo, "show", `${target}:${published}`).equals(record.bytes), "Published receipt bytes differ from the supplied evidence file");
   }
-  clean(o.repo, target);
+  // Integrated verification may run detached at this exact target SHA. Candidate
+  // and review checks still require an attached implementation branch.
+  clean(o.repo, target, false);
   return { ...snapshot, integrated, verified, target, receiptSha256: record.sha256 };
 }
 function main() {

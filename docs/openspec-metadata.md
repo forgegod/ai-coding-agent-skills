@@ -52,7 +52,7 @@ Markdown outside native proposal/design/tasks/spec paths is not part of this sch
 
 For projects explicitly selecting this policy, a new proposal includes creating
 or reusing one risk-focused GitHub issue before plan approval. Use the existing
-`openspec-change-integration/references/ticket.md` procedure, search for an
+`openspec-delivery/references/ticket.md` procedure, search for an
 existing issue first, and read back the exact issue after a write. Record the
 verified full URL only in `proposal.md`. Do not create a second issue on retry.
 The corresponding PR links the issue in GitHub; frontmatter does not track PRs.

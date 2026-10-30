@@ -6,7 +6,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const helper = new URL("../skills/software-development/openspec-change-integration/scripts/change-name.mjs", import.meta.url);
+const helper = new URL("../skills/software-development/openspec-delivery/scripts/change-name.mjs", import.meta.url);
 const alphabet = "0123456789abcdefghjkmnpqrstvwxyz";
 const decode = (text) => [...text].reduce((n, char) => n * 32n + BigInt(alphabet.indexOf(char)), 0n);
 function invoke(args, cwd) {

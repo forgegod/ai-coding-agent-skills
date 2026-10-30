@@ -11,7 +11,8 @@ const expectedSkillNames = [
   "autonomous-implementation-review",
   "capability-wireframes",
   "git-commit-message",
-  "openspec-change-integration",
+  "openspec-delivery",
+  "openspec-next",
 ];
 
 function frontmatterField(source, name) {
@@ -42,8 +43,8 @@ test("well-known build publishes every skill and all advertised files", async ()
 
     const autonomous = index.skills.find((skill) => skill.name === "autonomous-implementation-review");
     assert.deepEqual(autonomous?.files, ["references/claude-code-host.md", "references/claude-code-roles.md", "references/environment-passthrough.md", "references/herdr.md", "references/lifecycle-watch.md", "references/openspec.md", "scripts/herdr_lifecycle_watch.mjs", "scripts/herdr_panes.py", "scripts/herdr-pane-state.mjs", "SKILL.md", "templates/phase-implementer.md", "templates/phase-reviewer.md"]);
-    const integration = index.skills.find((skill) => skill.name === "openspec-change-integration");
-    assert.deepEqual(integration?.files, ["references/guard.md", "references/integration.md", "references/naming.md", "references/recovery.md", "references/ticket.md", "scripts/change-guard.mjs", "scripts/change-name.mjs", "SKILL.md"]);
+    const integration = index.skills.find((skill) => skill.name === "openspec-delivery");
+    assert.deepEqual(integration?.files, ["references/continuation.md", "references/guard.md", "references/integration.md", "references/naming.md", "references/recovery.md", "references/ticket.md", "references/workspace.md", "scripts/change-guard.mjs", "scripts/change-name.mjs", "scripts/change-workspace.mjs", "SKILL.md"]);
   } finally {
     await rm(output, { recursive: true, force: true });
   }

@@ -16,7 +16,7 @@ scripts before enabling; do not use another client to evade an unresolved securi
 4. Open **openspec-development**, review the package, and select **Add**.
 5. Start a new conversation or Cowork task and look for the skills in the picker.
 
-The workflow plugin contains `openspec-change-integration`, `git-commit-message`,
+The workflow plugin contains `openspec-delivery`, `openspec-next`, `git-commit-message`,
 and `capability-wireframes`. It does not install OpenSpec or its CLI and does not
 transfer another project's records. The separate **autonomous-orchestration**
 plugin adds `autonomous-implementation-review` only. It requires
@@ -49,7 +49,7 @@ Source: [Anthropic's plugin ZIP upload instructions](https://claude.com/docs/plu
 
 ### Alternative: upload one skill
 
-1. Download the individual skill ZIP, for example `openspec-change-integration.zip`, from
+1. Download the individual skill ZIP, for example `openspec-delivery.zip`, from
    the same download page. It is different from a `.plugin.zip` bundle.
 2. Ensure **Settings → Capabilities → Code execution and file creation** (also
    called **Create and edit files**) is enabled, subject to organization policy.
@@ -68,18 +68,18 @@ and [Create and package custom skills](https://support.claude.com/en/articles/12
 
 Open the plugin's skill list rather than trusting a model's statement that it has
 loaded something. The workflow plugin should list exactly
-`openspec-change-integration`, `git-commit-message`, and `capability-wireframes`,
+`openspec-delivery`, `openspec-next`, `git-commit-message`, and `capability-wireframes`,
 and not `autonomous-implementation-review`.
 The optional orchestration plugin should list only that latter skill.
 
 Claude Code namespaces plugin skills: use
-`/openspec-development:openspec-change-integration`, not the bare slash-command
+`/openspec-development:openspec-delivery`, not the bare slash-command
 names used by direct directory copies. Resolve related skill names within the
 installed plugins and support files relative to the loaded skill directory;
 Hermes's `skill_view`, `terminal`, and `patch` tools are not installed by these packages.
 
 For an initial read-only check, ask Claude to describe the installed
-`openspec-change-integration` workflow without creating or editing anything. This confirms
+`openspec-delivery` workflow without creating or editing anything. This confirms
 loading, not the ability to execute a change safely.
 
 Avoid enabling an individual upload, a plugin copy, and a manually copied local
@@ -135,7 +135,7 @@ and [manage skills](https://support.claude.com/en/articles/12512180-use-skills-i
 
 `npm test` and `npm run build` validate the repository catalog and produce:
 
-- Four individual ZIPs, each preserving every canonical package file byte-for-byte.
+- Five individual ZIPs, each preserving every canonical package file byte-for-byte.
 - Two plugin ZIPs, with the OpenSpec companion skills separated from opt-in orchestration.
 - `dist/downloads/index.html` and `index.json`, including SHA-256 checksums.
 - The unchanged-format Hermes `.well-known/skills/` endpoint.
@@ -157,7 +157,7 @@ and Pages artifact inclusion. They do not prove model obedience, cloud acceptanc
 or scanner approval.
 
 Validate the marketplace and both plugin exports with a disposable HOME and
-CLAUDE_CONFIG_DIR, without account credentials. Check exact inventories: three
+CLAUDE_CONFIG_DIR, without account credentials. Check exact inventories: four
 companion skills and one optional orchestration skill; no active agents, hooks
 or servers. Desktop acceptance and end-to-end workflow
 execution are not verified by package validation and require separate checks.

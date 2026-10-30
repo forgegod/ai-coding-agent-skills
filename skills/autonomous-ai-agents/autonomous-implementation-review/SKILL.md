@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.13.0
+version: 0.14.0
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -32,7 +32,7 @@ write GitHub state.
   before dispatch. A planning-only request stops after proposal/spec/design/tasks;
   do not dispatch implementation.
 - Require explicit execution authority before step 1. The orchestrator is the sole
-  Git and `tasks.md` writer through `openspec-change-integration`. The executor
+  Git and `tasks.md` writer through `openspec-delivery`. The executor
   must not edit `tasks.md`, stage, commit, integrate, or retire checkouts.
   Reviewers are read-only.
 - This automated role loop is Herdr-only. Require `$HERDR_ENV=1` and load
@@ -52,10 +52,16 @@ write GitHub state.
 
 ## Goal and repository truth
 
-Operator launch (display alone grants no authority; assessment is read-only):
+In a project adopting delivery's short-invocation policy, `/openspec-next` or
+`/openspec-delivery <name>` selects the approved group and automatically calls
+this configured role loop. The operator need not repeat its Git recipe. Local
+authority includes workspace creation/bootstrap, task updates and previewed
+autonomous commits, not push/PR/merge. Restrictions override defaults.
+
+Optional persisted-goal launch (display alone grants no authority):
 
 ```text
-/goal draft Execute only the authorized task group of openspec/changes/<name> using autonomous-implementation-review and openspec-change-integration. I authorize the orchestrator to use an isolated checkout, commit the reviewed implementation, and update that change's tasks.md after checking evidence. Stop after the named task group; do not push, open a pull request, merge, or start another change.
+/goal draft /openspec-delivery <name>
 ```
 
 `/goal draft` starts execution; the operator inspects `/goal show`. Resume from
@@ -71,7 +77,7 @@ resolve. Reuse valid evidence; batch independent lookups.
 
 ## Procedure
 
-1. Confirm recovery and an isolated checkout through `openspec-change-integration`.
+1. Confirm recovery and an isolated checkout through `openspec-delivery`.
    Do not start a second writer for the same change.
 2. Through the Herdr recipe, start a fresh outcome-named implementer session with
    accepted `/busy queue`, configured model and a visible `Agent Running` readback.

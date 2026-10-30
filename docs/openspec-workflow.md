@@ -1,7 +1,7 @@
 # OpenSpec SDLC
 
 This distribution supports one lifecycle: OpenSpec for specification and task
-progress, plus four companion skills for the boundaries OpenSpec does not
+progress, plus five companion skills for the boundaries OpenSpec does not
 enforce. Installing a package does not select the workflow for another project,
 transfer that project's records, or grant Git or GitHub authority. Projects that
 already keep older records leave those records in place.
@@ -16,61 +16,134 @@ archival by itself.
 The picture and the field-notes walk-through below are unexecuted examples.
 Displaying them grants no Git or GitHub authority.
 
+## Short operator commands
+
+The agent owns the Git plumbing. This project explicitly selects the following
+invocation contract; other projects must adopt it in contributor instructions.
+Installing skills, displaying examples or approving a plan does not execute it.
+Operator restrictions override defaults and remain effective on a bare `next`.
+
+| Request | Agent behavior and authority |
+| --- | --- |
+| `/openspec-propose add-dark-mode` | Generate the name, prepare/reuse an isolated workspace before native scaffolding, draft the plan and bind the proposal-time issue. No implementation or commits. |
+| `/openspec-next` | Resolve the current change and advance one approved unfinished local task group through setup, bootstrap, implementation, gates, independent review, task updates and autonomous local commits with previews. No push/PR/merge. |
+| `/openspec-next pin-note` | The same, selecting an unambiguous short slug; no operator-typed ULID. |
+| `/openspec-next inspect` | Read-only selection and evidence/approval/dependency assessment. No setup, bootstrap, dispatch or Git writes. |
+| `/openspec-delivery pin-note` | The same bounded local continuation as next, for the selected change. |
+| `/openspec-delivery prepare pin-note` | Only prepare/reuse and bootstrap its workspace; no implementation, commits or remote writes. |
+| `/openspec-delivery finish pin-note` | Separately authorize that change's frozen candidate publication, protected implementation/closure PRs, integrated gates, receipt/archive commits, acceptance-bound issue closure and clean dedicated worktree retirement. |
+| `/openspec-delivery document pin-note` | Create/reuse one documentation issue, read it back and bind its URL; no implementation, commits or PR. |
+
+Normally propose, approve the actual plan, then send `/openspec-next`; repeat next
+for the next group of the same change. The agent does not stop between worktree
+creation, bootstrap, testing and local commits to ask for the same authority
+again. It stops for missing approval, ambiguous selection/ownership, failed gates,
+review findings needing disposition, unsupported roles, or a new side-effect
+boundary. At a reviewed candidate it offers the short `finish` invocation rather
+than a paragraph of Git instructions. A bare next never grants remote authority.
+With existing finish authority, resume remaining closure steps automatically;
+never ask again for each receipt, archive or clean-worktree removal.
+
+A direction change needs only the exception, for example
+`/openspec-delivery pin-note group 1 no commits` or
+`/openspec-delivery finish pin-note keep the worktree`.
+Finish does not approve findings/risk, bypass protection, push the target directly,
+force-push, delete branches, release or start another change. Earlier conflicting
+restrictions need an explicit change, not silent cancellation. Host/tool approval
+controls and reviewer pane-selection requirements remain in force.
+
+The workspace recipe and read-only helper validate canonical paths, exact base,
+branch registration, creation/reuse and clean retirement; the orchestrator runs
+and verifies their argument arrays. Worktrees isolate the directory/index, not
+shared Git refs, services, caches or agent identity. Bootstrap uses the target
+project's documented recipe, not invented dependency commands. Existing dirty
+work, detached/locked trees, collisions or missing plan ancestry require recovery,
+not reset/copy/another ULID. Independent clones remain supported for evidence.
+See [workspace](../skills/software-development/openspec-delivery/references/workspace.md)
+and [continuation](../skills/software-development/openspec-delivery/references/continuation.md).
+
+The canonical lifecycle package is `openspec-delivery`; `openspec-change-integration`
+is no longer distributed. Installed copies are unchanged by source edits. Do not
+load old and new lifecycle instructions together. A separate operator-authorized
+installation/retirement must preserve local customizations and old hub registration;
+the local installer does not interpret a new package name as permission to delete
+an old installed package. No running shared-profile skill removes itself.
+
 ## Lifecycle picture
 
-OpenSpec skills own the change package. The four companion skills own the
+OpenSpec skills own the change package. The five companion skills own the
 boundaries OpenSpec does not enforce. Under the selected metadata policy, an
 authorized new proposal includes its documentation issue before approval. A pull
 request still needs separate authority. Neither becomes the task list.
 
-```text
-idea
-  |
-  | optional                         proposal-time documentation
-  v                                  |
-/openspec-explore (/opsx:explore)    v
-  |                              GitHub issue
-  |                              links the change
-  v                              does not copy tasks.md
-/openspec-propose (/opsx:propose)
-  writes proposal, delta specs, design, tasks.md; binds verified issue URL
-  |
-  +-- human-facing surface --> /capability-wireframes
-  |                            proposal image stays in the change
-  |
-  v
-isolated checkout
-  /openspec-change-integration     one orchestrator, one writer
-  |
-  +-- required before merge --> /autonomous-implementation-review
-  |                             a reviewer that did not implement
-  |
-  v
-/openspec-apply-change (/opsx:apply)
-  implementer reports evidence
-  orchestrator checks tasks.md
-  /git-commit-message commits accepted batches
-  |
-  v
-frozen candidate SHA
-  |
-  | review record, only if asked
-  v
-pull request reviews that SHA
-  a new SHA needs a new review
-  |
-  | separate integration authority
-  v
-read back the integrated revision
-sync current specs/links if needed under explicit authority
-read back the resulting integrated revision and run its required gates
-  |
-  v
-/openspec-archive-change (/opsx:archive)
-  |
-  v
-close the issue only if that documentation write is authorized
+An isolated checkout is an agent-managed workspace, not a lifecycle phase or a
+manual prerequisite. The operator does not create it: after an authorized proposal
+request the agent creates or reuses it before drafting, and later invocations
+reuse it. The same applies to bootstrap and authorized clean-worktree retirement.
+If ownership, tooling or permissions block that work, the agent reports the
+specific decision needed instead of handing the operator a Git checklist.
+
+The two lanes below distinguish **operator actions** from **automatic agent
+work within the selected invocation's authority**. Arrows crossing into the
+operator lane are decision or authorization checkpoints, not manual setup tasks.
+
+```mermaid
+flowchart TB
+  subgraph operator["Operator actions"]
+    idea["Describe the desired outcome<br/>Optional: /openspec-explore"]
+    propose["Request a proposal<br/>/openspec-propose pin-note"]
+    approve["Review the plan and proposal visuals<br/>Approve scope or request changes"]
+    next["Start or continue local work<br/>/openspec-next"]
+    finish["Authorize terminal delivery<br/>/openspec-delivery finish pin-note"]
+    decision["Resolve a reported blocker or provide<br/>a required human or host approval"]
+  end
+
+  subgraph agent["Agent work - automatic within authority"]
+    workspace["Generate the identity and create or reuse<br/>the isolated worktree"]
+    plan["Draft native planning artifacts and issue link<br/>Add proposal wireframes when needed"]
+    ready["Check plan approval and dependencies<br/>Reuse the workspace and bootstrap"]
+    implement["Implement one task group via native apply<br/>Run gates, update tasks and commit local batches"]
+    review["Independent review of the final candidate SHA<br/>Bounded corrections and renewed verification"]
+    groups{"More approved<br/>implementation groups?"}
+    publish["Publish PR for the exact reviewed SHA<br/>Satisfy protected checks and reviews, then merge"]
+    verify["Read back the integrated revision<br/>Sync specs if needed and verify the final revision"]
+    closure["Commit receipt and native archive<br/>Review and integrate the record-only closure PR"]
+    cleanup["Verify closure and acceptance<br/>Close the issue and retire clean worktrees"]
+    done(["Change complete<br/>Stop; no next change"])
+  end
+
+  idea --> propose --> workspace --> plan --> approve
+  approve -->|Approved plan| next
+  approve -->|Request changes| plan
+  next --> ready --> implement --> review --> groups
+  groups -->|Yes: wait for next invocation| next
+  groups -->|No: wait for finish authority| finish
+  finish --> publish --> verify --> closure --> cleanup --> done
+  workspace -.->|If blocked| decision
+  ready -.->|If blocked| decision
+  review -.->|If disposition or approval is needed| decision
+  publish -.->|If human review or permission is needed| decision
+  verify -.->|If verification fails| decision
+  cleanup -.->|If preservation or cleanup is blocked| decision
 ```
+
+### When the operator acts
+
+| Checkpoint | Operator action | What the agent handles automatically |
+| --- | --- | --- |
+| Before the first run | Review/install the required tools and skills, select the project workflow, and authorize any host/role configuration. | Inspect the actual project contracts, tooling and configured execution roles; report missing prerequisites. Installation alone does not start work. |
+| A new request | Describe the outcome and send `/openspec-propose pin-note`; exploration is optional. | Generate the full name, prepare the isolated workspace, draft native artifacts, bind the authorized proposal-time issue and add proposal wireframes when needed. |
+| Plan review | Approve the actual scope/plan or request changes; approval binds the immutable plan revision and digest presented by the agent. | Validate the planning artifacts and present the approval boundary. Approval is not permission to implement. |
+| Local implementation | Send `/openspec-next`, or select a change once with `/openspec-next pin-note`. Repeat only when another approved group is ready. | Resolve and execute one task group through setup/bootstrap, implementation, gates, independent review, task updates and previewed local commits. No repeated approval for each covered command; no push, PR or merge. |
+| Terminal delivery | Send `/openspec-delivery finish pin-note` for the reviewed candidate. | Publish and integrate through the protected route, verify the integrated revision, perform native sync/archive and receipt/closure work, and verify issue closure and clean-worktree retirement at acceptance. No separate prompts for each covered closeout command. |
+| An exception | Resolve ambiguous ownership/selection, changed scope, failed verification, findings needing disposition, required human PR approvals, or host/tool permission prompts when asked. | Preserve work and evidence, state the exact blocker and needed decision, then resume the interrupted step under the retained authority. Do not replay merged work or silently skip a gate. |
+
+The diagram is not a promise of unattended execution: required human PR approvals,
+host/tool permission controls and the configured role protocol still apply. In
+particular, the current Herdr protocol requires explicit reviewer/executor pane
+handoff approval. Routine Git commands are automated; these decisions are not.
+Operator restrictions such as `no commits` or `keep the worktree` override the
+automatic actions shown. An ordinary `next` never supplies finish authority.
 
 Parallel changes are two of these pictures at once, in separate checkouts.
 They share neither an index nor a `tasks.md`. A parent issue may list both
@@ -166,7 +239,8 @@ Branch: change/add-dark-mode-01arz3ndektsv4rrffq69g5fav
 
 The branch convention is `change/<full-name>`. Keep the same branch through
 specification, implementation and review; do not add phase numbers, developer
-names, or status prefixes. Naming does not authorize branch creation. Check
+names, or status prefixes. Naming alone does not authorize branch creation;
+the selected proposal/delivery invocation supplies bounded setup authority. Check
 existing local/remote branches and worktrees before an authorized creation;
 reuse the confirmed branch or stop on conflicting ownership, never reset it.
 
@@ -185,7 +259,7 @@ slug, but first inspect visible matching requests to avoid duplicating work.
 Unique names do not eliminate overlapping-spec reconciliation or acquire a lock.
 
 This is project policy, not stock OpenSpec behavior. The root `AGENTS.md` directs
-the agent to the packaged [naming procedure](../skills/software-development/openspec-change-integration/references/naming.md)
+the agent to the packaged [naming procedure](../skills/software-development/openspec-delivery/references/naming.md)
 before `openspec new change`. The helper generates/resolves names without writes;
 OpenSpec still owns proposal scaffolding. Config artifact instructions alone
 are not a pre-creation hook. Other projects must explicitly adopt the same rule
@@ -230,7 +304,8 @@ On Hermes those are `/openspec-explore` (`/opsx:explore`) and `/openspec-propose
 propose workflow creates change `pin-note-01arz3ndektsv4rrffq69g5fav` and writes
 its proposal, delta spec, design, and `tasks.md`. The selected proposal policy includes one
 documentation issue; without that bounded authority the link remains pending.
-Planning does not authorize implementation, a commit, or a pull request.
+The agent prepares its isolated workspace before scaffolding. Planning does not
+authorize implementation, a commit, or a pull request.
 
 The note screen is a primary human-facing surface. The operator asks for a
 wireframe with a prompt, which loads `/capability-wireframes`:
@@ -274,16 +349,16 @@ draft with a pending link, this separately authorized invocation completes only
 the documentation step:
 
 ```text
-/openspec-change-integration document pin-note-01arz3ndektsv4rrffq69g5fav
+/openspec-delivery document pin-note-01arz3ndektsv4rrffq69g5fav
 ```
 
-`/openspec-change-integration` applies the proposal-time risk-focused body and
+`/openspec-delivery` applies the proposal-time risk-focused body and
 identifies `pin-note-01arz3ndektsv4rrffq69g5fav` by its full name. It reads back
 the issue and binds its verified URL in the proposal when authorized, then stops. It does not
 generate another suffix, copy `tasks.md`, implement, commit, open a pull request, or
 assign the issue to lock the work.
 
-The body is the packaged [ticket template](../skills/software-development/openspec-change-integration/references/ticket.md)
+The body is the packaged [ticket template](../skills/software-development/openspec-delivery/references/ticket.md)
 (this link points to distribution source, not a file expected in field-notes).
 It records request, blast radius, confidentiality, integrity, availability,
 authorization and recovery. That supports change-control evidence. It does not
@@ -305,26 +380,27 @@ child issues. The parent is a group label, not a third plan.
 
 ### Implement one task group
 
-The operator authorizes only task group 1 of `pin-note`, in an isolated
-checkout, by naming the skill:
+The operator has approved the plan and wants the next local group. They send:
 
 ```text
-/openspec-change-integration
-Implement only task group 1 of change pin-note-01arz3ndektsv4rrffq69g5fav in this isolated
-checkout. You are the only writer. Do not push, open a pull request, or merge.
+/openspec-next pin-note
 ```
 
-It confirms recovery and refuses a second writer for that change. The branch,
-when separately authorized, is `change/pin-note-01arz3ndektsv4rrffq69g5fav`.
+It resolves the existing full name, confirms recovery, prepares/reuses and
+bootstraps the dedicated worktree, and refuses a second writer for that change.
+It selects task group 1 from the actual tasks and approval, not this example.
+The branch is `change/pin-note-01arz3ndektsv4rrffq69g5fav`.
 Keep it through specification, implementation and review.
 
 The implementer follows `/openspec-apply-change` (`/opsx:apply`) for that
 group and reports commands, paths, and results. The orchestrator checks the
-matching boxes in `tasks.md` only after that evidence is in the frozen
-candidate. Stock apply must not tick those boxes itself.
+matching boxes in `tasks.md` only after verifying that implementation evidence.
+Include those ticks in the final frozen commit before independent review; a later
+checkbox commit needs renewed review. Stock apply must not tick those boxes itself.
 
-Commits use `/git-commit-message`: preview the batch, stop, and commit only
-after the preview is accepted. The implementation batch does not include a
+Commits use `/git-commit-message`: preview the exact batch, verify its staged
+content and commit automatically under the selected local execution contract.
+No extra confirmation is required unless the operator restricts commit authority. The implementation batch does not include a
 later evidence file or the issue text.
 
 Before a pull request may be merged, and before its branch may be deleted, a
@@ -359,28 +435,30 @@ The pull request is the review record of `abc1111`. It is not a copy of
 count. Do not put a closing keyword in the pull-request body while later
 acceptance is still required.
 
-`/openspec-change-integration` then uses its read-only guard. The review record
+`/openspec-delivery` then uses its read-only guard. The review record
 cites issue 40 because the operator already created that documentation issue.
 The citation is not a reason to create an issue, and the guard does not call
 GitHub.
 
-Merge is another prompt, and only after the independent verdict on `abc1111`
-and a disposition of every finding:
+Terminal delivery is one short authorization after the independent verdict on
+the actual frozen SHA and disposition of every finding. It includes protected
+publication/integration and verified closeout, not repeated prompts for plumbing:
 
 ```text
-/openspec-change-integration
-The independent review of abc1111 is accepted and every finding is dispositioned.
-Merge that pull request by the protected route and read back the result.
-Do not delete the branch.
+/openspec-delivery finish pin-note
 ```
 
-Deleting the branch waits until the integrated evidence is recoverable and the
-operator authorizes deletion. Review alone is not that authorization. One OpenSpec
-change uses one checkout and one review pull request.
+The agent verifies the bound candidate and actual repository/target first. Branch
+deletion remains excluded unless separately authorized; clean dedicated worktree
+retirement is included after verified closure. One change retains its implementation
+branch through review. Integrated verification uses an exact-revision isolated tree;
+record-only closure uses `closure/<full-name>` from the verified target and its own
+protected PR. These are the same change, not additional task trackers.
 
 ### Integrate, sync, archive
 
-Integration is a separate authorization. Read back the merge and the containing
+The finish invocation supplies integration and terminal-closeout authority.
+The agent continues automatically: read back the merge and the containing
 target revision. Run the project's required gates on that named revision and
 keep the output. A failed gate keeps the change open. It does not close issue
 40, and it does not mean the merge should be replayed.
@@ -430,7 +508,8 @@ two files is not combined-system evidence.
 | Commits | `/git-commit-message` |
 | Human-facing visuals | `/capability-wireframes` |
 | Independent review before merge | `/autonomous-implementation-review` |
-| Candidate identity, recovery and integrated evidence | `/openspec-change-integration` |
+| Workspace lifecycle, candidate identity, recovery and integrated evidence | `/openspec-delivery` |
+| Grounded next task group and bounded continuation | `/openspec-next` |
 | Documentation and human review | Proposal-time issue under explicit project policy; PR and later updates separately authorized |
 
 One concern has one authority. `tasks.md` is the only mutable task list. An
@@ -447,13 +526,16 @@ OpenSpec does not commit, isolate writers, bind review to an exact candidate,
 or keep a visual identity across archival. Its collaboration rules are
 convention, not enforcement.
 
-- `/openspec-change-integration` is the orchestrator boundary: one writer, an
+- `/openspec-delivery` is the orchestrator boundary: one writer, an
   isolated checkout, candidate and plan identity, recovery, and Git-tracked
   evidence after integrated verification. It is not a scheduler and not a
-  GitHub client. Invoke it by name when documenting, implementing, or merging.
+  GitHub client. Its short invocation owns setup/bootstrap, local execution and
+  bounded finish; the operator supplies exceptions, not a Git recipe.
+- `/openspec-next` finds the actual approved unfinished group and advances it
+  under the selected local policy; inspect mode performs no mutations.
 - `/git-commit-message` keeps logical batches, a preview, exact staging and
-  separate commit authority. An orchestrator role does not enable autonomous
-  commits.
+  separate commit authority. A project-selected execution invocation explicitly
+  enables autonomous local commits; the orchestrator role alone does not.
 - `/capability-wireframes` keeps a stable screen key and a generated HTML/PNG
   review. Proposal images stay change-owned. They are not current behavior.
 - `/autonomous-implementation-review` is the independent reviewer. It must be a
@@ -524,7 +606,9 @@ system and not an execution lock.
    archive the change. Do not reapply delta specs that are already in current
    specs. A receipt names completed verification. It does not predict the merge
    of the commit that contains it.
-5. Stop at the authorized change. No next change, release or cleanup is implied.
+5. Under finish authority, verify issue acceptance/closure and retire clean dedicated
+   worktrees automatically unless the operator retains them. Stop at the authorized
+   change. No next change, release or branch deletion is implied.
 
 Planning permission ends at the requested artifacts and the bounded proposal-time
 issue write when explicitly selected by project policy. Approval of a plan is not
@@ -542,10 +626,10 @@ not another task authority or proof of client filesystem synchronization.
 
 ## Guard
 
-`/openspec-change-integration` ships the read-only package-relative `scripts/change-guard.mjs`
-helper. Its [guard](../skills/software-development/openspec-change-integration/references/guard.md),
-[integration](../skills/software-development/openspec-change-integration/references/integration.md)
-and [recovery](../skills/software-development/openspec-change-integration/references/recovery.md)
+`/openspec-delivery` ships the read-only package-relative `scripts/change-guard.mjs`
+helper. Its [guard](../skills/software-development/openspec-delivery/references/guard.md),
+[integration](../skills/software-development/openspec-delivery/references/integration.md)
+and [recovery](../skills/software-development/openspec-delivery/references/recovery.md)
 references own the commands and recovery table.
 
 The helper validates committed identities, plan continuity, review binding and
@@ -558,7 +642,7 @@ dirty work and uncertain API outcomes. Read back before retrying a write.
 
 | Plugin | Skills |
 | --- | --- |
-| `openspec-development` | `/openspec-change-integration`, `/git-commit-message`, `/capability-wireframes` |
+| `openspec-development` | `/openspec-delivery`, `/openspec-next`, `/git-commit-message`, `/capability-wireframes` |
 | `autonomous-orchestration` | `/autonomous-implementation-review` |
 
 Orchestration is optional. It requires the workflow plugin, explicit role and

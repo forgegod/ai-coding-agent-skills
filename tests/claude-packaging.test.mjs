@@ -13,11 +13,11 @@ const marketplacePath = path.join(root, ".claude-plugin/marketplace.json");
 
 const expectedBundles = {
   "openspec-development": {
-    version: "0.7.0",
-    skills: ["openspec-change-integration", "git-commit-message", "capability-wireframes"],
+    version: "1.0.0",
+    skills: ["openspec-delivery", "openspec-next", "git-commit-message", "capability-wireframes"],
   },
   "autonomous-orchestration": {
-    version: "1.3.0",
+    version: "1.4.0",
     skills: ["autonomous-implementation-review"],
   },
 };
@@ -55,9 +55,9 @@ test("Claude marketplace selects exact canonical packages for two isolated bundl
   }
   assert.deepEqual([...selected.keys()].sort(), packages.map(({ name }) => name).sort());
   assert.equal(sharedSkills.length, 0);
-  assert.deepEqual(selected.get("openspec-change-integration"), ["openspec-development"]);
+  assert.deepEqual(selected.get("openspec-delivery"), ["openspec-development"]);
   assert.deepEqual(selected.get("autonomous-implementation-review"), ["autonomous-orchestration"]);
-  assert.equal(marketplace.plugins[0].skills.length, 3);
+  assert.equal(marketplace.plugins[0].skills.length, 4);
   assert.equal(marketplace.plugins[1].skills.length, 1);
 });
 
@@ -116,9 +116,9 @@ test("distribution builds complete skill and plugin ZIPs from canonical bytes", 
   assert.deepEqual(await pluginPackages(catalog.plugins[0]), expectedBundles["openspec-development"].skills.slice().sort());
   assert.deepEqual(await pluginPackages(catalog.plugins[1]), ["autonomous-implementation-review"]);
   const integrationArchive = unzipSync(await readFile(path.join(output, "downloads", catalog.plugins[0].file)));
-  assert.ok(integrationArchive["skills/openspec-change-integration/scripts/change-guard.mjs"], "OpenSpec ZIP must ship its guard");
-  assert.ok(integrationArchive["skills/openspec-change-integration/scripts/change-name.mjs"], "OpenSpec ZIP must ship its naming helper");
-  assert.ok(integrationArchive["skills/openspec-change-integration/references/naming.md"], "OpenSpec ZIP must ship its naming procedure");
+  assert.ok(integrationArchive["skills/openspec-delivery/scripts/change-guard.mjs"], "OpenSpec ZIP must ship its guard");
+  assert.ok(integrationArchive["skills/openspec-delivery/scripts/change-name.mjs"], "OpenSpec ZIP must ship its naming helper");
+  assert.ok(integrationArchive["skills/openspec-delivery/references/naming.md"], "OpenSpec ZIP must ship its naming procedure");
   assert.deepEqual(
     Buffer.from(integrationArchive["skills/git-commit-message/SKILL.md"]),
     await readFile(path.join(root, "skills/software-development/git-commit-message/SKILL.md")),
@@ -164,7 +164,7 @@ test("distribution refuses source overlap and unsafe support files before replac
   }
   await buildDistribution({ root: source, output });
   const original = await readFile(path.join(output, "downloads/index.json"));
-  const forbidden = path.join(source, "skills/software-development/openspec-change-integration/references/AGENTS.md");
+  const forbidden = path.join(source, "skills/software-development/openspec-delivery/references/AGENTS.md");
   await mkdir(path.dirname(forbidden), { recursive: true });
   await writeFile(forbidden, "not distributable");
   await assert.rejects(buildDistribution({ root: source, output }), /forbidden/);

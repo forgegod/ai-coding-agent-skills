@@ -7,7 +7,7 @@ Load only when the operator sent the `code-tab-phase-roles` command and
 ## Parent
 
 The parent session is the orchestrator and the only Git and `tasks.md` writer,
-through `openspec-change-integration`. Stay in Manual permission mode. Accept-edits, auto, and
+through `openspec-delivery`. Stay in Manual permission mode. Accept-edits, auto, and
 bypass ignore subagent `permissionMode`; stop before dispatch if the parent is
 in one of those modes.
 

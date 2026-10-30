@@ -11,7 +11,8 @@ const packages = {
   "autonomous-implementation-review": "autonomous-ai-agents/autonomous-implementation-review",
   "capability-wireframes": "software-development/capability-wireframes",
   "git-commit-message": "software-development/git-commit-message",
-  "openspec-change-integration": "software-development/openspec-change-integration",
+  "openspec-delivery": "software-development/openspec-delivery",
+  "openspec-next": "software-development/openspec-next",
 };
 const names = Object.keys(packages);
 
@@ -27,7 +28,7 @@ async function setup(t) {
   return { readme, helper, scratch, home, env: { ...process.env, HOME: home, PI_CODING_AGENT_DIR: "" } };
 }
 
-test("documented recipes copy four complete packages to all four native user locations", async (t) => {
+test("documented recipes copy five complete packages to all four native user locations", async (t) => {
   const f = await setup(t);
   for (const [heading, directory] of [["Claude Code", ".claude/skills"], ["Codex", ".agents/skills"], ["Kilo", ".kilo/skills"], ["Pi", ".pi/agent/skills"]]) {
     const section = f.readme.split(`### ${heading}\n`)[1]?.split(/\n### |\n## /)[0];
@@ -40,7 +41,7 @@ test("documented recipes copy four complete packages to all four native user loc
     for (const name of names) {
       assert.deepEqual(await readFile(path.join(destination, name, "SKILL.md")), await readFile(path.join(root, "skills", packages[name], "SKILL.md")));
     }
-    for (const [name, file] of [["autonomous-implementation-review", "references/environment-passthrough.md"], ["autonomous-implementation-review", "references/herdr.md"], ["autonomous-implementation-review", "references/lifecycle-watch.md"], ["autonomous-implementation-review", "scripts/herdr_lifecycle_watch.mjs"], ["openspec-change-integration", "scripts/change-guard.mjs"], ["autonomous-implementation-review", "templates/phase-implementer.md"]]) {
+    for (const [name, file] of [["autonomous-implementation-review", "references/environment-passthrough.md"], ["autonomous-implementation-review", "references/herdr.md"], ["autonomous-implementation-review", "references/lifecycle-watch.md"], ["autonomous-implementation-review", "scripts/herdr_lifecycle_watch.mjs"], ["openspec-delivery", "scripts/change-guard.mjs"], ["autonomous-implementation-review", "templates/phase-implementer.md"]]) {
       assert.deepEqual(await readFile(path.join(destination, name, file)), await readFile(path.join(root, "skills", packages[name], file)));
     }
     for (const name of ["autonomous-implementation-review"]) {

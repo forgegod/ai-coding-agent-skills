@@ -78,8 +78,8 @@ test("CLI accepts repeated --profile arguments and reports a dry run", async (t)
     { cwd: f.root, encoding: "utf8" },
   );
 
-  assert.match(output, /Would install 4 skill packages into default\./);
-  assert.match(output, /Would install 4 skill packages into named\./);
+  assert.match(output, /Would install 5 skill packages into default\./);
+  assert.match(output, /Would install 5 skill packages into named\./);
   await assert.rejects(stat(path.join(f.hermesHome, "profiles", "named", "skills", "software-development", "demo")));
 });
 
@@ -106,7 +106,7 @@ test("update replaces complete packages, backs up local edits, and installs miss
   assert.equal(await readFile(path.join(unrelated, "SKILL.md"), "utf8"), "Unrelated user skill.\n");
 });
 
-test("CLI update supports dry-run and updates all four complete packages in selected scratch profiles", async (t) => {
+test("CLI update supports dry-run and updates all five complete packages in selected scratch profiles", async (t) => {
   const f = await fixture(t);
   const args = [script, "--hermes-home", f.hermesHome, "--profile", "default", "--profile", "named"];
   execFileSync(process.execPath, args, { encoding: "utf8" });
@@ -118,12 +118,12 @@ test("CLI update supports dry-run and updates all four complete packages in sele
   }
   const before = await readdir(f.hermesHome);
   const preview = execFileSync(process.execPath, [...args, "--update", "--dry-run"], { encoding: "utf8" });
-  assert.match(preview, /Would install 0 and update 4 skill packages in default/);
-  assert.match(preview, /Would install 0 and update 4 skill packages in named/);
+  assert.match(preview, /Would install 0 and update 5 skill packages in default/);
+  assert.match(preview, /Would install 0 and update 5 skill packages in named/);
   assert.deepEqual(await readdir(f.hermesHome), before);
   const output = execFileSync(process.execPath, [...args, "--update"], { encoding: "utf8" });
-  assert.match(output, /Installed 0 and updated 4 skill packages in default/);
-  assert.match(output, /Installed 0 and updated 4 skill packages in named/);
+  assert.match(output, /Installed 0 and updated 5 skill packages in default/);
+  assert.match(output, /Installed 0 and updated 5 skill packages in named/);
   assert.match(output, /Backup:/);
   for (const home of [f.hermesHome, path.join(f.hermesHome, "profiles", "named")]) {
     const sourceDir = fileURLToPath(new URL("../skills/software-development/git-commit-message/", import.meta.url));

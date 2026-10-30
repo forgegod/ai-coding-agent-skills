@@ -24,7 +24,7 @@ test("Pages artifact includes the hidden endpoint and Claude downloads", async (
   assert.match(inventory, /\.well-known\/skills\/index\.json/);
   assert.match(inventory, /downloads\/openspec-development\.plugin\.zip/);
   assert.match(inventory, /downloads\/autonomous-orchestration\.plugin\.zip/);
-  assert.match(inventory, /downloads\/openspec-change-integration\.zip/);
+  assert.match(inventory, /downloads\/openspec-delivery\.zip/);
   assert.match(inventory, /downloads\/index\.html/);
   assert.doesNotMatch(inventory, /(?:^|\/)AGENTS\.md$/m);
 });

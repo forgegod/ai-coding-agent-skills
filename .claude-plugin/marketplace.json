@@ -7,19 +7,20 @@
   "plugins": [
     {
       "name": "openspec-development",
-      "version": "0.7.0",
-      "description": "Integration, commits, and wireframes for OpenSpec changes. Does not install OpenSpec or write GitHub state.",
+      "version": "1.0.0",
+      "description": "Delivery, next-step execution, commits and wireframes for OpenSpec changes. Does not install OpenSpec or grant remote authority.",
       "source": "./",
       "strict": false,
       "skills": [
-        "./skills/software-development/openspec-change-integration",
+        "./skills/software-development/openspec-delivery",
+        "./skills/software-development/openspec-next",
         "./skills/software-development/git-commit-message",
         "./skills/software-development/capability-wireframes"
       ]
     },
     {
       "name": "autonomous-orchestration",
-      "version": "1.3.0",
+      "version": "1.4.0",
       "description": "Optional implementation/review orchestration. Requires openspec-development and separately configured execution roles.",
       "source": "./",
       "strict": false,

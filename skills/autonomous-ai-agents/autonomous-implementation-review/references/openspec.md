@@ -19,14 +19,17 @@ Selecting or approving a change grants nothing by itself.
 ## Roles and writes
 
 - The orchestrator is the sole Git and `tasks.md` writer, and it uses
-  `openspec-change-integration` for committed candidate, review and receipt
+  `openspec-delivery` for committed candidate, review and receipt
   checks. Stock OpenSpec apply checkbox writes are mediated: the implementer
   reports evidence and never edits `tasks.md`; the orchestrator checks a task only
-  after verifying it in the frozen candidate.
+  after verifying the implementation evidence. Include those ticks in the final
+  frozen commit reviewed by the independent reviewer. A later checkbox commit
+  changes the SHA and requires renewed candidate review.
 - Review binds the immutable candidate commit and the approved plan content
   digest. The reviewer is a different session and a different model from the
   implementer. A changed head, changed planning content or changed gate evidence
-  invalidates review. Correct confirmed in-scope findings in the same unit and
+  invalidates review. Per-group verdicts never substitute for review of the final
+  delivery SHA. Correct confirmed in-scope findings in the same unit and
   stop at two correction/review cycles before operator escalation.
 - A pull request must not be merged, and its branch must not be deleted, until
   this independent verdict exists for that SHA and findings are dispositioned.

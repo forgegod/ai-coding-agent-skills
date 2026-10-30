@@ -10,7 +10,7 @@ and does not invent a change package.
 - One orchestrator is the sole Git and `openspec/changes/<name>/tasks.md` writer for
   a change. Implementers and reviewers stage nothing, commit nothing, and never
   edit planning files or task checkboxes.
-- `openspec-change-integration` owns the OpenSpec batch adapter and its path allowlists.
+- `openspec-delivery` owns the OpenSpec batch adapter and its path allowlists.
   The orchestrator declares exact allowed paths from approved scope and project
   policy; the read-only helper does not generate an implementation allowlist.
   Planning edits, the implementation candidate, and a later documentation or
@@ -24,7 +24,10 @@ and does not invent a change package.
   before committing, and the hook-preserving `git commit -F` sequence are
   required. Autonomous mode needs explicit environment or
   governing-instruction enablement; an OpenSpec change or an orchestrator role
-  never enables it.
+  alone never enables it. A project-selected short delivery/next execution
+  invocation explicitly enables autonomous local commits for its bounded group.
+  Keep the preview and staged/commit readbacks; only the extra confirmation is
+  omitted. Operator restrictions such as `no commits` override that default.
 - Name every changed path left out of a batch and why. If staging produced by
   another actor does not match the accepted batch, stop and present a new preview.
 - Local commit authority never includes push, pull-request creation, merge,

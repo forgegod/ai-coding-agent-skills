@@ -18,7 +18,7 @@ const escapeHtml = (value) => value.replace(/[&<>"']/g, (char) => ({
 const pluginNames = ["openspec-development", "autonomous-orchestration"];
 const sharedSkillNames = new Set();
 const expectedBundleSkills = {
-  "openspec-development": ["openspec-change-integration", "git-commit-message", "capability-wireframes"],
+  "openspec-development": ["openspec-delivery", "openspec-next", "git-commit-message", "capability-wireframes"],
   "autonomous-orchestration": ["autonomous-implementation-review"],
 };
 
@@ -51,7 +51,7 @@ function validateMarketplace(marketplace, packages) {
       if ((pkg.name === "autonomous-implementation-review") !== (plugin.name === "autonomous-orchestration")) {
         fail("orchestration must remain a separate opt-in");
       }
-      if (pkg.name === "openspec-change-integration" && plugin.name !== "openspec-development") {
+      if (pkg.name === "openspec-delivery" && plugin.name !== "openspec-development") {
         fail("the OpenSpec integration must remain a separate opt-in");
       }
       if (pkg.description.length > 200) fail(`${pkg.name} exceeds Claude's 200-character description limit`);
@@ -173,7 +173,7 @@ export async function buildDistribution({ root = scriptRoot, output }) {
   for (const [file, bytes] of archives) await writeFile(path.join(downloads, file), bytes);
   await writeFile(path.join(downloads, "index.json"), json(catalog));
   const optional = new Set(["autonomous-orchestration", "autonomous-implementation-review"]);
-  const adoption = new Set(["openspec-development", "openspec-change-integration"]);
+  const adoption = new Set(["openspec-development", "openspec-delivery"]);
   const list = (entries) => entries.map(({ name, file }) => `<li><a href="${escapeHtml(file)}" download>${escapeHtml(name)}</a>${optional.has(name) ? " — optional; operator review required" : adoption.has(name) ? " — optional OpenSpec workflow; operator review required" : ""}</li>`).join("\n");
   await writeFile(path.join(downloads, "index.html"), `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Claude skill downloads</title></head>

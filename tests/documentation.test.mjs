@@ -25,7 +25,7 @@ test("Claude instructions lead with native GUI installation and cite primary sou
   assert.match(guide, /not.*Hermes scanner approval/i);
   assert.match(guide, /Desktop UI upload\s+have not been verified/);
   assert.match(guide, /2\.1\.273/);
-  assert.match(guide, /openspec-development:openspec-change-integration/);
+  assert.match(guide, /openspec-development:openspec-delivery/);
   assert.match(guide, /No agents, hooks, MCP servers/);
 });
 
@@ -35,12 +35,12 @@ test("all launch examples carry the same bounded operator authorization", async 
   const prompts = [];
   for (const file of files) {
     const source = await readFile(file, "utf8");
-    const promptsInFile = [...source.matchAll(/^\s*(\/goal draft Execute only the authorized task group .+)$/gm)].map((match) => match[1]);
+    const promptsInFile = [...source.matchAll(/^\s*(\/goal draft \/openspec-delivery .+)$/gm)].map((match) => match[1]);
     assert.equal(promptsInFile.length, 1, file);
     const prompt = promptsInFile[0];
-    assert.match(prompt, /openspec-change-integration/);
-    assert.match(prompt, /I authorize the orchestrator/);
-    for (const action of [/isolated checkout/, /commit/, /tasks\.md/, /do not push/, /do not .*start another change/]) assert.match(prompt, action);
+    assert.match(prompt, /openspec-delivery/);
+    assert.equal(prompt, "/goal draft /openspec-delivery <name>");
+    assert.match(source, /short-invocation policy/);
     prompts.push(prompt);
   }
   assert.ok(prompts.every((prompt) => prompt === prompts[0]), "launch contract drift");
@@ -50,16 +50,16 @@ test("normal installer loop documents all generic software-development skills", 
   const source = await readFile(readme, "utf8");
   const loop = source.match(/^for skill in (.+); do$/m)?.[1]?.split(/\s+/);
   assert.ok(loop, "document a normal installer loop");
-  assert.equal(loop.length, 3);
-  assert.deepEqual(loop, ["openspec-change-integration", "git-commit-message", "capability-wireframes"]);
-  assert.match(source, /three-package example/);
-  assert.match(source, /collection of \*\*four\*\* categorized Agent Skills packages/);
+  assert.equal(loop.length, 4);
+  assert.deepEqual(loop, ["openspec-delivery", "openspec-next", "git-commit-message", "capability-wireframes"]);
+  assert.match(source, /four-package example/);
+  assert.match(source, /collection of \*\*five\*\* categorized Agent Skills packages/);
   assert.doesNotMatch(source, /phased-plan-next/);
 });
 
 test("OpenSpec installation and orchestration use the explicitly selected workflow", async () => {
   const source = await readFile(readme, "utf8");
-  assert.equal(source.includes("hermes -p hermes-dev skills install \"well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-change-integration\" --category software-development"), true, "document the independent OpenSpec Hermes install route");
+  assert.equal(source.includes("hermes -p hermes-dev skills install \"well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery\" --category software-development"), true, "document the independent OpenSpec Hermes install route");
   const marketplace = JSON.parse(await readFile(new URL("../.claude-plugin/marketplace.json", import.meta.url), "utf8"));
   const orchestration = marketplace.plugins.find(({ name }) => name === "autonomous-orchestration");
   for (const workflow of ["openspec-development"]) assert.equal(orchestration.description.includes(workflow), true, workflow);
@@ -92,7 +92,7 @@ test("directory-discovery instructions separate installation telemetry from auth
   const source = await readFile(readme, "utf8");
   assert.match(source, /## Discovery on skill directories/);
   assert.match(source, /npx skills add forgegod\/ai-coding-agent-skills --list/);
-  assert.match(source, /--skill openspec-change-integration --agent claude-code/);
+  assert.match(source, /--skill openspec-delivery --agent claude-code/);
   assert.match(source, /anonymous installation telemetry/);
   assert.match(source, /DISABLE_TELEMETRY=1/);
   assert.match(source, /https:\/\/skillsllm\.com\/submit/);
@@ -105,8 +105,8 @@ test("directory-discovery instructions separate installation telemetry from auth
 test("autonomous goal documentation distinguishes orchestration from polling", async () => {
   const source = await readFile(readme, "utf8");
   assert.match(source, /### Run the autonomous implementation-review goal/);
-  assert.match(source, /\/goal draft Execute only the authorized task group of openspec\/changes\/<name>/);
-  assert.match(source, /Stop after the named task group; do not push/);
+  assert.match(source, /\/goal draft \/openspec-delivery <name>/);
+  assert.match(source, /push\/PR\/merge are not/);
   assert.match(source, /supports Herdr only/);
   assert.match(source, /operator sends `\/goal pause`/i);
   assert.match(source, /docs\/openspec-workflow\.md/);
@@ -136,7 +136,30 @@ test("operational documentation has no research dependencies or adoption-history
     assert.equal(await stat(new URL(`../${relative}`, import.meta.url)).then(() => true, (error) => { if (error.code !== "ENOENT") throw error; return false; }), false, relative);
   }
   const workflow = await readFile(new URL("../docs/openspec-workflow.md", import.meta.url), "utf8");
-  for (const pattern of [/tasks\.md/, /post-merge|integrated/, /documentation/, /parallel/i, /openspec-propose/, /field-notes/, /pull request reviews that SHA/, /\/openspec-change-integration/, /risk-focused/, /does not\s+establish ISO/, /independent review/]) assert.match(workflow, pattern);
+  for (const pattern of [/tasks\.md/, /post-merge|integrated/, /documentation/, /parallel/i, /openspec-propose/, /field-notes/, /(?:pull request|PR).*SHA/i, /\/openspec-delivery/, /risk-focused/, /does not\s+establish ISO/, /independent review/]) assert.match(workflow, pattern);
+});
+
+test("lifecycle Mermaid separates operator decisions from automatic workspace and delivery work", async () => {
+  const workflow = await readFile(new URL("../docs/openspec-workflow.md", import.meta.url), "utf8");
+  const section = workflow.split("## Lifecycle picture\n")[1]?.split("\n## Identity and path conventions")[0];
+  assert.ok(section, "keep the lifecycle section discoverable");
+  assert.doesNotMatch(section, /```text/);
+  const diagram = section.match(/```mermaid\n([\s\S]*?)\n```/)?.[1];
+  assert.ok(diagram, "publish a Mermaid lifecycle diagram");
+  assert.match(diagram, /^flowchart TB/m);
+  const operator = diagram.match(/subgraph operator\["Operator actions"\]([\s\S]*?)\n  end/)?.[1];
+  const automatic = diagram.match(/subgraph agent\["Agent work - automatic within authority"\]([\s\S]*?)\n  end/)?.[1];
+  assert.ok(operator && automatic, "ownership must not rely on colors alone");
+  for (const action of [/openspec-propose/, /Approve/, /openspec-next/, /openspec-delivery finish/]) assert.match(operator, action);
+  assert.doesNotMatch(operator, /worktree|checkout|bootstrap/i);
+  for (const action of [/worktree/, /bootstrap/, /Implement/, /Independent review/, /receipt/, /archive/, /retire clean/]) assert.match(automatic, action);
+  assert.match(diagram, /implement --> review --> groups/);
+  assert.match(diagram, /groups -->\|[^\n]*\| next/);
+  assert.match(diagram, /groups -->\|[^\n]*\| finish/);
+  assert.match(diagram, /finish --> publish --> verify --> closure --> cleanup --> done/);
+  assert.match(section, /not a lifecycle phase/i);
+  assert.match(section, /operator does not create/i);
+  for (const boundary of [/When the operator acts/, /one task group/, /human PR approvals/, /host\/tool permission/, /resume the interrupted step/]) assert.match(section, boundary);
 });
 
 test("change naming is automatic project policy, not a second identity or installed adapter fork", async () => {
@@ -146,7 +169,7 @@ test("change naming is automatic project policy, not a second identity or instal
   assert.match(contract, /before.*openspec new change/i);
   assert.match(contract, /change-name\.mjs/);
   for (const pattern of [/\/openspec-propose add-dark-mode/, /<slug>-<ulid>/, /change\/<full-name>/, /automatically/, /ambiguous/i, /existing.*names/i, /not.*stock OpenSpec/i]) assert.match(workflow, pattern);
-  for (const relative of ["docs/openspec-workflow.md", "skills/software-development/AGENTS.md", "skills/software-development/openspec-change-integration/SKILL.md", "skills/software-development/openspec-change-integration/references/ticket.md", "skills/software-development/openspec-change-integration/references/guard.md"]) {
+  for (const relative of ["docs/openspec-workflow.md", "skills/software-development/AGENTS.md", "skills/software-development/openspec-delivery/SKILL.md", "skills/software-development/openspec-delivery/references/ticket.md", "skills/software-development/openspec-delivery/references/guard.md"]) {
     const source = await readFile(new URL(relative, root), "utf8");
     assert.doesNotMatch(source, /Do not generate a ULID\.|Do not add a ULID\./, relative);
   }

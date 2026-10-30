@@ -2,7 +2,7 @@
 name: git-commit-message
 description: Preview batches; autonomous commits skip confirmation.
 argument-hint: "[--tier 1|2|3]"
-version: 4.7.0
+version: 4.8.0
 metadata:
   hermes:
     tags: [git, commit]
@@ -26,7 +26,7 @@ not the required preview or verification.
 When the commit belongs to an OpenSpec change, read
 [references/openspec.md](references/openspec.md) before step 2 and keep the
 preview, acceptance, and verification rules below. The orchestrator is then the
-sole writable owner of batch boundaries through `openspec-change-integration`.
+sole writable owner of batch boundaries through `openspec-delivery`.
 Other work uses the grouping rule in step 2 and does not invent a change package.
 
 ## Procedure
@@ -36,7 +36,7 @@ Other work uses the grouping rule in step 2 and does not invent a change package
    and `git diff --staged`. Include untracked files from `git status`. If every
    view is empty, report "No changes" and stop.
 2. Build dependency-aware logical batches before staging:
-   - For an OpenSpec change, `openspec-change-integration` owns the batches and
+   - For an OpenSpec change, `openspec-delivery` owns the batches and
      their path allowlists; follow [references/openspec.md](references/openspec.md).
      Do not combine a documentation or evidence batch with implementation, and
      do not assign Git writes to an executor.

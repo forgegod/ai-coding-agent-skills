@@ -9,7 +9,7 @@ never grants a ticket write. Displaying the line below does not create an issue.
 Hermes prompt:
 
 ```text
-/openspec-change-integration document <name>
+/openspec-delivery document <name>
 ```
 
 The skill applies the rest. Identify the change by its full name, including the

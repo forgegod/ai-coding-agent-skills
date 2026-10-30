@@ -58,11 +58,11 @@ test("autonomous-implementation-review packages its selection helper", async () 
   assert.ok(source.length < 6500, "keep the normal orchestration path compact");
   assert.ok(transport.length < 6500, "transport reference must not accumulate duplicated procedures");
   assert.match(source, /references\/herdr\.md/);
-  assert.match(source, /\/goal draft Execute only the authorized task group of openspec\/changes\/<name>/);
+  assert.match(source, /\/goal draft \/openspec-delivery <name>/);
   assert.match(source, /automated role loop is Herdr-only/);
   assert.match(source, /Dispatch failed prerequisites to a fresh\s+implementer session/);
   assert.match(source, /orchestrator does not edit worker code/);
-  assert.match(source, /openspec-change-integration/);
+  assert.match(source, /openspec-delivery/);
   assert.match(source, /must not edit `tasks\.md`/);
   assert.match(source, /Iteration budget exhausted/);
   assert.match(source, /orchestrator.*alone decides/i);
@@ -134,13 +134,13 @@ test("every SKILL.md name matches its directory", async () => {
 });
 
 test("skills/ packages the OpenSpec companion set without a second phase tracker", async () => {
-  const names = ["openspec-change-integration", "git-commit-message", "capability-wireframes"];
+  const names = ["openspec-delivery", "openspec-next", "git-commit-message", "capability-wireframes"];
   for (const name of names) {
     const source = await readFile(path.join(skillsRoot, "software-development", name, "SKILL.md"), "utf8");
     assert.doesNotMatch(source, /(?:~\/\.hermes|\/home\/)/, `${name} depends on agent-private paths`);
     assert.doesNotMatch(source, /phased-plan-|application-records/);
   }
-  const integration = await readFile(path.join(skillsRoot, "software-development/openspec-change-integration/SKILL.md"), "utf8");
+  const integration = await readFile(path.join(skillsRoot, "software-development/openspec-delivery/SKILL.md"), "utf8");
   assert.match(integration, /tasks\.md/);
   assert.match(integration, /documentation and review records|documentation or review/i);
   const rootAgent = await readFile(path.join(root, "AGENTS.md"), "utf8");
@@ -164,7 +164,7 @@ test("git-commit-message requires confirmation except in explicit autonomous mod
   assert.match(source, /explicitly enabled autonomous mode/);
   assert.match(source, /do not wait for a separate confirmation/);
   assert.match(source, /never infer it from an agent's name, identity, or[\s\S]*ability to act autonomously/);
-  assert.match(source, /openspec-change-integration/);
+  assert.match(source, /openspec-delivery/);
   assert.match(source, /Do not combine a documentation or evidence batch with implementation/);
   assert.doesNotMatch(source, /phased-plan-closeout/);
   assert.match(source, /Repository commit-message rules override/);

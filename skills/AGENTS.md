@@ -33,6 +33,6 @@ Run `npm test` and `npm run build` in this repository. Validate changed skill me
 | Child | Owns | Read when editing… |
 | --- | --- | --- |
 | `autonomous-ai-agents/AGENTS.md` | Autonomous implementation and review workflow. | Autonomous orchestration skill or support files. |
-| `software-development/AGENTS.md` | Integration, commit, and wireframe skills. | OpenSpec integration, commits, or wireframe output. |
+| `software-development/AGENTS.md` | Delivery, continuation, commit, and wireframe skills. | OpenSpec delivery/continuation, commits, or wireframe output. |
 
 Parent contract: `../AGENTS.md`.

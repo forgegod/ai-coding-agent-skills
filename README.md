@@ -10,7 +10,8 @@ OpenSpec propose, apply, sync and archive own the change package and current beh
 
 | Skill | What it adds |
 | --- | --- |
-| [openspec-change-integration](skills/software-development/openspec-change-integration/SKILL.md) | One writer, isolated checkout, candidate review, recovery, and integrated evidence. |
+| [openspec-delivery](skills/software-development/openspec-delivery/SKILL.md) | Automatic workspace setup, bounded execution and verified closeout. |
+| [openspec-next](skills/software-development/openspec-next/SKILL.md) | Find and advance the next approved local task group; inspect mode is read-only. |
 | [git-commit-message](skills/software-development/git-commit-message/SKILL.md) | Logical batches, a preview, and exact staging. Commit authority stays explicit. |
 | [capability-wireframes](skills/software-development/capability-wireframes/SKILL.md) | Stable HTML/PNG review for a primary human-facing surface. |
 | [autonomous-implementation-review](skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md) | Optional fresh implementer and read-only reviewer for one task group. |
@@ -36,7 +37,8 @@ Start here: [Claude Desktop (no terminal)](#install-with-claude-desktop) ·
 
 | Skill | Purpose |
 | --- | --- |
-| [openspec-change-integration](skills/software-development/openspec-change-integration/SKILL.md) | Candidate review, protected integration when authorized, and post-merge receipts. |
+| [openspec-delivery](skills/software-development/openspec-delivery/SKILL.md) | Workspace, candidate review, recovery and protected closeout when authorized. |
+| [openspec-next](skills/software-development/openspec-next/SKILL.md) | Grounded continuation without a long operator prompt. |
 | [git-commit-message](skills/software-development/git-commit-message/SKILL.md) | Dependency-aware logical Git batches, a preview before apply (or autonomous execution), and tiered Conventional Commit messages. |
 | [capability-wireframes](skills/software-development/capability-wireframes/SKILL.md) | Stable HTML/PNG visual handoff for a human-facing surface. |
 | [autonomous-implementation-review](skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md) | Bounded implementation and independent review loop. |
@@ -51,7 +53,7 @@ or hidden-folder copying is needed for installation.
 3. Select **openspec-development**, review its contents, and click **Add**.
 4. Start a new conversation or task and check that its skills appear in the skill picker.
 
-This installs integration, commits and wireframes. It does not install OpenSpec
+This installs delivery, next-step execution, commits and wireframes. It does not install OpenSpec
 or its CLI. **autonomous-orchestration** is a separate optional plugin: review it
 and its host/role prerequisites before adding it. Neither plugin installs
 execution roles, transfers another project's records, or changes permissions.
@@ -90,26 +92,26 @@ hermes skills search https://forgegod.github.io/ai-coding-agent-skills/
 Install an individual skill and its advertised support files through the well-known adapter:
 
 ```sh
-hermes skills install well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-change-integration --category software-development
+hermes skills install well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery --category software-development
 ```
 
 To target a named profile, add `-p <profile>`; for example:
 
 ```sh
-hermes -p hermes-dev skills install well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-change-integration --category software-development
+hermes -p hermes-dev skills install well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery --category software-development
 ```
 
 Install the workflow skills (POSIX shell; omit `-p hermes-dev` to use the active profile):
 
 ```sh
-for skill in openspec-change-integration git-commit-message capability-wireframes; do
+for skill in openspec-delivery openspec-next git-commit-message capability-wireframes; do
   hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/$skill" --category software-development || break
 done
 ```
 
 `autonomous-implementation-review` is published separately because it can coordinate editing
 agents and worktrees. Review its complete package before installing it; the normal
-three-package example does not establish scanner approval for it:
+four-package example does not establish scanner approval for it:
 
 ```sh
 hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/autonomous-implementation-review" --category autonomous-ai-agents
@@ -118,7 +120,8 @@ hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-co
 The commands use the published endpoint, not this checkout:
 
 ```sh
-hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-change-integration" --category software-development
+hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery" --category software-development
+hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-next" --category software-development
 hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/git-commit-message" --category software-development
 hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/capability-wireframes" --category software-development
 ```
@@ -158,7 +161,7 @@ home. The local installer does not infer this base from the session's HERMES_HOM
 #### Install or refresh local packages
 
 For a reviewed checkout on the local machine, the repository script copies all
-four complete packages to the default profile and every recognized named profile:
+five complete packages to the default profile and every recognized named profile:
 
 ```sh
 npm run install:local
@@ -172,7 +175,7 @@ npm run install:local -- --profile hermes-dev --profile default
 ```
 
 Install missing packages and update existing packages across all recognized
-profiles, including `openspec-change-integration`:
+profiles, including `openspec-delivery`:
 
 ```sh
 npm run install:local -- --update --dry-run
@@ -228,11 +231,11 @@ Start a fresh session after installation. Later, use the normal internet updater
 
 ```sh
 hermes -p hermes-dev skills update
-hermes -p hermes-dev skills update openspec-change-integration
+hermes -p hermes-dev skills update openspec-delivery
 ```
 
 The first command updates all eligible registered skills in that profile, including
-skills from other sources; the second targets only `openspec-change-integration`. Unlike the
+skills from other sources; the second targets only `openspec-delivery`. Unlike the
 local installer, Hermes does not update every profile at once.
 
 Internet updates run Hermes's normal scanner, keep the category, and protect edits made after that
@@ -260,16 +263,26 @@ This automated role loop currently supports Herdr only (`HERDR_ENV=1`, selected
 Hermes executor, verified model keys). Outside Herdr, stop unless the operator
 sent `code-tab-phase-roles`. Do not invent a fallback transport.
 
-The operator fills the change name and sends this command only if they authorize
-its listed local Git operations. Displaying the template grants no authority.
+For a project that explicitly adopts the short-invocation policy, the operator
+sends `/openspec-next` to advance the current approved group, or
+`/openspec-delivery <name>` to select a change. Setup, bootstrap, task updates and
+previewed autonomous local commits are included; push/PR/merge are not. Operator
+restrictions override defaults. `/openspec-next inspect` is read-only.
+`/openspec-delivery finish <name>` separately authorizes protected publication
+and verified receipt/archive/issue closure/clean-worktree retirement for that
+change, not branch deletion, a release or another change. See the SDLC for the
+complete contract. No operator worktree commands are required.
+
+For a persisted Hermes goal, the optional short form is below. Displaying the
+template grants no authority.
 Hermes' `/goal draft` expands the request into a persisted completion contract
 and immediately starts it:
 
 ```text
-/goal draft Execute only the authorized task group of openspec/changes/<name> using autonomous-implementation-review and openspec-change-integration. I authorize the orchestrator to use an isolated checkout, commit the reviewed implementation, and update that change's tasks.md after checking evidence. Stop after the named task group; do not push, open a pull request, merge, or start another change.
+/goal draft /openspec-delivery <name>
 ```
 
-The agent must load both named skills and the selected change artifacts before
+The agent loads delivery, the configured role-loop skill and selected artifacts before
 dispatching. Use `/goal show` to inspect the drafted contract. Pause or clear it
 if it materially misstates the change.
 
@@ -349,7 +362,7 @@ diffs.
 The well-known endpoint is the preferred, host-independent distribution route. The categorized source packages can also be installed directly:
 
 ```sh
-hermes skills install forgegod/ai-coding-agent-skills/skills/software-development/openspec-change-integration --category software-development
+hermes skills install forgegod/ai-coding-agent-skills/skills/software-development/openspec-delivery --category software-development
 ```
 
 Other Agent Skills-compatible agents can consume the same SKILL.md packages using their own installation mechanism. Well-known discovery and Hermes-specific metadata support depend on the client.
@@ -379,7 +392,7 @@ git clone https://github.com/forgegod/ai-coding-agent-skills.git ai-coding-agent
 ```
 
 After review, from the directory containing that checkout, define this helper in
-the same shell used for the agent-specific commands below. It copies all four
+the same shell used for the agent-specific commands below. It copies all five
 package directories, preflights all name collisions, and never overwrites local
 edits.
 
@@ -389,7 +402,7 @@ skills_source="$PWD/ai-coding-agent-skills-review/skills"
 install_reviewed_skills() (
   set -eu
   destination="$1"
-  for package in autonomous-ai-agents/autonomous-implementation-review software-development/capability-wireframes software-development/git-commit-message software-development/openspec-change-integration; do
+  for package in autonomous-ai-agents/autonomous-implementation-review software-development/capability-wireframes software-development/git-commit-message software-development/openspec-delivery software-development/openspec-next; do
     skill="${package##*/}"
     test -f "$skills_source/$package/SKILL.md"
     if [ -e "$destination/$skill" ] || [ -L "$destination/$skill" ]; then
@@ -398,7 +411,7 @@ install_reviewed_skills() (
     fi
   done
   mkdir -p "$destination"
-  for package in autonomous-ai-agents/autonomous-implementation-review software-development/capability-wireframes software-development/git-commit-message software-development/openspec-change-integration; do
+  for package in autonomous-ai-agents/autonomous-implementation-review software-development/capability-wireframes software-development/git-commit-message software-development/openspec-delivery software-development/openspec-next; do
     skill="${package##*/}"
     cp -R "$skills_source/$package" "$destination/$skill"
   done
@@ -420,7 +433,7 @@ install_reviewed_skills "$HOME/.claude/skills"
 
 For project-only installation, use `install_reviewed_skills "$PWD/.claude/skills"`
 from the target project. Start a fresh Claude Code session, inspect `/` autocomplete
-for `openspec-change-integration`, or explicitly invoke `/openspec-change-integration`. Verify the
+for `openspec-delivery`, or explicitly invoke `/openspec-delivery`. Verify the
 loaded skill path and content rather than relying only on the model's claim.
 
 Reference: [Claude Code skills](https://code.claude.com/docs/en/skills).
@@ -443,7 +456,7 @@ install_reviewed_skills "$HOME/.agents/skills"
 ```
 
 For project-only installation, use `install_reviewed_skills "$PWD/.agents/skills"`
-from the target repository. Open `/skills` or mention `$openspec-change-integration` in
+from the target repository. Open `/skills` or mention `$openspec-delivery` in
 Codex CLI/the IDE extension. Codex detects skill changes automatically; restart
 if the new entries do not appear. `.agents/skills` is also consumed by some other
 agents, so this location is shared rather than Codex-exclusive.
@@ -459,7 +472,7 @@ install_reviewed_skills "$HOME/.kilo/skills"
 ```
 
 For project-only installation, use `install_reviewed_skills "$PWD/.kilo/skills"`.
-Start a new session or run `/reload`; invoke `/openspec-change-integration` and inspect
+Start a new session or run `/reload`; invoke `/openspec-delivery` and inspect
 the `skill` tool call to confirm the selected package.
 
 The legacy Kilo Code extension uses `~/.kilocode/skills/` and project
@@ -484,7 +497,7 @@ install_reviewed_skills "${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}/skills"
 
 For project-only installation, use `install_reviewed_skills "$PWD/.pi/skills"`
 from the target project and review its project-trust prompt. Start a new session
-or run `/reload`, then invoke `/skill:openspec-change-integration`. Pi also discovers
+or run `/reload`, then invoke `/skill:openspec-delivery`. Pi also discovers
 `.agents/skills`; avoid copying the same skill into both locations.
 
 References: [Pi skills](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/skills.md)
@@ -519,7 +532,7 @@ npx skills add forgegod/ai-coding-agent-skills --list
 After reviewing the selected package, a genuine user installation can use:
 
 ```sh
-npx skills add forgegod/ai-coding-agent-skills --skill openspec-change-integration --agent claude-code
+npx skills add forgegod/ai-coding-agent-skills --skill openspec-delivery --agent claude-code
 ```
 
 The default scope is the current project; add `--global` for a personal install.
@@ -549,7 +562,7 @@ The verified SkillsLLM site is `https://skillsllm.com`. Its
 [submission page](https://skillsllm.com/submit) requires GitHub OAuth:
 
 1. Sign in as the operator and submit `https://github.com/forgegod/ai-coding-agent-skills`.
-2. Describe it as a collection of **four** categorized Agent Skills packages and
+2. Describe it as a collection of **five** categorized Agent Skills packages and
    retain the README's installation and security boundaries.
 3. Confirm the platform accepts the collection layout, wait for its scanning and
    catalog policy checks, and read back the resulting listing before claiming success.
@@ -595,7 +608,7 @@ npm run build
 
 Canonical source is `skills/<category>/<name>/`. `dist/` is generated and ignored. The generator emits the complete `.well-known/skills/` inventory, with an explicit file list for each package.
 
-The same build emits `dist/downloads/`: four complete skill ZIPs, two plugin ZIPs,
+The same build emits `dist/downloads/`: five complete skill ZIPs, two plugin ZIPs,
 an HTML download page, and a JSON inventory with SHA-256 checksums. The checked-in
 `.claude-plugin/marketplace.json` selects canonical source packages directly;
 no generated skill copies are committed. Its explicit skill lists separate the

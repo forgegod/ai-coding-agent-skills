@@ -8,7 +8,7 @@ const entry = {
   commit: "software-development/git-commit-message/",
   wireframes: "software-development/capability-wireframes/",
   orchestration: "autonomous-ai-agents/autonomous-implementation-review/",
-  integration: "software-development/openspec-change-integration/",
+  integration: "software-development/openspec-delivery/",
 };
 
 test("companion skills route OpenSpec work before generic procedure", async () => {
@@ -25,15 +25,15 @@ test("companion skills route OpenSpec work before generic procedure", async () =
 
 test("git-commit-message keeps its preview and uses the integration skill for change batches", async () => {
   const source = await read(`${entry.commit}SKILL.md`);
-  assert.match(source, /^version: 4\.7\.0$/m);
-  assert.match(source, /openspec-change-integration/);
+  assert.match(source, /^version: 4\.8\.0$/m);
+  assert.match(source, /openspec-delivery/);
   assert.match(source, /In normal operation, present a preview and stop/i);
   assert.match(source, /Outside\s+explicitly enabled autonomous mode, a preview is not permission to commit/i);
   assert.doesNotMatch(source, /phased-plan-closeout/);
   const reference = await read(`${entry.commit}references/openspec.md`);
   assert.ok(reference.length > 900, "OpenSpec commit reference must stay substantive");
   for (const expected of [
-    /openspec-change-integration/,
+    /openspec-delivery/,
     /sole Git and `openspec\/changes\/<name>\/tasks\.md` writer/,
     /path allowlists/,
     /preview, its single-turn stop, explicit acceptance/,
@@ -45,7 +45,7 @@ test("git-commit-message keeps its preview and uses the integration skill for ch
 
 test("capability-wireframes uses stable keys and change-owned proposals", async () => {
   const source = await read(`${entry.wireframes}SKILL.md`);
-  assert.match(source, /^version: 1\.5\.0$/m);
+  assert.match(source, /^version: 1\.5\.1$/m);
   assert.match(source, /docs\/product\/wireframes\//);
   assert.match(source, /within their change package/);
   assert.doesNotMatch(source, /CAP-NNNN|application-records/);
@@ -67,12 +67,12 @@ test("capability-wireframes uses stable keys and change-owned proposals", async 
 
 test("autonomous-implementation-review bounds orchestration to one change and supported hosts", async () => {
   const source = await read(`${entry.orchestration}SKILL.md`);
-  assert.match(source, /^version: 0\.13\.0$/m);
+  assert.match(source, /^version: 0\.14\.0$/m);
   assert.match(source, /A planning-only request stops after proposal\/spec\/design\/tasks/);
   assert.match(source, /This automated role loop is Herdr-only/);
-  assert.match(source, /openspec-change-integration/);
-  assert.match(source, /\/goal draft Execute only the authorized task group of openspec\/changes\/<name>/);
-  assert.equal([...source.matchAll(/^\s*\/goal draft Execute only .+$/gm)].length, 1);
+  assert.match(source, /openspec-delivery/);
+  assert.match(source, /\/goal draft \/openspec-delivery <name>/);
+  assert.equal([...source.matchAll(/^\s*\/goal draft \/openspec-delivery .+$/gm)].length, 1);
   assert.doesNotMatch(source, /phased-plan-|application-records/);
   const reference = await read(`${entry.orchestration}references/openspec.md`);
   assert.ok(reference.length > 900, "OpenSpec orchestration reference must stay substantive");
@@ -82,7 +82,7 @@ test("autonomous-implementation-review bounds orchestration to one change and su
     /\$HERDR_ENV=1/,
     /code-tab-phase-roles/,
     /defines no new host/,
-    /openspec-change-integration/,
+    /openspec-delivery/,
     /sole Git and `tasks\.md` writer/,
     /checkbox writes are mediated/i,
     /stops after the named task group/,
@@ -104,7 +104,7 @@ test("integration treats GitHub as documentation and review, not a task lock", a
 test("the autonomous category contract owns the OpenSpec orchestration boundary", async () => {
   const contract = await read("autonomous-ai-agents/AGENTS.md");
   assert.match(contract, /references\/openspec\.md/);
-  assert.match(contract, /openspec-change-integration/);
+  assert.match(contract, /openspec-delivery/);
   assert.match(contract, /sole\s+Git\/`tasks\.md`/);
   assert.match(contract, /`code-tab-phase-roles`/);
   assert.match(contract, /Herdr/);

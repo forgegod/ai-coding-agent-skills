@@ -1,13 +1,13 @@
 ---
 name: capability-wireframes
 description: Use when a human-facing surface needs a stable visual review.
-version: 1.5.0
+version: 1.5.1
 author: AI Software Blueprint
 license: MIT
 metadata:
   hermes:
     tags: [product, wireframes, ux, capability, documentation]
-    related_skills: [openspec-change-integration]
+    related_skills: [openspec-delivery]
 ---
 
 # Capability Wireframes

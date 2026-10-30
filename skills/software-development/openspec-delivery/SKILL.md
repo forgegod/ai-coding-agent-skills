@@ -1,22 +1,23 @@
 ---
-name: openspec-change-integration
-description: Review and integrate explicitly selected OpenSpec changes.
-version: 0.7.0
+name: openspec-delivery
+description: Automate setup, execution and closeout of OpenSpec changes.
+version: 1.0.0
 author: Raphael (forgegod), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
 metadata:
   hermes:
     tags: [OpenSpec, Git, Review, Evidence]
-    related_skills: [git-commit-message, capability-wireframes, autonomous-implementation-review]
+    related_skills: [openspec-next, git-commit-message, capability-wireframes, autonomous-implementation-review]
 ---
 
-# OpenSpec change integration
+# OpenSpec Delivery
 
 Preserve a reviewed committed candidate and truthful post-merge evidence for one
 OpenSpec change in a project that explicitly selects this workflow. This is an
 orchestrator procedure, not a scheduler, distributed lock, approval service or
 GitHub API client, and installing OpenSpec or this package never selects it.
+The agent handles the plumbing; the operator selects scope and exceptions.
 
 ## When to Use
 
@@ -57,6 +58,16 @@ Use operator-serialized starts and handoffs per change. Assignees, comments and
 refs detect observed conflicts; they are not a lock. Missing authority or an
 unknown write outcome blocks the mutation. A selection snapshot never grants
 permission for a later action.
+
+When project policy explicitly adopts the short-invocation contract below, sending
+an execution invocation authorizes its bounded local operations, including
+autonomous local commits through `git-commit-message`: preview exact batches and
+continue without another confirmation. Operator restrictions override defaults,
+including natural-language restrictions such as `inspect only`, `no commits`,
+`group 1 only`, or `keep the worktree`. A missing policy is not implied consent:
+present the bounded contract once for adoption, not a command-by-command quiz.
+Plan approval, risk acceptance, remote publication and host permission checks
+remain separate from this local authority. Never infer approval from `next`.
 
 ## Parallel specification and documentation
 
@@ -110,22 +121,42 @@ those commands without a verified, authorized issue.
 
 ## Short invocation
 
-The operator does not repeat the documentation constraints. This skill applies
-them. On Hermes the whole request is:
+On Hermes (map the skill name to the host's native spelling):
 
 ```text
-/openspec-change-integration document <name>
+/openspec-delivery <name>
+/openspec-delivery prepare <name>
+/openspec-delivery finish <name>
+/openspec-delivery document <name>
 ```
 
-`<name>` is the full OpenSpec change name, not its active/archive path. A short slug may be resolved
-through `references/naming.md`; ambiguous matches require selection. Other hosts
-use their spelling of this skill, then the same `document <name>` words.
+`<name>` may be the full name or an unambiguous short slug. With no name, or
+`next`, reuse only verified current-change context; otherwise select through
+`openspec-next`. A longer prompt is not required. Never ask the operator to type
+a ULID or remember a worktree path. Load [references/continuation.md](references/continuation.md).
 
-That verb means: load `references/ticket.md`, create or reuse one issue for change
-`<name>`, read back the issue and record its URL in the proposal when authorized,
-then stop. Reuse does not authorize rewriting an existing issue. Use the full
-change name as its durable reference; later issue updates need separate authority. Do not generate
-another suffix. Do not copy `tasks.md`. Do not implement, commit, open a pull request, or assign the issue to lock the work. A longer prompt is not required and does not add authority.
+- Default / `next`: resume the next unfinished task group of the approved change;
+  create/reuse its isolated checkout, bootstrap, implement, verify, independently
+  review, update `tasks.md`, and commit the local candidate. Stop after one group.
+  This does not authorize push, a pull request, merge, issue closure or retirement.
+  If already merged, recover rather than implement again; request `finish` only
+  when its authority is missing. A repeated `next` advances the same change.
+- `prepare`: workspace setup/bootstrap only. No implementation, commits or remote
+  writes. For a new proposal the project's selected proposal policy can invoke
+  this recipe internally after naming and before upstream scaffolding.
+- `finish`: explicitly authorizes this change's branch publication, implementation
+  and record-only closure PRs through the protected route, integrated gates,
+  factual receipt/archive commits, issue closure when acceptance is satisfied,
+  and removal of clean dedicated worktrees. No direct target push, bypass,
+  force-push, release, branch deletion or next change. Bind an existing frozen
+  candidate/review first; do not implement missing groups under `finish`.
+- `document`: load `references/ticket.md`, create/reuse one issue, read it back,
+  bind its verified URL, then stop. No implementation, commits or PR. Reuse
+  does not authorize rewriting an existing issue. No second task list.
+
+For narrower work, append only the exception: `group 1`, `no commits`, or
+`keep the worktree`. Persist no permission flag in task frontmatter. Earlier
+restrictions continue until explicitly lifted; a bare `next` never cancels them.
 
 ## Procedure
 
@@ -137,15 +168,18 @@ another suffix. Do not copy `tasks.md`. Do not implement, commit, open a pull re
 3. Check recovery first: use `references/recovery.md` for dirty/unowned work,
    competing activation, an existing PR, an uncertain API outcome or a prior merge.
    Preserve work; do not start another executor or replay merged implementation.
-4. Use a separate clone/worktree and isolated mutable test resources per change.
+4. Automatically prepare/reuse a separate clone/worktree through
+   [references/workspace.md](references/workspace.md); do not require manual setup.
+   `prepare` stops after bootstrap. Isolate mutable test resources per change.
    Independent changes may run concurrently; dependent execution waits for accepted
    integrated prerequisite evidence. One implementation writer per change initially.
 5. Prepare native proposal/spec/design/tasks and obtain approval bound to an
    immutable plan commit and digest. Only checkbox progress edits preserve that
    digest; scope, acceptance, gates and dependencies changing require reapproval.
    Only the orchestrator may create commits, with explicit local commit authority.
-6. Implement only the authorized change/task group. Retain actual gate output and
-   report failed prerequisites. If role orchestration is explicitly requested,
+6. Implement only the authorized change/task group. `finish` skips implementation
+   and resumes at its actual publication/integration/closure boundary. Retain actual
+   gate output and report failed prerequisites. When the project's role loop is selected,
    load `autonomous-implementation-review` and its OpenSpec reference; unsupported
    hosts stop rather than inventing model/session commands.
 7. Freeze a clean committed candidate. Use `references/guard.md` for candidate
@@ -172,7 +206,8 @@ another suffix. Do not copy `tasks.md`. Do not implement, commit, open a pull re
     review factual claims. Do not reapply deltas already incorporated in current
     specs; reconcile differing current specs explicitly. An archive requiring new
     current-spec changes needs renewed verification, not a record-only exception.
-12. Verify closure and cleanup by exact readback. A documentation issue closes
+12. Under `finish` authority, retire clean dedicated worktrees using `workspace.md`
+    and verify closure and cleanup by exact readback. A documentation issue closes
     only when that write is authorized and its acceptance boundary is satisfied.
     Evidence publication ends here: no extra pull request solely attesting the
     previous receipt, no next change, automatic release or implied cleanup.
