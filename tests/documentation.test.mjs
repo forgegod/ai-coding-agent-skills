@@ -152,13 +152,22 @@ test("lifecycle Mermaid separates operator decisions from automatic workspace an
   assert.ok(operator && automatic, "ownership must not rely on colors alone");
   for (const action of [/openspec-propose/, /Approve/, /openspec-next/, /openspec-delivery finish/]) assert.match(operator, action);
   assert.doesNotMatch(operator, /worktree|checkout|bootstrap/i);
-  for (const action of [/worktree/, /bootstrap/, /Implement/, /Independent review/, /receipt/, /archive/, /retire clean/]) assert.match(automatic, action);
+  for (const action of [/worktree/, /bootstrap/, /Implement/, /Independent review via \/autonomous-implementation-review/, /receipt/, /archive/, /retire clean/]) assert.match(automatic, action);
   assert.match(diagram, /implement --> review --> groups/);
   assert.match(diagram, /groups -->\|[^\n]*\| next/);
   assert.match(diagram, /groups -->\|[^\n]*\| finish/);
-  assert.match(diagram, /finish --> publish --> verify --> closure --> cleanup --> done/);
+  assert.match(diagram, /finish --> publish --> reviewWait/);
+  assert.match(diagram, /reviewWait -->\|Yes: merge the same SHA\| verify --> closure --> cleanup --> done/);
+  assert.match(diagram, /Not yet: typical wait/);
+  assert.match(diagram, /Same finish, later/);
+  assert.match(diagram, /That PR block is cleared/);
+  assert.doesNotMatch(diagram, /If human review or permission is needed/);
   assert.match(section, /not a lifecycle phase/i);
   assert.match(section, /operator does not create/i);
+  assert.match(section, /closing keyword/i);
+  assert.match(section, /next push does not close/i);
+  assert.match(section, /Fixes #<issue>/);
+  assert.match(section, /default branch/i);
   for (const boundary of [/When the operator acts/, /one task group/, /human PR approvals/, /host\/tool permission/, /resume the interrupted step/]) assert.match(section, boundary);
 });
 

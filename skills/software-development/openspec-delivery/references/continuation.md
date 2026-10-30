@@ -39,6 +39,8 @@ No mutable ownership/progress ledger is added to the common Git directory.
 | Approved plan, pending implementation | Select the first unfinished approved implementation task group in native document order whose dependencies are accepted. |
 | Candidate frozen, gates/review incomplete | Complete gates/review for that candidate before selecting another group. |
 | All approved implementation groups accepted | Report the candidate and offer `finish`; no remote write without its authority. |
+| Open implementation PR waiting on checks or human review | Normal pause, not a failure. Read that pull request; do not open another. `next` does not merge it. Under finish already held, resume when the same SHA is approved and checks pass; otherwise request that same finish once. |
+| Open PR blocked, or head no longer the reviewed SHA | Report the exact blocker. Renew gates and independent review before merging a changed SHA. Do not bypass protection or replay a timed-out write. The same finish resumes after the block is cleared. |
 | Implementation already merged | Do not replay it; resume integrated verification/receipt/archive under existing finish authority, otherwise request it once. |
 | Receipt/archive PR already exists | Read its actual head, diff, gate and merge state; resume it rather than creating competing closure evidence. |
 | Closure merged, cleanup pending | Resume only authorized cleanup/issue closure; never recreate implementation or archive. |
@@ -113,11 +115,18 @@ corrections. Never reapply a delta over newer accepted behavior. Use native arch
 with the verified no-spec-update path only when current specs are already correct;
 validate byte-identical movement, metadata and upstream strict checks.
 
-Commit receipt/archive as separate factual batches, obtain independent factual
-review, publish and merge the closure through the same protected route, read back
-and verify the published receipt bytes. A closure PR is not a prediction about
-its own merge. No extra PR attests the previous receipt. Then close the issue only
-when its actual acceptance boundary is met, and perform `workspace.md` cleanup.
+Commit receipt/archive as separate factual batches. The receipt message carries
+the closeout trailer from `git-commit-message`: `Fixes #<issue>` for the
+verified documentation issue, and `Closes #<pull-request>` only when that pull
+request is already merged. Repeat `Fixes #<issue>` in the closure pull-request
+body. Do not put a closing keyword on an open pull request. Obtain independent
+factual review, publish and merge the closure through the same protected route,
+and read back the published receipt bytes. A closure PR is not a prediction
+about its own merge. The trailer closes nothing until that commit is merged
+into the repository default branch. If it does not target the default branch,
+or the issue is still open after readback, perform the authorized documentation
+close. No extra PR attests the previous receipt. Then perform `workspace.md`
+cleanup.
 
 Report change/group, workspace/branch, actual plan/candidate/review identities,
 executed commands/results, remote readbacks when applicable, remaining boundary

@@ -25,7 +25,9 @@ test("companion skills route OpenSpec work before generic procedure", async () =
 
 test("git-commit-message keeps its preview and uses the integration skill for change batches", async () => {
   const source = await read(`${entry.commit}SKILL.md`);
-  assert.match(source, /^version: 4\.8\.0$/m);
+  assert.match(source, /^version: 4\.9\.0$/m);
+  assert.match(source, /closeout trailer/);
+  assert.match(source, /closing keyword/);
   assert.match(source, /openspec-delivery/);
   assert.match(source, /In normal operation, present a preview and stop/i);
   assert.match(source, /Outside\s+explicitly enabled autonomous mode, a preview is not permission to commit/i);
@@ -39,6 +41,10 @@ test("git-commit-message keeps its preview and uses the integration skill for ch
     /preview, its single-turn stop, explicit acceptance/,
     /push, pull-request creation, merge/,
     /documentation or review/,
+    /closing keyword/,
+    /next\s+push does/,
+    /Fixes #<issue>/,
+    /read back as merged/,
   ]) assert.match(reference, expected);
   assert.doesNotMatch(reference, /~(?:[A-Za-z0-9._-]+)?\/\.hermes|\/home\//);
 });

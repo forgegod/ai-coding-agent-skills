@@ -1,7 +1,7 @@
 ---
 name: openspec-next
 description: Find and advance the next approved OpenSpec task group.
-version: 0.1.0
+version: 0.1.1
 author: Raphael (forgegod), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -54,7 +54,8 @@ convert a local-only request into finish authority.
    task discovery, but do not call an unreachable remote "not merged".
 4. Establish one concrete boundary: missing plan/approval, owned interrupted group,
    pending implementation group, frozen candidate awaiting verification/review,
-   already merged implementation awaiting closeout, closure awaiting cleanup,
+   already merged implementation awaiting closeout, open pull request awaiting
+   checks or human review, closure awaiting cleanup,
    or fully complete. Read native task syntax and headings, not a scratch task list.
    Retain exact group, target/base, workspace and evidence. Missing task grouping,
    ambiguous approval or unknown ownership blocks execution.
@@ -68,7 +69,8 @@ convert a local-only request into finish authority.
 7. For normal execution, load `openspec-delivery` and its continuation/workspace
    recipes, pass the verified selection and constraints, and execute the remaining
    local boundary without a second permission prompt. Stop after one task group,
-   or a real approval/review/authority blocker. If already merged, do not replay
+   or a real approval/review/authority blocker. If a pull request is open and
+   only waiting, report it and do not merge. If already merged, do not replay
    implementation; request `finish` only when that authority is absent. Fully
    complete means report completion with no next change.
 

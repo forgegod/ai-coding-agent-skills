@@ -34,4 +34,16 @@ and does not invent a change package.
   protection changes, issue writes or archival notification. Those need separate
   authorization and orchestrator readback. A checked task is progress, not
   integrated behavior. An issue or pull request is a documentation or review
-  record, not a batch boundary.
+  record, not a batch boundary. Do not emit a closing keyword on an
+  implementation batch or while later acceptance is still required. The next
+  push does not close the issue or the pull request. After acceptance is
+  verified, the receipt or archive batch carries the closeout trailer:
+  `Fixes #<issue>` from the verified proposal issue, and `Closes #<pull-request>`
+  only for a pull request already read back as merged. Name an open pull request
+  without a closing keyword; that keyword would close it without merging when
+  the commit later reaches the default branch. Do not invent a number, and do
+  not include a closure pull request that does not exist yet. The trailer is
+  not a push. GitHub applies it only when that commit is merged into the
+  repository default branch. If the closure pull request does not target the
+  default branch, the keyword will not fire; the authorized documentation close
+  remains required and must be read back.

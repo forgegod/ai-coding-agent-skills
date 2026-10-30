@@ -2,7 +2,7 @@
 name: git-commit-message
 description: Preview batches; autonomous commits skip confirmation.
 argument-hint: "[--tier 1|2|3]"
-version: 4.8.0
+version: 4.9.0
 metadata:
   hermes:
     tags: [git, commit]
@@ -153,5 +153,15 @@ work and the plan is accepted: either they supplied the message and paths,
 they apply a preview or return changes to it, or explicitly enabled autonomous
 mode treats the request to commit as acceptance. Otherwise the existing index
 is the commit boundary. Do not unstage paths, change identity, amend history,
-bypass hooks, or push. Report failures instead of bypassing them. Outside
+bypass hooks, or push. This skill does not push. A push does not close an
+issue or a pull request. Do not add a closing keyword (`Fixes`, `Closes`, or
+`Resolves`) to an implementation batch, or to any batch whose acceptance is
+still open. A ticket or pull-request number is not an implementation footer.
+On the receipt or archive closeout batch only, after acceptance is already
+verified, append the closeout trailer from verified numbers: `Fixes #<issue>`
+for the documentation issue, and `Closes #<pull-request>` only for a pull
+request whose readback state is already merged. Name an open pull request
+without a closing keyword. Do not invent a number. The trailer does not push
+and does not close anything at commit time. Report failures instead of
+bypassing them. Outside
 explicitly enabled autonomous mode, a preview is not permission to commit.

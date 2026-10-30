@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "openspec-development",
-      "version": "1.0.0",
+      "version": "1.0.3",
       "description": "Delivery, next-step execution, commits and wireframes for OpenSpec changes. Does not install OpenSpec or grant remote authority.",
       "source": "./",
       "strict": false,

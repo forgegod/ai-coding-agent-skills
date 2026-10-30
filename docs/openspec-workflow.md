@@ -43,6 +43,16 @@ boundary. At a reviewed candidate it offers the short `finish` invocation rather
 than a paragraph of Git instructions. A bare next never grants remote authority.
 With existing finish authority, resume remaining closure steps automatically;
 never ask again for each receipt, archive or clean-worktree removal.
+A published pull request that is only waiting for review or checks is a normal
+pause under that same finish, not a new exception. When the wait ends, resume
+with the same finish invocation if that authority is not already held. Read
+the actual pull request and continue. Do not open another pull request or
+replay merged work. A changed head, failed required check, or missing
+protection is the exception: report it, then resume the same finish after it
+is cleared. `/git-commit-message` does not push. Implementation commits do
+not use a closing keyword. The next push does not close the issue or the pull
+request. After acceptance, the receipt commit carries the closeout trailer.
+The pull request is merged by the protected route, not by a commit keyword.
 
 A direction change needs only the exception, for example
 `/openspec-delivery pin-note group 1 no commits` or
@@ -86,6 +96,9 @@ specific decision needed instead of handing the operator a Git checklist.
 The two lanes below distinguish **operator actions** from **automatic agent
 work within the selected invocation's authority**. Arrows crossing into the
 operator lane are decision or authorization checkpoints, not manual setup tasks.
+Independent review is `/autonomous-implementation-review` on the exact candidate
+SHA. Under `/openspec-next` the agent loads that skill; pane handoff and finding
+disposition remain operator checkpoints.
 
 ```mermaid
 flowchart TB
@@ -102,13 +115,15 @@ flowchart TB
     workspace["Generate the identity and create or reuse<br/>the isolated worktree"]
     plan["Draft native planning artifacts and issue link<br/>Add proposal wireframes when needed"]
     ready["Check plan approval and dependencies<br/>Reuse the workspace and bootstrap"]
-    implement["Implement one task group via native apply<br/>Run gates, update tasks and commit local batches"]
-    review["Independent review of the final candidate SHA<br/>Bounded corrections and renewed verification"]
+    implement["Implement one task group via native apply<br/>Gates, task updates, /git-commit-message<br/>No closing keyword and no push"]
+    review["Independent review via /autonomous-implementation-review<br/>Exact candidate SHA, bounded corrections, renewed verification"]
     groups{"More approved<br/>implementation groups?"}
-    publish["Publish PR for the exact reviewed SHA<br/>Satisfy protected checks and reviews, then merge"]
+    publish["Publish or reuse one PR<br/>for the exact reviewed SHA"]
+    reviewWait{"Protected checks and<br/>human review satisfied?"}
+    pause["Report that open PR and stop<br/>Waiting is normal, not a new authority"]
     verify["Read back the integrated revision<br/>Sync specs if needed and verify the final revision"]
-    closure["Commit receipt and native archive<br/>Review and integrate the record-only closure PR"]
-    cleanup["Verify closure and acceptance<br/>Close the issue and retire clean worktrees"]
+    closure["Commit receipt with Fixes #issue<br/>Native archive and the closure PR"]
+    cleanup["Read back the close after default-branch merge<br/>Authorized issue close if needed; retire clean worktrees"]
     done(["Change complete<br/>Stop; no next change"])
   end
 
@@ -118,11 +133,15 @@ flowchart TB
   next --> ready --> implement --> review --> groups
   groups -->|Yes: wait for next invocation| next
   groups -->|No: wait for finish authority| finish
-  finish --> publish --> verify --> closure --> cleanup --> done
+  finish --> publish --> reviewWait
+  reviewWait -->|Yes: merge the same SHA| verify --> closure --> cleanup --> done
+  reviewWait -->|Not yet: typical wait| pause
+  pause -->|Same finish, later| finish
   workspace -.->|If blocked| decision
   ready -.->|If blocked| decision
   review -.->|If disposition or approval is needed| decision
-  publish -.->|If human review or permission is needed| decision
+  reviewWait -.->|Blocked: failed check, changed SHA, or missing permission| decision
+  decision -->|That PR block is cleared| finish
   verify -.->|If verification fails| decision
   cleanup -.->|If preservation or cleanup is blocked| decision
 ```
@@ -134,9 +153,10 @@ flowchart TB
 | Before the first run | Review/install the required tools and skills, select the project workflow, and authorize any host/role configuration. | Inspect the actual project contracts, tooling and configured execution roles; report missing prerequisites. Installation alone does not start work. |
 | A new request | Describe the outcome and send `/openspec-propose pin-note`; exploration is optional. | Generate the full name, prepare the isolated workspace, draft native artifacts, bind the authorized proposal-time issue and add proposal wireframes when needed. |
 | Plan review | Approve the actual scope/plan or request changes; approval binds the immutable plan revision and digest presented by the agent. | Validate the planning artifacts and present the approval boundary. Approval is not permission to implement. |
-| Local implementation | Send `/openspec-next`, or select a change once with `/openspec-next pin-note`. Repeat only when another approved group is ready. | Resolve and execute one task group through setup/bootstrap, implementation, gates, independent review, task updates and previewed local commits. No repeated approval for each covered command; no push, PR or merge. |
-| Terminal delivery | Send `/openspec-delivery finish pin-note` for the reviewed candidate. | Publish and integrate through the protected route, verify the integrated revision, perform native sync/archive and receipt/closure work, and verify issue closure and clean-worktree retirement at acceptance. No separate prompts for each covered closeout command. |
-| An exception | Resolve ambiguous ownership/selection, changed scope, failed verification, findings needing disposition, required human PR approvals, or host/tool permission prompts when asked. | Preserve work and evidence, state the exact blocker and needed decision, then resume the interrupted step under the retained authority. Do not replay merged work or silently skip a gate. |
+| Local implementation | Send `/openspec-next`, or select a change once with `/openspec-next pin-note`. Repeat only when another approved group is ready. | Resolve and execute one task group through setup/bootstrap, implementation, gates, `/autonomous-implementation-review`, task updates and previewed local commits. `/git-commit-message` adds no closing keyword and does not push. No repeated approval for each covered command; no push, PR, merge, or issue close. |
+| Terminal delivery | Send `/openspec-delivery finish pin-note` for the reviewed candidate. | Publish or reuse one pull request. If checks or human review are still pending, stop and report it. A later same finish resumes that pull request. Once they are satisfied, integrate through the protected route, verify the integrated revision, perform native sync/archive and receipt/closure work, and verify issue closure and clean-worktree retirement at acceptance. No second pull request and no separate prompts for each covered closeout command. |
+| Pull-request wait | Leave the open pull request. When review or checks finish, or a real block is cleared, send the same `/openspec-delivery finish pin-note` only if that authority is not already held. | Read the actual head, checks and reviews. An unchanged reviewed SHA with satisfied protection continues into merge and closeout. Do not open a second pull request, replay implementation, bypass protection, or ask for a different authority. A changed head needs renewed gates and `/autonomous-implementation-review`. |
+| An exception | Resolve ambiguous ownership/selection, changed scope, failed verification, findings needing disposition, a pull-request head that changed, missing protection, or host/tool permission prompts when asked. | Preserve work and evidence, state the exact blocker and needed decision, then resume the interrupted step under the retained authority. Do not replay merged work or silently skip a gate. |
 
 The diagram is not a promise of unattended execution: required human PR approvals,
 host/tool permission controls and the configured role protocol still apply. In
@@ -144,6 +164,36 @@ particular, the current Herdr protocol requires explicit reviewer/executor pane
 handoff approval. Routine Git commands are automated; these decisions are not.
 Operator restrictions such as `no commits` or `keep the worktree` override the
 automatic actions shown. An ordinary `next` never supplies finish authority.
+
+Waiting for protected checks and human review is the normal pause after a pull
+request is opened, not an exception and not a failed finish. The agent reports
+that pull request and stops. It does not poll unattended, open a second pull
+request, or ask for a new kind of authority. There is no scheduler. When the
+review lands or a block is cleared in the meantime, the same
+`/openspec-delivery finish` resumes from the actual pull request. The return
+to finish in the picture is only for that pull-request wait; other blockers
+resume the step that reported them. Continue only if that head is still the
+reviewed SHA and required checks and reviews are satisfied. A changed head
+invalidates the previous review and needs renewed gates and
+`/autonomous-implementation-review` before merge. Do not bypass protection,
+replay implementation, or merge under `next`. The same pause and same-finish
+resume apply to the record-only closure pull request; do not open a second
+one while that pull request is waiting.
+
+A local commit is not a close, and `/git-commit-message` does not push.
+Implementation commits and the implementation pull-request body do not use
+`Fixes`, `Closes` or `Resolves` while later acceptance is still required. The
+next push does not close the documentation issue or the pull request. After
+acceptance is verified, the receipt commit carries `Fixes #<issue>` for the
+verified documentation issue and `Closes #<pull-request>` only for a pull
+request already read back as merged. An open pull request is named without a
+closing keyword, because that keyword would close it without merging once the
+commit reaches the default branch. The closure pull-request body repeats
+`Fixes #<issue>`. GitHub applies the keyword only when that commit is merged
+into the repository default branch. If the closure pull request targets
+another branch, or readback shows the issue still open, finish performs the
+authorized documentation close and reads it back. Archival does not close the
+issue, and closing it does not archive the change.
 
 Parallel changes are two of these pictures at once, in separate checkouts.
 They share neither an index nor a `tasks.md`. A parent issue may list both
@@ -432,8 +482,10 @@ Body:  Change: pin-note-01arz3ndektsv4rrffq69g5fav
 
 The pull request is the review record of `abc1111`. It is not a copy of
 `tasks.md`. If the candidate becomes `def2222`, the previous review does not
-count. Do not put a closing keyword in the pull-request body while later
-acceptance is still required.
+count. Do not put a closing keyword in an implementation commit or in the
+implementation pull-request body while later acceptance is still required.
+The next push does not close the issue or the pull request. The receipt
+commit, after acceptance, carries the closeout trailer.
 
 `/openspec-delivery` then uses its read-only guard. The review record
 cites issue 40 because the operator already created that documentation issue.
@@ -448,7 +500,13 @@ publication/integration and verified closeout, not repeated prompts for plumbing
 /openspec-delivery finish pin-note
 ```
 
-The agent verifies the bound candidate and actual repository/target first. Branch
+The agent verifies the bound candidate and actual repository/target first. If
+that pull request is still waiting on review or checks, stop and report it.
+That wait is typical. When it is later satisfied for the same SHA, send the
+same finish again if that authority is not already held. The agent reads that
+pull request and continues. It does not open another. A changed head or a
+failed required check is the exception; resume the same finish only after it
+is cleared. Branch
 deletion remains excluded unless separately authorized; clean dedicated worktree
 retirement is included after verified closure. One change retains its implementation
 branch through review. Integrated verification uses an exact-revision isolated tree;
@@ -505,7 +563,7 @@ two files is not combined-system evidence.
 | Technical approach | Change-owned `design.md` where needed |
 | Implementation progress | Change-owned `tasks.md`, written only by the orchestrator |
 | Specification actions | OpenSpec propose, apply, sync and archive |
-| Commits | `/git-commit-message` |
+| Commits | `/git-commit-message`; no push. No closing keyword before acceptance. The receipt commit carries the closeout trailer. |
 | Human-facing visuals | `/capability-wireframes` |
 | Independent review before merge | `/autonomous-implementation-review` |
 | Workspace lifecycle, candidate identity, recovery and integrated evidence | `/openspec-delivery` |
@@ -534,7 +592,9 @@ convention, not enforcement.
 - `/openspec-next` finds the actual approved unfinished group and advances it
   under the selected local policy; inspect mode performs no mutations.
 - `/git-commit-message` keeps logical batches, a preview, exact staging and
-  separate commit authority. A project-selected execution invocation explicitly
+  separate commit authority. It does not push. Implementation commits omit
+  closing keywords. The receipt commit, after acceptance, carries
+  `Fixes #<issue>` and names already-merged pull requests with `Closes`. A project-selected execution invocation explicitly
   enables autonomous local commits; the orchestrator role alone does not.
 - `/capability-wireframes` keeps a stable screen key and a generated HTML/PNG
   review. Proposal images stay change-owned. They are not current behavior.

@@ -11,6 +11,7 @@ A failed command or unknown remote result is not proof of absence.
 | Proposed plan changed after approval | Reapprove named changed scope/gates and digest before continuing. Preserve previous approval and evidence. |
 | Candidate changed after review | Run gates and independent review on the new exact candidate; do not relabel old review. At most two correction/review cycles before escalation. |
 | Push/comment/PR write timed out | Read the exact target and intended content back. Resume only from known state; do not replay a possibly successful write blindly. |
+| Open PR waiting on review or checks | Not a failure and not a second pull request. Resume under finish from the actual head and review state. |
 | Implementation already merged, no receipt | Verify actual merge and target, run missing integrated gates, then prepare the same change's truthful receipt/archive. Do not reapply implementation. |
 | Integrated gate failed | Keep completion blocked, preserve failure output and obtain explicit repair/revert authority. Checked tasks do not mean accepted integration. |
 | Receipt/archive PR already exists | Read its exact head/content/merge state and continue that closure path. Do not create competing receipts or rewrite previous failed evidence. |

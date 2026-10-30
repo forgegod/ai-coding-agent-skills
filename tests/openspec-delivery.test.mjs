@@ -10,13 +10,13 @@ test("short delivery invocations own local plumbing without granting remote or n
 });
 test("next advances only a grounded approved group and offers an inspect-only mode", async () => {
   const source = await read("skills/software-development/openspec-next/SKILL.md");
-  for (const pattern of [/\/openspec-next/, /inspect/, /tasks\.md/, /approved/, /ambiguous/i, /already merged/i, /do not push/i, /one task group/, /no next change/i]) assert.match(source, pattern);
+  for (const pattern of [/\/openspec-next/, /inspect/, /tasks\.md/, /approved/, /ambiguous/i, /already merged/i, /open pull request awaiting/, /do not push/i, /one task group/, /no next change/i]) assert.match(source, pattern);
 });
 test("workspace and continuation recipes cover bootstrap, exact argv, closeout and recoverable cleanup", async () => {
   const workspace = await read("skills/software-development/openspec-delivery/references/workspace.md");
   for (const pattern of [/change-workspace\.mjs prepare/, /change-workspace\.mjs locate/, /change-workspace\.mjs retire/, /argv/, /bootstrap/i, /no force/i, /ignored/i, /common.*Git|Git.*shared/i, /independent clone/i]) assert.match(workspace, pattern);
   const continuation = await read("skills/software-development/openspec-delivery/references/continuation.md");
-  for (const pattern of [/already merged/i, /approval/i, /one task group/, /remote/i, /closure/i, /archive/i, /read.?back/i, /no second task/i]) assert.match(continuation, pattern);
+  for (const pattern of [/already merged/i, /approval/i, /one task group/, /remote/i, /closure/i, /archive/i, /read.?back/i, /no second task/i, /Open implementation PR/, /Normal pause/, /changed SHA/]) assert.match(continuation, pattern);
 });
 test("delivery guidance retains approval and retry evidence and binds review after task updates", async () => {
   const continuation = await read("skills/software-development/openspec-delivery/references/continuation.md");

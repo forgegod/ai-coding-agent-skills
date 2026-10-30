@@ -1,7 +1,7 @@
 ---
 name: openspec-delivery
 description: Automate setup, execution and closeout of OpenSpec changes.
-version: 1.0.0
+version: 1.0.2
 author: Raphael (forgegod), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -222,7 +222,11 @@ restrictions continue until explicitly lifted; a bare `next` never cancels them.
 - OpenSpec verification is not a substitute for executable project gates,
   independent review or protected integration. Config guidance is not enforcement.
 - Do not commit prospective merge results or put closing keywords on an
-  intermediate implementation PR when later acceptance is still required.
+  intermediate implementation commit or pull request while later acceptance is
+  still required. After acceptance, the receipt or archive commit carries
+  `Fixes #<issue>` and `Closes #<pull-request>` only for an already merged pull
+  request. That trailer does not push. It takes effect only when the commit is
+  merged into the default branch.
 - Preserve exact IDs, failures and rejected candidates. Never rename a conflicting run, unassign an operator or discard dirty work.
 - A shared-profile package must not update/remove its installed copy while
   operating in a project. Source adoption is not installed-profile permission.
