@@ -43,11 +43,11 @@ orchestration package only, and SHALL NOT publish a second phase skill set.
 
 #### Scenario: Catalog inventory
 - **WHEN** the distribution is built
-- **THEN** the packages are openspec-change-integration, git-commit-message, capability-wireframes, and autonomous-implementation-review
+- **THEN** the packages are openspec-delivery, openspec-next, git-commit-message, capability-wireframes, and autonomous-implementation-review
 
 #### Scenario: OpenSpec bundle inventory
 - **WHEN** the OpenSpec plugin ZIP is built
-- **THEN** it contains integration, commit and wireframe packages only, byte-for-byte
+- **THEN** it contains delivery, next-step execution, commit and wireframe packages only, byte-for-byte
 
 ### Requirement: Documentation records are not the task authority
 GitHub issues and pull requests SHALL be documentation and review records. They
@@ -82,7 +82,7 @@ implementation and review. Existing names SHALL remain valid and unchanged.
 #### Scenario: Short proposal request
 - **WHEN** the operator requests `/openspec-propose add-dark-mode` for a new change
 - **THEN** the agent generates the suffix before OpenSpec scaffolding and reuses the returned name without requiring the operator to type a ULID
-- **AND** naming does not authorize branch creation, implementation, commits or publication
+- **AND** naming alone does not authorize writes; the selected proposal invocation includes isolated setup, not implementation, commits or publication
 
 #### Scenario: Resume and ambiguous selection
 - **WHEN** an operator resumes by a short slug or current change context
@@ -137,3 +137,38 @@ PR state, and SHALL remain included in the existing planning digest.
 #### Scenario: Invalid metadata
 - **WHEN** metadata has duplicate YAML keys, wrong types, unsupported fields or identities inconsistent with its native path
 - **THEN** the read-only metadata check fails without repairing files or bypassing upstream validation
+
+### Requirement: Short bounded delivery invocations
+Projects explicitly adopting the invocation contract SHALL let the agent perform
+workspace setup, bootstrap, verification, task updates and previewed autonomous
+local commits for one approved task group without repeated plumbing prompts.
+Operator restrictions SHALL override defaults and remain effective on continuation.
+
+#### Scenario: Next approved local group
+- **WHEN** the operator sends `/openspec-next` in verified current-change context
+- **THEN** the agent resolves actual tasks, approval, dependencies and interrupted work and advances one eligible unfinished group
+- **AND** it does not infer plan approval, perform remote writes or start another change
+
+#### Scenario: Inspect or restricted execution
+- **WHEN** the operator requests inspect-only assessment or excludes commits
+- **THEN** inspect performs no mutations and a no-commit execution preserves its uncommitted boundary without claiming a clean candidate
+- **AND** ambiguous selection, missing approval or conflicting ownership blocks execution rather than creating replacement work
+
+#### Scenario: Explicit terminal delivery
+- **WHEN** the operator sends `/openspec-delivery finish <name>` under the adopted contract
+- **THEN** the agent resumes that candidate's protected publication, integrated verification, factual receipt/archive closure, acceptance-bound issue closure and clean-worktree retirement automatically
+- **AND** changed candidates require renewed gates/review, already merged implementation is not replayed, and branch deletion, bypass, release or another change remains unauthorized
+
+### Requirement: Recoverable isolated workspace lifecycle
+The delivery package SHALL supply read-only creation, reuse, location and retirement
+previews, leaving execution and exact readback to the authorized orchestrator.
+
+#### Scenario: Automatic workspace preparation
+- **WHEN** authorized setup begins from a captured clean base without collisions
+- **THEN** the helper emits exact worktree creation arguments outside existing checkouts without writing files or refs
+- **AND** preparation precedes parallel proposal scaffolding and bootstrap uses the project's actual documented recipe
+
+#### Scenario: Resume and retirement
+- **WHEN** the selected branch already has one verified registered dedicated worktree
+- **THEN** the agent reuses it and preserves dirty or interrupted work rather than resetting or creating a competitor
+- **AND** removal requires exact clean head and reachable closure evidence, ignored-file inspection, no force and verified absence; branch refs remain recoverable

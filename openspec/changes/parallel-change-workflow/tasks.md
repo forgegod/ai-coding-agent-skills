@@ -77,3 +77,13 @@ pinned OpenSpec compatibility, native Claude marketplace/plugin validation and
 `git diff --check` passed. The path audit distinguishes native layouts, companion
 defaults, Git refs and package-relative helpers. No product files were moved and
 no issue, installed profile, vault, commit or push was created by this revision.
+
+## Operator revision: automatic delivery plumbing
+
+- [ ] 8.1 Rename the lifecycle package to `openspec-delivery`, add grounded `openspec-next` execution/inspect, and define short project-selected invocation defaults with operator overrides.
+- [ ] 8.2 Implement real-Git-tested workspace creation/reuse/location/retirement previews and document bootstrap, recovery, integrated verification and record-only closure workspaces.
+- [ ] 8.3 Synchronize contracts, native records, documentation, package/plugin inventories, versions and short launch examples; verify tests/build, metadata, pinned upstream compatibility and scratch plugin packaging without changing installed profiles or publishing.
+
+## Operator revision: lifecycle ownership diagram
+
+- [ ] 9.1 Replace the lifecycle text picture with Mermaid, distinguish operator checkpoints from automatic agent work, and clarify that the isolated checkout is an agent-managed workspace rather than a manual prerequisite or lifecycle phase; verify documentation regressions, Mermaid syntax, tests/build and metadata.

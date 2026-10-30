@@ -17,7 +17,10 @@ OpenSpec.
 ## What Changes
 
 - Define native OpenSpec proposal/spec/design/tasks for explicitly selected scope.
-- Add an opt-in integration skill with read-only committed evidence checks.
+- Provide `openspec-delivery` for automatic isolated workspace setup, bounded local
+  execution and verified protected closeout, with read-only evidence/workspace checks.
+- Add `openspec-next` for grounded continuation or read-only inspection without long
+  operator prompts; explicit project adoption defines local defaults and finish scope.
 - Adapt commit, visual and supported-host role skills to the OpenSpec change.
 - Publish only the OpenSpec companion packages and the separate orchestration
   package. Do not publish a second phase skill set.
@@ -45,7 +48,8 @@ issue remains pending before plan approval; metadata migration does not create i
 
 Real Git fixture tests demonstrate independent-clone support and rejection of stale
 plans/reviews, failed or mismatched evidence and changed target content. Existing
-package/guard tests continue to pass. The pinned real OpenSpec CLI validates artifacts.
+package/guard tests continue to pass. Workspace fixtures exercise create/reuse,
+collision refusal, dirty-work preservation and verified clean retirement. The pinned real OpenSpec CLI validates artifacts.
 
 ## Out of Scope
 

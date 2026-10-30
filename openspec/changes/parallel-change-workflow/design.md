@@ -9,8 +9,8 @@ change: parallel-change-workflow
 
 Use native OpenSpec artifacts as the task/specification authority for migrated scope.
 Keep one operator-designated orchestrator per change. Shared source packages route to
-on-demand OpenSpec references only under explicit project adoption; legacy skills and
-current launch examples stay functional.
+on-demand OpenSpec references only under explicit project adoption. Operator-facing
+commands define short bounded defaults; explicit restrictions override them.
 
 ## Integration boundary
 
@@ -58,10 +58,31 @@ a reviewer, verifies GitHub state, runs tests, obtains a lock or grants writes.
 
 ## Distribution
 
-Preserve the legacy general bundle and separate orchestration. A third opt-in
-OpenSpec bundle selects integration plus shared commit/wireframe packages. Sharing
-those exact packages across workflow bundles is intentional; duplicates within an
-entry, unselected canonical packages and implicit orchestration remain invalid.
+Publish two bundles: OpenSpec delivery, next-step execution, commits and wireframes
+in `openspec-development`, and the separate opt-in orchestration package. Every
+canonical package belongs to exactly one bundle. Duplicates within an entry,
+unselected canonical packages and implicit orchestration remain invalid.
+
+## Automatic local plumbing
+
+`openspec-next` resolves actual change/task/approval/dependency state and advances
+one approved group, with an inspect-only mode. `openspec-delivery` owns preparation,
+local execution and terminal finish. A project explicitly adopts the invocation
+contract; installation alone never enables it. An execution invocation grants
+workspace creation/bootstrap and autonomous local commits with batch previews,
+not remote writes. Finish separately grants named protected publication and
+verified receipt/archive/acceptance-bound issue closure/clean-tree retirement.
+Restrictions persist on next; plan approval and reviewer host controls remain.
+
+A read-only workspace helper emits creation/reuse/removal previews and checks
+canonical paths, branch registration, exact base/head, cleanliness and ancestry.
+The authorized orchestrator executes exact argv and verifies resulting state.
+Bootstrap comes from project exports/CI and is not an acceptance gate. Worktrees
+share Git refs/config and may share services/agent identity; isolate those inputs
+separately. Independent-clone evidence checks do not depend on this linked-worktree
+helper. Integrated verification uses a named detached checkout; record-only closure
+uses a separate `closure/<full-name>` branch from the verified target, preserving
+implementation review identity. Cleanup never deletes branches or discards work.
 
 ## Recovery and boundaries
 
