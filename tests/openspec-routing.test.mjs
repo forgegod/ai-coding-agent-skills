@@ -45,9 +45,9 @@ test("git-commit-message keeps its preview and uses the integration skill for ch
 
 test("capability-wireframes uses stable keys and change-owned proposals", async () => {
   const source = await read(`${entry.wireframes}SKILL.md`);
-  assert.match(source, /^version: 1\.4\.0$/m);
+  assert.match(source, /^version: 1\.5\.0$/m);
   assert.match(source, /docs\/product\/wireframes\//);
-  assert.match(source, /openspec\/changes\/<name>\//);
+  assert.match(source, /within their change package/);
   assert.doesNotMatch(source, /CAP-NNNN|application-records/);
   const reference = await read(`${entry.wireframes}references/openspec.md`);
   assert.ok(reference.length > 900, "OpenSpec wireframe reference must stay substantive");

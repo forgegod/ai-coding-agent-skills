@@ -7,6 +7,7 @@ Generate and verify the static well-known skill endpoint and Claude upload packa
 ## Ownership
 
 - `build-well-known-skills.mjs` owns discovery, metadata validation, package inventory, and site generation.
+- `validate-openspec-metadata.mjs` owns read-only validation of native OpenSpec Markdown identity frontmatter, archive/path consistency and optional proposal issue readiness. `tests/openspec-cli-compatibility.mjs` owns the opt-in pinned upstream validation/spec-update/archive probe in scratch; neither modifies a real vault or creates tickets.
 - `build-distribution.mjs` owns the full build entry point, Claude marketplace validation, deterministic complete-package ZIPs, plugin wrappers, and download HTML/checksum inventory. It enforces two explicit bundles: the OpenSpec companion set and optional orchestration. Every canonical package belongs to exactly one bundle. Root owns the source marketplace manifest.
 - `check-skill-security.py` owns the opt-in release scan against an explicitly selected trusted Hermes source checkout; it never installs packages or changes a profile.
 - `install-local-skills.mjs` owns collision-safe installation and explicit, backed-up updates of every validated local package into selected Hermes profiles.

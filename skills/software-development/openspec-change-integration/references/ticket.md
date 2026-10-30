@@ -1,7 +1,10 @@
 # Documentation issue
 
-Create this issue only when the operator uses the short invocation. Specification
-does not wait for it. Displaying the line below does not create an issue.
+Create or reuse one issue during an authorized new proposal when the target
+project explicitly selects proposal-time issue creation. Otherwise require the
+short invocation below. Local drafting can proceed offline, but a required issue
+link must be verified before plan approval. Installation or metadata migration
+never grants a ticket write. Displaying the line below does not create an issue.
 
 Hermes prompt:
 
@@ -9,23 +12,54 @@ Hermes prompt:
 /openspec-change-integration document <name>
 ```
 
-The skill applies the rest. Link `openspec/changes/<name>/` by that change
-name. Do not generate another suffix. Use the body below. Do not copy `tasks.md`. Do
-not implement, commit, open a pull request, or assign the issue to acquire a
-lock. Stop after the issue readback. The operator does not repeat those
-constraints.
+The skill applies the rest. Identify the change by its full name, including the
+existing ULID where present, not its current directory. Do not generate another
+suffix or copy `tasks.md`. Create or reuse the documentation issue, read it back,
+record its verified URL in the proposal when that local write is authorized, and
+stop. Do not implement, commit, open a pull request or assign the issue to acquire
+a lock. The operator does not repeat those constraints.
 
 Other hosts use their own spelling of this skill. The action is the same.
 
+## Stable proposal link
+
+Confirm the intended GitHub repository; do not assume a fork's remote is the
+documentation repository. Search for the exact full change name before creating
+an issue. Reuse one confirmed matching issue without rewriting its body by
+default. Multiple matches or conflicting ownership require operator selection.
+If the write outcome is unknown, read back before retrying. Stop on repository,
+ownership or permission ambiguity. An existing issue update needs its own authority.
+Record the read-back full issue URL as `github_issue` on `proposal.md` when the
+project uses that frontmatter convention. A missing or unauthorized issue stays
+`null`, never a synthetic URL. Keep this identity unchanged by default; the issue
+body can receive separately authorized corrections or risk reassessment.
+
+PRs link the issue in GitHub; no PR metadata or separate Markdown index is needed.
+Do not copy the URL into every artifact. Metadata is not status or approval.
+Frontmatter edits remain covered by the plan digest and need reapproval after
+plan approval. Specification and native task progress remain OpenSpec-owned.
+
 ## Identity
 
-The full OpenSpec change name is the identity. Link `openspec/changes/<name>/`
-from the issue, the pull request and the evidence. Resolve a short slug using
-`naming.md` and ask on ambiguous matches. Documentation never generates a suffix
-or creates a missing change. Before proposing new work, inspect visible matching
-requests and adopt the existing change when it is the same work. A second name
-does not make a duplicate request independent; a local search cannot discover
-every unpushed proposal in another clone.
+The full OpenSpec change name is the stable reference in issues, pull requests,
+dependencies and evidence. Add an artifact role when needed, for example
+`proposal of <full-change-name>`. Archival changes its location, not this identity.
+Do not use an active-directory path or a guessed archive path as the reference.
+The repository identity supplies context when referencing another project.
+
+Resolve a short slug using `naming.md` and ask on ambiguous matches. That helper
+searches active changes only; an archived reference requires inspecting the
+archive for the same exact name. Never interpret a missing active match as
+permission to create another change. Duplicate active/archive identities need
+reconciliation. Documentation never generates a suffix or creates a missing
+change. Before proposing new work, inspect visible matching requests; a local
+search cannot discover every unpushed proposal in another clone.
+
+An optional clickable source link must be a verified commit permalink to an
+already published artifact. It supplements the full name and describes that
+revision, not the latest location. If the proposal is local-only, the name is
+enough; do not invent a URL, push merely to obtain one, or make a relative path
+in a GitHub issue look like a working repository link.
 
 Two operators in two clones can still edit the same capability spec. That
 overlap is stopped by comparing the specs and reconciling before either change
@@ -45,7 +79,7 @@ confidentiality.
 Do not install this body as `.github/ISSUE_TEMPLATE/` unless the operator
 authorizes that repository change.
 
-## Required body
+## Proposal-time body
 
 Empty is not "no risk". Use `not applicable` with a reason, or mark the fact
 unknown. An agent may draft impact from inspected scope and must label
@@ -56,61 +90,65 @@ change still uses this body; concise justified answers are enough.
 
 ```markdown
 ## Identity and request
-- OpenSpec change: openspec/changes/<name>/
+- OpenSpec change: <full-change-name>
+- Repository: <confirmed owner/repository>
+- Proposal reference: <full-change-name>, proposal; <verified commit permalink if published, otherwise local-only>
 - Change type: <feature | bug | security | refactor | dependency | infrastructure | documentation>
 - Change procedure: <normal | approved standard change | emergency>
-- Requester: <person or team>
-- Responsible operator: GitHub Assignees, one accountable person
-- Request / problem / justification:
-- Desired outcome and acceptance criteria:
-- In scope / explicitly out of scope:
-- Related requests or dependencies: <links>
-- Closure boundary: <source integration | deployment and operational validation>
+- Request and justification: <problem, affected people, expected benefit>
+- Scope and exclusions: <concise summary; proposal and delta specs remain authoritative>
+- Expected outcome and acceptance boundary: <summary; source integration or deployment/operational validation>
+- Dependencies: <full change names and existing issue links, or none with rationale>
 
 ## Impact and estimated blast radius
-- Affected assets, services or components:
-- Environments, regions, tenants or user groups:
-- Data categories; personal or regulated data:
-- Access, privilege, trust-boundary or external-interface changes:
-- Dependencies and plausible downstream effects:
-- Failure scenarios and worst credible consequence:
-- Disruption, data-loss or corruption exposure:
-- Expected blast radius, with assumptions:
-- Unknowns:
+- Affected components, environments and people: <bounded extent; label estimates>
+- Data and trust boundaries: <personal/regulated data, permissions, external interfaces>
+- Worst credible failure and blast radius: <disruption, corruption, loss and downstream effects>
+- Assumptions and unknowns: <include facts needing confirmation>
 
 ## Risk assessment and treatment
-- Risk method: <link, or qualitative low/medium/high/unknown if no method is adopted>
-- Confidentiality impact and rationale:
-- Integrity impact and rationale:
-- Availability impact and rationale:
-- Likelihood and inherent risk, with rationale:
-- Mitigations or compensating controls:
-- Residual risk and limitations:
-- Risk owner: <role; not this agent>
-- Applicable policy or SoA reference: <link or not applicable, with reason>
+- Confidentiality: <impact and rationale>
+- Integrity: <impact and rationale>
+- Availability: <impact and rationale>
+- Likelihood and risk: <project method; if absent, qualitative estimate with rationale, not approval>
+- Mitigations and residual risk: <controls, limitations and unresolved questions>
+- Applicable policy / SoA: <reference or not applicable with reason>
 
-## Verification, rollout, and recovery
-- Verification approach: <summary; tasks stay in tasks.md>
-- Required security or privacy review: <link or not applicable, with reason>
-- Rollout and change dependencies:
-- Abort triggers:
-- Rollback or forward recovery; owner; whether it is reversible:
-- Stakeholders to notify:
+## Verification and recovery plan
+- Verification: <required gates and security/privacy reviews; summary, not a task list>
+- Rollout and abort conditions: <approach and signals that stop it>
+- Recovery: <rollback or forward repair, reversibility and responsible person/role>
+- Communication: <affected stakeholders and notification needs>
 
-## Authorization and review evidence
-- Assessment revision being approved: <permalink of this body>
-- Plan or execution approval: <actor, time, scope, link; do not invent>
-- Required risk-owner approval: <link or not applicable, with reason>
-- Independent reviewer verdict: <reviewer that did not implement the candidate, exact SHA, link>
-- Conditions or reassessment triggers:
-
-## Outcome
-- Integrated revision and retained gate evidence:
-- Pull request and candidate SHA:
-- Actual impact or deviation from the estimate:
-- Follow-up, with owner:
-- Closure decision: <actor, time, result>
+## Ownership and authorization boundary
+- Requester and accountable operator: <confirmed people/roles, otherwise unknown; no automatic assignment>
+- Risk owner / required approvers: <project-defined people/roles, otherwise unresolved>
+- Authorization: <what is currently authorized, by whom and from which real instruction; otherwise pending>
+- Reassessment triggers: <scope, data, permissions, dependencies or rollout changes>
 ```
+
+This is a proposal-time risk snapshot, not a second specification or a live
+progress form. Keep all headings; use concise justified answers for small changes.
+Do not prepopulate passing reviews, merge SHAs, deployed outcomes or closure
+decisions. Missing approval is `pending`, not implied by issue creation.
+
+## Later evidence, only after the events occur
+
+The stable issue URL does not require a frozen body, but updates remain separately
+authorized. Prefer links from the actual PR and later factual comments over
+continually copying state into the initial request. A comment is still editable;
+do not describe an issue/comment URL alone as immutable evidence.
+
+An editable issue body is not an immutable approval snapshot. Approval must name
+the exact plan commit/digest and a retained revision of any external risk input
+that it depends on. Use the project's evidence-retention mechanism, not a
+fictional "permalink of this body". If that revision cannot be retained, report
+the approval evidence gap instead of claiming review binding.
+
+After they actually occur, separately authorized records can link the independent
+review of the exact candidate SHA, the real PR, integrated revision and retained
+gate evidence, deviations, and the human closure decision. These belong to the
+existing review/receipt workflow; do not add PR fields to proposal frontmatter.
 
 Reassess if scope, data, permissions, rollout or dependencies change. Do not
 keep an old approval as if it covered the new body. Public text must not

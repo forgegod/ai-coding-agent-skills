@@ -23,7 +23,7 @@ test("OpenSpec package documents explicit authority, writer separation and read-
   for (const pattern of [/candidate --repo/, /review --repo/, /receipt --repo/, /schemaVersion/, /planDigest/, /exitCode/, /does not authenticate/, /fences/, /append-only/]) assert.match(reference, pattern);
   for (const pattern of [/valid UTF-8/, /refs\/replace/, /grafts/, /fsmonitor/, /Every commit in `verified\.\.target`/, /--receipt-path/, /duplicate/i, /raw blob bytes/]) assert.match(reference, pattern);
   assert.doesNotMatch(skill, /adoption history|reviewer found|previously reported/i);
-  assert.match(skill, /version: 0\.5\.0/);
+  assert.match(skill, /version: 0\.7\.0/);
   assert.doesNotMatch(skill, /\/home\/|~\/.hermes/);
 });
 
@@ -111,6 +111,24 @@ test("OpenSpec plan digest preserves checkbox progress but not examples inside f
   assert.equal(before.status, 0, before.error);
   await writeFile(path.join(f.repo, changeRoot, "tasks.md"), "# Tasks\n- [x] 1.1 Implement and test\n```md\n- [x] example\n```\n");
   f.head = commit(f.repo, "Changed fenced definition");
+  assert.match(invoke(f).error, /Planning content changed/);
+});
+
+test("identity frontmatter remains bound while task checkbox progress is allowed", async (t) => {
+  const metadata = "---\nmetadata_version: 1\nartifact: tasks\nchange: fixture-change\n---\n";
+  const f = await fixture(t, {
+    planTasks: `${metadata}# Tasks\n- [ ] 1.1 Implement and test\n`,
+    headTasks: `${metadata}# Tasks\n- [x] 1.1 Implement and test\n`,
+  });
+  const before = invoke(f);
+  assert.equal(before.status, 0, before.error);
+  const issueHeader = "---\nmetadata_version: 1\nartifact: proposal\nchange: fixture-change\ngithub_issue: https://github.com/example/project/issues/1\n---\n";
+  await writeFile(path.join(f.repo, changeRoot, "proposal.md"), `${issueHeader}# Scope\nOne bounded change.\n`);
+  f.head = commit(f.repo, "Bind issue before approval");
+  f.plan = f.head;
+  assert.equal(invoke(f).status, 0);
+  await writeFile(path.join(f.repo, changeRoot, "proposal.md"), `${issueHeader.replace("issues/1", "issues/2")}# Scope\nOne bounded change.\n`);
+  f.head = commit(f.repo, "Change issue after approval");
   assert.match(invoke(f).error, /Planning content changed/);
 });
 

@@ -1,7 +1,7 @@
 ---
 name: capability-wireframes
 description: Use when a human-facing surface needs a stable visual review.
-version: 1.4.0
+version: 1.5.0
 author: AI Software Blueprint
 license: MIT
 metadata:
@@ -30,6 +30,10 @@ or a cosmetic adjustment that does not alter interaction, hierarchy, or meaning.
 
 ## Layout
 
+This is the companion's default layout, not an OpenSpec requirement. Resolve it
+from the target project's root and preserve an existing project-owned layout.
+The package does not ship a product generator or create these files on install.
+
 ```text
 docs/product/wireframes/
 ├── generate.mjs
@@ -41,12 +45,15 @@ docs/product/wireframes/
 
 The project chooses the visual system and screenshot renderer. Do not copy a
 reference project's framework or machine-local paths into an adopting repository.
-`openspec/specs/` links the stable HTML page. Link the manifest entry rather
-than duplicating paths.
+Current capability specs link the actual stable HTML/PNG resolved from the
+manifest, relative to the referring spec. A directory or manifest key is not a
+page or a URL. Do not invent index anchors the generator does not emit.
 
-Pre-implementation visuals stay under `openspec/changes/<name>/`, review-only,
-outside the manifest and outside product links. Reference them from the proposal,
-design or tasks. Do not copy proposal files into the product directory.
+Pre-implementation visuals stay within their change package, review-only,
+outside the manifest and outside current-product links. Use package-relative
+links from that change's proposal, design or tasks. Elsewhere cite the full
+change name and screen key, not the moving active/archive path. Do not copy
+proposal files into the product directory.
 
 ## Contracts
 
@@ -58,8 +65,10 @@ design or tasks. Do not copy proposal files into the product directory.
   has a unique stable key, a non-empty title, HTML and PNG paths, and positive
   integer viewport width and height. Directories agree with the manifest both ways.
 - The implementation slice updates the stable screen and links it from the spec
-  delta and tests. A later change of the same surface updates that screen; it
-  does not mint a second key.
+  and tests. Delta references use stable capability/screen keys or verified commit
+  permalinks; when syncing into the current spec, compute its relative link from
+  the destination, not the delta's directory. A later change of the same surface
+  updates that screen; it does not mint a second key.
 - Wireframes illustrate the intended interface. They do not replace OpenSpec
   scenarios or executable tests.
 - Use synthetic, non-sensitive sample content. Never place real identities,

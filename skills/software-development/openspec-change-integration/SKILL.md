@@ -1,7 +1,7 @@
 ---
 name: openspec-change-integration
 description: Review and integrate explicitly selected OpenSpec changes.
-version: 0.5.0
+version: 0.7.0
 author: Raphael (forgegod), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -25,9 +25,11 @@ GitHub API client, and installing OpenSpec or this package never selects it.
   project's records.
 - An operator authorizes bounded specification, implementation, review,
   documentation or recovery. A planning-only request ends at
-  proposal/spec/design/tasks.
+  proposal/spec/design/tasks plus a bounded issue write only when the project's
+  explicitly selected proposal policy includes it.
 - Do not use to create a second task tracker, or to require a GitHub issue
-  before specification.
+  before local specification can begin. The selected policy requires the verified
+  issue before plan approval, not before drafting.
 
 ## Prerequisites
 
@@ -36,9 +38,10 @@ GitHub API client, and installing OpenSpec or this package never selects it.
   does not install it or assert host execution support.
 - Explicit project policy naming target, required gates, evidence retention and
   source/deployment completion boundaries.
-- For a documentation or review record: a real issue or pull request the operator
-  asked to write. Offline work may leave that link pending. Never invent remote
-  state. When the operator asks to document, follow
+- For a documentation or review record: a real issue or pull request with explicit
+  authority. A project may include one issue in an authorized new proposal;
+  installation alone never grants that authority. Offline work leaves the link
+  pending and the proposal unready for approval. Never invent remote state. Follow
   [references/ticket.md](references/ticket.md): one risk-focused issue, no task
   list. The full OpenSpec change name is the identity; reuse it exactly.
 
@@ -77,11 +80,22 @@ When two active changes touch the same capability spec, reconcile the overlap
 before either merges. A clean Git merge is not compatibility evidence.
 
 GitHub issues and pull requests are documentation and review records. Create or
-update them only when the operator sends a prompt that names this skill, as in
-`references/ticket.md`. Link the OpenSpec change and, for a review, the exact
+reuse one issue during a new proposal only when project policy explicitly includes
+that write. Otherwise use the separately authorized `document <name>` invocation
+in `references/ticket.md`. PR creation and later issue updates need separate
+authority. Link the OpenSpec change and, for a review, the exact
 candidate SHA. Do not put the task list in the issue, and do not invent a ticket so a helper command will run. Do not write that the issue is ISO/IEC
 27001 compliant. Closing an issue does not archive a change. Archiving a change
 does not close an issue unless that documentation write is separately authorized.
+For metadata-enabled projects, bind the verified issue URL in proposal frontmatter
+before approval and keep it unchanged by default. No PR metadata or second index
+is needed. Follow the project's metadata validator; keep identity metadata covered
+by the plan digest. An authorized correction after approval requires reapproval.
+Archive moves preserve change identity; current specs must not inherit it.
+With OpenSpec 1.15.0, keep delta specs free of frontmatter: strict validation
+rejects it. Proposal/design/tasks and current specs can carry the project's
+identity schema. After spec sync, add the schema to newly created current specs
+under the same authorized scope and revalidate; native OpenSpec does not add it.
 
 Before a pull request is merged, and before its branch is deleted, require a
 verdict from `/autonomous-implementation-review` by a reviewer that did not
@@ -92,7 +106,7 @@ different reviewer, stop.
 
 The helper's review and receipt commands cite a documentation issue URL when
 those evidence records are produced. That URL is not admission. Do not call
-those commands without an operator-provided issue.
+those commands without a verified, authorized issue.
 
 ## Short invocation
 
@@ -103,12 +117,14 @@ them. On Hermes the whole request is:
 /openspec-change-integration document <name>
 ```
 
-`<name>` is the full OpenSpec change directory name. A short slug may be resolved
+`<name>` is the full OpenSpec change name, not its active/archive path. A short slug may be resolved
 through `references/naming.md`; ambiguous matches require selection. Other hosts
 use their spelling of this skill, then the same `document <name>` words.
 
-That verb means: load `references/ticket.md`, create or update one issue for
-`openspec/changes/<name>/`, link the resolved full name, and stop. Do not generate
+That verb means: load `references/ticket.md`, create or reuse one issue for change
+`<name>`, read back the issue and record its URL in the proposal when authorized,
+then stop. Reuse does not authorize rewriting an existing issue. Use the full
+change name as its durable reference; later issue updates need separate authority. Do not generate
 another suffix. Do not copy `tasks.md`. Do not implement, commit, open a pull request, or assign the issue to lock the work. A longer prompt is not required and does not add authority.
 
 ## Procedure

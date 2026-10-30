@@ -27,9 +27,22 @@ keeps the overlap and archival checks.
 
 ## Change-owned proposals
 
-- Pre-implementation visuals stay under `openspec/changes/<name>/`, review-only,
-  outside the manifest, and outside `openspec/specs/` links.
-- The implementation slice updates the stable screen and links it from the spec
-  delta and tests. Do not copy proposal files into `docs/product/wireframes/`.
-- Archived change packages retain their review assets and package-relative paths.
-  Repair repository links when the package moves.
+- Pre-implementation visuals stay within the selected change package, review-only,
+  outside the manifest and outside current `openspec/specs/` links. The active
+  package is located at `openspec/changes/<name>/` for tool use, not durable identity.
+- From other documents, cite the full change name (including its existing ULID)
+  and the screen key. Resolve the current package location when reading it; do not
+  embed an active path or guess a future archive path. An optional immutable commit
+  permalink is a reference to that published revision, not the latest file.
+- The implementation slice updates the stable screen and links it from the current
+  spec and tests. Do not copy proposal files into `docs/product/wireframes/`.
+  The default product layout is a companion convention, not native OpenSpec policy.
+- Delta specs should identify current visuals by stable capability/screen keys or
+  a verified commit permalink. During sync, compute the current spec's relative
+  HTML/PNG links from its destination and validate them; copying a delta-relative
+  link verbatim changes its meaning. A manifest entry is not automatically a URL.
+- Archived change packages retain their review assets and package-relative links
+  when both endpoints move together. The receipt guard requires byte-identical
+  archival. Do not repair links by rewriting the frozen package during closure;
+  resolve any necessary content changes before integrated verification. Changes
+  outside that package also need renewed verification, not a wider archive allowlist.
