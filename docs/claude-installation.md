@@ -8,7 +8,8 @@ scripts before enabling; do not use another client to evade an unresolved securi
 
 This guide installs our five companion packages, not upstream OpenSpec. Complete
 the [separate OpenSpec prerequisite setup](openspec-installation.md) for CLI
-1.15.0, Node 22+, Git and the seven required upstream workflows. Its
+1.16.0, Node 22.12.0+ for the OpenSpec npm package, Git and the seven required
+upstream workflows. Its
 [account upload section](openspec-installation.md#claude-desktop-account-uploads-and-cowork)
 covers preparing complete individual upstream ZIPs and the unverified metadata/
 GUI acceptance boundary; its [Code section](openspec-installation.md#claude-code-including-desktops-code-tab)

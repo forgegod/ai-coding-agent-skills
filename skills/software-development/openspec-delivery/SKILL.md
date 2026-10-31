@@ -103,7 +103,7 @@ before approval and keep it unchanged by default. No PR metadata or second index
 is needed. Follow the project's metadata validator; keep identity metadata covered
 by the plan digest. An authorized correction after approval requires reapproval.
 Archive moves preserve change identity; current specs must not inherit it.
-With OpenSpec 1.15.0, keep delta specs free of frontmatter: strict validation
+With OpenSpec 1.16.0, keep delta specs free of frontmatter: strict validation
 rejects it. Proposal/design/tasks and current specs can carry the project's
 identity schema. After spec sync, add the schema to newly created current specs
 under the same authorized scope and revalidate; native OpenSpec does not add it.

@@ -19,7 +19,7 @@ rules:
     - Follow docs/openspec-metadata.md; record one verified proposal-time github_issue before approval, or null for a blocked draft. No ticket creation is implied by metadata migration.
   specs:
     - State observable requirements with executable acceptance scenarios.
-    - Current specs use identity-only frontmatter with capability, never change or github_issue. Delta specs have no frontmatter because OpenSpec 1.15.0 strict validation rejects it. Recheck metadata after sync/archive.
+    - Current specs use identity-only frontmatter with capability, never change or github_issue. Delta specs have no frontmatter because OpenSpec 1.16.0 strict validation rejects it. Recheck metadata after sync/archive.
   tasks:
     - Keep independently mergeable changes small; do not recreate a second task table.
     - Use metadata_version, artifact and exact change frontmatter; no status or progress properties.

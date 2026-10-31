@@ -9,7 +9,7 @@ The process is [OpenSpec plus these companion skills](docs/openspec-workflow.md)
 OpenSpec propose, apply, sync and archive own the change package and current behavior specs. This repository does not vendor those actions.
 
 Before using the workflow, follow [Install the upstream OpenSpec prerequisites](docs/openspec-installation.md):
-CLI **1.15.0**, Node **22+**, Git, and **seven required upstream workflow skills**,
+CLI **1.16.0** (the npm package requires Node **22.12.0+**), Git, and **seven required upstream workflow skills**,
 including advisory verification. The guide separates Hermes profile enablement,
 Claude account uploads versus Code execution, and Codex user-global setup.
 The five packages below are companions, not a replacement for those prerequisites.
