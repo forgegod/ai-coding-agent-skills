@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "change": "local-client-skill-install-01m6896x3994xcc0erw8jnr15z",
+  "issueUrl": "https://github.com/forgegod/ai-coding-agent-skills/issues/1",
+  "base": "dd33c2bbb211bd4718af79b7091d4150ecea78dd",
+  "head": "59afd4bb01d7b73a6afe298d2f94656e2a2b89a5",
+  "plan": "5f62632d97a7835cbdf9c9141135c3c5485e8c3b",
+  "planDigest": "5b0a4b6a4ac8f6035e7c57d23a7abf9fc881451de40ee89e56fa8932cb3a9a38",
+  "integrated": "3c91f34df3865e1d229160f39eeffc356dbb7ef5",
+  "verified": "aa4b11328ee4f8814d7c674adae78771f20c5c82",
+  "review": {
+    "schemaVersion": 1,
+    "change": "local-client-skill-install-01m6896x3994xcc0erw8jnr15z",
+    "issueUrl": "https://github.com/forgegod/ai-coding-agent-skills/issues/1",
+    "head": "59afd4bb01d7b73a6afe298d2f94656e2a2b89a5",
+    "planDigest": "5b0a4b6a4ac8f6035e7c57d23a7abf9fc881451de40ee89e56fa8932cb3a9a38",
+    "verdict": "pass",
+    "findings": [],
+    "reviewer": "Grok 4.7 via Herdr pane w19:p2, session rereview-local-client-docs",
+    "reference": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/local-client-skill-install-01m6896x3994xcc0erw8jnr15z-herdr/rereview-lifecycle.jsonl and Herdr transcript for pane w19:p2",
+    "gates": [
+      {
+        "command": "npm test",
+        "commit": "59afd4bb01d7b73a6afe298d2f94656e2a2b89a5",
+        "exitCode": 0,
+        "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/local-client-skill-install-01m6896x3994xcc0erw8jnr15z-gates-59afd4b/npm-test.log"
+      },
+      {
+        "command": "npm run build",
+        "commit": "59afd4bb01d7b73a6afe298d2f94656e2a2b89a5",
+        "exitCode": 0,
+        "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/local-client-skill-install-01m6896x3994xcc0erw8jnr15z-gates-59afd4b/npm-run-build.log"
+      },
+      {
+        "command": "npm run validate:openspec",
+        "commit": "59afd4bb01d7b73a6afe298d2f94656e2a2b89a5",
+        "exitCode": 0,
+        "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/local-client-skill-install-01m6896x3994xcc0erw8jnr15z-gates-59afd4b/npm-run-validate-openspec.log"
+      },
+      {
+        "command": "git diff --check",
+        "commit": "59afd4bb01d7b73a6afe298d2f94656e2a2b89a5",
+        "exitCode": 0,
+        "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/local-client-skill-install-01m6896x3994xcc0erw8jnr15z-gates-59afd4b/git-diff-check.log"
+      }
+    ]
+  },
+  "integrationReference": "https://github.com/forgegod/ai-coding-agent-skills/pull/2",
+  "gates": [
+    {
+      "command": "openspec validate --specs",
+      "commit": "aa4b11328ee4f8814d7c674adae78771f20c5c82",
+      "exitCode": 0,
+      "evidence": "Hermes terminal execution in the isolated integrated checkout: 1 spec passed, 0 failed"
+    },
+    {
+      "command": "npm test",
+      "commit": "aa4b11328ee4f8814d7c674adae78771f20c5c82",
+      "exitCode": 0,
+      "evidence": "Hermes terminal execution in the isolated integrated checkout: 242 passed, 0 failed"
+    },
+    {
+      "command": "npm run validate:openspec",
+      "commit": "aa4b11328ee4f8814d7c674adae78771f20c5c82",
+      "exitCode": 0,
+      "evidence": "Hermes terminal execution in the isolated integrated checkout: metadata validator returned ok true"
+    },
+    {
+      "command": "npm run build",
+      "commit": "aa4b11328ee4f8814d7c674adae78771f20c5c82",
+      "exitCode": 0,
+      "evidence": "Hermes terminal execution in the isolated integrated checkout: built 5 skills and 2 Claude plugins"
+    },
+    {
+      "command": "git diff --check",
+      "commit": "aa4b11328ee4f8814d7c674adae78771f20c5c82",
+      "exitCode": 0,
+      "evidence": "Hermes terminal execution in the isolated integrated checkout: no output"
+    }
+  ]
+}
