@@ -35,7 +35,7 @@ change: local-client-skill-install-01m6896x3994xcc0erw8jnr15z
 
 - [x] 3.1 Run `npm test`, `npm run build`, `npm run validate:openspec`, and
   `git diff --check` after the final local change; record actual results.
-- [ ] 3.2 Obtain an independent read-only review of the frozen candidate through
+- [x] 3.2 Obtain an independent read-only review of the frozen candidate through
   `/autonomous-implementation-review`, address confirmed findings within the
   authorized task group, and rerun affected gates.
 
