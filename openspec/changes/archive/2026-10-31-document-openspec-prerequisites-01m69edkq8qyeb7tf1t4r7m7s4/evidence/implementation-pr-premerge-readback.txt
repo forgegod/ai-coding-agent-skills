@@ -1,0 +1,10 @@
+Historical pre-merge readback for PR 6
+
+Source: terminal tool output in Hermes session 20261031_184024_81639f, before the subsequent successful merge command for PR 6. The two JSON lines below are verbatim excerpts of the response already present in this session's active context; surrounding gh watch-table output and the main-ref line are omitted. This is a retained historical extract, not a new API response and not a newly executed pre-merge query. The separate implementation-pr-checks-readback.json and implementation-pr-threads-readback.json files retain a fresh post-merge corroborating readback.
+
+Original executed command:
+gh pr checks 6 --repo forgegod/ai-coding-agent-skills --watch --interval 10 && gh pr view 6 --repo forgegod/ai-coding-agent-skills --json headRefOid,state,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup,reviews && gh api graphql -f query='query { repository(owner:"forgegod",name:"ai-coding-agent-skills") { pullRequest(number:6) { reviewThreads(first:100) { totalCount pageInfo { hasNextPage } nodes { isResolved isOutdated } } } } }' && git ls-remote origin refs/heads/main
+
+Verbatim response excerpts:
+{"headRefOid":"095d04c6999f324c336ef9b68f50c1b94813aa92","mergeStateStatus":"CLEAN","mergeable":"MERGEABLE","reviewDecision":"","reviews":[],"state":"OPEN","statusCheckRollup":[{"__typename":"CheckRun","completedAt":"2026-10-31T20:47:23Z","conclusion":"SUCCESS","detailsUrl":"https://github.com/forgegod/ai-coding-agent-skills/actions/runs/41240497506/job/124653203154","name":"verify","startedAt":"2026-10-31T20:46:59Z","status":"COMPLETED","workflowName":"Verify skills"},{"__typename":"CheckRun","completedAt":"2026-10-31T20:47:13Z","conclusion":"SUCCESS","detailsUrl":"https://github.com/forgegod/ai-coding-agent-skills/actions/runs/41240485842/job/124653169175","name":"verify","startedAt":"2026-10-31T20:46:50Z","status":"COMPLETED","workflowName":"Verify skills"}]}
+{"data":{"repository":{"pullRequest":{"reviewThreads":{"totalCount":0,"pageInfo":{"hasNextPage":false},"nodes":[]}}}}}

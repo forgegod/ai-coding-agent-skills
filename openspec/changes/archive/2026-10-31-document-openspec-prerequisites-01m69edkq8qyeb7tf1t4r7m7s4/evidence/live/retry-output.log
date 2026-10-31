@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "commit": "164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+  "url": "https://forgegod.github.io/ai-coding-agent-skills/",
+  "packages": 5,
+  "plugins": 2,
+  "advertisedPackageFiles": 28,
+  "httpFilesVerified": 37,
+  "allLiveBytesMatchIntegratedBuild": true,
+  "normalHermesInstallsByteMatch": true,
+  "realProfilesUnmodified": true,
+  "commands": [
+    {
+      "argv": [
+        "/home/raphael/.local/bin/hermes",
+        "skills",
+        "search",
+        "https://forgegod.github.io/ai-coding-agent-skills/",
+        "--source",
+        "well-known",
+        "--limit",
+        "10",
+        "--json"
+      ],
+      "exitCode": 0,
+      "log": "hermes-1.log",
+      "sha256": "3d9e7e5852a34668cceda3c63f8ab7826b6613cd21da7c30ee6347b522c6f54b"
+    },
+    {
+      "argv": [
+        "/home/raphael/.local/bin/hermes",
+        "skills",
+        "install",
+        "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/autonomous-implementation-review",
+        "--yes"
+      ],
+      "exitCode": 0,
+      "log": "hermes-2.log",
+      "sha256": "09f98379b07b64d76c2b52cc2c6fdef2666c96f4c4a63980a2558644e90e417f"
+    },
+    {
+      "argv": [
+        "/home/raphael/.local/bin/hermes",
+        "skills",
+        "install",
+        "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/capability-wireframes",
+        "--yes"
+      ],
+      "exitCode": 0,
+      "log": "hermes-3.log",
+      "sha256": "2fd1b589925ce79a045ed414c41d8e9e38e95a57298f09821c5e8220397d72ab"
+    },
+    {
+      "argv": [
+        "/home/raphael/.local/bin/hermes",
+        "skills",
+        "install",
+        "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/git-commit-message",
+        "--yes"
+      ],
+      "exitCode": 0,
+      "log": "hermes-4.log",
+      "sha256": "70261ab22ac8618d603d5bc3c80a21729b6f2c47b057890b7fc03e9464cdd397"
+    },
+    {
+      "argv": [
+        "/home/raphael/.local/bin/hermes",
+        "skills",
+        "install",
+        "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery",
+        "--yes"
+      ],
+      "exitCode": 0,
+      "log": "hermes-5.log",
+      "sha256": "ee93fbf5d123d31b14e2950b273ba155f76e74a83db5d3b8b4b0fa08bee81ad0"
+    },
+    {
+      "argv": [
+        "/home/raphael/.local/bin/hermes",
+        "skills",
+        "install",
+        "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-next",
+        "--yes"
+      ],
+      "exitCode": 0,
+      "log": "hermes-6.log",
+      "sha256": "7173ac144ec1a9a8317d60e74bd6412f0450ebb68769347aec474b3b29dcf8a5"
+    },
+    {
+      "argv": [
+        "/home/raphael/.local/bin/hermes",
+        "skills",
+        "list",
+        "--source",
+        "hub"
+      ],
+      "exitCode": 0,
+      "log": "hermes-7.log",
+      "sha256": "8b4600440f5c616bc4031612b470e23b4659bc1f31bfe5ffd717c65a4c471bb5"
+    }
+  ],
+  "fileSha256": {
+    ".well-known/skills/index.json": "064117de431787f3076961d3ae86bee6448414530ee0f3471cbbe6483bfdf43e",
+    "downloads/index.json": "c3a737a86483f66ad919e38f3585d2953d02bddf74f62777b90d189d87072ca6",
+    ".well-known/skills/autonomous-implementation-review/references/claude-code-host.md": "46daf2157d6132ca2b8fbe50d00f8aab3142d7d4d0afbd8caa63eb9062358aa3",
+    ".well-known/skills/autonomous-implementation-review/references/claude-code-roles.md": "60b939c21fae62b47d02ac66821023a0227ea1245c93e5d69381520e87e287c2",
+    ".well-known/skills/autonomous-implementation-review/references/environment-passthrough.md": "869ca8babbdcf58582ed02710cc5805506227a228c02712f07172d088bec3c0f",
+    ".well-known/skills/autonomous-implementation-review/references/herdr.md": "b252cf477eaf13345357f60c2089ef1c2766abe21dd320b0d7b0fc590f2baf5e",
+    ".well-known/skills/autonomous-implementation-review/references/lifecycle-watch.md": "ae292cc6e6c2ee6cc8d404cdc3fe0461d1f65a2f7411c6c351ae320743a68c1b",
+    ".well-known/skills/autonomous-implementation-review/references/openspec.md": "7365ae56e35f178717e0258cf6f88af599d510cf237adfcfa8470baac22e5c46",
+    ".well-known/skills/autonomous-implementation-review/scripts/herdr_lifecycle_watch.mjs": "ba9b8e1092a2920e24bc895df24075e7fbf92c26dc667dc9d1724eedaedef830",
+    ".well-known/skills/autonomous-implementation-review/scripts/herdr_panes.py": "1df993c8bb2282f4294c683a4a4e8261ef3710505c693d3fb8cd80effd1febd3",
+    ".well-known/skills/autonomous-implementation-review/scripts/herdr-pane-state.mjs": "068d8c0b1ab157016c919e7299ffb8975e634b0d33412fc34ecfd6aac0a164b6",
+    ".well-known/skills/autonomous-implementation-review/SKILL.md": "495b8ef5c33375a43a14c649eb67a01156624b8ca102a140556f77a57e19afe7",
+    ".well-known/skills/autonomous-implementation-review/templates/phase-implementer.md": "88a88ffc03f9736cbff97721a0dfaca344c4675ebaf997508ba25e571d65deb9",
+    ".well-known/skills/autonomous-implementation-review/templates/phase-reviewer.md": "1494ed85b6a9ad859f9322daa9b2892850f6b7ebc22262dbf4c3694fd8e0153c",
+    ".well-known/skills/capability-wireframes/references/openspec.md": "6e7992deeb6fb155765d517bdcb02eb02cca9dbe6798c037d443fef884056e6f",
+    ".well-known/skills/capability-wireframes/SKILL.md": "ab7af90a4952c7cb87716f6d62f6773d68c00a75e537e7a8d74302aba9c73370",
+    ".well-known/skills/git-commit-message/references/openspec.md": "a37b6c6d6dd644d7442a9ed147cddabc54c3c841aff5a5668365bb4bc34aefa7",
+    ".well-known/skills/git-commit-message/SKILL.md": "2e6429570b8099884c57e1b97b7db2a0881ab08d48e4448d3c8fee2362975406",
+    ".well-known/skills/openspec-delivery/references/continuation.md": "680c1b8c2aa6902c5918c3929b4676cbe5b3da3a415002195edf907189e0ca43",
+    ".well-known/skills/openspec-delivery/references/guard.md": "5aec3a4f96487f6faa5868ac4fc7b83ab46e3d67d21907b4b273a455535a8461",
+    ".well-known/skills/openspec-delivery/references/integration.md": "ac540f772c18115c3456fae4ed701b80a9e257400faaf70292530bbc24dd400b",
+    ".well-known/skills/openspec-delivery/references/naming.md": "2c33e56f7edcc5f7f52dad2af785298a6fd040e16dbdc4824d990c53608d040e",
+    ".well-known/skills/openspec-delivery/references/recovery.md": "f2df1618619dc5d9e237ec5749e915499ff1605f31ff84c7d5b8e147ca778258",
+    ".well-known/skills/openspec-delivery/references/ticket.md": "e3a94f0159e7592814fb737c29316671bde4c7da7c0cb1e08680499484f4ab67",
+    ".well-known/skills/openspec-delivery/references/workspace.md": "8a4c4f4dfa5c1b005fde7988ad72a36a1604c3e5ffb12c08d6535bd005e69f1d",
+    ".well-known/skills/openspec-delivery/scripts/change-guard.mjs": "6c7b724b3191529b1869ed4386b19780d272d85cdd9bb353d1869b1fd035f59d",
+    ".well-known/skills/openspec-delivery/scripts/change-name.mjs": "fb56ec805b5cf0548b73ff048482d97276236becee84ed9c0eb8c1f9f98f0004",
+    ".well-known/skills/openspec-delivery/scripts/change-workspace.mjs": "9766e6434abc4244b144fc6a77704725257c56283b36866baa843c93ea75e1f8",
+    ".well-known/skills/openspec-delivery/SKILL.md": "cbe7dd5f7d3787496f9310c4c78c27b549bc4778e1d39ee2d9b20347e77dc52f",
+    ".well-known/skills/openspec-next/SKILL.md": "e220f7a4081977af7161f6b36ae2db27620df4e6b1a09959dfac42b09ae85428",
+    "downloads/autonomous-implementation-review.zip": "5f81716105da02a3b72613a19ddb00e0a9cd4dd53638b0417d9ec032adcd0c43",
+    "downloads/capability-wireframes.zip": "509f1c5dfd1e06c753a38a920a37b3359a31a2a97d63b5bd6050107fd25c8aa1",
+    "downloads/git-commit-message.zip": "4ac7bab30896bc9a4228fa54f7dd889848cca77ed7871a6570a97614c5ff92c1",
+    "downloads/openspec-delivery.zip": "646b83258694f894e3af415e39f6fb039f6100aff835c9243f830ad29cfbdecb",
+    "downloads/openspec-next.zip": "585365852b1b29ce483dbdb337e94b49efc5d4454522eddbbda207bbb8ca4784",
+    "downloads/openspec-development.plugin.zip": "2706a2cb596fc75176e4b6ff9d0d90f933275c9fe18eea4f117f3fecaae18e84",
+    "downloads/autonomous-orchestration.plugin.zip": "aeb607f044bcbefa4bd7548771d361e1b83d60b72f5e5750a7a2173909e1d98a"
+  },
+  "previousAttempt": {
+    "log": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-live-probe-164603a.log",
+    "outcome": "Harness JSON parser rejected launcher bootstrap lines preceding successful CLI discovery; no package install was attempted. This retry parses and validates the actual JSON array."
+  },
+  "limitation": "Checks the unchanged companion distribution, not upstream Desktop/account acceptance or native model loading."
+}

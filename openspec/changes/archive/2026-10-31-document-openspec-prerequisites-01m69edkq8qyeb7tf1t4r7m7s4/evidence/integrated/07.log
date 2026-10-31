@@ -1,0 +1,3 @@
+$ /home/raphael/.hermes/profiles/hermes-dev-exec/cache/scratch/openspec-prerequisites-probe/npm-global/bin/openspec validate document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4 --strict
+Change 'document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4' is valid
+ℹ [INFO] file: skip_specs is set in .openspec.yaml: change declares no spec-level behavior changes, zero deltas accepted

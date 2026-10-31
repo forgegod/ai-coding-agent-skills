@@ -1,0 +1,37 @@
+[
+  {
+    "name": "autonomous-implementation-review",
+    "identifier": "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/autonomous-implementation-review",
+    "source": "well-known",
+    "trust_level": "community",
+    "description": "Implement changes with an independent review loop."
+  },
+  {
+    "name": "capability-wireframes",
+    "identifier": "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/capability-wireframes",
+    "source": "well-known",
+    "trust_level": "community",
+    "description": "Use when a human-facing surface needs a stable visual review."
+  },
+  {
+    "name": "git-commit-message",
+    "identifier": "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/git-commit-message",
+    "source": "well-known",
+    "trust_level": "community",
+    "description": "Preview batches; autonomous commits skip confirmation."
+  },
+  {
+    "name": "openspec-delivery",
+    "identifier": "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery",
+    "source": "well-known",
+    "trust_level": "community",
+    "description": "Automate setup, execution and closeout of OpenSpec changes."
+  },
+  {
+    "name": "openspec-next",
+    "identifier": "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-next",
+    "source": "well-known",
+    "trust_level": "community",
+    "description": "Find and advance the next approved OpenSpec task group."
+  }
+]

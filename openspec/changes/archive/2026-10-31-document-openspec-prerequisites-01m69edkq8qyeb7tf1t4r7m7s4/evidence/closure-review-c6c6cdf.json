@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "change": "document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4",
+  "issueUrl": "https://github.com/forgegod/ai-coding-agent-skills/issues/5",
+  "head": "c6c6cdff9bdf516c9e1e3a45bcc281a84b995173",
+  "planDigest": "8a53bd6aaea8f3c8a37f4b0bce00b7a74d23dbed37c460766368d8b9a4b7fc80",
+  "verified": "164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+  "receiptSha256": "d003e49d22afe333e909daf0ac6f5304bc6c22977f410abd8a40015d4631c057",
+  "verdict": "fail",
+  "findings": [
+    {
+      "severity": "low",
+      "path": "openspec/changes/archive/2026-10-31-document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/evidence/integrated-verification.md:17",
+      "trigger": "Prose asserts both actual PR verify checks passed and no review threads existed.",
+      "impact": "Those GitHub check and thread facts are not in retained implementation-merge.json, which only records MERGED, headRefOid 095d04c6999f324c336ef9b68f50c1b94813aa92, mergeCommit 164603a76cc37bc1bbf89fc0bc08940f7dae5963, and mergedAt 2026-10-31T20:47:46Z. This review did not query GitHub and does not assert the checks failed.",
+      "minimalCorrection": "Retain the actual check-run and review-thread readback beside implementation-merge.json, or narrow the sentence to the retained merge state, ruleset, and ancestry. Do not invent check results."
+    }
+  ],
+  "reviewer": "Grok 4.7 (xai-oauth); profile hermes-dev-exec; operator approval w19:p2; distinct from implementer Astra and from 095d04c reviewer session local-a524d5ecac689ce68abafb301b57abfad1c998df62d56de27f9cfef30b19862f; this turn was not given a separate session id",
+  "reference": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-closure-review-c6c6cdf.md",
+  "gatesReexecuted": false,
+  "gatesSource": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-closure-gates-c6c6cdf/gates.json",
+  "gates": [
+    {
+      "command": "npm test",
+      "commit": "c6c6cdff9bdf516c9e1e3a45bcc281a84b995173",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-closure-gates-c6c6cdf/01.log",
+      "startedAt": "2026-10-31T20:59:22.469847+00:00",
+      "outputSha256": "a1c65e12950ba4a1d7c4b86d531ad9b75f7e46bd334ffba0ef35d0ccd32b4fc2"
+    },
+    {
+      "command": "npm run build",
+      "commit": "c6c6cdff9bdf516c9e1e3a45bcc281a84b995173",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-closure-gates-c6c6cdf/02.log",
+      "startedAt": "2026-10-31T20:59:36.416741+00:00",
+      "outputSha256": "0bf4cda39c1df6269d0100ab9a2b915000deb05a1bf739485bf64387a20f7f32"
+    },
+    {
+      "command": "npm run validate:openspec",
+      "commit": "c6c6cdff9bdf516c9e1e3a45bcc281a84b995173",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-closure-gates-c6c6cdf/03.log",
+      "startedAt": "2026-10-31T20:59:36.677158+00:00",
+      "outputSha256": "6346af045ddd949c12e15725753c635ae99411b90144a746c86efbbe4d0d479a"
+    },
+    {
+      "command": "/home/raphael/.hermes/profiles/hermes-dev-exec/cache/scratch/openspec-prerequisites-probe/npm-global/bin/openspec validate --specs --strict",
+      "commit": "c6c6cdff9bdf516c9e1e3a45bcc281a84b995173",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-closure-gates-c6c6cdf/04.log",
+      "startedAt": "2026-10-31T20:59:36.830242+00:00",
+      "outputSha256": "c4b61d8fed37b1764f2343ef26d5276c06020d975ef0849af4e080f60e7ff273"
+    },
+    {
+      "command": "git diff --check 164603a76cc37bc1bbf89fc0bc08940f7dae5963 c6c6cdff9bdf516c9e1e3a45bcc281a84b995173",
+      "commit": "c6c6cdff9bdf516c9e1e3a45bcc281a84b995173",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-closure-gates-c6c6cdf/05.log",
+      "startedAt": "2026-10-31T20:59:36.988284+00:00",
+      "outputSha256": "5601171e5f248b1e779c3ff16f6df86af14d938219558c476a2ee75439b5cf2d"
+    },
+    {
+      "command": "node skills/software-development/openspec-delivery/scripts/change-guard.mjs receipt --repo /home/raphael/src/ai-coding-agent-skills--closure-document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4 --change document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4 --target c6c6cdff9bdf516c9e1e3a45bcc281a84b995173 --issue https://github.com/forgegod/ai-coding-agent-skills/issues/5 --receipt /home/raphael/src/ai-coding-agent-skills--closure-document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/openspec/changes/archive/2026-10-31-document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/evidence/receipt.json --receipt-path openspec/changes/archive/2026-10-31-document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/evidence/receipt.json",
+      "commit": "c6c6cdff9bdf516c9e1e3a45bcc281a84b995173",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-closure-gates-c6c6cdf/06.log",
+      "startedAt": "2026-10-31T20:59:36.994125+00:00",
+      "outputSha256": "55dadeecea09a144333ab2955eb3ac2eca8c4f38bbb09795936e9b857f94a7d7"
+    }
+  ],
+  "publicationAuthorized": false,
+  "issueClosureAuthorized": false
+}

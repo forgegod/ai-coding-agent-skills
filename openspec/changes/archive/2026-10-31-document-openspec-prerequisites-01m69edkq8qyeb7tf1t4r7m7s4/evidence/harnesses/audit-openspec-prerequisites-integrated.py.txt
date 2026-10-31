@@ -1,0 +1,63 @@
+import hashlib
+import json
+import re
+import subprocess
+from pathlib import Path
+from urllib.parse import unquote
+
+ROOT = Path('/home/raphael/src/ai-coding-agent-skills--verify-document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4')
+OUT = Path('/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-integrated-gates-164603a')
+FILES = ['AGENTS.md', 'README.md', 'docs/openspec-installation.md', 'docs/claude-installation.md', 'docs/openspec-workflow.md']
+NAMES = ['openspec-explore', 'openspec-propose', 'openspec-update-change', 'openspec-apply-change', 'openspec-sync-specs', 'openspec-archive-change', 'openspec-verify-change']
+
+def clean(text):
+    return re.sub(r'```[^\n]*\n.*?\n```', '', text, flags=re.S)
+
+def anchors(text):
+    return {re.sub(r'[^\w\- ]', '', s.lower()).replace(' ', '-') for s in re.findall(r'^#{1,6} (.+)$', clean(text), re.M)}
+
+links = []
+for rel in FILES:
+    path = ROOT / rel
+    text = path.read_text()
+    for link in re.findall(r'\[[^\]]+\]\(([^)]+)\)', clean(text)):
+        if re.match(r'^[a-z]+:', link):
+            continue
+        target, _, anchor = unquote(link).partition('#')
+        dest = (path.parent / target).resolve() if target else path
+        assert dest.exists(), (rel, link)
+        if anchor and dest.suffix == '.md':
+            assert anchor in anchors(dest.read_text()), (rel, link, anchors(dest.read_text()))
+        links.append({'file': rel, 'link': link})
+
+guide = (ROOT / 'docs/openspec-installation.md').read_text()
+inventory = guide.split('## Required upstream inventory\n')[1].split('\n## ')[0]
+assert re.findall(r'^\| `(openspec-[^`]+)` \|', inventory, re.M) == NAMES
+assert re.search(r"OPENSPEC_SKILLS='([^']+)'", guide)[1].split() == NAMES
+assert 'CLI **1.15.0**' in guide and 'Node **22+**' in guide
+for rel in ['README.md', 'docs/claude-installation.md', 'docs/openspec-workflow.md']:
+    assert 'openspec-installation.md' in (ROOT / rel).read_text()
+for rel in ['AGENTS.md', 'docs/openspec-installation.md', 'docs/openspec-workflow.md']:
+    text = re.sub(r'\s+', ' ', (ROOT / rel).read_text().lower())
+    for term in ['same change', 'author', 'reviewer', 'runtime', 'companion dependencies', 'installation route', 'version/source pins', 'host prerequisites', 'verification', 'follow-up', 'archived', 'uninstall', 'automated enforcement']:
+        assert term in text, (rel, term)
+readme = (ROOT / 'README.md').read_text()
+assert re.search(r'^for skill in (.+); do$', readme, re.M)[1].split() == ['openspec-delivery', 'openspec-next', 'git-commit-message', 'capability-wireframes']
+# Preserve test-parsed companion helper and every native recipe byte-for-byte.
+before = subprocess.check_output(['git', 'show', 'HEAD:README.md'], cwd=ROOT, text=True)
+helper = r'```sh\n(# Native installation helper\n.*?)\n```'
+assert re.search(helper, readme, re.S)[1] == re.search(helper, before, re.S)[1]
+for heading in ['Claude Code', 'Codex', 'Kilo', 'Pi']:
+    def recipe(text):
+        section = text.split('### ' + heading + '\n')[1].split('\n### ')[0]
+        return re.search(r'```sh\n(.*?)\n```', section, re.S)[1]
+    assert recipe(readme) == recipe(before)
+changed = subprocess.check_output(['git', 'diff', '--name-only', 'HEAD'], cwd=ROOT, text=True).splitlines()
+assert set(changed) <= set(FILES), changed
+assert subprocess.check_output(['git', 'diff', '--cached', '--name-only'], cwd=ROOT, text=True) == ''
+untracked = subprocess.check_output(['git', 'ls-files', '--others', '--exclude-standard'], cwd=ROOT, text=True).splitlines()
+allowed_evidence = 'openspec/changes/document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/evidence/plan-approval.json'
+assert set(untracked) <= {'docs/openspec-installation.md', allowed_evidence}, untracked
+result = {'status': 'PASS', 'checked_local_links': len(links), 'links': links, 'upstream_inventory': NAMES, 'tracked_changed_paths': changed, 'untracked_paths': untracked, 'documentation_sha256': {f: hashlib.sha256((ROOT / f).read_bytes()).hexdigest() for f in FILES}, 'note': 'Ad-hoc scratch assertions and manual coherence review; not permanent automated enforcement.'}
+(OUT / 'audit-result.json').write_text(json.dumps(result, indent=2) + '\n')
+print(json.dumps({k: v for k, v in result.items() if k != 'links'}, indent=2))

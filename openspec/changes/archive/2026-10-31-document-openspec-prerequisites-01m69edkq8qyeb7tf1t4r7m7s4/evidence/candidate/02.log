@@ -1,0 +1,24 @@
+$ python3 /home/raphael/.hermes/profiles/hermes-dev-exec/cache/scratch/openspec-prerequisites-probe/audit.py
+{
+  "status": "PASS",
+  "checked_local_links": 49,
+  "upstream_inventory": [
+    "openspec-explore",
+    "openspec-propose",
+    "openspec-update-change",
+    "openspec-apply-change",
+    "openspec-sync-specs",
+    "openspec-archive-change",
+    "openspec-verify-change"
+  ],
+  "tracked_changed_paths": [],
+  "untracked_paths": [],
+  "documentation_sha256": {
+    "AGENTS.md": "fe015001d5b2476afa68a60e692a4b772aa3a242cecca58fb242910bae33be45",
+    "README.md": "d21e1f13f8d1803d541f7d6192ddf903c92520252f63c279fc1535469a27c1f1",
+    "docs/openspec-installation.md": "def1588fba02e58af8c21c7d75b037819b5bc5ddf348cc389607c56f8427bb01",
+    "docs/claude-installation.md": "d0866d7c5bf28d8ebacf22dcfea37b9b460b24ce119116c35896865360eb2748",
+    "docs/openspec-workflow.md": "0123e99b7de23fe530333b78a626546a18530f89ad0577b0182177c049352e22"
+  },
+  "note": "Ad-hoc scratch assertions and manual coherence review; not permanent automated enforcement."
+}

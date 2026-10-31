@@ -1,0 +1,71 @@
+"""Independent parent readback of documentation and isolated package evidence."""
+from pathlib import Path
+import hashlib
+import json
+import re
+import subprocess
+import zipfile
+
+root = Path('/home/raphael/src/ai-coding-agent-skills--verify-document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4')
+probe = Path('/home/raphael/.hermes/profiles/hermes-dev-exec/cache/scratch/openspec-prerequisites-probe')
+source = probe / 'documented-run/openspec-v1.15.0-review'
+plan = '70de9d4154eec93a32967f240ec9d94cb05115cb'
+names = ['openspec-explore', 'openspec-propose', 'openspec-update-change', 'openspec-apply-change', 'openspec-sync-specs', 'openspec-archive-change', 'openspec-verify-change']
+files = ['AGENTS.md', 'README.md', 'docs/openspec-installation.md', 'docs/claude-installation.md', 'docs/openspec-workflow.md']
+def git(*args, cwd=root):
+    return subprocess.check_output(['git', *args], cwd=cwd, text=True).strip()
+def inventory(package):
+    assert package.is_dir() and not package.is_symlink(), package
+    result = {}
+    for p in sorted(package.rglob('*')):
+        assert not p.is_symlink(), p
+        if p.is_file():
+            result[p.relative_to(package).as_posix()] = p.read_bytes()
+        else:
+            assert p.is_dir(), p
+    return result
+assert git('rev-parse', 'HEAD', cwd=source) == '8e0288df12d401b0e183e2f47254d22528c1dffb'
+assert not git('status', '--porcelain', cwd=source)
+checks = []
+for relative in ['home/.claude/skills', 'home/.agents/skills', 'home/.hermes/profiles/my-profile/skills/software-development']:
+    target = probe / relative
+    assert sorted(p.name for p in target.iterdir()) == sorted(names), target
+    for name in names:
+        assert inventory(target / name) == inventory(source / 'skills' / name), (target, name)
+    checks.append({'target': relative, 'count': len(names), 'byteMatches': True})
+zips = probe / 'documented-run/openspec-v1.15.0-zips'
+assert sorted(p.name for p in zips.iterdir()) == sorted(n + '.zip' for n in names)
+for name in names:
+    expected = {name + '/' + f: data for f, data in inventory(source / 'skills' / name).items()}
+    with zipfile.ZipFile(zips / (name + '.zip')) as z:
+        assert len(z.namelist()) == len(expected)
+        assert set(z.namelist()) == set(expected)
+        assert all(z.read(f) == data for f, data in expected.items())
+log = (probe / 'documented-hermes-retry.log').read_text()
+assert len(re.findall(r'Verdict:\s+SAFE', log)) == len(names)
+assert len(re.findall(r'Decision: ALLOWED', log)) == len(names)
+assert len(re.findall(r'LOW\s+privilege_escalation', log)) == len(names)
+assert not re.search(r'Decision: BLOCKED|Verdict: DANGEROUS', log)
+guide = (root / 'docs/openspec-installation.md').read_text()
+section = guide.split('## Required upstream inventory\n')[1].split('\n## ')[0]
+assert re.findall(r'^\| `(openspec-[^`]+)` \|', section, re.M) == names
+assert re.search(r"OPENSPEC_SKILLS='([^']+)'", guide)[1].split() == names
+for f in ['AGENTS.md', 'docs/openspec-installation.md', 'docs/openspec-workflow.md']:
+    text = re.sub(r'\s+', ' ', (root / f).read_text().lower())
+    for phrase in ['same change', 'author', 'reviewer', 'companion dependencies', 'runtime', 'installation route', 'version/source pins', 'verification', 'follow-up']:
+        assert phrase in text, (f, phrase)
+before = git('show', plan + ':README.md')
+readme = (root / 'README.md').read_text()
+assert re.search(r'^for skill in (.+); do$', readme, re.M)[1] == re.search(r'^for skill in (.+); do$', before, re.M)[1]
+assert not git('diff', plan, '--', 'skills', 'tests', 'scripts', 'package.json', 'package-lock.json', '.claude-plugin', '.github')
+assert not git('diff', plan, '--', 'openspec/changes/document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/proposal.md', 'openspec/changes/document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/design.md', 'openspec/changes/document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/.openspec.yaml', 'openspec/config.yaml')
+index = json.loads((root / 'dist/.well-known/skills/index.json').read_text())
+downloads = json.loads((root / 'dist/downloads/index.json').read_text())
+companions = {'autonomous-implementation-review', 'capability-wireframes', 'git-commit-message', 'openspec-delivery', 'openspec-next'}
+assert {s['name'] for s in index['skills']} == companions
+assert {s['name'] for s in downloads['skills']} == companions
+assert {p['name'] for p in downloads['plugins']} == {'openspec-development', 'autonomous-orchestration'}
+summary = {'verified': True, 'packages': checks, 'zipCount': len(names), 'scanSafeAllowed': len(names), 'scanLowToolAccessNotices': len(names), 'companionPackages': len(companions), 'plugins': len(downloads['plugins']), 'documentationSha256': {f: hashlib.sha256((root / f).read_bytes()).hexdigest() for f in files}, 'desktopAcceptance': 'not verified', 'nativeClientModelLoading': 'not verified'}
+out = Path('/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-integrated-parent-audit.json')
+out.write_text(json.dumps(summary, indent=2) + '\n')
+print(json.dumps(summary, indent=2))

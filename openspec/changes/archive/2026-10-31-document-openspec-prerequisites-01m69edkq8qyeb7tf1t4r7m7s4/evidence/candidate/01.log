@@ -1,0 +1,35 @@
+$ python3 /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/verify-openspec-prerequisites-parent.py
+{
+  "verified": true,
+  "packages": [
+    {
+      "target": "home/.claude/skills",
+      "count": 7,
+      "byteMatches": true
+    },
+    {
+      "target": "home/.agents/skills",
+      "count": 7,
+      "byteMatches": true
+    },
+    {
+      "target": "home/.hermes/profiles/my-profile/skills/software-development",
+      "count": 7,
+      "byteMatches": true
+    }
+  ],
+  "zipCount": 7,
+  "scanSafeAllowed": 7,
+  "scanLowToolAccessNotices": 7,
+  "companionPackages": 5,
+  "plugins": 2,
+  "documentationSha256": {
+    "AGENTS.md": "fe015001d5b2476afa68a60e692a4b772aa3a242cecca58fb242910bae33be45",
+    "README.md": "d21e1f13f8d1803d541f7d6192ddf903c92520252f63c279fc1535469a27c1f1",
+    "docs/openspec-installation.md": "def1588fba02e58af8c21c7d75b037819b5bc5ddf348cc389607c56f8427bb01",
+    "docs/claude-installation.md": "d0866d7c5bf28d8ebacf22dcfea37b9b460b24ce119116c35896865360eb2748",
+    "docs/openspec-workflow.md": "0123e99b7de23fe530333b78a626546a18530f89ad0577b0182177c049352e22"
+  },
+  "desktopAcceptance": "not verified",
+  "nativeClientModelLoading": "not verified"
+}
