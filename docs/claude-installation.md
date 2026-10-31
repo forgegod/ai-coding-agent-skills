@@ -13,13 +13,16 @@ scripts before enabling; do not use another client to evade an unresolved securi
 1. In Claude Desktop or claude.ai, open **Customize → Plugins**.
 2. Select **Add → Add marketplace → Add from a repository**.
 3. Enter `forgegod/ai-coding-agent-skills`.
-4. Open **software-development**, review the package, and select **Add**.
+4. Open **openspec-development**, review the package, and select **Add**.
 5. Start a new conversation or Cowork task and look for the skills in the picker.
 
-The general plugin contains nine skills. The separate **autonomous-orchestration**
-plugin adds `autonomous-implementation-review` only. Add it only after reviewing
-its requirements; it does not automatically install its general-skill prerequisites.
-No agents, hooks, MCP servers, or permission changes are installed by either plugin.
+The workflow plugin contains `openspec-delivery`, `openspec-next`, `git-commit-message`,
+and `capability-wireframes`. It does not install OpenSpec or its CLI and does not
+transfer another project's records. The separate **autonomous-orchestration**
+plugin adds `autonomous-implementation-review` only. It requires
+`openspec-development` and separately configured roles; those prerequisites are
+not installed automatically.
+No agents, hooks, MCP servers, or permission changes are installed by any plugin.
 The bundled role templates remain inert support files.
 
 Plugins require a paid plan (Pro, Max, Team, or Enterprise). Organization policy
@@ -32,20 +35,21 @@ and [plugin availability](https://support.claude.com/en/articles/13837440-use-pl
 ### Alternative: upload a ready-made plugin ZIP
 
 1. Open the [download page](https://forgegod.github.io/ai-coding-agent-skills/downloads/index.html).
-2. Download **software-development** (`software-development.plugin.zip`).
+2. Download **openspec-development** (`openspec-development.plugin.zip`).
 3. In Claude, select **Customize → Plugins → Add → Upload plugin** and choose the ZIP.
 4. Review the installed plugin and check its skill inventory.
 
 The optional `autonomous-orchestration.plugin.zip` uses the same route but needs
-separate review. Plugin ZIPs contain `.claude-plugin/plugin.json`, a standalone
-README and license, and complete `skills/<name>/` directories. Do not unzip before
-uploading, and do not upload GitHub's whole-repository ZIP.
+separate review.
+Plugin ZIPs contain `.claude-plugin/plugin.json`, a standalone README and license,
+and complete `skills/<name>/` directories. Do not unzip before uploading, and do
+not upload GitHub's whole-repository ZIP.
 
 Source: [Anthropic's plugin ZIP upload instructions](https://claude.com/docs/plugins/overview#find-and-add-a-plugin).
 
 ### Alternative: upload one skill
 
-1. Download the individual skill ZIP, for example `application-records.zip`, from
+1. Download the individual skill ZIP, for example `openspec-delivery.zip`, from
    the same download page. It is different from a `.plugin.zip` bundle.
 2. Ensure **Settings → Capabilities → Code execution and file creation** (also
    called **Create and edit files**) is enabled, subject to organization policy.
@@ -54,8 +58,8 @@ Source: [Anthropic's plugin ZIP upload instructions](https://claude.com/docs/plu
 
 Individual skills support Free, Pro, Max, Team, and Enterprise plans. Each ZIP
 contains one matching top-level skill folder with `SKILL.md` and all its support
-files. Related skills are not installed automatically: for the composed phase
-workflow, prefer the general plugin instead of selecting isolated pieces.
+files. Related skills are not installed automatically: for the composed workflow,
+prefer the `openspec-development` plugin instead of selecting isolated pieces.
 
 Sources: [Use skills in Claude](https://support.claude.com/en/articles/12512180-use-skills-in-claude)
 and [Create and package custom skills](https://support.claude.com/en/articles/12512198-creating-custom-skills).
@@ -63,19 +67,20 @@ and [Create and package custom skills](https://support.claude.com/en/articles/12
 ## Confirm what is installed
 
 Open the plugin's skill list rather than trusting a model's statement that it has
-loaded something. The general plugin should list nine skills, including
-`application-records` and `phased-plan-next`, but not `autonomous-implementation-review`.
+loaded something. The workflow plugin should list exactly
+`openspec-delivery`, `openspec-next`, `git-commit-message`, and `capability-wireframes`,
+and not `autonomous-implementation-review`.
 The optional orchestration plugin should list only that latter skill.
 
-Claude Code namespaces plugin skills: use `/software-development:application-records`
-or `/software-development:phased-plan-next`, not the bare slash-command names used
-by direct directory copies. Resolve related skill names within the installed
-plugins and support files relative to the loaded skill directory; Hermes's
-`skill_view`, `terminal`, and `patch` tools are not installed by these packages.
+Claude Code namespaces plugin skills: use
+`/openspec-development:openspec-delivery`, not the bare slash-command
+names used by direct directory copies. Resolve related skill names within the
+installed plugins and support files relative to the loaded skill directory;
+Hermes's `skill_view`, `terminal`, and `patch` tools are not installed by these packages.
 
 For an initial read-only check, ask Claude to describe the installed
-`application-records` workflow without creating or editing anything. This confirms
-loading, not the ability to execute an entire phase safely.
+`openspec-delivery` workflow without creating or editing anything. This confirms
+loading, not the ability to execute a change safely.
 
 Avoid enabling an individual upload, a plugin copy, and a manually copied local
 skill for the same workflow at once. Preserve any local customizations before
@@ -87,13 +92,13 @@ changing installation routes.
 | --- | --- | --- |
 | Desktop Chat / claude.ai | Skills and bundled reference material | Not a local repository executor merely because code execution is enabled. Do not assume access to local Git, worktrees, or project subagents. |
 | Cowork | Skills in its task environment | Check actual workspace access, tools, and permissions. This repository's Claude Code role protocol is not automatically a Cowork role protocol. |
-| Claude Code, including Desktop's Code tab | Coding-agent skill loading | A project checkout, Git, Node 22+ for the phase guard, project-specific tooling, and explicit execution authority. |
+| Claude Code, including Desktop's Code tab | Coding-agent skill loading | A project checkout, Git, Node 22+ for the packaged guards, project-specific tooling, and explicit execution authority. |
 
 The orchestration path additionally requires separately reviewed project subagents
-and model/permission configuration. Follow the [Claude Code host reference](../skills/software-development/phased-plan-overview/references/claude-code-host.md)
+and model/permission configuration. Follow the [Claude Code host reference](../skills/autonomous-ai-agents/autonomous-implementation-review/references/claude-code-host.md)
 and [role protocol](../skills/autonomous-ai-agents/autonomous-implementation-review/references/claude-code-roles.md).
-Installing a plugin neither creates those project files nor authorizes phase
-reservation, commits, worktree creation, or unattended execution.
+Installing a plugin neither creates those project files nor authorizes commits,
+checkout creation, publication, or unattended execution.
 
 Anthropic documents account skills and plugins syncing into Claude Code v2.1.273+
 when signed in with the same Claude account. API-key and cloud-provider sign-ins
@@ -130,8 +135,8 @@ and [manage skills](https://support.claude.com/en/articles/12512180-use-skills-i
 
 `npm test` and `npm run build` validate the repository catalog and produce:
 
-- Ten individual ZIPs, each preserving every canonical package file byte-for-byte.
-- Two plugin ZIPs, with general skills separated from opt-in orchestration.
+- Five individual ZIPs, each preserving every canonical package file byte-for-byte.
+- Two plugin ZIPs, with the OpenSpec companion skills separated from opt-in orchestration.
 - `dist/downloads/index.html` and `index.json`, including SHA-256 checksums.
 - The unchanged-format Hermes `.well-known/skills/` endpoint.
 
@@ -145,16 +150,17 @@ files plus their generated plugin metadata, README, and license.
 
 Bump the affected plugin version in the catalog whenever its selected skills or
 support files change; skill versions alone do not update the enclosing plugin.
-Tests reject omitted/duplicate packages, implicit orchestration inclusion, added
-active plugin components, unsafe paths, and symlinks, and verify archive bytes,
-repeatability, checksums, and Pages artifact inclusion. They do not prove model
-obedience, cloud acceptance, or scanner approval.
+Tests reject omitted/duplicate packages, implicit orchestration or OpenSpec
+inclusion, unshared packages in multiple bundles, added active plugin components,
+unsafe paths, and symlinks, and verify archive bytes, repeatability, checksums,
+and Pages artifact inclusion. They do not prove model obedience, cloud acceptance,
+or scanner approval.
 
-The local validation probe used Claude Code 2.1.312 with a disposable HOME and
-CLAUDE_CONFIG_DIR, without account credentials. Its native validator accepted the
-marketplace and both extracted plugin ZIPs; local marketplace installs reported
-nine general skills and one opt-in orchestration skill, with no active agents,
-hooks, or servers. Desktop installation and end-to-end workflow execution are not yet verified.
+Validate the marketplace and both plugin exports with a disposable HOME and
+CLAUDE_CONFIG_DIR, without account credentials. Check exact inventories: four
+companion skills and one optional orchestration skill; no active agents, hooks
+or servers. Desktop acceptance and end-to-end workflow
+execution are not verified by package validation and require separate checks.
 
 Before release, repeat native validation with `claude plugin validate <path>` and
 install into an isolated scratch home, never a real agent profile. Run the

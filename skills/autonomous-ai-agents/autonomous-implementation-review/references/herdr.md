@@ -90,7 +90,7 @@ For each approved role, from a verified visible idle session:
    command must exit 0 before the role packet; otherwise stop the background
    watcher and do not send it.
 6. Send the compact role packet once, without `--wait`, then end the turn. Review
-   is read-only; the implementer does not stage, commit, or change the CHG path.
+   is read-only; the implementer does not stage, commit, or edit `tasks.md`.
    Do not run `herdr agent wait` or inject another prompt while the watcher runs.
 7. After the watcher exits, apply its one receipt. `settled` permits factual
    verification, not the next handoff; every other outcome stops without pane input.

@@ -9,15 +9,10 @@ import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL("../", import.meta.url));
 const packages = {
   "autonomous-implementation-review": "autonomous-ai-agents/autonomous-implementation-review",
-  "application-records": "software-development/application-records",
   "capability-wireframes": "software-development/capability-wireframes",
   "git-commit-message": "software-development/git-commit-message",
-  "phased-plan-design": "software-development/phased-plan-design",
-  "phased-plan-execution": "software-development/phased-plan-execution",
-  "phased-plan-closeout": "software-development/phased-plan-closeout",
-  "phased-plan-overview": "software-development/phased-plan-overview",
-  "phased-plan-next": "software-development/phased-plan-next",
-  "phased-plan-refactoring": "software-development/phased-plan-refactoring",
+  "openspec-delivery": "software-development/openspec-delivery",
+  "openspec-next": "software-development/openspec-next",
 };
 const names = Object.keys(packages);
 
@@ -33,7 +28,7 @@ async function setup(t) {
   return { readme, helper, scratch, home, env: { ...process.env, HOME: home, PI_CODING_AGENT_DIR: "" } };
 }
 
-test("documented recipes copy ten complete packages to all four native user locations", async (t) => {
+test("documented recipes copy five complete packages to all four native user locations", async (t) => {
   const f = await setup(t);
   for (const [heading, directory] of [["Claude Code", ".claude/skills"], ["Codex", ".agents/skills"], ["Kilo", ".kilo/skills"], ["Pi", ".pi/agent/skills"]]) {
     const section = f.readme.split(`### ${heading}\n`)[1]?.split(/\n### |\n## /)[0];
@@ -46,8 +41,7 @@ test("documented recipes copy ten complete packages to all four native user loca
     for (const name of names) {
       assert.deepEqual(await readFile(path.join(destination, name, "SKILL.md")), await readFile(path.join(root, "skills", packages[name], "SKILL.md")));
     }
-    assert.deepEqual(await readdir(path.join(destination, "phased-plan-next")), ["SKILL.md"]);
-    for (const [name, file] of [["autonomous-implementation-review", "references/environment-passthrough.md"], ["autonomous-implementation-review", "references/herdr.md"], ["autonomous-implementation-review", "references/lifecycle-watch.md"], ["autonomous-implementation-review", "scripts/herdr_lifecycle_watch.mjs"], ["phased-plan-closeout", "scripts/phase-guard.mjs"], ["phased-plan-closeout", "references/record-writes.md"]]) {
+    for (const [name, file] of [["autonomous-implementation-review", "references/environment-passthrough.md"], ["autonomous-implementation-review", "references/herdr.md"], ["autonomous-implementation-review", "references/lifecycle-watch.md"], ["autonomous-implementation-review", "scripts/herdr_lifecycle_watch.mjs"], ["openspec-delivery", "scripts/change-guard.mjs"], ["autonomous-implementation-review", "templates/phase-implementer.md"]]) {
       assert.deepEqual(await readFile(path.join(destination, name, file)), await readFile(path.join(root, "skills", packages[name], file)));
     }
     for (const name of ["autonomous-implementation-review"]) {
@@ -63,11 +57,11 @@ test("documented recipes copy ten complete packages to all four native user loca
 test("native helper refuses collisions before copying any other skill", async (t) => {
   const f = await setup(t);
   const destination = path.join(f.home, ".agents/skills");
-  const existing = path.join(destination, "phased-plan-refactoring");
+  const existing = path.join(destination, "git-commit-message");
   await mkdir(existing, { recursive: true });
   await writeFile(path.join(existing, "SKILL.md"), "Operator edits.\n");
   assert.throws(() => execFileSync("sh", ["-c", f.helper + '\ninstall_reviewed_skills "$HOME/.agents/skills"'], { cwd: f.scratch, env: f.env, stdio: "pipe" }));
-  assert.deepEqual(await readdir(destination), ["phased-plan-refactoring"]);
+  assert.deepEqual(await readdir(destination), ["git-commit-message"]);
   assert.equal(await readFile(path.join(existing, "SKILL.md"), "utf8"), "Operator edits.\n");
 });
 

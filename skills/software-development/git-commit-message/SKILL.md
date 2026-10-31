@@ -2,7 +2,7 @@
 name: git-commit-message
 description: Preview batches; autonomous commits skip confirmation.
 argument-hint: "[--tier 1|2|3]"
-version: 4.5.0
+version: 4.9.0
 metadata:
   hermes:
     tags: [git, commit]
@@ -21,6 +21,14 @@ operation, do not stage or commit a suggested plan until the user applies its
 preview or returns changes. Autonomous mode changes that confirmation gate,
 not the required preview or verification.
 
+## Scope selection
+
+When the commit belongs to an OpenSpec change, read
+[references/openspec.md](references/openspec.md) before step 2 and keep the
+preview, acceptance, and verification rules below. The orchestrator is then the
+sole writable owner of batch boundaries through `openspec-delivery`.
+Other work uses the grouping rule in step 2 and does not invent a change package.
+
 ## Procedure
 
 1. Inspect the whole boundary with `terminal`: run `git status --short`,
@@ -28,12 +36,12 @@ not the required preview or verification.
    and `git diff --staged`. Include untracked files from `git status`. If every
    view is empty, report "No changes" and stop.
 2. Build dependency-aware logical batches before staging:
-   - For CHG creation/restructuring or phase execution, `phased-plan-closeout`
-     controls the explicit record/implementation batches and their path allowlists.
-     Do not combine its record-only target commits with implementation or assign
-     Git writes to an executor. This exception precedes the general grouping rule.
-   - Otherwise keep one observable change with its tests, current-state CAP/docs,
-     and required configuration in the same batch; exclude CHG lifecycle records.
+   - For an OpenSpec change, `openspec-delivery` owns the batches and
+     their path allowlists; follow [references/openspec.md](references/openspec.md).
+     Do not combine a documentation or evidence batch with implementation, and
+     do not assign Git writes to an executor.
+   - Otherwise keep one observable change with its tests, current-behavior docs,
+     and required configuration in the same batch.
    - Keep unrelated topics separate. Do not split a vertical slice merely to
      make smaller commits.
    - A verified implementation may precede a separate documentation/record
@@ -145,5 +153,15 @@ work and the plan is accepted: either they supplied the message and paths,
 they apply a preview or return changes to it, or explicitly enabled autonomous
 mode treats the request to commit as acceptance. Otherwise the existing index
 is the commit boundary. Do not unstage paths, change identity, amend history,
-bypass hooks, or push. Report failures instead of bypassing them. Outside
+bypass hooks, or push. This skill does not push. A push does not close an
+issue or a pull request. Do not add a closing keyword (`Fixes`, `Closes`, or
+`Resolves`) to an implementation batch, or to any batch whose acceptance is
+still open. A ticket or pull-request number is not an implementation footer.
+On the receipt or archive closeout batch only, after acceptance is already
+verified, append the closeout trailer from verified numbers: `Fixes #<issue>`
+for the documentation issue, and `Closes #<pull-request>` only for a pull
+request whose readback state is already merged. Name an open pull request
+without a closing keyword. Do not invent a number. The trailer does not push
+and does not close anything at commit time. Report failures instead of
+bypassing them. Outside
 explicitly enabled autonomous mode, a preview is not permission to commit.
