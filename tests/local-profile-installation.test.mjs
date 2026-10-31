@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { cp, mkdir, mkdtemp, readFile, readdir, rm, stat, symlink, writeFile } from "node:fs/promises";
+import fs, { cp, mkdir, mkdtemp, readFile, readdir, rm, stat, symlink, writeFile } from "node:fs/promises";
+import { syncBuiltinESMExports } from "node:module";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -36,6 +37,60 @@ async function sourceAndDestinationMatch(source, destination) {
   assert.deepEqual(await readFile(path.join(destination, "SKILL.md")), await readFile(path.join(source, "SKILL.md")));
   assert.deepEqual(await readFile(path.join(destination, "references", "guide.md")), await readFile(path.join(source, "references", "guide.md")));
 }
+
+async function homeIsolationFixture(t) {
+  const f = await fixture(t);
+  const ambientHome = path.join(f.directory, "ambient-user");
+  await mkdir(path.join(ambientHome, ".hermes"), { recursive: true });
+  await writeFile(path.join(ambientHome, ".hermes", "config.yaml"), "model: {}\n");
+  for (const home of [ambientHome, f.userHome]) {
+    await mkdir(path.join(home, ".claude"));
+    await mkdir(path.join(home, ".codex"));
+  }
+  return { ...f, ambientHome };
+}
+
+test("an explicit home root alone isolates API installation to its target family", async (t) => {
+  for (const option of ["hermesHome", "userHome"]) await t.test(option, async (t) => {
+    const f = await homeIsolationFixture(t);
+    t.mock.method(os, "homedir", () => f.ambientHome);
+
+    const result = await installLocalSkills({ root: f.root, [option]: f[option] });
+
+    assert.deepEqual(result.profiles.map(({ name }) => name), option === "hermesHome" ? ["default", "named"] : []);
+    assert.deepEqual(result.clients.map(({ name }) => name), option === "userHome" ? ["claude-code", "codex"] : []);
+    for (const directory of [".hermes", ".claude", ".codex", ".agents"]) {
+      await assert.rejects(stat(path.join(f.ambientHome, directory, "skills")), { code: "ENOENT" });
+    }
+    for (const entry of result.plan) await sourceAndDestinationMatch(f.source, entry.destination);
+  });
+});
+
+test("CLI home-root isolation applies to --all and explicit selectors opt in to other targets", async (t) => {
+  const f = await homeIsolationFixture(t);
+  const hermes = ["--hermes-home", f.hermesHome];
+  const user = ["--user-home", f.userHome];
+  const profiles = ["default", "named"];
+  const clients = ["claude-code", "codex"];
+  const cases = [
+    [[], ["default", ...clients]],
+    [hermes, profiles],
+    [[...hermes, "--all"], profiles],
+    [user, clients],
+    [[...user, "--all"], clients],
+    [[...hermes, "--client", "codex"], ["codex"]],
+    [[...user, "--profile", "default"], ["default"]],
+    [[...hermes, "--profile", "named", "--client", "codex"], ["named", "codex"]],
+    [[...user, "--profile", "default", "--client", "claude-code"], ["default", "claude-code"]],
+    [[...hermes, ...user], [...profiles, ...clients]],
+  ];
+  for (const [args, expected] of cases) await t.test(args.join(" ") || "default roots", () => {
+    const output = execFileSync(process.execPath, [script, ...args, "--dry-run"], {
+      cwd: f.root, encoding: "utf8", env: { ...process.env, HOME: f.ambientHome, USERPROFILE: f.ambientHome },
+    });
+    assert.deepEqual([...output.matchAll(/Would install 5 skill packages into ([\w-]+)\./g)].map((match) => match[1]), expected);
+  });
+});
 
 test("installs every complete package into default and recognized named profiles", async (t) => {
   const f = await fixture(t);
@@ -176,6 +231,72 @@ test("purges only the seven historical packages with explicit authority and pres
   assert.deepEqual(JSON.parse(await readFile(registrationBackup.path, "utf8")), registration);
   const lock = JSON.parse(await readFile(path.join(f.hermesHome, "skills", ".hub", "lock.json"), "utf8"));
   assert.equal(lock.installed["phased-plan-next"], undefined);
+});
+
+test("purge rollback reports only preserved backups and warns of earlier partial changes", async (t) => {
+  for (const failure of ["registration backup", "registration removal"]) await t.test(failure, async (t) => {
+    const f = await fixture(t);
+    const options = installOptions(f, { profiles: ["default"] });
+    await installLocalSkills(options);
+    const skills = path.join(f.hermesHome, "skills", "software-development");
+    await writeFile(path.join(skills, "demo", "SKILL.md"), "Local demo edits.\n");
+    for (const name of ["application-records", "phased-plan-next"]) {
+      await mkdir(path.join(skills, name));
+      await writeFile(path.join(skills, name, "SKILL.md"), `Local ${name} edits.\n`);
+    }
+    const lockFile = path.join(f.hermesHome, "skills", ".hub", "lock.json");
+    const lock = JSON.parse(await readFile(lockFile, "utf8"));
+    const registration = {
+      source: "well-known",
+      identifier: "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/phased-plan-next",
+      install_path: "software-development/phased-plan-next",
+    };
+    lock.installed["phased-plan-next"] = registration;
+    await writeFile(lockFile, JSON.stringify(lock));
+
+    // Fail deterministically at real I/O boundaries, before or after the
+    // registration backup exists; the package has already been moved away.
+    const originalWriteFile = fs.writeFile;
+    let registrationBackup;
+    t.mock.method(fs, "writeFile", async (file, ...args) => {
+      if (String(file).includes(`${path.sep}retired-hermes-registrations${path.sep}`)) {
+        registrationBackup = file;
+        if (failure === "registration backup") throw new Error("Injected registration backup failure");
+      } else if (registrationBackup && path.basename(file).startsWith(".lock-")) {
+        throw new Error("Injected registration removal failure");
+      }
+      return originalWriteFile(file, ...args);
+    });
+    syncBuiltinESMExports();
+    t.after(() => { t.mock.restoreAll(); syncBuiltinESMExports(); });
+
+    let stopped;
+    await assert.rejects(installLocalSkills({ ...options, update: true, purge: true }), (error) => {
+      stopped = error;
+      assert.equal(error.cause.message, `Injected ${failure} failure`);
+      return true;
+    });
+    await sourceAndDestinationMatch(f.source, path.join(skills, "demo"));
+    await assert.rejects(stat(path.join(skills, "application-records")), { code: "ENOENT" });
+    assert.equal(await readFile(path.join(skills, "phased-plan-next", "SKILL.md"), "utf8"), "Local phased-plan-next edits.\n");
+    assert.deepEqual(JSON.parse(await readFile(lockFile, "utf8")).installed["phased-plan-next"], registration);
+    const batch = path.dirname(path.dirname(path.dirname(registrationBackup)));
+    await assert.rejects(stat(path.join(batch, "software-development", "phased-plan-next")), { code: "ENOENT" });
+
+    await t.test("only existing backup paths are reported", async () => {
+      const reported = stopped.message.split("Preserved backup locations: ")[1].split(", ");
+      const expected = ["demo", "application-records"].map((name) => path.join(batch, "software-development", name));
+      if (failure === "registration removal") expected.push(registrationBackup);
+      assert.deepEqual(reported, expected);
+      for (const file of reported) await stat(file);
+      assert.equal(await readFile(path.join(expected[0], "SKILL.md"), "utf8"), "Local demo edits.\n");
+      assert.equal(await readFile(path.join(expected[1], "SKILL.md"), "utf8"), "Local application-records edits.\n");
+      if (failure === "registration removal") assert.deepEqual(JSON.parse(await readFile(registrationBackup, "utf8")), registration);
+    });
+    await t.test("failure text includes earlier purges", () => {
+      assert.match(stopped.message, /Earlier packages may already be installed, updated, or purged\./);
+    });
+  });
 });
 
 test("purge refuses a historical package with another Hermes source registration", async (t) => {

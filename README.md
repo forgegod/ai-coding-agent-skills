@@ -161,11 +161,22 @@ Project paths such as `$PWD/.claude/skills` and `$PWD/.agents/skills` stay untou
 
 Use `--profile <name>` to limit the run to Hermes profiles, or `--client
 claude-code` / `--client codex` to limit it to detected global native clients.
-Selectors may be combined; `--all` makes the unfiltered default explicit and
-cannot be combined with either selector. `--hermes-home <path>` selects an
-alternate base containing the default profile and `profiles/`; `--user-home <path>`
+Selectors may be combined; `--all` selects every recognized target within the
+home-root scope below and cannot be combined with either selector.
+`--hermes-home <path>` selects an alternate base containing the default profile
+and `profiles/`; `--user-home <path>`
 selects the user home used for native-client detection. Neither path is a named
 profile home, and the installer does not infer its Hermes base from HERMES_HOME.
+
+Without selectors, one explicit home root isolates the run to that family:
+`--hermes-home` alone selects only Hermes profiles, and `--user-home` alone selects
+only native clients. This also applies with `--all`. Supply both roots to enable
+both families under those roots; with neither override, both families use their
+normal user-home defaults. Explicit `--profile` / `--client` selectors take
+precedence and select only their named targets, including opting in to the other
+family. If that family's root is omitted, it uses the real user's default home
+location; `--user-home` does not relocate the Hermes base. For fully isolated
+scratch runs covering both families, supply both home roots.
 
 #### Install or refresh local packages
 
@@ -234,8 +245,8 @@ client copies have no Hermes lock entry to remove.
 Source validation and destination preflight cover all selected targets; symlink
 destinations/parents and source overlap are refused. All copies are staged before
 replacing installed packages. This is not an all-targets transaction: a runtime
-failure can leave earlier packages updated; inspect the error and backups before
-retrying. `--dry-run` previews install/update counts without creating copies or
+failure can leave earlier packages installed, updated, or purged; inspect the
+error and backups before retrying. `--dry-run` previews install/update counts without creating copies or
 backups. Stop agents using the selected targets and avoid concurrent installers
 or source edits during updates; start fresh sessions afterwards.
 

@@ -140,8 +140,8 @@ async function assertDirectoryChain(base, destination) {
  */
 export async function installLocalSkills({
   root = scriptRoot,
-  hermesHome = path.join(os.homedir(), ".hermes"),
-  userHome = os.homedir(),
+  hermesHome,
+  userHome,
   profiles: requestedProfiles,
   clients: requestedClients,
   dryRun = false,
@@ -149,10 +149,13 @@ export async function installLocalSkills({
   purge = false,
 } = {}) {
   const packages = await discoverSkillPackages({ root });
-  const home = path.resolve(hermesHome);
-  const user = path.resolve(userHome);
-  const profiles = requestedClients?.length && !requestedProfiles?.length ? [] : await profilesAt(home, requestedProfiles);
-  const clients = requestedProfiles?.length && !requestedClients?.length ? [] : await clientsAt(user, requestedClients);
+  const home = path.resolve(hermesHome === undefined ? path.join(os.homedir(), ".hermes") : hermesHome);
+  const user = path.resolve(userHome === undefined ? os.homedir() : userHome);
+  const hasSelectors = requestedProfiles?.length || requestedClients?.length;
+  const selectProfiles = hasSelectors ? requestedProfiles?.length : hermesHome !== undefined || userHome === undefined;
+  const selectClients = hasSelectors ? requestedClients?.length : userHome !== undefined || hermesHome === undefined;
+  const profiles = selectProfiles ? await profilesAt(home, requestedProfiles) : [];
+  const clients = selectClients ? await clientsAt(user, requestedClients) : [];
   if (!profiles.length && !clients.length) throw new Error(`No local Hermes profiles or supported client configurations found under ${home} and ${user}`);
   const canonicalHome = profiles.length ? await realpath(home) : null;
   const canonicalUserHome = clients.length ? await realpath(user) : null;
@@ -300,6 +303,7 @@ export async function installLocalSkills({
         if (!(await existing(destination))) throw new Error(`Retirement destination changed during installation: ${destination}`);
         await mkdir(path.dirname(backup), { recursive: true, mode: 0o700 });
         await rename(destination, backup);
+        const packageBackupIndex = backups.length;
         backups.push({ kind: "retired-package", target: target.name, profile: profile?.name, client: client?.name, skill: legacy.name, path: backup });
         try {
           if (registration) {
@@ -309,13 +313,16 @@ export async function installLocalSkills({
             await removeRegistration(locks.get(profile.name), legacy);
           }
         } catch (error) {
-          if (!(await existing(destination)) && (await existing(backup))) await rename(backup, destination);
+          if (!(await existing(destination)) && (await existing(backup))) {
+            await rename(backup, destination);
+            backups.splice(packageBackupIndex, 1);
+          }
           throw error;
         }
         purged++;
       }
     } catch (error) {
-      throw new Error(`Installation stopped: ${error.message}. Earlier packages may already be installed/updated. Preserved backup locations: ${backups.map((entry) => entry.path).join(", ") || "none"}`, { cause: error });
+      throw new Error(`Installation stopped: ${error.message}. Earlier packages may already be installed, updated, or purged. Preserved backup locations: ${backups.map((entry) => entry.path).join(", ") || "none"}`, { cause: error });
     } finally {
       for (const directory of staging.values()) await rm(directory, { recursive: true, force: true });
     }
@@ -333,13 +340,21 @@ detected user-global Claude Code/Codex skill directories.
 Options:
   --profile <name>      Install only this profile; repeat for multiple profiles.
   --client <name>       Install only this detected client; claude-code or codex.
-  --all                 Install every recognized local target (the default).
+  --all                 Install every recognized target within home-root scope.
   --update              Also replace existing packages, preserving full backups.
   --purge               Retire only this project's known historical packages.
-  --hermes-home <path>  Override ~/.hermes, primarily for an alternate local home.
+  --hermes-home <path>  Override the Hermes base (~/.hermes), not a named profile.
   --user-home <path>    Override the user home used for Claude Code and Codex.
   --dry-run             Validate sources, profiles, and collisions without copying.
   --help                Show this message.
+
+With no selectors or home overrides, all recognized targets are selected.
+With no selectors, --hermes-home alone selects only Hermes profiles, and
+--user-home alone selects only native clients; both roots enable both families.
+--all follows the same home-root isolation and cannot be combined with selectors.
+--profile and --client select only the named targets and may be combined, including
+to opt in to the other family. An omitted root then uses its normal user-home
+default: --user-home does not rebase Hermes, and HERMES_HOME is not used.
 
 Without --update, existing packages are refused. Updates replace entire packages,
 including stale support files; old packages remain under each target's
