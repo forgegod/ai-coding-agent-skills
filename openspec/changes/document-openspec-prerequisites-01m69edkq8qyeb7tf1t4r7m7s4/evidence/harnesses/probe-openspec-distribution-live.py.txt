@@ -1,0 +1,78 @@
+"""Verify the unchanged live distribution and normal Hermes scratch installs."""
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+import hashlib
+import json
+import os
+import re
+import subprocess
+import urllib.request
+
+repo = Path('/home/raphael/src/ai-coding-agent-skills--verify-document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4')
+commit = '164603a76cc37bc1bbf89fc0bc08940f7dae5963'
+assert subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=repo, text=True).strip() == commit
+out = Path('/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-live-probe-164603a')
+out.mkdir(exist_ok=False)
+base = 'https://forgegod.github.io/ai-coding-agent-skills/'
+def fetch(relative):
+    assert relative and not relative.startswith('/') and '..' not in relative.split('/')
+    with urllib.request.urlopen(base + relative, timeout=45) as response:
+        assert response.status == 200
+        assert response.url.startswith(base)
+        return response.read()
+index_path = '.well-known/skills/index.json'
+index_raw = fetch(index_path)
+assert index_raw == (repo / 'dist' / index_path).read_bytes()
+index = json.loads(index_raw)
+assert len(index['skills']) == 5
+assert len({entry['name'] for entry in index['skills']}) == 5
+files = [index_path, 'downloads/index.json']
+for entry in index['skills']:
+    assert re.fullmatch(r'[a-z][a-z0-9-]+', entry['name'])
+    files.extend('.well-known/skills/' + entry['name'] + '/' + file for file in entry['files'])
+downloads = json.loads((repo / 'dist/downloads/index.json').read_text())
+assert len(downloads['skills']) == 5 and len(downloads['plugins']) == 2
+files.extend('downloads/' + item['file'] for group in ['skills', 'plugins'] for item in downloads[group])
+assert len(files) == len(set(files))
+with ThreadPoolExecutor(max_workers=6) as pool:
+    remote = dict(zip(files, pool.map(fetch, files)))
+for relative, data in remote.items():
+    assert data == (repo / 'dist' / relative).read_bytes(), relative
+for group in ['skills', 'plugins']:
+    for item in downloads[group]:
+        assert hashlib.sha256(remote['downloads/' + item['file']]).hexdigest() == item['sha256']
+home = out / 'home'
+hermes_home = home / '.hermes'
+hermes_home.mkdir(parents=True)
+(hermes_home / '.no-bundled-skills').touch()
+env = dict(os.environ)
+for key in ['HERMES_PROFILE', 'HERMES_PROFILE_ALIAS']:
+    env.pop(key, None)
+env.update({'HOME': str(home), 'HERMES_HOME': str(hermes_home), 'XDG_CONFIG_HOME': str(home / '.config'), 'TMPDIR': str(out), 'DO_NOT_TRACK': '1', 'OPENSPEC_TELEMETRY': '0'})
+commands = [['/home/raphael/.local/bin/hermes', 'skills', 'search', base, '--source', 'well-known', '--limit', '10', '--json']]
+commands.extend(['/home/raphael/.local/bin/hermes', 'skills', 'install', 'well-known:' + base + '.well-known/skills/' + entry['name'], '--yes'] for entry in index['skills'])
+commands.append(['/home/raphael/.local/bin/hermes', 'skills', 'list', '--source', 'hub'])
+records = []
+for number, argv in enumerate(commands, 1):
+    result = subprocess.run(argv, cwd=repo, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, timeout=180)
+    log = out / ('hermes-' + str(number) + '.log')
+    log.write_text(result.stdout)
+    records.append({'argv': argv, 'exitCode': result.returncode, 'log': log.name, 'sha256': hashlib.sha256(log.read_bytes()).hexdigest()})
+    assert result.returncode == 0, (argv, result.returncode, str(log))
+    if number == 1:
+        discovered = json.loads(result.stdout)
+        (out / 'discovery.json').write_text(json.dumps(discovered, indent=2) + '\n')
+    elif number <= 6:
+        assert 'Decision: ALLOWED' in result.stdout, str(log)
+        assert not re.search(r'Decision: BLOCKED|Verdict: DANGEROUS', result.stdout), str(log)
+for entry in index['skills']:
+    matches = list((hermes_home / 'skills').rglob(entry['name'] + '/SKILL.md'))
+    assert len(matches) == 1, (entry['name'], matches)
+    package = matches[0].parent
+    for relative in entry['files']:
+        assert (package / relative).read_bytes() == remote['.well-known/skills/' + entry['name'] + '/' + relative], (entry['name'], relative)
+assert subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=repo, text=True).strip() == commit
+assert not subprocess.check_output(['git', 'status', '--porcelain'], cwd=repo, text=True).strip()
+summary = {'schemaVersion': 1, 'commit': commit, 'url': base, 'packages': len(index['skills']), 'plugins': len(downloads['plugins']), 'advertisedPackageFiles': sum(len(entry['files']) for entry in index['skills']), 'httpFilesVerified': len(files), 'allLiveBytesMatchIntegratedBuild': True, 'normalHermesInstallsByteMatch': True, 'realProfilesUnmodified': True, 'commands': records, 'fileSha256': {key: hashlib.sha256(data).hexdigest() for key, data in remote.items()}, 'limitation': 'Checks the unchanged companion distribution, not upstream Desktop/account acceptance or native model loading.'}
+(out / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')
+print(json.dumps(summary, indent=2))

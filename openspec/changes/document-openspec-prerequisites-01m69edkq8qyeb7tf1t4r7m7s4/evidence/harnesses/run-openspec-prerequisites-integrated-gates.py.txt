@@ -1,0 +1,91 @@
+"""Retain gates for the corrected immutable documentation candidate."""
+from pathlib import Path
+import datetime
+import hashlib
+import json
+import re
+import shlex
+import subprocess
+import sys
+
+repo = Path('/home/raphael/src/ai-coding-agent-skills--verify-document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4')
+scratch = Path('/home/raphael/.hermes/profiles/hermes-dev/cache/scratch')
+probe = Path('/home/raphael/.hermes/profiles/hermes-dev-exec/cache/scratch/openspec-prerequisites-probe')
+head = '164603a76cc37bc1bbf89fc0bc08940f7dae5963'
+base = 'fc184fb1a5068b129c33017b8e8619c5334cf18a'
+plan = '70de9d4154eec93a32967f240ec9d94cb05115cb'
+digest = '8a53bd6aaea8f3c8a37f4b0bce00b7a74d23dbed37c460766368d8b9a4b7fc80'
+change = 'document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4'
+out = scratch / 'openspec-prerequisites-integrated-gates-164603a'
+def git(*args):
+    return subprocess.check_output(['git', *args], cwd=repo, text=True).strip()
+assert git('rev-parse', 'HEAD') == head
+assert not git('status', '--porcelain')
+record_paths = {'openspec/changes/' + change + '/tasks.md'}
+record_paths.update('openspec/changes/' + change + '/evidence/review-' + rev + '.' + ext for rev in ['a47e705', '15f89b3'] for ext in ['md', 'json'])
+assert set(git('diff', '--name-only', '15f89b39967f74e08fdeb98fa32fdb296bdfe001', head).splitlines()) == record_paths
+before_tasks = git('show', '15f89b39967f74e08fdeb98fa32fdb296bdfe001:openspec/changes/' + change + '/tasks.md')
+after_tasks = (repo / 'openspec/changes' / change / 'tasks.md').read_text().strip()
+assert after_tasks == before_tasks.replace('- [ ] 1.8 ', '- [x] 1.8 ')
+assert len(re.findall(r'^- \[x\] \d+\.\d+ ', after_tasks, re.M)) == 8
+assert not re.search(r'^- \[ \] ', after_tasks, re.M)
+for rev in ['a47e705', '15f89b3']:
+    for ext in ['md', 'json']:
+        target = repo / 'openspec/changes' / change / 'evidence' / ('review-' + rev + '.' + ext)
+        source_review = scratch / ('openspec-prerequisites-review-' + rev + '.' + ext)
+        assert target.read_bytes() == source_review.read_bytes()
+
+allowed = {'AGENTS.md', 'README.md', 'docs/openspec-installation.md', 'docs/claude-installation.md', 'docs/openspec-workflow.md'}
+allowed.update('openspec/changes/' + change + '/' + f for f in ['.openspec.yaml', 'proposal.md', 'design.md', 'tasks.md', 'evidence/plan-approval.json'])
+allowed.update(record_paths)
+changed = git('diff', '--name-only', base, head).splitlines()
+assert set(changed) == allowed
+old = json.loads((scratch / 'openspec-prerequisites-gates-a47e705/gates.json').read_text())
+for gate in old['gates']:
+    assert hashlib.sha256(Path(gate['evidence']).read_bytes()).hexdigest() == gate['outputSha256']
+workflow = (repo / 'docs/openspec-workflow.md').read_text()
+assert hashlib.sha256(workflow.encode()).hexdigest() == '0123e99b7de23fe530333b78a626546a18530f89ad0577b0182177c049352e22'
+names = ['openspec-explore', 'openspec-propose', 'openspec-update-change', 'openspec-apply-change', 'openspec-sync-specs', 'openspec-archive-change', 'openspec-verify-change']
+rows = re.findall(r'^\| [^\n]+ \| `/(openspec-[^`]+)` \| `\$(openspec-[^`]+)` \| `/opsx:([^`]+)` \|$', workflow, re.M)
+assert [r[0] for r in rows] == names
+assert [r[1] for r in rows] == names
+assert [r[2] for r in rows] == ['explore', 'propose', 'update', 'apply', 'sync', 'archive', 'verify']
+assert 'Generated adapter only, if installed' in workflow
+assert 'This SDLC assumes all seven setup skills' in workflow
+assert 'Verification is required at setup but advisory in use.' in workflow
+assert 'Core profile, which this document assumes' not in workflow
+assert '/opsx:' not in workflow.split('### Specify `pin-note`', 1)[1]
+old_workflow = git('show', 'a47e705bdc0cdba036f9319db4fed8645a4344ca:docs/openspec-workflow.md')
+assert workflow.split('## Authorities', 1)[1].strip() == old_workflow.split('## Authorities', 1)[1].strip()
+pinned = {'HOME': str(probe / 'home'), 'XDG_CONFIG_HOME': str(probe / 'home/.config'), 'TMPDIR': str(probe.parent), 'PATH': '/home/raphael/.nvm/versions/node/v24.21.0/bin:/usr/bin:/bin', 'OPENSPEC_TELEMETRY': '0', 'DO_NOT_TRACK': '1'}
+cli = str(probe / 'npm-global/bin/openspec')
+assert subprocess.check_output([cli, '--version'], cwd=repo, env=pinned, text=True).strip() == '1.15.0'
+out.mkdir(exist_ok=False)
+commands = [
+    (['npm', 'run', 'build'], None),
+    (['python3', str(scratch / 'verify-openspec-prerequisites-integrated.py')], None),
+    (['python3', str(scratch / 'audit-openspec-prerequisites-integrated.py')], None),
+    (['node', '--test', 'tests/documentation.test.mjs', 'tests/native-installation.test.mjs'], None),
+    (['npm', 'test'], None),
+    (['npm', 'run', 'validate:openspec'], None),
+    ([cli, 'validate', change, '--strict'], pinned),
+    (['git', 'diff', '--check', base, head], None),
+    (['git', 'diff', '--exit-code', '095d04c6999f324c336ef9b68f50c1b94813aa92', head], None),
+    ([cli, 'validate', '--specs', '--strict'], pinned),
+]
+gates = []
+for i, (argv, env) in enumerate(commands, 1):
+    started = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    result = subprocess.run(argv, cwd=repo, env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=240)
+    log = out / f'{i:02d}.log'
+    log.write_text('$ ' + shlex.join(argv) + '\n' + result.stdout)
+    gate = {'command': shlex.join(argv), 'commit': head, 'exitCode': result.returncode, 'evidence': str(log), 'startedAt': started, 'outputSha256': hashlib.sha256(log.read_bytes()).hexdigest()}
+    gates.append(gate)
+    print(json.dumps(gate), flush=True)
+    if result.returncode:
+        (out / 'failed-gates.json').write_text(json.dumps(gates, indent=2) + '\n')
+        sys.exit(result.returncode)
+assert git('rev-parse', 'HEAD') == head and not git('status', '--porcelain')
+summary = {'schemaVersion': 1, 'change': change, 'head': head, 'base': base, 'plan': plan, 'planDigest': digest, 'openspecVersion': '1.15.0', 'changedPaths': changed, 'gates': gates, 'cleanAfterGates': True, 'coherenceAudit': {'verified': True, 'skillCount': len(rows), 'conditionalAdapters': True, 'authorityAndMaintenancePreserved': True, 'historicalGateLogsPreserved': True}, 'pinnedCliEnvironment': pinned, 'environment': {'platform': sys.platform, 'node': subprocess.check_output(['node', '--version'], text=True).strip(), 'npm': subprocess.check_output(['npm', '--version'], text=True).strip(), 'git': git('--version'), 'bootstrap': 'npm ci; 2 packages added, 0 vulnerabilities', 'workspace': str(repo)}}
+(out / 'gates.json').write_text(json.dumps(summary, indent=2) + '\n')
+print(json.dumps({'ok': True, 'head': head, 'gateCount': len(gates), 'evidence': str(out / 'gates.json')}))

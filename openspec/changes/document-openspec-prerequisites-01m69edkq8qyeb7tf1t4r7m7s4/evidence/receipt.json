@@ -1,0 +1,495 @@
+{
+  "schemaVersion": 1,
+  "change": "document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4",
+  "issueUrl": "https://github.com/forgegod/ai-coding-agent-skills/issues/5",
+  "base": "fc184fb1a5068b129c33017b8e8619c5334cf18a",
+  "head": "095d04c6999f324c336ef9b68f50c1b94813aa92",
+  "plan": "70de9d4154eec93a32967f240ec9d94cb05115cb",
+  "planDigest": "8a53bd6aaea8f3c8a37f4b0bce00b7a74d23dbed37c460766368d8b9a4b7fc80",
+  "integrated": "164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+  "verified": "164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+  "review": {
+    "schemaVersion": 1,
+    "change": "document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4",
+    "issueUrl": "https://github.com/forgegod/ai-coding-agent-skills/issues/5",
+    "head": "095d04c6999f324c336ef9b68f50c1b94813aa92",
+    "base": "fc184fb1a5068b129c33017b8e8619c5334cf18a",
+    "plan": "70de9d4154eec93a32967f240ec9d94cb05115cb",
+    "planDigest": "8a53bd6aaea8f3c8a37f4b0bce00b7a74d23dbed37c460766368d8b9a4b7fc80",
+    "verdict": "pass",
+    "findings": [],
+    "task18": "checked-before-this-review",
+    "thisReviewModifiedCandidate": false,
+    "localFrozenCandidateApproved": true,
+    "integrationAuthorized": false,
+    "publicationAuthorized": false,
+    "issueClosureAuthorized": false,
+    "reviewer": "Grok 4.7 (xai-oauth); Hermes session local-a524d5ecac689ce68abafb301b57abfad1c998df62d56de27f9cfef30b19862f; profile hermes-dev-exec",
+    "reference": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-review-095d04c.md",
+    "recordOnly": {
+      "parent": "15f89b39967f74e08fdeb98fa32fdb296bdfe001",
+      "pathsSinceParent": [
+        "openspec/changes/document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/evidence/review-15f89b3.json",
+        "openspec/changes/document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/evidence/review-15f89b3.md",
+        "openspec/changes/document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/evidence/review-a47e705.json",
+        "openspec/changes/document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/evidence/review-a47e705.md",
+        "openspec/changes/document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/tasks.md"
+      ],
+      "tasksDiff": "1.8 unchecked to checked only",
+      "documentationUnchangedSinceParent": true,
+      "workflowSha256": "0123e99b7de23fe530333b78a626546a18530f89ad0577b0182177c049352e22",
+      "historicalCopiesByteIdentical": true,
+      "passingReviewMdSha256": "c77485148298573af4e61ee9ce8c0462918c70a482408a342a632d55e48d0283",
+      "passingReviewJsonSha256": "96f64ea9045a1c93f9bcc35c9d27997e79ffab6594d224be8e6bc808a33f408e"
+    },
+    "gatesSource": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/gates.json",
+    "gatesReexecuted": false,
+    "gatesLogSha256Match": true,
+    "gates": [
+      {
+        "command": "python3 /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/verify-openspec-prerequisites-parent.py",
+        "commit": "095d04c6999f324c336ef9b68f50c1b94813aa92",
+        "exitCode": 0,
+        "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/01.log",
+        "startedAt": "2026-10-31T20:29:34.095512+00:00",
+        "outputSha256": "4f90d5975d2349efa3c0bf25a9ccda213d160992032077ec446e8214eeb7d157"
+      },
+      {
+        "command": "python3 /home/raphael/.hermes/profiles/hermes-dev-exec/cache/scratch/openspec-prerequisites-probe/audit.py",
+        "commit": "095d04c6999f324c336ef9b68f50c1b94813aa92",
+        "exitCode": 0,
+        "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/02.log",
+        "startedAt": "2026-10-31T20:29:34.153283+00:00",
+        "outputSha256": "abc0f1c6e8bdf125edd7da5047ec041050f35c86f593107192b74c737d542728"
+      },
+      {
+        "command": "node --test tests/documentation.test.mjs tests/native-installation.test.mjs",
+        "commit": "095d04c6999f324c336ef9b68f50c1b94813aa92",
+        "exitCode": 0,
+        "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/03.log",
+        "startedAt": "2026-10-31T20:29:34.197086+00:00",
+        "outputSha256": "f7d0f1a82a1baf18678045e107c70e1e52ed995b53b42634e757f4031a687d71"
+      },
+      {
+        "command": "npm test",
+        "commit": "095d04c6999f324c336ef9b68f50c1b94813aa92",
+        "exitCode": 0,
+        "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/04.log",
+        "startedAt": "2026-10-31T20:29:34.476134+00:00",
+        "outputSha256": "a1dff2a20a038c57aadb66e186726e3ea1a1f3c5d4fce9e401249cf052481112"
+      },
+      {
+        "command": "npm run build",
+        "commit": "095d04c6999f324c336ef9b68f50c1b94813aa92",
+        "exitCode": 0,
+        "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/05.log",
+        "startedAt": "2026-10-31T20:29:48.468474+00:00",
+        "outputSha256": "2fb729db5be6b55e80c97f58769592071416120d45e20ddf75b7a066cf278555"
+      },
+      {
+        "command": "npm run validate:openspec",
+        "commit": "095d04c6999f324c336ef9b68f50c1b94813aa92",
+        "exitCode": 0,
+        "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/06.log",
+        "startedAt": "2026-10-31T20:29:48.729810+00:00",
+        "outputSha256": "d9f708bf33f01861384961242b3874498e34266be5df0be9b68e14670a1a22b8"
+      },
+      {
+        "command": "/home/raphael/.hermes/profiles/hermes-dev-exec/cache/scratch/openspec-prerequisites-probe/npm-global/bin/openspec validate document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4 --strict",
+        "commit": "095d04c6999f324c336ef9b68f50c1b94813aa92",
+        "exitCode": 0,
+        "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/07.log",
+        "startedAt": "2026-10-31T20:29:48.880936+00:00",
+        "outputSha256": "bfc223382ea9862c4b0400a859fc827663268931938a02f9642d86e0118ae773"
+      },
+      {
+        "command": "git diff --check fc184fb1a5068b129c33017b8e8619c5334cf18a 095d04c6999f324c336ef9b68f50c1b94813aa92",
+        "commit": "095d04c6999f324c336ef9b68f50c1b94813aa92",
+        "exitCode": 0,
+        "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/08.log",
+        "startedAt": "2026-10-31T20:29:49.049456+00:00",
+        "outputSha256": "a41bf910f00626539b4bf05896cabad477eb9c7f5d6f1fbe9f31bffa4b64ef63"
+      },
+      {
+        "command": "node skills/software-development/openspec-delivery/scripts/change-guard.mjs candidate --repo /home/raphael/src/ai-coding-agent-skills--document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4 --change document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4 --base fc184fb1a5068b129c33017b8e8619c5334cf18a --head 095d04c6999f324c336ef9b68f50c1b94813aa92 --plan 70de9d4154eec93a32967f240ec9d94cb05115cb --expect-plan 8a53bd6aaea8f3c8a37f4b0bce00b7a74d23dbed37c460766368d8b9a4b7fc80",
+        "commit": "095d04c6999f324c336ef9b68f50c1b94813aa92",
+        "exitCode": 0,
+        "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/09.log",
+        "startedAt": "2026-10-31T20:29:49.053628+00:00",
+        "outputSha256": "7762f5bc87cf96cc5360daf9693b8f78d06a595eea22a99f6b7217dee7acb1d0"
+      }
+    ],
+    "caveats": [
+      "Probe packages and scratch homes are not actual user installations or native model loading.",
+      "Hermes scans were SAFE/ALLOWED with LOW allowed-tools privilege notices, not finding-free. Those notices do not block this documentation candidate, are not risk acceptance, and do not authorize a scanner bypass.",
+      "Claude account upload/sync, Desktop acceptance, and end-to-end execution are unverified. The guide still says all seven descriptions exceed the documented 200-character limit. Lengths were not remeasured in this review.",
+      "Ambient OpenSpec was not changed. Retained strict validation used the isolated probe CLI. Ambient CLI was not re-probed. The harness asserts that probe binary is 1.15.0; this review did not re-run --version.",
+      "Workflow reference permalink 6d04a1b58dedc95729d34e4f223d9d483aae210a was not re-resolved against skill pin 8e0288df12d401b0e183e2f47254d22528c1dffb.",
+      "Task 1.8 was already checked before this review as the orchestrator record of the 15f89b3 pass. This review did not tick it. Pass approves the frozen local candidate only, not integration, publication, deployment, host acceptance, or issue closure.",
+      "parallel-change-workflow was not edited. Overlap reconciliation belongs to separately authorized finish."
+    ]
+  },
+  "integrationReference": "https://github.com/forgegod/ai-coding-agent-skills/pull/6",
+  "gates": [
+    {
+      "command": "npm run build",
+      "commit": "164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+      "exitCode": 0,
+      "evidence": "integrated/01.log",
+      "startedAt": "2026-10-31T20:48:37.704596+00:00",
+      "outputSha256": "283fa257052577fc26a3a7099fce73f3ebe884002b848a172fe3feb84256571f"
+    },
+    {
+      "command": "python3 /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/verify-openspec-prerequisites-integrated.py",
+      "commit": "164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+      "exitCode": 0,
+      "evidence": "integrated/02.log",
+      "startedAt": "2026-10-31T20:48:37.963057+00:00",
+      "outputSha256": "e0284423f416f28aa32a71f8a85418308ca2e04d8e49ca57ff3414e06b9a7d54"
+    },
+    {
+      "command": "python3 /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/audit-openspec-prerequisites-integrated.py",
+      "commit": "164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+      "exitCode": 0,
+      "evidence": "integrated/03.log",
+      "startedAt": "2026-10-31T20:48:38.022905+00:00",
+      "outputSha256": "83f8f59c5e5ec98d18c9017c6b0e836c71a52422a5f1e06c8abba5f62c1f6c68"
+    },
+    {
+      "command": "node --test tests/documentation.test.mjs tests/native-installation.test.mjs",
+      "commit": "164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+      "exitCode": 0,
+      "evidence": "integrated/04.log",
+      "startedAt": "2026-10-31T20:48:38.067262+00:00",
+      "outputSha256": "fba351ef1327535a2b891f4d5608e5d3048d91f7ea81bcc9515d16b6756a38b5"
+    },
+    {
+      "command": "npm test",
+      "commit": "164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+      "exitCode": 0,
+      "evidence": "integrated/05.log",
+      "startedAt": "2026-10-31T20:48:38.343779+00:00",
+      "outputSha256": "91293b022069772bbe23ce52bee4849d4db9df7d74cca312e4c1eb38b8f957e5"
+    },
+    {
+      "command": "npm run validate:openspec",
+      "commit": "164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+      "exitCode": 0,
+      "evidence": "integrated/06.log",
+      "startedAt": "2026-10-31T20:48:52.513667+00:00",
+      "outputSha256": "d9f708bf33f01861384961242b3874498e34266be5df0be9b68e14670a1a22b8"
+    },
+    {
+      "command": "/home/raphael/.hermes/profiles/hermes-dev-exec/cache/scratch/openspec-prerequisites-probe/npm-global/bin/openspec validate document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4 --strict",
+      "commit": "164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+      "exitCode": 0,
+      "evidence": "integrated/07.log",
+      "startedAt": "2026-10-31T20:48:52.657215+00:00",
+      "outputSha256": "bfc223382ea9862c4b0400a859fc827663268931938a02f9642d86e0118ae773"
+    },
+    {
+      "command": "git diff --check fc184fb1a5068b129c33017b8e8619c5334cf18a 164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+      "commit": "164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+      "exitCode": 0,
+      "evidence": "integrated/08.log",
+      "startedAt": "2026-10-31T20:48:52.827109+00:00",
+      "outputSha256": "2ed6d4ab5897bcf64f8b2ec618e88b64a76d260bbe38b918e912d1e25eac680b"
+    },
+    {
+      "command": "git diff --exit-code 095d04c6999f324c336ef9b68f50c1b94813aa92 164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+      "commit": "164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+      "exitCode": 0,
+      "evidence": "integrated/09.log",
+      "startedAt": "2026-10-31T20:48:52.831244+00:00",
+      "outputSha256": "6cd34c09d067099813a284b8922d682ac9f0d7e6e11830e7ef55f4514f92db35"
+    },
+    {
+      "command": "/home/raphael/.hermes/profiles/hermes-dev-exec/cache/scratch/openspec-prerequisites-probe/npm-global/bin/openspec validate --specs --strict",
+      "commit": "164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+      "exitCode": 0,
+      "evidence": "integrated/10.log",
+      "startedAt": "2026-10-31T20:48:52.833134+00:00",
+      "outputSha256": "c4b61d8fed37b1764f2343ef26d5276c06020d975ef0849af4e080f60e7ff273"
+    },
+    {
+      "command": "python3 /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/probe-openspec-distribution-live-retry.py",
+      "commit": "164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+      "exitCode": 0,
+      "evidence": "live/retry-output.log",
+      "outputSha256": "f32e68f3777a33eed2113bccef1618a2e3108e0e2974537f74781fe930af7977"
+    }
+  ],
+  "environment": {
+    "platform": "linux",
+    "node": "v24.21.0",
+    "npm": "11.19.0",
+    "git": "git version 2.43.0",
+    "bootstrap": "npm ci; 2 packages added, 0 vulnerabilities",
+    "workspace": "/home/raphael/src/ai-coding-agent-skills--verify-document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4"
+  },
+  "openspecVersion": "1.15.0",
+  "retentionBase": "All retained file references are relative to this receipt directory; original execution paths in byte-identical historical reports map through retainedEvidence. The complete package moves together on archive. Seven raw Hermes outputs use lossless UTF-8 JSON wrappers to preserve original trailing whitespace without weakening whitespace checks. Hash the wrapper bytes against sha256; decode its text as UTF-8 and hash against decodedSha256 to recover the exact original output. Historical inventories still name original log files; map through retainedEvidence.",
+  "retainedEvidence": [
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-review-095d04c.md",
+      "file": "review-095d04c.md",
+      "sha256": "17e61b437b7bf18d8583cea4eb4394042707497bed0d93c73b9b86a049f19c48"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-review-095d04c.json",
+      "file": "review-095d04c.json",
+      "sha256": "46b6dd171fcc8854ab6cb440df1f32ed8650acbdf204c8d02e28c5a612c1d567"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/gates.json",
+      "file": "candidate/gates.json",
+      "sha256": "1fb63716a5687418c731ded36c96e7116cc5ab7d4804a3efe9ad2749e10095d4"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/01.log",
+      "file": "candidate/01.log",
+      "sha256": "4f90d5975d2349efa3c0bf25a9ccda213d160992032077ec446e8214eeb7d157"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/02.log",
+      "file": "candidate/02.log",
+      "sha256": "abc0f1c6e8bdf125edd7da5047ec041050f35c86f593107192b74c737d542728"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/03.log",
+      "file": "candidate/03.log",
+      "sha256": "f7d0f1a82a1baf18678045e107c70e1e52ed995b53b42634e757f4031a687d71"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/04.log",
+      "file": "candidate/04.log",
+      "sha256": "a1dff2a20a038c57aadb66e186726e3ea1a1f3c5d4fce9e401249cf052481112"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/05.log",
+      "file": "candidate/05.log",
+      "sha256": "2fb729db5be6b55e80c97f58769592071416120d45e20ddf75b7a066cf278555"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/06.log",
+      "file": "candidate/06.log",
+      "sha256": "d9f708bf33f01861384961242b3874498e34266be5df0be9b68e14670a1a22b8"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/07.log",
+      "file": "candidate/07.log",
+      "sha256": "bfc223382ea9862c4b0400a859fc827663268931938a02f9642d86e0118ae773"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/08.log",
+      "file": "candidate/08.log",
+      "sha256": "a41bf910f00626539b4bf05896cabad477eb9c7f5d6f1fbe9f31bffa4b64ef63"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-095d04c/09.log",
+      "file": "candidate/09.log",
+      "sha256": "7762f5bc87cf96cc5360daf9693b8f78d06a595eea22a99f6b7217dee7acb1d0"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-integrated-gates-164603a/gates.json",
+      "file": "integrated/gates.json",
+      "sha256": "827c90bf982e101f80d3c004c09b40b6fa7e8769f62baff3b4f542bb6ad3b1a0"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-integrated-gates-164603a/01.log",
+      "file": "integrated/01.log",
+      "sha256": "283fa257052577fc26a3a7099fce73f3ebe884002b848a172fe3feb84256571f"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-integrated-gates-164603a/02.log",
+      "file": "integrated/02.log",
+      "sha256": "e0284423f416f28aa32a71f8a85418308ca2e04d8e49ca57ff3414e06b9a7d54"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-integrated-gates-164603a/03.log",
+      "file": "integrated/03.log",
+      "sha256": "83f8f59c5e5ec98d18c9017c6b0e836c71a52422a5f1e06c8abba5f62c1f6c68"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-integrated-gates-164603a/04.log",
+      "file": "integrated/04.log",
+      "sha256": "fba351ef1327535a2b891f4d5608e5d3048d91f7ea81bcc9515d16b6756a38b5"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-integrated-gates-164603a/05.log",
+      "file": "integrated/05.log",
+      "sha256": "91293b022069772bbe23ce52bee4849d4db9df7d74cca312e4c1eb38b8f957e5"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-integrated-gates-164603a/06.log",
+      "file": "integrated/06.log",
+      "sha256": "d9f708bf33f01861384961242b3874498e34266be5df0be9b68e14670a1a22b8"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-integrated-gates-164603a/07.log",
+      "file": "integrated/07.log",
+      "sha256": "bfc223382ea9862c4b0400a859fc827663268931938a02f9642d86e0118ae773"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-integrated-gates-164603a/08.log",
+      "file": "integrated/08.log",
+      "sha256": "2ed6d4ab5897bcf64f8b2ec618e88b64a76d260bbe38b918e912d1e25eac680b"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-integrated-gates-164603a/09.log",
+      "file": "integrated/09.log",
+      "sha256": "6cd34c09d067099813a284b8922d682ac9f0d7e6e11830e7ef55f4514f92db35"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-integrated-gates-164603a/10.log",
+      "file": "integrated/10.log",
+      "sha256": "c4b61d8fed37b1764f2343ef26d5276c06020d975ef0849af4e080f60e7ff273"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-live-probe-164603a-retry/summary.json",
+      "file": "live/summary.json",
+      "sha256": "f32e68f3777a33eed2113bccef1618a2e3108e0e2974537f74781fe930af7977"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-live-probe-164603a-retry/discovery.json",
+      "file": "live/discovery.json",
+      "sha256": "88ec32640ea5d0417bdf9633e8f888a25edb3aa29ccda5a0ff92ba422e489f20"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-live-probe-164603a-retry/hermes-1.log",
+      "file": "live/hermes-1.log",
+      "sha256": "3d9e7e5852a34668cceda3c63f8ab7826b6613cd21da7c30ee6347b522c6f54b"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-live-probe-164603a-retry/hermes-2.log",
+      "file": "live/hermes-2.log.json",
+      "sha256": "1d4b4d7834e56d338c84ac525a401b2b8a39302ddf93b3c98dacf44e7317815e",
+      "representation": "lossless-utf8-log",
+      "decodedSha256": "09f98379b07b64d76c2b52cc2c6fdef2666c96f4c4a63980a2558644e90e417f"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-live-probe-164603a-retry/hermes-3.log",
+      "file": "live/hermes-3.log.json",
+      "sha256": "235d81b65ce01656bb6ae3ec57bcc8012bb2c5fe0212e023dd24194165b01fb2",
+      "representation": "lossless-utf8-log",
+      "decodedSha256": "2fd1b589925ce79a045ed414c41d8e9e38e95a57298f09821c5e8220397d72ab"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-live-probe-164603a-retry/hermes-4.log",
+      "file": "live/hermes-4.log.json",
+      "sha256": "bd74993eeb8a9eeecf7dd41b213442ba687aa9df25eb687cd367a25451166f37",
+      "representation": "lossless-utf8-log",
+      "decodedSha256": "70261ab22ac8618d603d5bc3c80a21729b6f2c47b057890b7fc03e9464cdd397"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-live-probe-164603a-retry/hermes-5.log",
+      "file": "live/hermes-5.log.json",
+      "sha256": "5d9376e9ac7c5a26a62b0af9f2adc86259123066790ef0941ae61373316c29ee",
+      "representation": "lossless-utf8-log",
+      "decodedSha256": "ee93fbf5d123d31b14e2950b273ba155f76e74a83db5d3b8b4b0fa08bee81ad0"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-live-probe-164603a-retry/hermes-6.log",
+      "file": "live/hermes-6.log.json",
+      "sha256": "a62daaaf315ca5a4781ef9f6d1dd04e8d2db53d6134f71f65cad7662337c5e4b",
+      "representation": "lossless-utf8-log",
+      "decodedSha256": "7173ac144ec1a9a8317d60e74bd6412f0450ebb68769347aec474b3b29dcf8a5"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-live-probe-164603a-retry/hermes-7.log",
+      "file": "live/hermes-7.log.json",
+      "sha256": "6ebc1d37ac5f5c74d009581124054d76dde487c7ab2c5ddcb67556e5a8ab368a",
+      "representation": "lossless-utf8-log",
+      "decodedSha256": "8b4600440f5c616bc4031612b470e23b4659bc1f31bfe5ffd717c65a4c471bb5"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-live-probe-164603a.log",
+      "file": "live/initial-harness-failure.log",
+      "sha256": "96a865dd1478f657eb024a6cb55aa96d695689f3979eedf8bbc63ca101129be7"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-live-probe-164603a/hermes-1.log",
+      "file": "live/initial-discovery.log",
+      "sha256": "3d9e7e5852a34668cceda3c63f8ab7826b6613cd21da7c30ee6347b522c6f54b"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-live-probe-164603a-retry.log",
+      "file": "live/retry-output.log",
+      "sha256": "f32e68f3777a33eed2113bccef1618a2e3108e0e2974537f74781fe930af7977"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-main-ruleset.json",
+      "file": "main-ruleset.json",
+      "sha256": "0c5c654bb5f0c6fc4aed5e4dfa1b027df85718cbb8e3d528921b48747b8f6651"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-implementation-merge.json",
+      "file": "implementation-merge.json",
+      "sha256": "a383d5a2afbc8fcbb8c3ca1aba1bf8790bcaf80b662c7d37b66910fa4e2e8738"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-integrated-pages.json",
+      "file": "integrated-pages.json",
+      "sha256": "43a087260cf4c18c8fc5df23c54106b43ac17b3d01469047fe70e419bb772147"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev-exec/cache/scratch/openspec-prerequisites-probe/documented-hermes-retry.log",
+      "file": "upstream-hermes-install-probe.log.json",
+      "sha256": "24710f728e317311923db2b022e327813d0d0f6a0d07a5eba6c1cf638da6947a",
+      "representation": "lossless-utf8-log",
+      "decodedSha256": "ff457c991aa7143f22764313088432e531cb1e4baa9c4bd116b86cf59b818689"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/run-openspec-prerequisites-final-gates.py",
+      "file": "harnesses/run-openspec-prerequisites-final-gates.py.txt",
+      "sha256": "1c68871928fe4b4625b3f60cdd76db92ebd6830f82a4768b4fc861d61488fb78"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/run-openspec-prerequisites-integrated-gates.py",
+      "file": "harnesses/run-openspec-prerequisites-integrated-gates.py.txt",
+      "sha256": "fea267d9eb6c221e969f238354831d572e26a05f72dbbf88933f0db578df1d81"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/verify-openspec-prerequisites-integrated.py",
+      "file": "harnesses/verify-openspec-prerequisites-integrated.py.txt",
+      "sha256": "77b74ff45abe4fce2ab1c1e1f6dc16f59bbc6ad2d0736a3887bd4d6d509ac5d1"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/audit-openspec-prerequisites-integrated.py",
+      "file": "harnesses/audit-openspec-prerequisites-integrated.py.txt",
+      "sha256": "f42e56c6c52eb21c774166052019dad080921e90864e9ce55e96fc026725d5c0"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/probe-openspec-distribution-live.py",
+      "file": "harnesses/probe-openspec-distribution-live.py.txt",
+      "sha256": "8c39d63c5b747b75e06f4206f6e53df3e8e3fb8cd174b0e697c518a3af20c0b4"
+    },
+    {
+      "source": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/probe-openspec-distribution-live-retry.py",
+      "file": "harnesses/probe-openspec-distribution-live-retry.py.txt",
+      "sha256": "c424ba2804fd362b4d34a709160c2d524f0c63236b4976444a65dc92bdf11be9"
+    }
+  ],
+  "acceptance": "Reviewed documentation source integrated by merge commit; all required integrated gates passed. This receipt does not attest its own future publication, archival merge, issue closure or worktree retirement.",
+  "publication": {
+    "workflow": "https://github.com/forgegod/ai-coding-agent-skills/actions/runs/41240564935",
+    "commit": "164603a76cc37bc1bbf89fc0bc08940f7dae5963",
+    "conclusion": "success",
+    "liveProbe": "live/summary.json",
+    "httpFilesVerified": 37,
+    "companionPackages": 5,
+    "plugins": 2,
+    "allLiveBytesMatchIntegratedBuild": true,
+    "normalHermesScratchInstallation": "five packages installed with normal scanning and byte-matched; no real profile installation"
+  },
+  "limitations": [
+    "Probe packages and scratch homes are not actual user installations or native model loading.",
+    "Hermes scans were SAFE/ALLOWED with LOW allowed-tools privilege notices, not finding-free. Those notices do not block this documentation candidate, are not risk acceptance, and do not authorize a scanner bypass.",
+    "Claude account upload/sync, Desktop acceptance, and end-to-end execution are unverified. The guide still says all seven descriptions exceed the documented 200-character limit. Lengths were not remeasured in this review.",
+    "Ambient OpenSpec was not changed. Retained strict validation used the isolated probe CLI. Ambient CLI was not re-probed. The harness asserts that probe binary is 1.15.0; this review did not re-run --version.",
+    "Workflow reference permalink 6d04a1b58dedc95729d34e4f223d9d483aae210a was not re-resolved against skill pin 8e0288df12d401b0e183e2f47254d22528c1dffb.",
+    "Task 1.8 was already checked before this review as the orchestrator record of the 15f89b3 pass. This review did not tick it. Pass approves the frozen local candidate only, not integration, publication, deployment, host acceptance, or issue closure.",
+    "parallel-change-workflow was not edited. Overlap reconciliation belongs to separately authorized finish."
+  ],
+  "probeRecovery": "Initial optional live-probe harness rejected successful discovery JSON because the managed launcher printed bootstrap lines before it; no package install was attempted in that run. Failure and discovery output are retained; parser correction and full retry succeeded without source changes or scan bypass."
+}

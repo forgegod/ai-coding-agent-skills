@@ -1,0 +1,22 @@
+$ node --test tests/documentation.test.mjs tests/native-installation.test.mjs
+✔ Claude instructions lead with native GUI installation and cite primary sources (9.317629ms)
+✔ all launch examples carry the same bounded operator authorization (2.750707ms)
+✔ normal installer loop documents all generic software-development skills (1.839652ms)
+✔ OpenSpec installation and orchestration use the explicitly selected workflow (1.451455ms)
+✔ local installation docs distinguish source, migration, profile scope, and scanning (1.455929ms)
+✔ directory-discovery instructions separate installation telemetry from authenticated submission (1.044634ms)
+✔ autonomous goal documentation distinguishes orchestration from polling (1.367346ms)
+✔ operational documentation has no research dependencies or adoption-history claims (6.672601ms)
+✔ lifecycle Mermaid separates operator decisions from automatic workspace and delivery work (1.038949ms)
+✔ change naming is automatic project policy, not a second identity or installed adapter fork (3.014552ms)
+✔ documented recipes copy five complete packages to all four native user locations (155.930703ms)
+✔ native helper refuses collisions before copying any other skill (43.328459ms)
+✔ native instructions retain support-file and host-tool caveats (1.0773ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 249.292809

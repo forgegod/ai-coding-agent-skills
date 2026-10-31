@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "representation": "lossless-utf8-log",
+  "originalFile": "hermes-7.log",
+  "decodedSha256": "8b4600440f5c616bc4031612b470e23b4659bc1f31bfe5ffd717c65a4c471bb5",
+  "text": "                                Installed Skills                                \n┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━┓\n┃ Name                           ┃ Category ┃ Source     ┃ Trust     ┃ Status  ┃\n┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━┩\n│ autonomous-implementation-rev… │          │ well-known │ community │ enabled │\n│ capability-wireframes          │          │ well-known │ community │ enabled │\n│ git-commit-message             │          │ well-known │ community │ enabled │\n│ openspec-delivery              │          │ well-known │ community │ enabled │\n│ openspec-next                  │          │ well-known │ community │ enabled │\n└────────────────────────────────┴──────────┴────────────┴───────────┴─────────┘\n5 hub-installed, 0 builtin, 0 local — 5 enabled, 0 disabled\n\n"
+}
