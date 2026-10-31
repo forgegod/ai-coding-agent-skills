@@ -141,8 +141,9 @@ authorization; it does not bypass scanning or resolve existing-copy conflicts.
 ### Copy every local package to global agent profiles
 
 Run these commands from the reviewed repository checkout. Local installation
-copies this checkout's bytes and registers the public source for future updates;
-it does not download the published version or start a skill workflow.
+copies this checkout's bytes to every selected target. Only selected Hermes
+profiles register the public source for future Hermes updates; local installation
+does not download the published version or start a skill workflow.
 
 #### Choose where updates come from
 
@@ -274,11 +275,13 @@ npm run install:local -- --update --profile hermes-dev --dry-run
 npm run install:local -- --update --profile hermes-dev
 ```
 
-This replaces the package files, preserves the previous packages in backups, and
-registers the new installed-content baseline. There is no registration-only mode.
-Without selectors, the same migration applies to every recognized target. Start a
-fresh session after installation. Later, use the normal internet updater for the
-Hermes profile copy:
+This replaces the package files and preserves the previous packages in backups
+for every selected target. Only selected Hermes profiles register the new
+installed-content baseline. There is no registration-only mode. Without selectors,
+replacement and backups apply to every recognized target. Refresh native Claude
+Code/Codex copies by rerunning this local installer with `--update`, not
+`hermes skills update`. Start a fresh session after installation. Later, use the
+normal internet updater for the Hermes profile copy:
 
 ```sh
 hermes -p hermes-dev skills update
