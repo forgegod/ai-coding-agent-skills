@@ -1,0 +1,26 @@
+---
+metadata_version: 1
+artifact: tasks
+change: document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4
+---
+# Tasks
+
+Implementation scope is documentation only. No task is completed by drafting this plan. The native spec artifact is deliberately skipped; no delta or current spec changes are needed. Approval and a new execution invocation are required before the group below starts. The orchestrator alone updates task progress and Git.
+
+## 1. Document and verify the upstream OpenSpec prerequisites
+
+- [ ] 1.1 Create `docs/openspec-installation.md` with the exact seven upstream workflow names from the proposal, their purpose, the existing CLI 1.15.0 pin, and separate CLI/skill/companion/adoption steps; verify all seven are listed once in the authoritative inventory and no release/docs-maintainer workflows or automatic orchestration are selected.
+- [ ] 1.2 Add the profile-scoped Hermes section with source-qualified inspect/install commands, normal scanning, selective enablement of existing disabled skills, enabled-inventory checks, collision/local-edit precautions and update ownership; verify the exact documented commands against the installed CLI and isolated scratch profile without changing any real profile or bypassing a scanner finding.
+- [ ] 1.3 Add distinct Claude Desktop account upload, Cowork and Code-tab/CLI instructions with complete upstream package preparation, user-global Code installation, native invocation spelling, policy/CLI/repository prerequisites and existing GUI-first companion links; verify package contents and command syntax in scratch and label account upload/sync/client execution unverified unless actually exercised with separate authority.
+- [ ] 1.4 Add user-global Codex installation using explicit upstream selection, `~/.agents/skills`, `/skills`/`$openspec-propose`, duplicate/collision precautions and correct update scope; exercise the documented installation recipe in an isolated home and verify selected package inventory/bytes, recording real client discovery separately if available.
+- [ ] 1.5 Link the new guide from `README.md`, `docs/claude-installation.md` and `docs/openspec-workflow.md`; verify local links/anchors, primary-source citations and version claims, preserve the existing companion install recipes/counts, and confirm native init is not represented as a global/profile install or required reinitialization of this existing repository.
+- [ ] 1.6 Add the same-change maintenance rule to `AGENTS.md`, `docs/openspec-installation.md` and `docs/openspec-workflow.md`: changes to the required skill set, CLI/runtime versions, companion dependencies or supported installation routes must update affected inventories, required/optional distinctions, version/source pins, host prerequisites, installation/enablement/update instructions, verification steps and cross-links in the same change; verify the rule identifies author/reviewer responsibility, blocks completion on stale affected instructions and does not imply automated enforcement, historical-record rewrites or uninstall authority.
+- [ ] 1.7 Run a content/link and prerequisite-to-instructions coherence audit, `node --test tests/documentation.test.mjs tests/native-installation.test.mjs`, `npm test`, `npm run build`, `npm run validate:openspec`, `openspec validate document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4 --strict` and `git diff --check` after the final edit; verify only the five approved documentation/contract files and this change's planning/evidence records differ, distribution still contains five companion packages/two plugins, and no skill source, test code, dependencies, manifests, installer or CI/deployment files change.
+- [ ] 1.8 Obtain `/autonomous-implementation-review` from a separate supported reviewer session/model on the frozen documentation candidate and its gate evidence, including whether the same-change maintenance obligation covers future prerequisite changes and all affected instructions are coherent; disposition findings and verify the candidate SHA is unchanged before the orchestrator records review completion. If the host cannot run that review, preserve the candidate and report the blocker rather than marking this task done.
+
+## Workflow follow-up
+
+- Plan approval does not itself authorize implementation or commits. Use the project's selected bounded execution invocation only after approval, retaining any operator restrictions.
+- Before separately authorized integration, reconcile overlapping installation prose with `parallel-change-workflow` against the actual target; do not edit that sibling change or manufacture a prerequisite ticket.
+- Publication, protected implementation/closure PRs, integrated gates, receipt/archive, acceptance-bound issue closure and clean dedicated-workspace retirement require `/openspec-delivery finish document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4` under the existing project policy. No direct target push, branch deletion, release or deployment is implied.
+- Actual user/profile installation and Claude Desktop upload/account sync or end-to-end workflow acceptance remain separate operator-authorized operations, not consequences of publishing documentation.
