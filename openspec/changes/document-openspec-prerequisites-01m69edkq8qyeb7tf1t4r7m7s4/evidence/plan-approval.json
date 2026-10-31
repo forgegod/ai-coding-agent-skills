@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "change": "document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4",
+  "plan": "70de9d4154eec93a32967f240ec9d94cb05115cb",
+  "planDigest": "8a53bd6aaea8f3c8a37f4b0bce00b7a74d23dbed37c460766368d8b9a4b7fc80",
+  "base": "fc184fb1a5068b129c33017b8e8619c5334cf18a",
+  "operator": "Raphael (forgegod)",
+  "approval": "approved",
+  "reference": "Operator reply 'approved' in this conversation, immediately following the approval request naming this exact plan commit and digest.",
+  "recordedAt": "2026-10-31T18:18:24+01:00",
+  "group": "1. Document and verify the upstream OpenSpec prerequisites",
+  "executionAuthority": "Resume the existing operator-sent /openspec-next invocation after its plan-approval pause.",
+  "scope": "Documentation-only changes to AGENTS.md, README.md, docs/openspec-installation.md, docs/claude-installation.md and docs/openspec-workflow.md, plus orchestrator-owned task/evidence records and local commits under the selected workflow.",
+  "exclusions": ["push", "pull requests", "merge", "release", "deployment", "real user/profile installation", "issue updates or closure", "spec sync or archive", "branch/worktree deletion", "another change"],
+  "implementationStatus": "not started",
+  "reviewStatus": "not performed"
+}

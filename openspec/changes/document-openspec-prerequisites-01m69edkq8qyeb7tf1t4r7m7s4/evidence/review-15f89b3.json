@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "change": "document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4",
+  "issueUrl": "https://github.com/forgegod/ai-coding-agent-skills/issues/5",
+  "head": "15f89b39967f74e08fdeb98fa32fdb296bdfe001",
+  "base": "fc184fb1a5068b129c33017b8e8619c5334cf18a",
+  "plan": "70de9d4154eec93a32967f240ec9d94cb05115cb",
+  "planDigest": "8a53bd6aaea8f3c8a37f4b0bce00b7a74d23dbed37c460766368d8b9a4b7fc80",
+  "verdict": "pass",
+  "task18": "pending",
+  "changeComplete": false,
+  "integrationComplete": false,
+  "findings": [],
+  "priorFinding": {
+    "sourceHead": "a47e705bdc0cdba036f9319db4fed8645a4344ca",
+    "disposition": "resolved",
+    "summary": "The six-skill core-profile assumption and unqualified /opsx field-note commands are gone. The SDLC now assumes the seven setup skills, keeps verification advisory, uses exact /openspec-<action> for direct-directory Claude Code and Hermes, uses /skills or $openspec-<action> for Codex, and limits /opsx:* to generated adapters that were actually installed."
+  },
+  "reviewer": "Grok 4.7 (xai-oauth); Hermes session local-4e5f50c2011d8e25c80e932f856ace5a059b03ed16eaf8c963639c7edc3c2a58; profile hermes-dev-exec",
+  "reference": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-review-15f89b3.md",
+  "gates": [
+    {
+      "command": "python3 /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/verify-openspec-prerequisites-parent.py",
+      "commit": "15f89b39967f74e08fdeb98fa32fdb296bdfe001",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-15f89b3/01.log",
+      "startedAt": "2026-10-31T20:13:37.492725+00:00",
+      "outputSha256": "4f90d5975d2349efa3c0bf25a9ccda213d160992032077ec446e8214eeb7d157"
+    },
+    {
+      "command": "python3 /home/raphael/.hermes/profiles/hermes-dev-exec/cache/scratch/openspec-prerequisites-probe/audit.py",
+      "commit": "15f89b39967f74e08fdeb98fa32fdb296bdfe001",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-15f89b3/02.log",
+      "startedAt": "2026-10-31T20:13:37.548270+00:00",
+      "outputSha256": "abc0f1c6e8bdf125edd7da5047ec041050f35c86f593107192b74c737d542728"
+    },
+    {
+      "command": "node --test tests/documentation.test.mjs tests/native-installation.test.mjs",
+      "commit": "15f89b39967f74e08fdeb98fa32fdb296bdfe001",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-15f89b3/03.log",
+      "startedAt": "2026-10-31T20:13:37.593778+00:00",
+      "outputSha256": "cf4f1d50f21a7e90b01d7e9366d41c9710dceec785d4abdc5f4741f900133053"
+    },
+    {
+      "command": "npm test",
+      "commit": "15f89b39967f74e08fdeb98fa32fdb296bdfe001",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-15f89b3/04.log",
+      "startedAt": "2026-10-31T20:13:37.873568+00:00",
+      "outputSha256": "522c920dc4bd5c54cb3e93bda7291b875c78e75752dc98223521d777c2e4ee6c"
+    },
+    {
+      "command": "npm run build",
+      "commit": "15f89b39967f74e08fdeb98fa32fdb296bdfe001",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-15f89b3/05.log",
+      "startedAt": "2026-10-31T20:13:52.190325+00:00",
+      "outputSha256": "2fb729db5be6b55e80c97f58769592071416120d45e20ddf75b7a066cf278555"
+    },
+    {
+      "command": "npm run validate:openspec",
+      "commit": "15f89b39967f74e08fdeb98fa32fdb296bdfe001",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-15f89b3/06.log",
+      "startedAt": "2026-10-31T20:13:52.456470+00:00",
+      "outputSha256": "d9f708bf33f01861384961242b3874498e34266be5df0be9b68e14670a1a22b8"
+    },
+    {
+      "command": "/home/raphael/.hermes/profiles/hermes-dev-exec/cache/scratch/openspec-prerequisites-probe/npm-global/bin/openspec validate document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4 --strict",
+      "commit": "15f89b39967f74e08fdeb98fa32fdb296bdfe001",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-15f89b3/07.log",
+      "startedAt": "2026-10-31T20:13:52.607864+00:00",
+      "outputSha256": "bfc223382ea9862c4b0400a859fc827663268931938a02f9642d86e0118ae773"
+    },
+    {
+      "command": "git diff --check fc184fb1a5068b129c33017b8e8619c5334cf18a 15f89b39967f74e08fdeb98fa32fdb296bdfe001",
+      "commit": "15f89b39967f74e08fdeb98fa32fdb296bdfe001",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-15f89b3/08.log",
+      "startedAt": "2026-10-31T20:13:52.781183+00:00",
+      "outputSha256": "dca894c28a182c63c397d9e45f6a68956d945c6ca3282e13d366070baaba3e43"
+    },
+    {
+      "command": "node skills/software-development/openspec-delivery/scripts/change-guard.mjs candidate --repo /home/raphael/src/ai-coding-agent-skills--document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4 --change document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4 --base fc184fb1a5068b129c33017b8e8619c5334cf18a --head 15f89b39967f74e08fdeb98fa32fdb296bdfe001 --plan 70de9d4154eec93a32967f240ec9d94cb05115cb --expect-plan 8a53bd6aaea8f3c8a37f4b0bce00b7a74d23dbed37c460766368d8b9a4b7fc80",
+      "commit": "15f89b39967f74e08fdeb98fa32fdb296bdfe001",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-15f89b3/09.log",
+      "startedAt": "2026-10-31T20:13:52.785624+00:00",
+      "outputSha256": "773dd206d1ee6f8413032ac6f5f9c4368444ebec5bafd4068db1f9038b311664"
+    }
+  ],
+  "gatesSource": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-prerequisites-gates-15f89b3/gates.json",
+  "gatesReexecuted": false,
+  "caveats": [
+    "Probe packages and scratch homes are not actual user installations.",
+    "Hermes scans were SAFE/ALLOWED with LOW allowed-tools privilege notices, not finding-free. Those notices do not block this documentation candidate, are not risk acceptance, and do not authorize a scanner bypass.",
+    "Claude account upload/sync, Desktop acceptance, and native model loading/execution are unverified. The guide still says all seven descriptions exceed the documented 200-character limit. Lengths were not remeasured in this review.",
+    "Ambient OpenSpec was not changed. Retained strict validation used isolated 1.15.0. Ambient CLI was not re-probed.",
+    "Workflow reference permalink 6d04a1b58dedc95729d34e4f223d9d483aae210a was not re-resolved against skill pin 8e0288df12d401b0e183e2f47254d22528c1dffb.",
+    "Task 1.8 remains pending. This review is not change or integration completion."
+  ]
+}

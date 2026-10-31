@@ -6,12 +6,14 @@ enforce. Installing a package does not select the workflow for another project,
 transfer that project's records, or grant Git or GitHub authority. Projects that
 already keep older records leave those records in place.
 
-OpenSpec's own CLI and native workflows remain a separate prerequisite. This
-repository does not vendor them. Use Node 22+, Git and OpenSpec 1.15.0. Review
-upstream packages before executing them. Select a profile that contains the
-verification workflow (for example Claude's `/opsx:verify`). That workflow is
-advisory. It is not an `openspec verify` CLI command and it does not block
-archival by itself.
+OpenSpec's own CLI and native workflows remain a separate prerequisite. Follow
+[Install the upstream OpenSpec prerequisites](openspec-installation.md) for the
+authoritative seven-skill inventory, host-specific installation/enablement and
+loading checks. This repository does not vendor them. Use Node 22+, Git and
+OpenSpec 1.15.0. Review upstream packages before executing them. Verification is
+a mandatory setup skill but an advisory workflow: `/openspec-verify-change` for
+a direct Claude skill, or `/opsx:verify` only with that command adapter installed.
+It is not an `openspec verify` CLI command and does not block archival by itself.
 
 The picture and the field-notes walk-through below are unexecuted examples.
 Displaying them grants no Git or GitHub authority.
@@ -201,24 +203,34 @@ Parallel changes are two of these pictures at once, in separate checkouts.
 They share neither an index nor a `tasks.md`. A parent issue may list both
 links. It does not own either task list.
 
-Host spelling differs. The pinned OpenSpec docs use `/opsx:propose` as the
-canonical command. Hermes loads the same action as `/openspec-propose`.
-`/openspec-apply-change` is the skill exposed as `/opsx:apply` in that command
-spelling. Do not assume one spelling works in every host.
+Host spelling differs. The documented direct-directory Claude Code and Hermes
+routes use `/openspec-<action>` with the exact skill names below. Codex uses
+`/skills` to select the skill or `$openspec-<action>` with the same exact name.
+The `/opsx:*` spelling is valid only when the corresponding generated
+command-adapter files were actually installed (for Claude Code,
+`.claude/commands/opsx/`). A directory skill copy does not install those adapters.
+Do not run `openspec init` in this existing repository just to acquire them.
 
-Core profile, which this document assumes:
+This SDLC assumes all seven setup skills in the
+[authoritative prerequisite inventory](openspec-installation.md#required-upstream-inventory),
+not the upstream six-skill core profile alone. The table maps those actions to
+host invocations; it does not define a separate setup inventory. Examples in this
+document use the direct-directory Claude Code/Hermes spelling; Codex users select
+the same skill through `/skills` or replace the leading `/` with `$`.
 
-| Action | Skill | Command name in the OpenSpec docs |
-| --- | --- | --- |
-| Think before a plan | `/openspec-explore` | `/opsx:explore` |
-| Create the change and its planning artifacts | `/openspec-propose` | `/opsx:propose` |
-| Revise planning artifacts | `/openspec-update-change` | `/opsx:update` |
-| Implement tasks | `/openspec-apply-change` | `/opsx:apply` |
-| Merge accepted delta specs into current specs | `/openspec-sync-specs` | `/opsx:sync` |
-| Move the finished change to the archive | `/openspec-archive-change` | `/opsx:archive` |
+| Action | Direct-directory Claude Code / Hermes | Codex skill mention | Generated adapter only, if installed |
+| --- | --- | --- | --- |
+| Think before a plan | `/openspec-explore` | `$openspec-explore` | `/opsx:explore` |
+| Create the change and its planning artifacts | `/openspec-propose` | `$openspec-propose` | `/opsx:propose` |
+| Revise planning artifacts | `/openspec-update-change` | `$openspec-update-change` | `/opsx:update` |
+| Implement tasks | `/openspec-apply-change` | `$openspec-apply-change` | `/opsx:apply` |
+| Merge accepted delta specs into current specs | `/openspec-sync-specs` | `$openspec-sync-specs` | `/opsx:sync` |
+| Move the finished change to the archive | `/openspec-archive-change` | `$openspec-archive-change` | `/opsx:archive` |
+| Review completeness, correctness and coherence | `/openspec-verify-change` | `$openspec-verify-change` | `/opsx:verify` |
 
-`/openspec-verify-change` (`/opsx:verify`) is an expanded-profile check. It is
-advisory. It does not replace project gates and it does not archive.
+Verification is required at setup but advisory in use. It does not replace project
+gates, independently block archive, or archive the change. It is not an
+`openspec verify` CLI gate.
 
 ## Identity and path conventions
 
@@ -347,12 +359,13 @@ revision.
 The operator asks to explore the pin interaction, then to propose it.
 
 ```text
-/opsx:explore
-/opsx:propose pin-note
+/openspec-explore
+/openspec-propose pin-note
 ```
 
-On Hermes those are `/openspec-explore` (`/opsx:explore`) and `/openspec-propose`
-(`/opsx:propose`). The selected project policy generates the suffix first. The
+These use the direct-directory Claude Code/Hermes spelling; on Codex select the
+same skills through `/skills` or use `$openspec-explore` and `$openspec-propose pin-note`.
+The selected project policy generates the suffix first. The
 propose workflow creates change `pin-note-01arz3ndektsv4rrffq69g5fav` and writes
 its proposal, delta spec, design, and `tasks.md`. The selected proposal policy includes one
 documentation issue; without that bounded authority the link remains pending.
@@ -444,7 +457,7 @@ It selects task group 1 from the actual tasks and approval, not this example.
 The branch is `change/pin-note-01arz3ndektsv4rrffq69g5fav`.
 Keep it through specification, implementation and review.
 
-The implementer follows `/openspec-apply-change` (`/opsx:apply`) for that
+The implementer follows `/openspec-apply-change` for that
 group and reports commands, paths, and results. The orchestrator checks the
 matching boxes in `tasks.md` only after verifying that implementation evidence.
 Include those ticks in the final frozen commit before independent review; a later
@@ -525,7 +538,7 @@ keep the output. A failed gate keeps the change open. It does not close issue
 
 Before closing the change:
 
-1. `/openspec-sync-specs` (`/opsx:sync`) updates the current `notes` capability spec only if the
+1. `/openspec-sync-specs` updates the current `notes` capability spec only if the
    delta is not already there. Do not reapply a delta over a newer spec. Add the
    project-owned `spec`/capability frontmatter to a newly created current spec;
    keep deltas frontmatter-free and validate links from their final document base.
@@ -536,7 +549,7 @@ Before closing the change:
    the authorized integrated revision and re-run required gates on it before
    recording the receipt. `/git-commit-message` commits the factual receipt as
    its own authorized batch; it names that actually verified revision.
-3. `/openspec-archive-change` (`/opsx:archive`) moves the completed package into
+3. `/openspec-archive-change` moves the completed package into
    the dated archive layout. Continue referring to it as
    `pin-note-01arz3ndektsv4rrffq69g5fav`; no cross-document path rewrite is needed.
    Verify byte-identical movement and re-run metadata/upstream checks. Current
@@ -712,6 +725,22 @@ model configuration, and a supported host. Package installation does not create
 those roles.
 
 ## Verification
+
+Changes to required skills or their prerequisite relationships, CLI/runtime
+versions, companion dependencies or supported installation routes include the
+affected current documentation updates in the same change, before completion,
+not a follow-up. The author assesses and updates inventories, required/optional
+distinctions, commands, version/source pins, host prerequisites,
+installation/enablement/update/removal guidance, verification steps, counts and
+cross-links. The reviewer compares the resulting prerequisites/dependencies with
+the instructions and actual gate/probe evidence; stale, missing or contradictory
+affected guidance blocks completion before integration/publication. Rerun
+affected verification after the final edit. See the
+[maintenance contract](openspec-installation.md#keep-prerequisites-and-instructions-in-the-same-change).
+This is an author/reviewer obligation, not automated enforcement. Do not rewrite
+archived plans/evidence or infer uninstall/installed-profile modification
+authority from a prerequisite removal; retain backup, collision and scanner
+boundaries.
 
 Run `npm test` and `npm run build`. Tests cover Git fixtures, package inventories
 and native-copy collision safety. Artifact validation does not prove model

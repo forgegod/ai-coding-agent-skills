@@ -8,6 +8,12 @@ The process is [OpenSpec plus these companion skills](docs/openspec-workflow.md)
 
 OpenSpec propose, apply, sync and archive own the change package and current behavior specs. This repository does not vendor those actions.
 
+Before using the workflow, follow [Install the upstream OpenSpec prerequisites](docs/openspec-installation.md):
+CLI **1.15.0**, Node **22+**, Git, and **seven required upstream workflow skills**,
+including advisory verification. The guide separates Hermes profile enablement,
+Claude account uploads versus Code execution, and Codex user-global setup.
+The five packages below are companions, not a replacement for those prerequisites.
+
 | Skill | What it adds |
 | --- | --- |
 | [openspec-delivery](skills/software-development/openspec-delivery/SKILL.md) | Automatic workspace setup, bounded execution and verified closeout. |
@@ -29,7 +35,7 @@ GitHub issues and pull requests document and review. They are not the task list 
 
 Installing these packages does not select the workflow for another project, transfer that project's records, or grant Git or GitHub authority.
 
-Start here: [Claude Desktop (no terminal)](#install-with-claude-desktop) ·
+Companion installation: [Claude Desktop (no terminal)](#install-with-claude-desktop) ·
 [Hermes](#install-with-hermes) ·
 [Other agents / advanced directory installation](#advanced-native-directory-installation).
 
@@ -74,6 +80,8 @@ different tools. Git/worktree workflows need a capable coding host and project a
 they are not made runnable in ordinary Chat merely by installing a skill.
 
 See [Claude installation, updates, compatibility, and verification](docs/claude-installation.md).
+Install the [separate upstream prerequisites](docs/openspec-installation.md#claude-desktop-account-uploads-and-cowork)
+as well; our marketplace and downloads do not include them.
 Primary sources: [Anthropic's plugin installation guide](https://claude.com/docs/plugins/overview)
 and [custom skill installation](https://support.claude.com/en/articles/12512180-use-skills-in-claude).
 
@@ -126,8 +134,10 @@ hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-co
 hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/capability-wireframes" --category software-development
 ```
 
-OpenSpec's CLI and native workflows remain separate prerequisites. No command above
-selects that workflow for a project or grants execution authority.
+OpenSpec's CLI and native workflows remain [separate prerequisites](docs/openspec-installation.md#hermes-selected-profile-scanning-and-enablement).
+Check all seven installed/enabled upstream skills in the intended profile; the
+four-package example above installs companions only. No command above selects
+that workflow for a project or grants execution authority.
 
 Source edits do not update installed copies. After an authorized publication,
 install through the normal hub and start a new session, or use the reviewed local
