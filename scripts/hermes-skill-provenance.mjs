@@ -34,6 +34,21 @@ export function checkRegistration(lock, skill) {
   }
 }
 
+async function persistLock(lock, data) {
+  if (await readLock(lock.file) !== lock.raw) throw new Error(`Hermes hub lock changed during installation: ${lock.file}`);
+  const raw = JSON.stringify(data, null, 2) + "\n";
+  await mkdir(path.dirname(lock.file), { recursive: true });
+  const temporary = path.join(path.dirname(lock.file), `.lock-${randomUUID()}.json`);
+  try {
+    await writeFile(temporary, raw, { flag: "wx", mode: 0o600 });
+    await rename(temporary, lock.file);
+    lock.raw = raw;
+    lock.data = data;
+  } finally {
+    await rm(temporary, { force: true });
+  }
+}
+
 export async function localContentHash(directory, files) {
   // Matches tools.skills_guard.content_hash: POSIX paths, NUL, raw bytes,
   // case-sensitive lexical ordering, first 16 SHA-256 hex digits.
@@ -62,17 +77,16 @@ export async function recordLocalInstall(lock, skill, directory) {
     installed_at: lock.data.installed[skill.name]?.installed_at ?? now,
     updated_at: now,
   };
-  if (await readLock(lock.file) !== lock.raw) throw new Error(`Hermes hub lock changed during installation: ${lock.file}`);
   const data = { ...lock.data, installed: { ...lock.data.installed, [skill.name]: entry } };
-  const raw = JSON.stringify(data, null, 2) + "\n";
-  await mkdir(path.dirname(lock.file), { recursive: true });
-  const temporary = path.join(path.dirname(lock.file), `.lock-${randomUUID()}.json`);
-  try {
-    await writeFile(temporary, raw, { flag: "wx", mode: 0o600 });
-    await rename(temporary, lock.file);
-    lock.raw = raw;
-    lock.data = data;
-  } finally {
-    await rm(temporary, { force: true });
-  }
+  await persistLock(lock, data);
+}
+
+export async function removeRegistration(lock, skill) {
+  checkRegistration(lock, skill);
+  const previous = lock.data.installed[skill.name];
+  if (previous === undefined) return undefined;
+  const installed = { ...lock.data.installed };
+  delete installed[skill.name];
+  await persistLock(lock, { ...lock.data, installed });
+  return previous;
 }

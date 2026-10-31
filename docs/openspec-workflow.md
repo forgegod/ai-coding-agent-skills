@@ -75,9 +75,11 @@ and [continuation](../skills/software-development/openspec-delivery/references/c
 The canonical lifecycle package is `openspec-delivery`; `openspec-change-integration`
 is no longer distributed. Installed copies are unchanged by source edits. Do not
 load old and new lifecycle instructions together. A separate operator-authorized
-installation/retirement must preserve local customizations and old hub registration;
-the local installer does not interpret a new package name as permission to delete
-an old installed package. No running shared-profile skill removes itself.
+installation/retirement must preserve local customizations and old hub registration.
+The local installer never interprets a new package name as deletion permission;
+only its explicit reviewed `--purge` manifest can retire a matching old package,
+after preserving the package and matching registration in a backup. No running
+shared-profile skill removes itself.
 
 ## Lifecycle picture
 

@@ -138,7 +138,7 @@ resolve local edits/name collisions explicitly rather than forcing replacement.
 On a first install, `--yes` answers the install confirmation only, after operator
 authorization; it does not bypass scanning or resolve existing-copy conflicts.
 
-### Copy every local package to Hermes profiles
+### Copy every local package to global agent profiles
 
 Run these commands from the reviewed repository checkout. Local installation
 copies this checkout's bytes and registers the public source for future updates;
@@ -152,16 +152,26 @@ it does not download the published version or start a skill workflow.
 | Install missing packages and replace existing copies with backups | `npm run install:local -- --update` | Reviewed checkout |
 | Update registered packages in one profile | `hermes -p <profile> skills update` | Published internet sources |
 
-The local commands default to all recognized profiles, not just the active profile.
-Use `--profile <name>` to limit that scope; `--all` makes the default explicit and
-cannot be combined with `--profile`. `--hermes-home <path>` selects an alternate
-base containing the default profile and `profiles/`; it is not a named profile's
-home. The local installer does not infer this base from the session's HERMES_HOME.
+The local commands default to all recognized profiles, not just the active profile,
+plus detected user-global Claude Code and Codex installations. An existing
+`~/.claude` receives packages under `~/.claude/skills/<skill-name>/`; an existing
+`~/.codex` or `~/.agents` receives them under `~/.agents/skills/<skill-name>/`.
+An absent client is left untouched. The installer never writes a project skill directory.
+Project paths such as `$PWD/.claude/skills` and `$PWD/.agents/skills` stay untouched.
+
+Use `--profile <name>` to limit the run to Hermes profiles, or `--client
+claude-code` / `--client codex` to limit it to detected global native clients.
+Selectors may be combined; `--all` makes the unfiltered default explicit and
+cannot be combined with either selector. `--hermes-home <path>` selects an
+alternate base containing the default profile and `profiles/`; `--user-home <path>`
+selects the user home used for native-client detection. Neither path is a named
+profile home, and the installer does not infer its Hermes base from HERMES_HOME.
 
 #### Install or refresh local packages
 
 For a reviewed checkout on the local machine, the repository script copies all
-five complete packages to the default profile and every recognized named profile:
+five complete packages to the default profile, every recognized named profile,
+and detected user-global Claude Code/Codex targets:
 
 ```sh
 npm run install:local
@@ -174,45 +184,74 @@ base `~/.hermes` profile explicitly:
 npm run install:local -- --profile hermes-dev --profile default
 ```
 
+To install only into a detected global native client, use its client selector:
+
+```sh
+npm run install:local -- --client claude-code
+npm run install:local -- --client codex
+```
+
 Install missing packages and update existing packages across all recognized
-profiles, including `openspec-delivery`:
+targets, including `openspec-delivery`:
 
 ```sh
 npm run install:local -- --update --dry-run
 npm run install:local -- --update
 ```
 
-Use `--profile <name>` (repeatable) to limit updates, just as for installation.
-Without `--update`, existing package destinations are refused. Both modes preserve
-the canonical category/package paths under each profile's `skills/` directory
-and ignore bare directories that Hermes does not recognize as profiles.
+Use `--profile <name>` or `--client <name>` (both repeatable) to limit updates,
+just as for installation. Without `--update`, existing package destinations are
+refused. Hermes copies preserve canonical category/package paths; native clients
+use their global flat `<skill-name>/` directory. Bare Hermes directories and absent
+native client configurations are ignored.
 
 Update replaces each complete package, removing obsolete support files from the
 installed copy. Before replacement it moves the entire previous package—including
-local edits—to `<profile-home>/.skills-backups/<batch>/<category>/<skill>` and
-prints each backup path. Unrelated skills and profile configuration are untouched.
-Backups stay outside skill discovery and are not automatically deleted. To recover
-local edits, compare or restore from the printed backup after stopping the agent.
+local edits—to `<target-home>/.skills-backups/<batch>/...` and prints each backup
+path. Unrelated skills and profile configuration are untouched. Backups stay
+outside skill discovery and are not automatically deleted. To recover local edits,
+compare or restore from the printed backup after stopping the affected agent.
 
-Source validation and destination preflight cover all selected profiles; symlink
+#### Retire historical packages
+
+The installer does not remove historical packages by default. After reviewing the
+dry run and stopping affected agents, `--purge` retires only these package names
+from the main-to-current catalog transition: `application-records`,
+`phased-plan-closeout`, `phased-plan-design`, `phased-plan-execution`,
+`phased-plan-next`, `phased-plan-overview`, and `phased-plan-refactoring`.
+It never infers a retirement from a missing current package and leaves all other
+skills alone.
+
+```sh
+npm run install:local -- --update --purge --dry-run
+npm run install:local -- --update --purge
+```
+
+Each retired package is moved into the target backup batch. The backup records a retired Hermes registration before removing a matching project-owned lock entry.
+A conflicting registration from another source aborts without deleting it. Native
+client copies have no Hermes lock entry to remove.
+
+Source validation and destination preflight cover all selected targets; symlink
 destinations/parents and source overlap are refused. All copies are staged before
-replacing installed packages. This is not an all-profiles transaction: a runtime
+replacing installed packages. This is not an all-targets transaction: a runtime
 failure can leave earlier packages updated; inspect the error and backups before
 retrying. `--dry-run` previews install/update counts without creating copies or
-backups. Stop agents using the selected profiles and avoid concurrent installers
+backups. Stop agents using the selected targets and avoid concurrent installers
 or source edits during updates; start fresh sessions afterwards.
 
 This is a direct local copy for a checkout you have reviewed; it does **not** run
-the Hermes Skills Hub security scanner or establish scanner approval. Use the
-normal `hermes skills install` workflow above when that scanner-managed install
-path is required.
+the Hermes Skills Hub security scanner, establish scanner approval, or make Claude
+Code/Codex execution capabilities equivalent to Hermes. Use the normal `hermes
+skills install` workflow above when that scanner-managed installation path is
+required.
 
-Local installations also register each package in the selected profile's Hermes
-`skills/.hub/lock.json`, pointing to this repository's public well-known endpoint. Registration
-records the exact locally installed hash and category, with `local-checkout`
-metadata and an `unscanned` verdict—not a fabricated scan attestation. Existing
-unrelated registrations are preserved; conflicting sources/paths or malformed
-locks are refused rather than silently reassigned.
+Hermes installations also register each package in the selected profile's
+`skills/.hub/lock.json`, pointing to this repository's public well-known endpoint.
+Registration records the exact locally installed hash and category, with
+`local-checkout` metadata and an `unscanned` verdict—not a fabricated scan
+attestation. Claude Code and Codex copies do not create Hermes registrations.
+Existing unrelated registrations are preserved; conflicting sources/paths or
+malformed locks are refused rather than silently reassigned.
 
 #### Migrate existing local copies to internet updates
 
@@ -226,8 +265,9 @@ npm run install:local -- --update --profile hermes-dev
 
 This replaces the package files, preserves the previous packages in backups, and
 registers the new installed-content baseline. There is no registration-only mode.
-Without `--profile`, the same migration applies to every recognized profile.
-Start a fresh session after installation. Later, use the normal internet updater:
+Without selectors, the same migration applies to every recognized target. Start a
+fresh session after installation. Later, use the normal internet updater for the
+Hermes profile copy:
 
 ```sh
 hermes -p hermes-dev skills update

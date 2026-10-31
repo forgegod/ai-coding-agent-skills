@@ -5,6 +5,10 @@ import { fileURLToPath } from "node:url";
 
 const readme = fileURLToPath(new URL("../README.md", import.meta.url));
 
+function withoutLocalInstaller(source) {
+  return source.replace(/### Copy every local package to global agent profiles\n[\s\S]*?(?=### Run the autonomous implementation-review goal)/, "");
+}
+
 test("Claude instructions lead with native GUI installation and cite primary sources", async () => {
   const source = await readFile(readme, "utf8");
   const section = source.split("## Install with Claude Desktop\n")[1]?.split("\n## ")[0];
@@ -48,13 +52,14 @@ test("all launch examples carry the same bounded operator authorization", async 
 
 test("normal installer loop documents all generic software-development skills", async () => {
   const source = await readFile(readme, "utf8");
+  const withoutRetirementManifest = withoutLocalInstaller(source);
   const loop = source.match(/^for skill in (.+); do$/m)?.[1]?.split(/\s+/);
   assert.ok(loop, "document a normal installer loop");
   assert.equal(loop.length, 4);
   assert.deepEqual(loop, ["openspec-delivery", "openspec-next", "git-commit-message", "capability-wireframes"]);
   assert.match(source, /four-package example/);
   assert.match(source, /collection of \*\*five\*\* categorized Agent Skills packages/);
-  assert.doesNotMatch(source, /phased-plan-next/);
+  assert.doesNotMatch(withoutRetirementManifest, /phased-plan-next/);
 });
 
 test("OpenSpec installation and orchestration use the explicitly selected workflow", async () => {
@@ -70,7 +75,7 @@ test("OpenSpec installation and orchestration use the explicitly selected workfl
 
 test("local installation docs distinguish source, migration, profile scope, and scanning", async () => {
   const source = await readFile(readme, "utf8");
-  const section = source.split("### Copy every local package to Hermes profiles\n")[1]?.split("### Run the autonomous implementation-review goal")[0];
+  const section = source.split("### Copy every local package to global agent profiles\n")[1]?.split("### Run the autonomous implementation-review goal")[0];
   assert.ok(section);
   assert.match(section, /#### Choose where updates come from/);
   assert.match(section, /#### Migrate existing local copies to internet updates/);
@@ -78,7 +83,18 @@ test("local installation docs distinguish source, migration, profile scope, and 
   assert.match(section, /npm run install:local -- --update --profile hermes-dev\n/);
   assert.match(section, /hermes -p hermes-dev skills update\n/);
   assert.match(section, /all recognized profiles, not just the active profile/);
+  assert.match(section, /detected user-global Claude Code and Codex/i);
+  assert.match(section, /~\/\.claude\/skills/);
+  assert.match(section, /~\/\.agents\/skills/);
+  assert.match(section, /--client claude-code/);
+  assert.match(section, /never writes a project skill directory/i);
   assert.match(section, /--hermes-home/);
+  assert.match(section, /--user-home/);
+  assert.match(section, /--update --purge --dry-run/);
+  assert.match(section, /application-records/);
+  assert.match(section, /phased-plan-refactoring/);
+  assert.match(section, /does not remove historical packages by default/i);
+  assert.match(section, /retired Hermes registration/i);
   assert.match(section, /skills\/\.hub\/lock\.json/);
   assert.match(section, /unscanned/);
   assert.match(section, /\.skills-backups/);
@@ -104,13 +120,14 @@ test("directory-discovery instructions separate installation telemetry from auth
 
 test("autonomous goal documentation distinguishes orchestration from polling", async () => {
   const source = await readFile(readme, "utf8");
+  const withoutRetirementManifest = withoutLocalInstaller(source);
   assert.match(source, /### Run the autonomous implementation-review goal/);
   assert.match(source, /\/goal draft \/openspec-delivery <name>/);
   assert.match(source, /push\/PR\/merge are not/);
   assert.match(source, /supports Herdr only/);
   assert.match(source, /operator sends `\/goal pause`/i);
   assert.match(source, /docs\/openspec-workflow\.md/);
-  assert.doesNotMatch(source, /phased-plan-/);
+  assert.doesNotMatch(withoutRetirementManifest, /phased-plan-/);
   assert.match(source, /#### Start bounded standalone work/);
   assert.match(source, /#### What persists across sessions and machines/);
   assert.match(source, /Scratch logs, patches, and agent reports are temporary evidence only/);
