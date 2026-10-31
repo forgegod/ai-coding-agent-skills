@@ -1,0 +1,36 @@
+schema: spec-driven
+context: |
+  docs/openspec-workflow.md defines the SDLC for this distribution.
+  Native tasks own an authorized change's progress. GitHub issues and pull
+  requests document and review; they are not the task list. Installing skills
+  does not select the workflow for another project or transfer its records.
+  Source work grants no push, live issue creation, or installed-profile update.
+  New change names follow the root AGENTS.md pre-scaffold naming procedure:
+  <slug>-<lowercase-ulid>, generated once by the agent, then reused verbatim.
+  Authorized branches use change/<full-name>; existing names remain unchanged.
+  This context reinforces policy; it is not a pre-creation CLI hook.
+  Follow root AGENTS.md for short delivery/next invocation scope: automatic local
+  workspace/bootstrap/previewed commits for one approved group; finish is the
+  separate named protected-publication/closure authority. Restrictions override
+  defaults; inspect is read-only. Prepare isolated proposal workspace before scaffolding.
+rules:
+  proposal:
+    - State scope, non-goals, compatibility and operator authority explicitly.
+    - Follow docs/openspec-metadata.md; record one verified proposal-time github_issue before approval, or null for a blocked draft. No ticket creation is implied by metadata migration.
+  specs:
+    - State observable requirements with executable acceptance scenarios.
+    - Current specs use identity-only frontmatter with capability, never change or github_issue. Delta specs have no frontmatter because OpenSpec 1.15.0 strict validation rejects it. Recheck metadata after sync/archive.
+  tasks:
+    - Keep independently mergeable changes small; do not recreate a second task table.
+    - Use metadata_version, artifact and exact change frontmatter; no status or progress properties.
+    - Distinguish verified local implementation from unperformed publication/integration.
+operations:
+  apply:
+    guidance:
+      - Only the orchestrator updates task progress and Git; implementers report evidence.
+      - Plan approval is not execution or GitHub write permission.
+  archive:
+    guidance:
+      - Require actual integrated verification and a Git-tracked post-merge receipt.
+      - Never reapply an already-integrated delta over newer capability changes.
+      - This guidance is not enforcement; use explicit authority and integration checks.

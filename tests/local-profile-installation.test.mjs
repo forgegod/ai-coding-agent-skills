@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdir, mkdtemp, readFile, readdir, rm, stat, symlink, writeFile } from "node:fs/promises";
+import fs, { cp, mkdir, mkdtemp, readFile, readdir, rm, stat, symlink, writeFile } from "node:fs/promises";
+import { syncBuiltinESMExports } from "node:module";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,6 +17,7 @@ async function fixture(t) {
   const root = path.join(directory, "repository");
   const source = path.join(root, "skills", "software-development", "demo");
   const hermesHome = path.join(directory, "hermes");
+  const userHome = path.join(directory, "user");
   await mkdir(path.join(source, "references"), { recursive: true });
   await writeFile(path.join(source, "SKILL.md"), "---\nname: demo\ndescription: Demo workflow.\nversion: 1.0.0\n---\n# Demo\n");
   await writeFile(path.join(source, "references", "guide.md"), "Reference material.\n");
@@ -23,7 +25,12 @@ async function fixture(t) {
   await writeFile(path.join(hermesHome, "config.yaml"), "model: {}\n");
   await writeFile(path.join(hermesHome, "profiles", "named", "profile.yaml"), "name: named\n");
   await mkdir(path.join(hermesHome, "profiles", "ignored"));
-  return { directory, root, source, hermesHome };
+  await mkdir(userHome);
+  return { directory, root, source, hermesHome, userHome };
+}
+
+function installOptions(f, overrides = {}) {
+  return { root: f.root, hermesHome: f.hermesHome, userHome: f.userHome, ...overrides };
 }
 
 async function sourceAndDestinationMatch(source, destination) {
@@ -31,9 +38,63 @@ async function sourceAndDestinationMatch(source, destination) {
   assert.deepEqual(await readFile(path.join(destination, "references", "guide.md")), await readFile(path.join(source, "references", "guide.md")));
 }
 
+async function homeIsolationFixture(t) {
+  const f = await fixture(t);
+  const ambientHome = path.join(f.directory, "ambient-user");
+  await mkdir(path.join(ambientHome, ".hermes"), { recursive: true });
+  await writeFile(path.join(ambientHome, ".hermes", "config.yaml"), "model: {}\n");
+  for (const home of [ambientHome, f.userHome]) {
+    await mkdir(path.join(home, ".claude"));
+    await mkdir(path.join(home, ".codex"));
+  }
+  return { ...f, ambientHome };
+}
+
+test("an explicit home root alone isolates API installation to its target family", async (t) => {
+  for (const option of ["hermesHome", "userHome"]) await t.test(option, async (t) => {
+    const f = await homeIsolationFixture(t);
+    t.mock.method(os, "homedir", () => f.ambientHome);
+
+    const result = await installLocalSkills({ root: f.root, [option]: f[option] });
+
+    assert.deepEqual(result.profiles.map(({ name }) => name), option === "hermesHome" ? ["default", "named"] : []);
+    assert.deepEqual(result.clients.map(({ name }) => name), option === "userHome" ? ["claude-code", "codex"] : []);
+    for (const directory of [".hermes", ".claude", ".codex", ".agents"]) {
+      await assert.rejects(stat(path.join(f.ambientHome, directory, "skills")), { code: "ENOENT" });
+    }
+    for (const entry of result.plan) await sourceAndDestinationMatch(f.source, entry.destination);
+  });
+});
+
+test("CLI home-root isolation applies to --all and explicit selectors opt in to other targets", async (t) => {
+  const f = await homeIsolationFixture(t);
+  const hermes = ["--hermes-home", f.hermesHome];
+  const user = ["--user-home", f.userHome];
+  const profiles = ["default", "named"];
+  const clients = ["claude-code", "codex"];
+  const cases = [
+    [[], ["default", ...clients]],
+    [hermes, profiles],
+    [[...hermes, "--all"], profiles],
+    [user, clients],
+    [[...user, "--all"], clients],
+    [[...hermes, "--client", "codex"], ["codex"]],
+    [[...user, "--profile", "default"], ["default"]],
+    [[...hermes, "--profile", "named", "--client", "codex"], ["named", "codex"]],
+    [[...user, "--profile", "default", "--client", "claude-code"], ["default", "claude-code"]],
+    [[...hermes, ...user], [...profiles, ...clients]],
+  ];
+  for (const [args, expected] of cases) await t.test(args.join(" ") || "default roots", () => {
+    const output = execFileSync(process.execPath, [script, ...args, "--dry-run"], {
+      cwd: f.root, encoding: "utf8", env: { ...process.env, HOME: f.ambientHome, USERPROFILE: f.ambientHome },
+    });
+    assert.deepEqual([...output.matchAll(/Would install 5 skill packages into ([\w-]+)\./g)].map((match) => match[1]), expected);
+  });
+});
+
 test("installs every complete package into default and recognized named profiles", async (t) => {
   const f = await fixture(t);
-  const result = await installLocalSkills({ root: f.root, hermesHome: f.hermesHome });
+  const result = await installLocalSkills(installOptions(f));
 
   assert.deepEqual(result.profiles.map((profile) => profile.name), ["default", "named"]);
   assert.equal(result.copied, 2);
@@ -46,9 +107,235 @@ test("installs every complete package into default and recognized named profiles
   await assert.rejects(stat(path.join(f.hermesHome, "profiles", "ignored", "skills")));
 });
 
+test("installs complete packages into existing global Claude Code and Codex directories", async (t) => {
+  const f = await fixture(t);
+  await mkdir(path.join(f.userHome, ".claude"));
+  await mkdir(path.join(f.userHome, ".codex"));
+
+  const result = await installLocalSkills(installOptions(f));
+
+  assert.deepEqual(result.clients.map((client) => client.name), ["claude-code", "codex"]);
+  for (const destination of [path.join(f.userHome, ".claude", "skills", "demo"), path.join(f.userHome, ".agents", "skills", "demo")]) {
+    await sourceAndDestinationMatch(f.source, destination);
+  }
+  await assert.rejects(stat(path.join(f.root, ".claude", "skills")));
+  await assert.rejects(stat(path.join(f.root, ".agents", "skills")));
+});
+
+test("omits absent native clients without creating their configuration directories", async (t) => {
+  const f = await fixture(t);
+
+  const result = await installLocalSkills(installOptions(f));
+
+  assert.deepEqual(result.clients, []);
+  await assert.rejects(stat(path.join(f.userHome, ".claude")));
+  await assert.rejects(stat(path.join(f.userHome, ".agents")));
+});
+
+test("limits native installation to an explicitly selected detected client", async (t) => {
+  const f = await fixture(t);
+  await mkdir(path.join(f.userHome, ".claude"));
+  await mkdir(path.join(f.userHome, ".codex"));
+
+  const result = await installLocalSkills(installOptions(f, { clients: ["codex"] }));
+
+  assert.deepEqual(result.profiles, []);
+  assert.deepEqual(result.clients.map((client) => client.name), ["codex"]);
+  await sourceAndDestinationMatch(f.source, path.join(f.userHome, ".agents", "skills", "demo"));
+  await assert.rejects(stat(path.join(f.userHome, ".claude", "skills", "demo")));
+  await assert.rejects(stat(path.join(f.hermesHome, "skills", "software-development", "demo")));
+});
+
+test("preflights a native client collision before changing Hermes profiles", async (t) => {
+  const f = await fixture(t);
+  const collision = path.join(f.userHome, ".claude", "skills", "demo");
+  await mkdir(collision, { recursive: true });
+  await writeFile(path.join(collision, "SKILL.md"), "Operator edits.\n");
+
+  await assert.rejects(installLocalSkills(installOptions(f)), /claude-code: demo/);
+
+  assert.equal(await readFile(path.join(collision, "SKILL.md"), "utf8"), "Operator edits.\n");
+  await assert.rejects(stat(path.join(f.hermesHome, "skills", "software-development", "demo")));
+});
+
+test("native client dry runs write nothing and explicit updates preserve full backups", async (t) => {
+  const f = await fixture(t);
+  await mkdir(path.join(f.userHome, ".claude"));
+  const options = installOptions(f, { clients: ["claude-code"] });
+  const destination = path.join(f.userHome, ".claude", "skills", "demo");
+
+  const preview = await installLocalSkills({ ...options, dryRun: true });
+  assert.equal(preview.copied, 0);
+  await assert.rejects(stat(destination));
+
+  await installLocalSkills(options);
+  await writeFile(path.join(destination, "references", "guide.md"), "Local edits.\n");
+  await writeFile(path.join(destination, "obsolete.md"), "Removed upstream.\n");
+  const result = await installLocalSkills({ ...options, update: true });
+
+  assert.equal(result.installed, 0);
+  assert.equal(result.updated, 1);
+  assert.equal(result.backups.length, 1);
+  await sourceAndDestinationMatch(f.source, destination);
+  assert.equal(await readFile(path.join(result.backups[0].path, "references", "guide.md"), "utf8"), "Local edits.\n");
+  assert.equal(await readFile(path.join(result.backups[0].path, "obsolete.md"), "utf8"), "Removed upstream.\n");
+});
+
+test("purges only the seven historical packages with explicit authority and preserves their backup", async (t) => {
+  const f = await fixture(t);
+  const historical = [
+    "application-records",
+    "phased-plan-closeout",
+    "phased-plan-design",
+    "phased-plan-execution",
+    "phased-plan-next",
+    "phased-plan-overview",
+    "phased-plan-refactoring",
+  ];
+  const skills = path.join(f.hermesHome, "skills", "software-development");
+  for (const name of historical) {
+    const directory = path.join(skills, name);
+    await mkdir(directory, { recursive: true });
+    await writeFile(path.join(directory, "SKILL.md"), `---\nname: ${name}\ndescription: Historical workflow.\nversion: 1.0.0\n---\n# Historical\n`);
+  }
+  await writeFile(path.join(skills, "phased-plan-next", "local-notes.md"), "Preserve local edits.\n");
+  const unrelated = path.join(f.hermesHome, "skills", "software-development", "personal-workflow");
+  await mkdir(unrelated);
+  await writeFile(path.join(unrelated, "SKILL.md"), "Personal skill.\n");
+  const registration = {
+    source: "well-known",
+    identifier: "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/phased-plan-next",
+    install_path: "software-development/phased-plan-next",
+  };
+  await mkdir(path.join(f.hermesHome, "skills", ".hub"), { recursive: true });
+  await writeFile(path.join(f.hermesHome, "skills", ".hub", "lock.json"), JSON.stringify({ version: 1, installed: { "phased-plan-next": registration } }));
+  const options = installOptions(f, { profiles: ["default"] });
+
+  await installLocalSkills(options);
+  for (const name of historical) await stat(path.join(skills, name));
+
+  const preview = await installLocalSkills({ ...options, update: true, purge: true, dryRun: true });
+  assert.equal(preview.purged, 0);
+  assert.deepEqual(preview.purgePlan.map((entry) => entry.legacy.name), historical);
+  for (const name of historical) await stat(path.join(skills, name));
+
+  const result = await installLocalSkills({ ...options, update: true, purge: true });
+
+  assert.equal(result.purged, historical.length);
+  assert.deepEqual(result.purgePlan.map((entry) => entry.legacy.name), historical);
+  for (const name of historical) await assert.rejects(stat(path.join(skills, name)));
+  assert.equal(await readFile(path.join(unrelated, "SKILL.md"), "utf8"), "Personal skill.\n");
+  const packageBackup = result.backups.find((backup) => backup.skill === "phased-plan-next" && backup.target === "default");
+  assert.equal(await readFile(path.join(packageBackup.path, "local-notes.md"), "utf8"), "Preserve local edits.\n");
+  const registrationBackup = result.backups.find((backup) => backup.kind === "retired-registration" && backup.skill === "phased-plan-next");
+  assert.deepEqual(JSON.parse(await readFile(registrationBackup.path, "utf8")), registration);
+  const lock = JSON.parse(await readFile(path.join(f.hermesHome, "skills", ".hub", "lock.json"), "utf8"));
+  assert.equal(lock.installed["phased-plan-next"], undefined);
+});
+
+test("purge rollback reports only preserved backups and warns of earlier partial changes", async (t) => {
+  for (const failure of ["registration backup", "registration removal"]) await t.test(failure, async (t) => {
+    const f = await fixture(t);
+    const options = installOptions(f, { profiles: ["default"] });
+    await installLocalSkills(options);
+    const skills = path.join(f.hermesHome, "skills", "software-development");
+    await writeFile(path.join(skills, "demo", "SKILL.md"), "Local demo edits.\n");
+    for (const name of ["application-records", "phased-plan-next"]) {
+      await mkdir(path.join(skills, name));
+      await writeFile(path.join(skills, name, "SKILL.md"), `Local ${name} edits.\n`);
+    }
+    const lockFile = path.join(f.hermesHome, "skills", ".hub", "lock.json");
+    const lock = JSON.parse(await readFile(lockFile, "utf8"));
+    const registration = {
+      source: "well-known",
+      identifier: "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/phased-plan-next",
+      install_path: "software-development/phased-plan-next",
+    };
+    lock.installed["phased-plan-next"] = registration;
+    await writeFile(lockFile, JSON.stringify(lock));
+
+    // Fail deterministically at real I/O boundaries, before or after the
+    // registration backup exists; the package has already been moved away.
+    const originalWriteFile = fs.writeFile;
+    let registrationBackup;
+    t.mock.method(fs, "writeFile", async (file, ...args) => {
+      if (String(file).includes(`${path.sep}retired-hermes-registrations${path.sep}`)) {
+        registrationBackup = file;
+        if (failure === "registration backup") throw new Error("Injected registration backup failure");
+      } else if (registrationBackup && path.basename(file).startsWith(".lock-")) {
+        throw new Error("Injected registration removal failure");
+      }
+      return originalWriteFile(file, ...args);
+    });
+    syncBuiltinESMExports();
+    t.after(() => { t.mock.restoreAll(); syncBuiltinESMExports(); });
+
+    let stopped;
+    await assert.rejects(installLocalSkills({ ...options, update: true, purge: true }), (error) => {
+      stopped = error;
+      assert.equal(error.cause.message, `Injected ${failure} failure`);
+      return true;
+    });
+    await sourceAndDestinationMatch(f.source, path.join(skills, "demo"));
+    await assert.rejects(stat(path.join(skills, "application-records")), { code: "ENOENT" });
+    assert.equal(await readFile(path.join(skills, "phased-plan-next", "SKILL.md"), "utf8"), "Local phased-plan-next edits.\n");
+    assert.deepEqual(JSON.parse(await readFile(lockFile, "utf8")).installed["phased-plan-next"], registration);
+    const batch = path.dirname(path.dirname(path.dirname(registrationBackup)));
+    await assert.rejects(stat(path.join(batch, "software-development", "phased-plan-next")), { code: "ENOENT" });
+
+    await t.test("only existing backup paths are reported", async () => {
+      const reported = stopped.message.split("Preserved backup locations: ")[1].split(", ");
+      const expected = ["demo", "application-records"].map((name) => path.join(batch, "software-development", name));
+      if (failure === "registration removal") expected.push(registrationBackup);
+      assert.deepEqual(reported, expected);
+      for (const file of reported) await stat(file);
+      assert.equal(await readFile(path.join(expected[0], "SKILL.md"), "utf8"), "Local demo edits.\n");
+      assert.equal(await readFile(path.join(expected[1], "SKILL.md"), "utf8"), "Local application-records edits.\n");
+      if (failure === "registration removal") assert.deepEqual(JSON.parse(await readFile(registrationBackup, "utf8")), registration);
+    });
+    await t.test("failure text includes earlier purges", () => {
+      assert.match(stopped.message, /Earlier packages may already be installed, updated, or purged\./);
+    });
+  });
+});
+
+test("purge refuses a historical package with another Hermes source registration", async (t) => {
+  const f = await fixture(t);
+  const destination = path.join(f.hermesHome, "skills", "software-development", "phased-plan-next");
+  await mkdir(destination, { recursive: true });
+  await writeFile(path.join(destination, "SKILL.md"), "Historical package.\n");
+  await mkdir(path.join(f.hermesHome, "skills", ".hub"), { recursive: true });
+  await writeFile(path.join(f.hermesHome, "skills", ".hub", "lock.json"), JSON.stringify({
+    version: 1,
+    installed: { "phased-plan-next": { source: "github", identifier: "other/project", install_path: "software-development/phased-plan-next" } },
+  }));
+
+  await assert.rejects(installLocalSkills(installOptions(f, { profiles: ["default"], purge: true })), /Conflicting Hermes hub registration/);
+
+  await stat(destination);
+});
+
+test("purge uses a flat native client path and leaves no Hermes registration", async (t) => {
+  const f = await fixture(t);
+  await mkdir(path.join(f.userHome, ".claude"));
+  const destination = path.join(f.userHome, ".claude", "skills", "phased-plan-next");
+  await mkdir(destination, { recursive: true });
+  await writeFile(path.join(destination, "SKILL.md"), "Historical package.\n");
+  await writeFile(path.join(destination, "local-notes.md"), "Preserve native edits.\n");
+
+  const result = await installLocalSkills(installOptions(f, { clients: ["claude-code"], purge: true }));
+
+  assert.equal(result.purged, 1);
+  await assert.rejects(stat(destination));
+  const backup = result.backups.find((entry) => entry.kind === "retired-package");
+  assert.equal(await readFile(path.join(backup.path, "local-notes.md"), "utf8"), "Preserve native edits.\n");
+  assert.equal(result.backups.some((entry) => entry.kind === "retired-registration"), false);
+  await assert.rejects(stat(path.join(f.userHome, ".claude", "skills", ".hub")));
+});
+
 test("limits installation to explicitly selected profiles", async (t) => {
   const f = await fixture(t);
-  const result = await installLocalSkills({ root: f.root, hermesHome: f.hermesHome, profiles: ["named"] });
+  const result = await installLocalSkills(installOptions(f, { profiles: ["named"] }));
 
   assert.deepEqual(result.profiles.map((profile) => profile.name), ["named"]);
   assert.equal(result.copied, 1);
@@ -63,7 +350,7 @@ test("preflights collisions across every selected profile before copying", async
   await writeFile(path.join(existing, "SKILL.md"), "Operator edits.\n");
 
   await assert.rejects(
-    installLocalSkills({ root: f.root, hermesHome: f.hermesHome }),
+    installLocalSkills(installOptions(f)),
     /Refusing to overwrite existing skill packages:[\s\S]*default: software-development\/demo/,
   );
   assert.equal(await readFile(path.join(existing, "SKILL.md"), "utf8"), "Operator edits.\n");
@@ -78,14 +365,28 @@ test("CLI accepts repeated --profile arguments and reports a dry run", async (t)
     { cwd: f.root, encoding: "utf8" },
   );
 
-  assert.match(output, /Would install 10 skill packages into default\./);
-  assert.match(output, /Would install 10 skill packages into named\./);
+  assert.match(output, /Would install 5 skill packages into default\./);
+  assert.match(output, /Would install 5 skill packages into named\./);
   await assert.rejects(stat(path.join(f.hermesHome, "profiles", "named", "skills", "software-development", "demo")));
+});
+
+test("CLI installs only a selected detected native client", async (t) => {
+  const f = await fixture(t);
+  await mkdir(path.join(f.userHome, ".codex"));
+  const output = execFileSync(
+    process.execPath,
+    [script, "--hermes-home", f.hermesHome, "--user-home", f.userHome, "--client", "codex", "--dry-run"],
+    { cwd: f.root, encoding: "utf8" },
+  );
+
+  assert.match(output, /Would install 5 skill packages into codex\./);
+  await assert.rejects(stat(path.join(f.userHome, ".agents", "skills", "demo")));
+  await assert.rejects(stat(path.join(f.hermesHome, "skills", "software-development", "demo")));
 });
 
 test("update replaces complete packages, backs up local edits, and installs missing skills", async (t) => {
   const f = await fixture(t);
-  await installLocalSkills({ root: f.root, hermesHome: f.hermesHome, profiles: ["default"] });
+  await installLocalSkills(installOptions(f, { profiles: ["default"] }));
   const destination = path.join(f.hermesHome, "skills", "software-development", "demo");
   await writeFile(path.join(destination, "references", "guide.md"), "Local edits.\n");
   await writeFile(path.join(destination, "obsolete.md"), "Removed upstream.\n");
@@ -93,7 +394,7 @@ test("update replaces complete packages, backs up local edits, and installs miss
   await mkdir(unrelated);
   await writeFile(path.join(unrelated, "SKILL.md"), "Unrelated user skill.\n");
 
-  const result = await installLocalSkills({ root: f.root, hermesHome: f.hermesHome, update: true });
+  const result = await installLocalSkills(installOptions(f, { update: true }));
   assert.equal(result.installed, 1);
   assert.equal(result.updated, 1);
   assert.equal(result.copied, 2);
@@ -106,30 +407,30 @@ test("update replaces complete packages, backs up local edits, and installs miss
   assert.equal(await readFile(path.join(unrelated, "SKILL.md"), "utf8"), "Unrelated user skill.\n");
 });
 
-test("CLI update supports dry-run and updates all ten complete packages in selected scratch profiles", async (t) => {
+test("CLI update supports dry-run and updates all five complete packages in selected scratch profiles", async (t) => {
   const f = await fixture(t);
   const args = [script, "--hermes-home", f.hermesHome, "--profile", "default", "--profile", "named"];
   execFileSync(process.execPath, args, { encoding: "utf8" });
   for (const home of [f.hermesHome, path.join(f.hermesHome, "profiles", "named")]) {
-    const obsolete = path.join(home, "skills/software-development/phased-plan-next/scripts");
+    const obsolete = path.join(home, "skills/software-development/git-commit-message/scripts");
     await mkdir(obsolete, { recursive: true });
     await writeFile(path.join(obsolete, "handoff.mjs"), "Obsolete dispatch helper.\n");
     await writeFile(path.join(obsolete, "herdr-pane-state.mjs"), "Obsolete pane monitor.\n");
   }
   const before = await readdir(f.hermesHome);
   const preview = execFileSync(process.execPath, [...args, "--update", "--dry-run"], { encoding: "utf8" });
-  assert.match(preview, /Would install 0 and update 10 skill packages in default/);
-  assert.match(preview, /Would install 0 and update 10 skill packages in named/);
+  assert.match(preview, /Would install 0 and update 5 skill packages in default/);
+  assert.match(preview, /Would install 0 and update 5 skill packages in named/);
   assert.deepEqual(await readdir(f.hermesHome), before);
   const output = execFileSync(process.execPath, [...args, "--update"], { encoding: "utf8" });
-  assert.match(output, /Installed 0 and updated 10 skill packages in default/);
-  assert.match(output, /Installed 0 and updated 10 skill packages in named/);
+  assert.match(output, /Installed 0 and updated 5 skill packages in default/);
+  assert.match(output, /Installed 0 and updated 5 skill packages in named/);
   assert.match(output, /Backup:/);
   for (const home of [f.hermesHome, path.join(f.hermesHome, "profiles", "named")]) {
-    const source = fileURLToPath(new URL("../skills/software-development/phased-plan-next/SKILL.md", import.meta.url));
-    const destination = path.join(home, "skills/software-development/phased-plan-next");
-    assert.deepEqual(await readFile(path.join(destination, "SKILL.md")), await readFile(source));
-    assert.deepEqual(await readdir(destination), ["SKILL.md"]);
+    const sourceDir = fileURLToPath(new URL("../skills/software-development/git-commit-message/", import.meta.url));
+    const destination = path.join(home, "skills/software-development/git-commit-message");
+    assert.deepEqual(await readFile(path.join(destination, "SKILL.md")), await readFile(path.join(sourceDir, "SKILL.md")));
+    assert.equal(await stat(path.join(destination, "scripts")).then(() => true, () => false), false);
     assert.ok((await readdir(home)).every((name) => !name.startsWith(".skills-staging-")));
   }
 });
@@ -148,7 +449,7 @@ test("update preflights symlink destinations and backup parents before changing 
         await mkdir(destination, { recursive: true });
         await writeFile(path.join(destination, "SKILL.md"), "Local copy");
       }
-      await assert.rejects(installLocalSkills({ root: f.root, hermesHome: f.hermesHome, update: true }), /symlink/);
+      await assert.rejects(installLocalSkills(installOptions(f, { update: true })), /symlink/);
       assert.deepEqual(await readdir(outside), []);
       await assert.rejects(stat(path.join(f.hermesHome, "profiles/named/skills")));
     });
@@ -159,13 +460,13 @@ test("installer refuses destinations overlapping canonical skill source", async 
   const f = await fixture(t);
   await writeFile(path.join(f.root, "config.yaml"), "model: {}\n");
   const before = await readFile(path.join(f.source, "SKILL.md"));
-  await assert.rejects(installLocalSkills({ root: f.root, hermesHome: f.root, update: true }), /overlap/);
+  await assert.rejects(installLocalSkills(installOptions(f, { hermesHome: f.root, update: true })), /overlap/);
   assert.deepEqual(await readFile(path.join(f.source, "SKILL.md")), before);
 });
 
 test("local installs register the public update source and the exact installed hash without scanner claims", async (t) => {
   const f = await fixture(t);
-  await installLocalSkills({ root: f.root, hermesHome: f.hermesHome });
+  await installLocalSkills(installOptions(f));
   for (const home of [f.hermesHome, path.join(f.hermesHome, "profiles", "named")]) {
     const lock = JSON.parse(await readFile(path.join(home, "skills/.hub/lock.json"), "utf8"));
     const entry = lock.installed.demo;
@@ -186,7 +487,7 @@ test("local installs register the public update source and the exact installed h
 
 test("updates refresh provenance, preserve unrelated entries, and dry-run leaves the lock unchanged", async (t) => {
   const f = await fixture(t);
-  const options = { root: f.root, hermesHome: f.hermesHome, profiles: ["default"] };
+  const options = installOptions(f, { profiles: ["default"] });
   await installLocalSkills(options);
   const file = path.join(f.hermesHome, "skills/.hub/lock.json");
   const old = JSON.parse(await readFile(file, "utf8"));
@@ -220,7 +521,7 @@ test("malformed, unsupported and conflicting hub records fail before any profile
     const directory = path.join(f.hermesHome, "profiles/named/skills/.hub");
     await mkdir(directory, { recursive: true });
     await writeFile(path.join(directory, "lock.json"), raw);
-    await assert.rejects(installLocalSkills({ root: f.root, hermesHome: f.hermesHome, update: true }), /hub lock|hub registration/);
+    await assert.rejects(installLocalSkills(installOptions(f, { update: true })), /hub lock|hub registration/);
     await assert.rejects(stat(path.join(f.hermesHome, "skills")));
     assert.equal(await readFile(path.join(directory, "lock.json"), "utf8"), raw);
   });
@@ -232,13 +533,13 @@ test("hub lock symlinks are refused without modifying their target", async (t) =
   await writeFile(target, '{"version":1,"installed":{}}');
   await mkdir(path.join(f.hermesHome, "skills/.hub"), { recursive: true });
   await symlink(target, path.join(f.hermesHome, "skills/.hub/lock.json"));
-  await assert.rejects(installLocalSkills({ root: f.root, hermesHome: f.hermesHome }), /symlink/);
+  await assert.rejects(installLocalSkills(installOptions(f)), /symlink/);
   assert.equal(await readFile(target, "utf8"), '{"version":1,"installed":{}}');
 });
 
 test("registration refuses a hub lock changed by another writer", async (t) => {
   const f = await fixture(t);
-  const result = await installLocalSkills({ root: f.root, hermesHome: f.hermesHome, profiles: ["default"] });
+  const result = await installLocalSkills(installOptions(f, { profiles: ["default"] }));
   const lock = await loadHubLock(f.hermesHome);
   const changed = JSON.stringify({ ...lock.data, external_writer: true });
   await writeFile(lock.file, changed);

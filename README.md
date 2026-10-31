@@ -1,6 +1,33 @@
 # AI Coding Agent Skills
 
-Portable engineering workflows for AI coding agents. This repository owns the skill sources and their static distribution endpoint; adopting projects own their DOX contracts, product behavior, and change progress.
+Portable engineering workflows for AI coding agents that use OpenSpec. This repository owns the companion skill sources and their static distribution endpoint. Adopting projects own their product behavior. OpenSpec owns specification and task progress.
+
+## SDLC
+
+The process is [OpenSpec plus these companion skills](docs/openspec-workflow.md).
+
+OpenSpec propose, apply, sync and archive own the change package and current behavior specs. This repository does not vendor those actions.
+
+| Skill | What it adds |
+| --- | --- |
+| [openspec-delivery](skills/software-development/openspec-delivery/SKILL.md) | Automatic workspace setup, bounded execution and verified closeout. |
+| [openspec-next](skills/software-development/openspec-next/SKILL.md) | Find and advance the next approved local task group; inspect mode is read-only. |
+| [git-commit-message](skills/software-development/git-commit-message/SKILL.md) | Logical batches, a preview, and exact staging. Commit authority stays explicit. |
+| [capability-wireframes](skills/software-development/capability-wireframes/SKILL.md) | Stable HTML/PNG review for a primary human-facing surface. |
+| [autonomous-implementation-review](skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md) | Optional fresh implementer and read-only reviewer for one task group. |
+
+Independent OpenSpec changes may be specified and implemented in parallel, one orchestrator and one checkout each. A dependent implementation waits for the prerequisite's integrated revision. Overlapping capability specs are reconciled explicitly.
+
+With the project's [naming policy](docs/openspec-workflow.md#change-names-and-branches)
+selected, `/openspec-propose add-dark-mode` stays short: the agent generates
+`add-dark-mode-<lowercase-ulid>` once and reuses it for the change folder and the
+authorized `change/<full-name>` branch. Existing names stay unchanged; ambiguous
+short names require selection. This is project instruction, not a stock OpenSpec
+hook or an installed-profile modification.
+
+GitHub issues and pull requests document and review. They are not the task list and not an execution lock. Under the explicitly selected [metadata policy](docs/openspec-metadata.md), a new proposal includes one authorized documentation issue before approval; offline drafts keep a null link. PR creation remains separately authorized. Do not invent a ticket. Identity-only YAML frontmatter supports Dataview without copying progress or PR state.
+
+Installing these packages does not select the workflow for another project, transfer that project's records, or grant Git or GitHub authority.
 
 Start here: [Claude Desktop (no terminal)](#install-with-claude-desktop) ·
 [Hermes](#install-with-hermes) ·
@@ -10,16 +37,11 @@ Start here: [Claude Desktop (no terminal)](#install-with-claude-desktop) ·
 
 | Skill | Purpose |
 | --- | --- |
-| [autonomous-implementation-review](skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md) | Bounded implementation and independent review loop. |
-| [application-records](skills/software-development/application-records/SKILL.md) | Canonical CAP/CHG lifecycle and evidence. |
-| [capability-wireframes](skills/software-development/capability-wireframes/SKILL.md) | CAP-linked HTML/PNG visual handoff. |
+| [openspec-delivery](skills/software-development/openspec-delivery/SKILL.md) | Workspace, candidate review, recovery and protected closeout when authorized. |
+| [openspec-next](skills/software-development/openspec-next/SKILL.md) | Grounded continuation without a long operator prompt. |
 | [git-commit-message](skills/software-development/git-commit-message/SKILL.md) | Dependency-aware logical Git batches, a preview before apply (or autonomous execution), and tiered Conventional Commit messages. |
-| [phased-plan-design](skills/software-development/phased-plan-design/SKILL.md) | Design restart-safe CHG phases. |
-| [phased-plan-execution](skills/software-development/phased-plan-execution/SKILL.md) | Execute and prove one CHG phase. |
-| [phased-plan-closeout](skills/software-development/phased-plan-closeout/SKILL.md) | Integrate a verified phase and hand off the next goal. |
-| [phased-plan-overview](skills/software-development/phased-plan-overview/SKILL.md) | Inspect active changes and select work to resume. |
-| [phased-plan-next](skills/software-development/phased-plan-next/SKILL.md) | Select one active CHG and present its bounded goal. |
-| [phased-plan-refactoring](skills/software-development/phased-plan-refactoring/SKILL.md) | Split or resequence work at verified boundaries. |
+| [capability-wireframes](skills/software-development/capability-wireframes/SKILL.md) | Stable HTML/PNG visual handoff for a human-facing surface. |
+| [autonomous-implementation-review](skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md) | Bounded implementation and independent review loop. |
 
 ## Install with Claude Desktop
 
@@ -28,12 +50,13 @@ or hidden-folder copying is needed for installation.
 
 1. Open **Customize → Plugins → Add → Add marketplace**.
 2. Choose **Add from a repository** and enter `forgegod/ai-coding-agent-skills`.
-3. Select **software-development**, review its contents, and click **Add**.
+3. Select **openspec-development**, review its contents, and click **Add**.
 4. Start a new conversation or task and check that its skills appear in the skill picker.
 
-This installs the nine general engineering skills. **autonomous-orchestration**
-is a separate, optional plugin: review it and its execution prerequisites before
-adding it. Neither plugin installs execution roles or changes permissions.
+This installs delivery, next-step execution, commits and wireframes. It does not install OpenSpec
+or its CLI. **autonomous-orchestration** is a separate optional plugin: review it
+and its host/role prerequisites before adding it. Neither plugin installs
+execution roles, transfers another project's records, or changes permissions.
 
 Prefer a file upload? The [download page](https://forgegod.github.io/ai-coding-agent-skills/downloads/index.html)
 offers ready-made plugin ZIPs and individual skill ZIPs. Upload a plugin with
@@ -69,36 +92,42 @@ hermes skills search https://forgegod.github.io/ai-coding-agent-skills/
 Install an individual skill and its advertised support files through the well-known adapter:
 
 ```sh
-hermes skills install well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/application-records --category software-development
+hermes skills install well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery --category software-development
 ```
 
 To target a named profile, add `-p <profile>`; for example:
 
 ```sh
-hermes -p hermes-dev skills install well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/application-records --category software-development
+hermes -p hermes-dev skills install well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery --category software-development
 ```
 
-Install the nine generic software-development skills (POSIX shell; omit `-p hermes-dev` to use the active profile):
+Install the workflow skills (POSIX shell; omit `-p hermes-dev` to use the active profile):
 
 ```sh
-for skill in application-records capability-wireframes git-commit-message phased-plan-design phased-plan-execution phased-plan-closeout phased-plan-overview phased-plan-next phased-plan-refactoring; do
+for skill in openspec-delivery openspec-next git-commit-message capability-wireframes; do
   hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/$skill" --category software-development || break
 done
 ```
 
 `autonomous-implementation-review` is published separately because it can coordinate editing
 agents and worktrees. Review its complete package before installing it; the normal
-nine-package example does not establish scanner approval for it:
+four-package example does not establish scanner approval for it:
 
 ```sh
 hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/autonomous-implementation-review" --category autonomous-ai-agents
 ```
 
-`phased-plan-next` is read-only and included in the generic loop. It selects an
-explicit or unambiguous active CHG and prints the bounded goal; it never submits
-it, resets a session, or monitors a pane. Overview inspects and prints no launch
-command. Executing the displayed goal separately requires the related execution,
-closeout, and autonomous orchestration skills.
+The commands use the published endpoint, not this checkout:
+
+```sh
+hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery" --category software-development
+hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-next" --category software-development
+hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/git-commit-message" --category software-development
+hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/capability-wireframes" --category software-development
+```
+
+OpenSpec's CLI and native workflows remain separate prerequisites. No command above
+selects that workflow for a project or grants execution authority.
 
 Source edits do not update installed copies. After an authorized publication,
 install through the normal hub and start a new session, or use the reviewed local
@@ -109,11 +138,12 @@ resolve local edits/name collisions explicitly rather than forcing replacement.
 On a first install, `--yes` answers the install confirmation only, after operator
 authorization; it does not bypass scanning or resolve existing-copy conflicts.
 
-### Copy every local package to Hermes profiles
+### Copy every local package to global agent profiles
 
 Run these commands from the reviewed repository checkout. Local installation
-copies this checkout's bytes and registers the public source for future updates;
-it does not download the published version or start a skill workflow.
+copies this checkout's bytes to every selected target. Only selected Hermes
+profiles register the public source for future Hermes updates; local installation
+does not download the published version or start a skill workflow.
 
 #### Choose where updates come from
 
@@ -123,16 +153,37 @@ it does not download the published version or start a skill workflow.
 | Install missing packages and replace existing copies with backups | `npm run install:local -- --update` | Reviewed checkout |
 | Update registered packages in one profile | `hermes -p <profile> skills update` | Published internet sources |
 
-The local commands default to all recognized profiles, not just the active profile.
-Use `--profile <name>` to limit that scope; `--all` makes the default explicit and
-cannot be combined with `--profile`. `--hermes-home <path>` selects an alternate
-base containing the default profile and `profiles/`; it is not a named profile's
-home. The local installer does not infer this base from the session's HERMES_HOME.
+The local commands default to all recognized profiles, not just the active profile,
+plus detected user-global Claude Code and Codex installations. An existing
+`~/.claude` receives packages under `~/.claude/skills/<skill-name>/`; an existing
+`~/.codex` or `~/.agents` receives them under `~/.agents/skills/<skill-name>/`.
+An absent client is left untouched. The installer never writes a project skill directory.
+Project paths such as `$PWD/.claude/skills` and `$PWD/.agents/skills` stay untouched.
+
+Use `--profile <name>` to limit the run to Hermes profiles, or `--client
+claude-code` / `--client codex` to limit it to detected global native clients.
+Selectors may be combined; `--all` selects every recognized target within the
+home-root scope below and cannot be combined with either selector.
+`--hermes-home <path>` selects an alternate base containing the default profile
+and `profiles/`; `--user-home <path>`
+selects the user home used for native-client detection. Neither path is a named
+profile home, and the installer does not infer its Hermes base from HERMES_HOME.
+
+Without selectors, one explicit home root isolates the run to that family:
+`--hermes-home` alone selects only Hermes profiles, and `--user-home` alone selects
+only native clients. This also applies with `--all`. Supply both roots to enable
+both families under those roots; with neither override, both families use their
+normal user-home defaults. Explicit `--profile` / `--client` selectors take
+precedence and select only their named targets, including opting in to the other
+family. If that family's root is omitted, it uses the real user's default home
+location; `--user-home` does not relocate the Hermes base. For fully isolated
+scratch runs covering both families, supply both home roots.
 
 #### Install or refresh local packages
 
 For a reviewed checkout on the local machine, the repository script copies all
-ten complete packages to the default profile and every recognized named profile:
+five complete packages to the default profile, every recognized named profile,
+and detected user-global Claude Code/Codex targets:
 
 ```sh
 npm run install:local
@@ -145,45 +196,74 @@ base `~/.hermes` profile explicitly:
 npm run install:local -- --profile hermes-dev --profile default
 ```
 
+To install only into a detected global native client, use its client selector:
+
+```sh
+npm run install:local -- --client claude-code
+npm run install:local -- --client codex
+```
+
 Install missing packages and update existing packages across all recognized
-profiles, including `phased-plan-next`:
+targets, including `openspec-delivery`:
 
 ```sh
 npm run install:local -- --update --dry-run
 npm run install:local -- --update
 ```
 
-Use `--profile <name>` (repeatable) to limit updates, just as for installation.
-Without `--update`, existing package destinations are refused. Both modes preserve
-the canonical category/package paths under each profile's `skills/` directory
-and ignore bare directories that Hermes does not recognize as profiles.
+Use `--profile <name>` or `--client <name>` (both repeatable) to limit updates,
+just as for installation. Without `--update`, existing package destinations are
+refused. Hermes copies preserve canonical category/package paths; native clients
+use their global flat `<skill-name>/` directory. Bare Hermes directories and absent
+native client configurations are ignored.
 
 Update replaces each complete package, removing obsolete support files from the
 installed copy. Before replacement it moves the entire previous package—including
-local edits—to `<profile-home>/.skills-backups/<batch>/<category>/<skill>` and
-prints each backup path. Unrelated skills and profile configuration are untouched.
-Backups stay outside skill discovery and are not automatically deleted. To recover
-local edits, compare or restore from the printed backup after stopping the agent.
+local edits—to `<target-home>/.skills-backups/<batch>/...` and prints each backup
+path. Unrelated skills and profile configuration are untouched. Backups stay
+outside skill discovery and are not automatically deleted. To recover local edits,
+compare or restore from the printed backup after stopping the affected agent.
 
-Source validation and destination preflight cover all selected profiles; symlink
+#### Retire historical packages
+
+The installer does not remove historical packages by default. After reviewing the
+dry run and stopping affected agents, `--purge` retires only these package names
+from the main-to-current catalog transition: `application-records`,
+`phased-plan-closeout`, `phased-plan-design`, `phased-plan-execution`,
+`phased-plan-next`, `phased-plan-overview`, and `phased-plan-refactoring`.
+It never infers a retirement from a missing current package and leaves all other
+skills alone.
+
+```sh
+npm run install:local -- --update --purge --dry-run
+npm run install:local -- --update --purge
+```
+
+Each retired package is moved into the target backup batch. The backup records a retired Hermes registration before removing a matching project-owned lock entry.
+A conflicting registration from another source aborts without deleting it. Native
+client copies have no Hermes lock entry to remove.
+
+Source validation and destination preflight cover all selected targets; symlink
 destinations/parents and source overlap are refused. All copies are staged before
-replacing installed packages. This is not an all-profiles transaction: a runtime
-failure can leave earlier packages updated; inspect the error and backups before
-retrying. `--dry-run` previews install/update counts without creating copies or
-backups. Stop agents using the selected profiles and avoid concurrent installers
+replacing installed packages. This is not an all-targets transaction: a runtime
+failure can leave earlier packages installed, updated, or purged; inspect the
+error and backups before retrying. `--dry-run` previews install/update counts without creating copies or
+backups. Stop agents using the selected targets and avoid concurrent installers
 or source edits during updates; start fresh sessions afterwards.
 
 This is a direct local copy for a checkout you have reviewed; it does **not** run
-the Hermes Skills Hub security scanner or establish scanner approval. Use the
-normal `hermes skills install` workflow above when that scanner-managed install
-path is required.
+the Hermes Skills Hub security scanner, establish scanner approval, or make Claude
+Code/Codex execution capabilities equivalent to Hermes. Use the normal `hermes
+skills install` workflow above when that scanner-managed installation path is
+required.
 
-Local installations also register each package in the selected profile's Hermes
-`skills/.hub/lock.json`, pointing to this repository's public well-known endpoint. Registration
-records the exact locally installed hash and category, with `local-checkout`
-metadata and an `unscanned` verdict—not a fabricated scan attestation. Existing
-unrelated registrations are preserved; conflicting sources/paths or malformed
-locks are refused rather than silently reassigned.
+Hermes installations also register each package in the selected profile's
+`skills/.hub/lock.json`, pointing to this repository's public well-known endpoint.
+Registration records the exact locally installed hash and category, with
+`local-checkout` metadata and an `unscanned` verdict—not a fabricated scan
+attestation. Claude Code and Codex copies do not create Hermes registrations.
+Existing unrelated registrations are preserved; conflicting sources/paths or
+malformed locks are refused rather than silently reassigned.
 
 #### Migrate existing local copies to internet updates
 
@@ -195,18 +275,21 @@ npm run install:local -- --update --profile hermes-dev --dry-run
 npm run install:local -- --update --profile hermes-dev
 ```
 
-This replaces the package files, preserves the previous packages in backups, and
-registers the new installed-content baseline. There is no registration-only mode.
-Without `--profile`, the same migration applies to every recognized profile.
-Start a fresh session after installation. Later, use the normal internet updater:
+This replaces the package files and preserves the previous packages in backups
+for every selected target. Only selected Hermes profiles register the new
+installed-content baseline. There is no registration-only mode. Without selectors,
+replacement and backups apply to every recognized target. Refresh native Claude
+Code/Codex copies by rerunning this local installer with `--update`, not
+`hermes skills update`. Start a fresh session after installation. Later, use the
+normal internet updater for the Hermes profile copy:
 
 ```sh
 hermes -p hermes-dev skills update
-hermes -p hermes-dev skills update phased-plan-next
+hermes -p hermes-dev skills update openspec-delivery
 ```
 
 The first command updates all eligible registered skills in that profile, including
-skills from other sources; the second targets only `phased-plan-next`. Unlike the
+skills from other sources; the second targets only `openspec-delivery`. Unlike the
 local installer, Hermes does not update every profile at once.
 
 Internet updates run Hermes's normal scanner, keep the category, and protect edits made after that
@@ -227,60 +310,35 @@ profile and a real public update; it does not update your live installations.
 ### Run the autonomous implementation-review goal
 
 Use `autonomous-implementation-review` from the orchestrator session, not an
-executor pane. It coordinates implementation and review; it does not replace a
-project's planning records or create a second progress tracker.
+executor pane. It coordinates implementation and review for one authorized
+OpenSpec task group. It does not replace OpenSpec artifacts or create a second
+progress tracker.
 This automated role loop currently supports Herdr only (`HERDR_ENV=1`, selected
-Hermes executor, verified model keys). Outside Herdr, use the portable phase skills
-under an explicitly agreed manual workflow; do not invent a fallback transport.
+Hermes executor, verified model keys). Outside Herdr, stop unless the operator
+sent `code-tab-phase-roles`. Do not invent a fallback transport.
 
-#### Choose the progress authority first
+For a project that explicitly adopts the short-invocation policy, the operator
+sends `/openspec-next` to advance the current approved group, or
+`/openspec-delivery <name>` to select a change. Setup, bootstrap, task updates and
+previewed autonomous local commits are included; push/PR/merge are not. Operator
+restrictions override defaults. `/openspec-next inspect` is read-only.
+`/openspec-delivery finish <name>` separately authorizes protected publication
+and verified receipt/archive/issue closure/clean-worktree retirement for that
+change, not branch deletion, a release or another change. See the SDLC for the
+complete contract. No operator worktree commands are required.
 
-- **Material change with no active CHG:** use `application-records`, then
-  `phased-plan-design`, to create or revise the CHG. Resolve only the outcome or
-  policy decisions that are genuinely unknown; the design skill creates the
-  phase table and gates.
-- **Selected active CHG phase:** use `phased-plan-execution` as the execution
-  authority. The orchestrator reads the CHG, CAPs, and DOX chain for scope,
-  phase gate, and status.
-- **Non-material standalone work:** no CAP/CHG is required. Use a bounded goal
-  with explicit verification and constraints.
-
-#### Start a selected CHG phase
-
-If the active CHG is not already chosen, inspect with `/phased-plan-overview`.
-It remains read-only and prints no launch command. To select a CHG and receive
-the goal, run `/phased-plan-next` or `/phased-plan-next <active-chg-path>`.
-Only after that CHG's phase is selected, it returns the exact bounded command below for the operator to send.
-
-The operator fills the numeric phase ID and literal active CHG path and sends
-this command only if they authorize its listed local Git operations. Displaying
-the template grants no authority. Hermes' `/goal draft` expands the request into
-a persisted completion contract and immediately starts it:
+For a persisted Hermes goal, the optional short form is below. Displaying the
+template grants no authority.
+Hermes' `/goal draft` expands the request into a persisted completion contract
+and immediately starts it:
 
 ```text
-/goal draft Execute only phase <phase-number> of <active-chg-path> using autonomous-implementation-review, phased-plan-execution, and phased-plan-closeout. I authorize the orchestrator to reserve this phase and create its worktree, commit its reviewed implementation, fast-forward the target, commit its completion/archive records, and remove its clean dedicated worktree after verification. Stop after verified target completion and cleanup; do not push or start another phase.
+/goal draft /openspec-delivery <name>
 ```
 
-The agent must load all three named skills, read the selected CHG, linked CAPs, and
-applicable DOX before dispatching. The CHG supplies scope, boundaries, the
-phase gate, and status; add only constraints that are not already recorded.
-Use `/goal show` to inspect the drafted contract. Pause or clear it if it
-materially misstates the CHG.
-
-Resume with the same bounded command only after closeout identifies the existing
-reservation/worktree. A fresh clone lacks local worktree registration; request an
-explicit recovery handoff instead of starting a duplicate. For assessment without
-commit authority, request a read-only assessment, not this completion goal.
-
-#### Present the next goal
-
-Invoke `/phased-plan-next` or `/phased-plan-next <active-chg-path>` to apply
-overview's repository selection and blocker rules and print the filled
-single-phase command above. An omitted CHG is used only when one active record
-is unambiguous. Selection is read-only:
-no session reset, prompt submission, queue-mode change, pane monitoring, or Git
-write is authorized by the invocation. Missing Herdr context does not prevent
-presenting a goal; transport is checked only when execution is requested.
+The agent loads delivery, the configured role-loop skill and selected artifacts before
+dispatching. Use `/goal show` to inspect the drafted contract. Pause or clear it
+if it materially misstates the change.
 
 The operator decides when and where to send the goal. After submission,
 `autonomous-implementation-review` keeps that session as orchestrator and asks
@@ -289,46 +347,25 @@ It owns that role handoff, including fresh-session queue/model setup, visible
 idle/input checks and passive executor monitoring. It never resets or runs a
 worker in the orchestrator pane. A displayed goal grants no execution authority.
 
-#### Close a verified phase
-
-Use `phased-plan-closeout` before dispatch for reservation and after gate/review
-approval for integration. `/phased-plan-closeout --reserve` authorizes the selected
-CHG-only target commit and worktree creation, not implementation/completion commits.
-A governing goal may explicitly authorize both stages.
-The orchestrator is the only Git/CHG writer; executors never stage, commit, or
-edit the CHG path. The skill's read-only Node 22+/Git guard checks committed CHG
-blobs, history, topology, and phase-table cells; it does not infer passed tests
-from prose or discard conflicting edits.
-
-For an explicit one-shot closeout authorization, invoke
-`/phased-plan-closeout --commit-ff`. The flag authorizes committing only the
-reviewed implementation and record completion batches and requires fast-forward
-integration. It does not authorize a missing reservation, a push, bypassed gates,
-or another phase. The command protocol lives only in the closeout skill.
+Publication, a pull request, and merge need separate authorization. The
+[SDLC](docs/openspec-workflow.md) owns that boundary. A pull request documents
+review of the frozen candidate. It is not the task list.
 
 #### Start bounded standalone work
 
-For non-material work, use `/goal draft <concise objective>`. State any required
-verification and constraints in that objective. Do not create a profile-local
-continuation document. If the adopting project requires a durable artifact, use
-only its documented repository-tracked location.
+For work that is not an OpenSpec change, use `/goal draft <concise objective>`.
+State any required verification and constraints in that objective. Do not create
+a profile-local continuation document. If the adopting project requires a durable
+artifact, use only its documented repository-tracked location.
 
 #### What persists across sessions and machines
 
-- `docs/changes/active/CHG-*.md` is the sole mutable authority for a material
-  change: phase, scope, gate, decisions, evidence, and next executable action.
-- For worktree phases, the orchestrator follows `phased-plan-closeout`; executors
-  must not edit or commit the CHG path. Resume a reserved worktree rather than
-  creating a competing status writer.
-- `docs/changes/reviews/CHG-<number>/` may retain a committed, frozen,
-  review-only receipt when the project needs one. It is evidence, never another
-  progress plan.
+- `openspec/changes/<name>/tasks.md` is the sole mutable task authority for the
+  selected change. The orchestrator is the only writer. Executors do not edit it.
+- A GitHub issue or pull request, when the operator asked for one, is a
+  documentation or review record. It is not another plan.
 - Scratch logs, patches, and agent reports are temporary evidence only. They are
   never required to resume work.
-
-The [Hermes workflow research record](docs/research/hermes-autonomous-goal-workflow.md)
-documents the evidence behind this boundary, the existing `/goal draft` option,
-and the future custom-shortcut proposal.
 
 #### Fresh-session busy-input protection
 
@@ -370,7 +407,7 @@ session:
 ```
 
 An agent printing a slash command does not execute it in its own session. Keep
-the CHG and any committed review receipt current so automatic compression and a
+the selected change's `tasks.md` current so automatic compression and a
 later fresh session have grounded task state without replaying full logs or
 diffs.
 
@@ -379,7 +416,7 @@ diffs.
 The well-known endpoint is the preferred, host-independent distribution route. The categorized source packages can also be installed directly:
 
 ```sh
-hermes skills install forgegod/ai-coding-agent-skills/skills/software-development/application-records --category software-development
+hermes skills install forgegod/ai-coding-agent-skills/skills/software-development/openspec-delivery --category software-development
 ```
 
 Other Agent Skills-compatible agents can consume the same SKILL.md packages using their own installation mechanism. Well-known discovery and Hermes-specific metadata support depend on the client.
@@ -409,7 +446,7 @@ git clone https://github.com/forgegod/ai-coding-agent-skills.git ai-coding-agent
 ```
 
 After review, from the directory containing that checkout, define this helper in
-the same shell used for the agent-specific commands below. It copies all ten
+the same shell used for the agent-specific commands below. It copies all five
 package directories, preflights all name collisions, and never overwrites local
 edits.
 
@@ -419,7 +456,7 @@ skills_source="$PWD/ai-coding-agent-skills-review/skills"
 install_reviewed_skills() (
   set -eu
   destination="$1"
-  for package in autonomous-ai-agents/autonomous-implementation-review software-development/application-records software-development/capability-wireframes software-development/git-commit-message software-development/phased-plan-design software-development/phased-plan-execution software-development/phased-plan-closeout software-development/phased-plan-overview software-development/phased-plan-next software-development/phased-plan-refactoring; do
+  for package in autonomous-ai-agents/autonomous-implementation-review software-development/capability-wireframes software-development/git-commit-message software-development/openspec-delivery software-development/openspec-next; do
     skill="${package##*/}"
     test -f "$skills_source/$package/SKILL.md"
     if [ -e "$destination/$skill" ] || [ -L "$destination/$skill" ]; then
@@ -428,7 +465,7 @@ install_reviewed_skills() (
     fi
   done
   mkdir -p "$destination"
-  for package in autonomous-ai-agents/autonomous-implementation-review software-development/application-records software-development/capability-wireframes software-development/git-commit-message software-development/phased-plan-design software-development/phased-plan-execution software-development/phased-plan-closeout software-development/phased-plan-overview software-development/phased-plan-next software-development/phased-plan-refactoring; do
+  for package in autonomous-ai-agents/autonomous-implementation-review software-development/capability-wireframes software-development/git-commit-message software-development/openspec-delivery software-development/openspec-next; do
     skill="${package##*/}"
     cp -R "$skills_source/$package" "$destination/$skill"
   done
@@ -450,15 +487,15 @@ install_reviewed_skills "$HOME/.claude/skills"
 
 For project-only installation, use `install_reviewed_skills "$PWD/.claude/skills"`
 from the target project. Start a fresh Claude Code session, inspect `/` autocomplete
-for `application-records`, or explicitly invoke `/application-records`. Verify the
+for `openspec-delivery`, or explicitly invoke `/openspec-delivery`. Verify the
 loaded skill path and content rather than relying only on the model's claim.
 
 Reference: [Claude Code skills](https://code.claude.com/docs/en/skills).
 
 That copy installs skills only. It does not install Code-tab subagents and does
 not receive Hermes scanner approval for them. Role templates are
-`templates/phase-implementer.md` and `templates/phase-reviewer.md` in the
-overview package. Copy them into the target project's `.claude/agents/` only
+`templates/phase-implementer.md` and `templates/phase-reviewer.md` in
+`autonomous-implementation-review`. Copy them into the target project's `.claude/agents/` only
 after review, and refuse an existing file. Set distinct non-`inherit` `model`
 values and keep the parent session in Manual mode before use. Absence of Herdr
 does not select this path.
@@ -473,7 +510,7 @@ install_reviewed_skills "$HOME/.agents/skills"
 ```
 
 For project-only installation, use `install_reviewed_skills "$PWD/.agents/skills"`
-from the target repository. Open `/skills` or mention `$application-records` in
+from the target repository. Open `/skills` or mention `$openspec-delivery` in
 Codex CLI/the IDE extension. Codex detects skill changes automatically; restart
 if the new entries do not appear. `.agents/skills` is also consumed by some other
 agents, so this location is shared rather than Codex-exclusive.
@@ -489,7 +526,7 @@ install_reviewed_skills "$HOME/.kilo/skills"
 ```
 
 For project-only installation, use `install_reviewed_skills "$PWD/.kilo/skills"`.
-Start a new session or run `/reload`; invoke `/application-records` and inspect
+Start a new session or run `/reload`; invoke `/openspec-delivery` and inspect
 the `skill` tool call to confirm the selected package.
 
 The legacy Kilo Code extension uses `~/.kilocode/skills/` and project
@@ -514,7 +551,7 @@ install_reviewed_skills "${PI_CODING_AGENT_DIR:-$HOME/.pi/agent}/skills"
 
 For project-only installation, use `install_reviewed_skills "$PWD/.pi/skills"`
 from the target project and review its project-trust prompt. Start a new session
-or run `/reload`, then invoke `/skill:application-records`. Pi also discovers
+or run `/reload`, then invoke `/skill:openspec-delivery`. Pi also discovers
 `.agents/skills`; avoid copying the same skill into both locations.
 
 References: [Pi skills](https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/skills.md)
@@ -549,7 +586,7 @@ npx skills add forgegod/ai-coding-agent-skills --list
 After reviewing the selected package, a genuine user installation can use:
 
 ```sh
-npx skills add forgegod/ai-coding-agent-skills --skill application-records --agent claude-code
+npx skills add forgegod/ai-coding-agent-skills --skill openspec-delivery --agent claude-code
 ```
 
 The default scope is the current project; add `--global` for a personal install.
@@ -579,7 +616,7 @@ The verified SkillsLLM site is `https://skillsllm.com`. Its
 [submission page](https://skillsllm.com/submit) requires GitHub OAuth:
 
 1. Sign in as the operator and submit `https://github.com/forgegod/ai-coding-agent-skills`.
-2. Describe it as a collection of **ten** categorized Agent Skills packages and
+2. Describe it as a collection of **five** categorized Agent Skills packages and
    retain the README's installation and security boundaries.
 3. Confirm the platform accepts the collection layout, wait for its scanning and
    catalog policy checks, and read back the resulting listing before claiming success.
@@ -625,16 +662,16 @@ npm run build
 
 Canonical source is `skills/<category>/<name>/`. `dist/` is generated and ignored. The generator emits the complete `.well-known/skills/` inventory, with an explicit file list for each package.
 
-The same build emits `dist/downloads/`: ten complete skill ZIPs, two plugin ZIPs,
+The same build emits `dist/downloads/`: five complete skill ZIPs, two plugin ZIPs,
 an HTML download page, and a JSON inventory with SHA-256 checksums. The checked-in
 `.claude-plugin/marketplace.json` selects canonical source packages directly;
-no generated skill copies are committed. Its two explicit skill lists separate
-general use from opt-in orchestration. Bump the affected plugin's version when
+no generated skill copies are committed. Its explicit skill lists separate the
+OpenSpec companion workflow from opt-in orchestration. Bump every affected plugin's version when
 its bundled content changes. See the [Claude release checks](docs/claude-installation.md#maintainer-verification).
 
 The optional `npm run test:local-update` probe requires the installed `hermes`
 CLI and internet access. It installs all local packages into a disposable scratch
-home, then tests a real public `application-records` update, scanner acceptance,
+home, then tests a real public `git-commit-message` update, scanner acceptance,
 category retention, and local-edit protection. It is not part of offline CI and
 does not touch live profile skills. Prefer a scratch TMPDIR under the existing
 Hermes data root so the CLI can reuse its managed dependency runtime.

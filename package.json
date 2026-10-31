@@ -9,6 +9,8 @@
   },
   "scripts": {
     "test": "node --test tests/*.test.mjs",
+    "validate:openspec": "node scripts/validate-openspec-metadata.mjs",
+    "test:openspec": "node tests/openspec-cli-compatibility.mjs",
     "build": "node scripts/build-distribution.mjs --out dist",
     "install:local": "node scripts/install-local-skills.mjs",
     "test:local-update": "node tests/local-update-integration.mjs",
