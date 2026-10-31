@@ -9,7 +9,7 @@ Maintain portable AI coding-agent playbooks and publish complete Agent Skills pa
 - `skills/` owns categorized skill source and its local DOX contracts.
 - `scripts/` owns deterministic endpoint/ZIP generation and the opt-in release security scan; `tests/` owns executable packaging and guard evidence.
 - `.github/` owns credential-free verification and GitHub Pages deployment with narrowly scoped deployment permissions.
-- Root owns this contract, README, package manifest, license, ignore rules, `.claude-plugin/marketplace.json`, distribution documentation including `docs/claude-installation.md`, the selectable workflow in `docs/openspec-workflow.md`, and project-local `openspec/` change artifacts.
+- Root owns this contract, README, package manifest, license, ignore rules, `.claude-plugin/marketplace.json`, distribution documentation including `docs/claude-installation.md` and the upstream prerequisite guide `docs/openspec-installation.md`, the selectable workflow in `docs/openspec-workflow.md`, and project-local `openspec/` change artifacts.
 
 ## Local Contracts
 
@@ -39,6 +39,7 @@ Maintain portable AI coding-agent playbooks and publish complete Agent Skills pa
 - Tests use synthetic fixtures and local output; live endpoint and installer probes are release checks, not ordinary CI dependencies.
 - Exercise documented native copy commands in isolated scratch homes; do not modify real agent installations while testing documentation or claim client discovery was verified if that client is unavailable.
 - Documentation describes the current design. Git history carries migration history.
+- A change to required OpenSpec skills or their prerequisite relationships, CLI/runtime versions, companion dependencies, or supported installation routes must update all affected current documentation in the same change before completion, not a follow-up. The author owns the impact assessment and synchronized inventories, required/optional distinctions, commands, version/source pins, host prerequisites, installation/enablement/update/removal guidance, verification steps, counts and cross-links in the README and installation/SDLC guides. The reviewer compares these with the resulting prerequisites/dependencies and actual gate/probe evidence; stale, missing or contradictory affected instructions block completion before integration/publication. Rerun affected verification after the final edit. This is a contributor/reviewer obligation, not new automated enforcement. Preserve archived plans/evidence as history; prerequisite removal grants no uninstall or installed-profile modification authority, and existing backup/collision/scanner boundaries remain in force.
 - Operator-facing launch examples state their exact side-effect authority; displaying a template neither executes it nor grants permission. Keep canonical examples synchronized by tests.
 - Operational documentation states the supported SDLC, its execution boundaries, and the companion skills. It does not infer that another project has adopted this workflow from installation.
 

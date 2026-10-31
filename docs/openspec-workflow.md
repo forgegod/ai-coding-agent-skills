@@ -6,12 +6,14 @@ enforce. Installing a package does not select the workflow for another project,
 transfer that project's records, or grant Git or GitHub authority. Projects that
 already keep older records leave those records in place.
 
-OpenSpec's own CLI and native workflows remain a separate prerequisite. This
-repository does not vendor them. Use Node 22+, Git and OpenSpec 1.15.0. Review
-upstream packages before executing them. Select a profile that contains the
-verification workflow (for example Claude's `/opsx:verify`). That workflow is
-advisory. It is not an `openspec verify` CLI command and it does not block
-archival by itself.
+OpenSpec's own CLI and native workflows remain a separate prerequisite. Follow
+[Install the upstream OpenSpec prerequisites](openspec-installation.md) for the
+authoritative seven-skill inventory, host-specific installation/enablement and
+loading checks. This repository does not vendor them. Use Node 22+, Git and
+OpenSpec 1.15.0. Review upstream packages before executing them. Verification is
+a mandatory setup skill but an advisory workflow: `/openspec-verify-change` for
+a direct Claude skill, or `/opsx:verify` only with that command adapter installed.
+It is not an `openspec verify` CLI command and does not block archival by itself.
 
 The picture and the field-notes walk-through below are unexecuted examples.
 Displaying them grants no Git or GitHub authority.
@@ -712,6 +714,22 @@ model configuration, and a supported host. Package installation does not create
 those roles.
 
 ## Verification
+
+Changes to required skills or their prerequisite relationships, CLI/runtime
+versions, companion dependencies or supported installation routes include the
+affected current documentation updates in the same change, before completion,
+not a follow-up. The author assesses and updates inventories, required/optional
+distinctions, commands, version/source pins, host prerequisites,
+installation/enablement/update/removal guidance, verification steps, counts and
+cross-links. The reviewer compares the resulting prerequisites/dependencies with
+the instructions and actual gate/probe evidence; stale, missing or contradictory
+affected guidance blocks completion before integration/publication. Rerun
+affected verification after the final edit. See the
+[maintenance contract](openspec-installation.md#keep-prerequisites-and-instructions-in-the-same-change).
+This is an author/reviewer obligation, not automated enforcement. Do not rewrite
+archived plans/evidence or infer uninstall/installed-profile modification
+authority from a prerequisite removal; retain backup, collision and scanner
+boundaries.
 
 Run `npm test` and `npm run build`. Tests cover Git fixtures, package inventories
 and native-copy collision safety. Artifact validation does not prove model
