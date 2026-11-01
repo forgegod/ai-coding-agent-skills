@@ -1,0 +1,55 @@
+{
+  "items": [
+    {
+      "id": "local-skill-installation",
+      "type": "spec",
+      "valid": true,
+      "issues": [],
+      "durationMs": 5
+    },
+    {
+      "id": "parallel-change-workflow",
+      "type": "change",
+      "valid": true,
+      "issues": [],
+      "durationMs": 33
+    },
+    {
+      "id": "update-openspec-1-16-prerequisites-01m69z5ccp3mt47qa6d7g6bdjr",
+      "type": "change",
+      "valid": true,
+      "issues": [
+        {
+          "level": "INFO",
+          "path": "file",
+          "message": "skip_specs is set in .openspec.yaml: change declares no spec-level behavior changes, zero deltas accepted"
+        }
+      ],
+      "durationMs": 26
+    }
+  ],
+  "summary": {
+    "totals": {
+      "items": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    "byType": {
+      "change": {
+        "items": 2,
+        "passed": 2,
+        "failed": 0
+      },
+      "spec": {
+        "items": 1,
+        "passed": 1,
+        "failed": 0
+      }
+    }
+  },
+  "version": "1.0",
+  "root": {
+    "path": "/home/raphael/src/ai-coding-agent-skills--integrated-update-openspec-1-16-prerequisites-01m69z5ccp3mt47qa6d7g6bdjr",
+    "source": "nearest"
+  }
+}

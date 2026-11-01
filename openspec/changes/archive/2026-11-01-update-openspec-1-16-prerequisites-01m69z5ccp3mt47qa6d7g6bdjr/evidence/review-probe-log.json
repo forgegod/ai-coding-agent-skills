@@ -1,0 +1,113 @@
+[
+  {
+    "args": [
+      "--version"
+    ],
+    "status": 0,
+    "stdout": "1.16.0\n",
+    "stderr": "npm notice\nnpm notice New major version of npm available! 11.19.0 -> 12.2.1\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1\nnpm notice To update run: npm install -g npm@12.2.1\nnpm notice\n"
+  },
+  {
+    "args": [
+      "validate",
+      "--all",
+      "--strict",
+      "--json",
+      "--no-interactive"
+    ],
+    "status": 0,
+    "stdout": "{\n  \"items\": [\n    {\n      \"id\": \"local-skill-installation\",\n      \"type\": \"spec\",\n      \"valid\": true,\n      \"issues\": [],\n      \"durationMs\": 6\n    },\n    {\n      \"id\": \"parallel-change-workflow\",\n      \"type\": \"change\",\n      \"valid\": true,\n      \"issues\": [],\n      \"durationMs\": 27\n    },\n    {\n      \"id\": \"update-openspec-1-16-prerequisites-01m69z5ccp3mt47qa6d7g6bdjr\",\n      \"type\": \"change\",\n      \"valid\": true,\n      \"issues\": [\n        {\n          \"level\": \"INFO\",\n          \"path\": \"file\",\n          \"message\": \"skip_specs is set in .openspec.yaml: change declares no spec-level behavior changes, zero deltas accepted\"\n        }\n      ],\n      \"durationMs\": 21\n    }\n  ],\n  \"summary\": {\n    \"totals\": {\n      \"items\": 3,\n      \"passed\": 3,\n      \"failed\": 0\n    },\n    \"byType\": {\n      \"change\": {\n        \"items\": 2,\n        \"passed\": 2,\n        \"failed\": 0\n      },\n      \"spec\": {\n        \"items\": 1,\n        \"passed\": 1,\n        \"failed\": 0\n      }\n    }\n  },\n  \"version\": \"1.0\",\n  \"root\": {\n    \"path\": \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/repository-copy\",\n    \"source\": \"nearest\"\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "new",
+      "change",
+      "metadata-fixture-01arz3ndektsv4rrffq69g5fav",
+      "--json"
+    ],
+    "status": 0,
+    "stdout": "{\n  \"change\": {\n    \"id\": \"metadata-fixture-01arz3ndektsv4rrffq69g5fav\",\n    \"path\": \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/metadata-fixture-01arz3ndektsv4rrffq69g5fav\",\n    \"metadataPath\": \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/metadata-fixture-01arz3ndektsv4rrffq69g5fav/.openspec.yaml\",\n    \"schema\": \"spec-driven\"\n  },\n  \"root\": {\n    \"path\": \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture\",\n    \"source\": \"nearest\"\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "validate",
+      "metadata-fixture-01arz3ndektsv4rrffq69g5fav",
+      "--strict",
+      "--json"
+    ],
+    "status": 0,
+    "stdout": "{\n  \"items\": [\n    {\n      \"id\": \"metadata-fixture-01arz3ndektsv4rrffq69g5fav\",\n      \"type\": \"change\",\n      \"valid\": true,\n      \"issues\": [],\n      \"durationMs\": 21\n    }\n  ],\n  \"summary\": {\n    \"totals\": {\n      \"items\": 1,\n      \"passed\": 1,\n      \"failed\": 0\n    },\n    \"byType\": {\n      \"change\": {\n        \"items\": 1,\n        \"passed\": 1,\n        \"failed\": 0\n      }\n    }\n  },\n  \"version\": \"1.0\",\n  \"root\": {\n    \"path\": \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture\",\n    \"source\": \"nearest\"\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "validate",
+      "metadata-fixture-01arz3ndektsv4rrffq69g5fav",
+      "--strict",
+      "--json"
+    ],
+    "status": 1,
+    "stdout": "{\n  \"items\": [\n    {\n      \"id\": \"metadata-fixture-01arz3ndektsv4rrffq69g5fav\",\n      \"type\": \"change\",\n      \"valid\": false,\n      \"issues\": [\n        {\n          \"level\": \"WARNING\",\n          \"path\": \"existing/spec.md\",\n          \"line\": 1,\n          \"message\": \"Text above the first \\\"## \\\" section is not carried into the main spec by archive. Move it into a requirement, or into proposal.md or design.md.\"\n        }\n      ],\n      \"durationMs\": 23\n    }\n  ],\n  \"summary\": {\n    \"totals\": {\n      \"items\": 1,\n      \"passed\": 0,\n      \"failed\": 1\n    },\n    \"byType\": {\n      \"change\": {\n        \"items\": 1,\n        \"passed\": 0,\n        \"failed\": 1\n      }\n    }\n  },\n  \"version\": \"1.0\",\n  \"root\": {\n    \"path\": \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture\",\n    \"source\": \"nearest\"\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "instructions",
+      "apply",
+      "--change",
+      "metadata-fixture-01arz3ndektsv4rrffq69g5fav",
+      "--json"
+    ],
+    "status": 0,
+    "stdout": "{\n  \"changeName\": \"metadata-fixture-01arz3ndektsv4rrffq69g5fav\",\n  \"changeDir\": \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/metadata-fixture-01arz3ndektsv4rrffq69g5fav\",\n  \"schemaName\": \"spec-driven\",\n  \"contextFiles\": {\n    \"proposal\": [\n      \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/metadata-fixture-01arz3ndektsv4rrffq69g5fav/proposal.md\"\n    ],\n    \"specs\": [\n      \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/metadata-fixture-01arz3ndektsv4rrffq69g5fav/specs/existing/spec.md\",\n      \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/metadata-fixture-01arz3ndektsv4rrffq69g5fav/specs/fresh/spec.md\"\n    ],\n    \"design\": [\n      \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/metadata-fixture-01arz3ndektsv4rrffq69g5fav/design.md\"\n    ],\n    \"tasks\": [\n      \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/metadata-fixture-01arz3ndektsv4rrffq69g5fav/tasks.md\"\n    ]\n  },\n  \"progress\": {\n    \"total\": 1,\n    \"complete\": 0,\n    \"remaining\": 1\n  },\n  \"tasks\": [\n    {\n      \"id\": \"1\",\n      \"description\": \"1.1 Verify metadata interoperability\",\n      \"done\": false,\n      \"sourcePath\": \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/metadata-fixture-01arz3ndektsv4rrffq69g5fav/tasks.md\",\n      \"line\": 9\n    }\n  ],\n  \"taskTrackingConfigured\": true,\n  \"state\": \"ready\",\n  \"instruction\": \"Read context files, work through pending tasks, mark complete as you go.\\nPause if you hit blockers or need clarification.\",\n  \"root\": {\n    \"path\": \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture\",\n    \"source\": \"nearest\"\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "instructions",
+      "apply",
+      "--change",
+      "metadata-fixture-01arz3ndektsv4rrffq69g5fav",
+      "--json"
+    ],
+    "status": 0,
+    "stdout": "{\n  \"changeName\": \"metadata-fixture-01arz3ndektsv4rrffq69g5fav\",\n  \"changeDir\": \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/metadata-fixture-01arz3ndektsv4rrffq69g5fav\",\n  \"schemaName\": \"spec-driven\",\n  \"contextFiles\": {\n    \"proposal\": [\n      \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/metadata-fixture-01arz3ndektsv4rrffq69g5fav/proposal.md\"\n    ],\n    \"specs\": [\n      \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/metadata-fixture-01arz3ndektsv4rrffq69g5fav/specs/existing/spec.md\",\n      \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/metadata-fixture-01arz3ndektsv4rrffq69g5fav/specs/fresh/spec.md\"\n    ],\n    \"design\": [\n      \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/metadata-fixture-01arz3ndektsv4rrffq69g5fav/design.md\"\n    ],\n    \"tasks\": [\n      \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/metadata-fixture-01arz3ndektsv4rrffq69g5fav/tasks.md\"\n    ]\n  },\n  \"progress\": {\n    \"total\": 1,\n    \"complete\": 1,\n    \"remaining\": 0\n  },\n  \"tasks\": [\n    {\n      \"id\": \"1\",\n      \"description\": \"1.1 Verify metadata interoperability\",\n      \"done\": true,\n      \"sourcePath\": \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/metadata-fixture-01arz3ndektsv4rrffq69g5fav/tasks.md\",\n      \"line\": 9\n    }\n  ],\n  \"taskTrackingConfigured\": true,\n  \"state\": \"all_done\",\n  \"instruction\": \"All tracked tasks are complete.\\nReview or verify the change as appropriate before archiving.\",\n  \"root\": {\n    \"path\": \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture\",\n    \"source\": \"nearest\"\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "archive",
+      "metadata-fixture-01arz3ndektsv4rrffq69g5fav",
+      "--yes",
+      "--json"
+    ],
+    "status": 0,
+    "stdout": "{\n  \"archive\": {\n    \"change\": \"metadata-fixture-01arz3ndektsv4rrffq69g5fav\",\n    \"archivedAs\": \"2026-11-01-metadata-fixture-01arz3ndektsv4rrffq69g5fav\",\n    \"path\": \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture/openspec/changes/archive/2026-11-01-metadata-fixture-01arz3ndektsv4rrffq69g5fav\",\n    \"specsUpdated\": true,\n    \"totals\": {\n      \"added\": 2,\n      \"modified\": 0,\n      \"removed\": 0,\n      \"renamed\": 0\n    }\n  },\n  \"root\": {\n    \"path\": \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture\",\n    \"source\": \"nearest\"\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "validate",
+      "--all",
+      "--strict",
+      "--json",
+      "--no-interactive"
+    ],
+    "status": 0,
+    "stdout": "{\n  \"items\": [\n    {\n      \"id\": \"existing\",\n      \"type\": \"spec\",\n      \"valid\": true,\n      \"issues\": [],\n      \"durationMs\": 6\n    },\n    {\n      \"id\": \"fresh\",\n      \"type\": \"spec\",\n      \"valid\": true,\n      \"issues\": [],\n      \"durationMs\": 1\n    }\n  ],\n  \"summary\": {\n    \"totals\": {\n      \"items\": 2,\n      \"passed\": 2,\n      \"failed\": 0\n    },\n    \"byType\": {\n      \"change\": {\n        \"items\": 0,\n        \"passed\": 0,\n        \"failed\": 0\n      },\n      \"spec\": {\n        \"items\": 2,\n        \"passed\": 2,\n        \"failed\": 0\n      }\n    }\n  },\n  \"version\": \"1.0\",\n  \"root\": {\n    \"path\": \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture\",\n    \"source\": \"nearest\"\n  }\n}\n",
+    "stderr": ""
+  },
+  {
+    "args": [
+      "validate",
+      "--archived",
+      "--json",
+      "--no-interactive"
+    ],
+    "status": 0,
+    "stdout": "{\n  \"items\": [\n    {\n      \"id\": \"2026-11-01-metadata-fixture-01arz3ndektsv4rrffq69g5fav\",\n      \"type\": \"change\",\n      \"valid\": true,\n      \"issues\": [],\n      \"durationMs\": 13\n    }\n  ],\n  \"summary\": {\n    \"totals\": {\n      \"items\": 1,\n      \"passed\": 1,\n      \"failed\": 0\n    },\n    \"byType\": {\n      \"change\": {\n        \"items\": 1,\n        \"passed\": 1,\n        \"failed\": 0\n      }\n    }\n  },\n  \"version\": \"1.0\",\n  \"root\": {\n    \"path\": \"/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/fixture\",\n    \"source\": \"nearest\"\n  }\n}\n",
+    "stderr": ""
+  }
+]

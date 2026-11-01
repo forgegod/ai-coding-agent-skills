@@ -1,0 +1,24 @@
+
+> ai-coding-agent-skills@1.0.0 validate:openspec
+> node scripts/validate-openspec-metadata.mjs
+
+{
+  "ok": true,
+  "files": [
+    "openspec/changes/archive/2026-10-31-document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/design.md",
+    "openspec/changes/archive/2026-10-31-document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/proposal.md",
+    "openspec/changes/archive/2026-10-31-document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/tasks.md",
+    "openspec/changes/archive/2026-10-31-local-client-skill-install-01m6896x3994xcc0erw8jnr15z/design.md",
+    "openspec/changes/archive/2026-10-31-local-client-skill-install-01m6896x3994xcc0erw8jnr15z/proposal.md",
+    "openspec/changes/archive/2026-10-31-local-client-skill-install-01m6896x3994xcc0erw8jnr15z/specs/local-skill-installation/spec.md",
+    "openspec/changes/archive/2026-10-31-local-client-skill-install-01m6896x3994xcc0erw8jnr15z/tasks.md",
+    "openspec/changes/parallel-change-workflow/design.md",
+    "openspec/changes/parallel-change-workflow/proposal.md",
+    "openspec/changes/parallel-change-workflow/specs/openspec-integration/spec.md",
+    "openspec/changes/parallel-change-workflow/tasks.md",
+    "openspec/changes/update-openspec-1-16-prerequisites-01m69z5ccp3mt47qa6d7g6bdjr/design.md",
+    "openspec/changes/update-openspec-1-16-prerequisites-01m69z5ccp3mt47qa6d7g6bdjr/proposal.md",
+    "openspec/changes/update-openspec-1-16-prerequisites-01m69z5ccp3mt47qa6d7g6bdjr/tasks.md",
+    "openspec/specs/local-skill-installation/spec.md"
+  ]
+}

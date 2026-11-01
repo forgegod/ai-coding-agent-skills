@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "change": "update-openspec-1-16-prerequisites-01m69z5ccp3mt47qa6d7g6bdjr",
+  "issueUrl": "https://github.com/forgegod/ai-coding-agent-skills/issues/9",
+  "head": "3947991840394e66f6181fff31d44b882d3fbbef",
+  "base": "4cd6ff73e9a8bf5bc9e1a102a8554b4ccdf96a7a",
+  "plan": "c36a219e4bd74e4fbd73d53597228adfae476fe2",
+  "planDigest": "0c93a4154b5543c59cd72daaccba3db370ed2e99f9f87eb0209232b2a91ac1d6",
+  "verdict": "pass",
+  "findings": [],
+  "reviewer": "Grok 4.7 (xai-oauth); Hermes session local-96a3618398d3a40bfa012c85e4e6414790916da3121c570d63088baa8576d9cb; profile hermes-dev-exec",
+  "reference": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/update-openspec-review-3947991.md",
+  "thisReviewModifiedCandidate": false,
+  "integrationAuthorized": false,
+  "publicationAuthorized": false,
+  "mergeAuthorized": false,
+  "archiveAuthorized": false,
+  "issueClosureAuthorized": false,
+  "acceptanceClaimed": false,
+  "gatesReexecuted": false,
+  "gatesSource": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/update-openspec-review-packet.txt",
+  "gates": [
+    {
+      "command": "npm run test:openspec",
+      "commit": "3947991840394e66f6181fff31d44b882d3fbbef",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/probe-log.json",
+      "outputSha256": "549b082456d12d7dcaef910c4a17af36e0e133fca59036af6b89647fb9f6a151"
+    },
+    {
+      "command": "openspec validate --all --strict --json --no-interactive",
+      "commit": "3947991840394e66f6181fff31d44b882d3fbbef",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-ll5DDY/probe-log.json"
+    },
+    {
+      "command": "npm run validate:openspec",
+      "commit": "3947991840394e66f6181fff31d44b882d3fbbef",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/update-openspec-review-packet.txt"
+    },
+    {
+      "command": "npm test",
+      "commit": "3947991840394e66f6181fff31d44b882d3fbbef",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/update-openspec-review-packet.txt"
+    },
+    {
+      "command": "npm run build",
+      "commit": "3947991840394e66f6181fff31d44b882d3fbbef",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/update-openspec-review-packet.txt"
+    },
+    {
+      "command": "git diff --check",
+      "commit": "3947991840394e66f6181fff31d44b882d3fbbef",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/update-openspec-review-3947991.md"
+    },
+    {
+      "command": "node skills/software-development/openspec-delivery/scripts/change-guard.mjs candidate --repo /home/raphael/src/ai-coding-agent-skills--update-openspec-1-16-prerequisites-01m69z5ccp3mt47qa6d7g6bdjr --change update-openspec-1-16-prerequisites-01m69z5ccp3mt47qa6d7g6bdjr --base 4cd6ff73e9a8bf5bc9e1a102a8554b4ccdf96a7a --head 3947991840394e66f6181fff31d44b882d3fbbef --plan c36a219e4bd74e4fbd73d53597228adfae476fe2 --expect-plan 0c93a4154b5543c59cd72daaccba3db370ed2e99f9f87eb0209232b2a91ac1d6",
+      "commit": "3947991840394e66f6181fff31d44b882d3fbbef",
+      "exitCode": 0,
+      "evidence": "/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/update-openspec-review-3947991-guard.json"
+    }
+  ]
+}

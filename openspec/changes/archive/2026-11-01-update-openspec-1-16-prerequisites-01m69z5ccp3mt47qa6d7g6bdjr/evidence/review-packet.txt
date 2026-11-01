@@ -1,0 +1,35 @@
+Independent read-only review requested.
+
+Change: update-openspec-1-16-prerequisites-01m69z5ccp3mt47qa6d7g6bdjr
+Repository: /home/raphael/src/ai-coding-agent-skills--update-openspec-1-16-prerequisites-01m69z5ccp3mt47qa6d7g6bdjr
+Base: 4cd6ff73e9a8bf5bc9e1a102a8554b4ccdf96a7a
+Candidate: 3947991840394e66f6181fff31d44b882d3fbbef
+Approved-plan commit: c36a219e4bd74e4fbd73d53597228adfae476fe2
+Approved plan digest: 0c93a4154b5543c59cd72daaccba3db370ed2e99f9f87eb0209232b2a91ac1d6
+Issue: https://github.com/forgegod/ai-coding-agent-skills/issues/9
+
+Review only this frozen candidate against the approved scope. Do not edit files,
+update tasks, stage, commit, push, create a PR, merge, archive, install packages,
+or change profiles. Read the diff and relevant artifacts; you may run read-only
+Git inspection and tests if needed. The orchestrator already ran, at the exact
+candidate: npm run test:openspec; openspec validate --all --strict --json
+--no-interactive; npm run validate:openspec; npm test (242 passed); npm run
+build; git diff --check; and candidate guard validation.
+
+Assess correctness, stale/contradictory references, Node-floor scope, probe
+isolation preservation, archive immutability, policy regressions, and test gaps.
+Report findings in severity order with path:line, impact, trigger, and minimal
+correction. If there are no findings, state that plainly.
+
+Write a factual Markdown report to:
+/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/update-openspec-review-3947991.md
+
+Also write a JSON report to:
+/home/raphael/.hermes/profiles/hermes-dev/cache/scratch/update-openspec-review-3947991.json
+
+The JSON must contain schemaVersion 1; exact change, issueUrl, head, and
+planDigest above; reviewer identity; reference pointing to the Markdown report;
+verdict "pass" only if findings is []; and non-empty gates entries. Each gate
+must name a command, use the exact candidate as commit, exitCode 0, and a
+non-empty evidence reference. Do not claim remote publication, merge, archive,
+or acceptance.
