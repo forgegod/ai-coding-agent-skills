@@ -1,0 +1,7 @@
+
+> ai-coding-agent-skills@1.0.0 test:openspec
+> node tests/openspec-cli-compatibility.mjs
+
+New current spec required a project-owned identity header after native spec update.
+PASS: pinned OpenSpec validation, task discovery, spec updates, byte-preserving archive and post-sync metadata validation.
+Probe log: /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/openspec-compatibility-Ith67Q/probe-log.json

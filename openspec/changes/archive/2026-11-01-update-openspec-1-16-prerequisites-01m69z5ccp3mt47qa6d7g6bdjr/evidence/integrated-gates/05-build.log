@@ -1,0 +1,5 @@
+
+> ai-coding-agent-skills@1.0.0 build
+> node scripts/build-distribution.mjs --out dist
+
+Built 5 skills and 2 Claude plugins at /home/raphael/src/ai-coding-agent-skills--integrated-update-openspec-1-16-prerequisites-01m69z5ccp3mt47qa6d7g6bdjr/dist
