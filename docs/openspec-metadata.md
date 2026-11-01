@@ -35,7 +35,7 @@ a capability outlives individual changes. Never copy change/issue metadata from
 a delta into the current spec. Keep OpenSpec's Markdown headings and task syntax.
 `.openspec.yaml` remains OpenSpec-owned; do not duplicate its schema/created fields.
 
-Delta specs deliberately have **no frontmatter**. OpenSpec 1.15.0 strict validation
+Delta specs deliberately have **no frontmatter**. OpenSpec 1.16.0 strict validation
 rejects text above the first `## ` section as content archive will not carry into
 the main spec. The compatibility probe locks in this negative control. Keep native
 delta headings; derive change/capability from their directory paths instead. Do
@@ -81,7 +81,7 @@ metadata hashing exemption and no extra Markdown index.
   issue exists, is in the intended repository, or was authorized; exact GitHub
   readback remains the operator's responsibility.
 - `npm test` runs offline metadata fixtures and checks the actual repository.
-- `npm run test:openspec` is an opt-in pinned OpenSpec 1.15.0 compatibility probe
+- `npm run test:openspec` is an opt-in pinned OpenSpec 1.16.0 compatibility probe
   in an isolated scratch HOME/project. It exercises strict validation, task
   discovery and real spec-update/archive behavior with synthetic completed work.
   It is not validation of real implementation, permission to archive this change,

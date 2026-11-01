@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 import { validateMetadata } from "../scripts/validate-openspec-metadata.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
-const pinned = "1.15.0";
+const pinned = "1.16.0";
 const win32Names = ["SystemRoot", "WINDIR", "ComSpec", "PATHEXT"];
 
 // Minimal platform execution allowlist plus scratch HOME/XDG/telemetry. Nothing else is inherited:

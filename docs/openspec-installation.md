@@ -3,8 +3,9 @@
 This is the prerequisite guide for the [OpenSpec SDLC](openspec-workflow.md), not
 an installer or permission to execute a change. Complete four separate steps:
 
-1. Make OpenSpec CLI **1.15.0**, Node **22+**, and Git available in the actual
-   execution host. A Desktop account upload does not install local executables.
+1. Make OpenSpec CLI **1.16.0** available through its npm package on Node
+   **22.12.0+**, with Git, in the actual execution host. A Desktop account upload
+   does not install local executables.
 2. Install and enable the seven upstream workflows below in the intended host.
 3. Install this repository's [companion packages](../README.md#catalog) separately:
    `openspec-delivery`, `openspec-next`, `git-commit-message`, and
@@ -49,33 +50,33 @@ version mismatch; do not silently upgrade the project's pin. After reviewing and
 authorizing installation into your chosen npm prefix, the pinned npm route is:
 
 ```sh
-npm install --global @fission-ai/openspec@1.15.0
+npm install --global @fission-ai/openspec@1.16.0
 openspec --version
 ```
 
 For disposable checks without changing a global installation:
 
 ```sh
-OPENSPEC_TELEMETRY=0 npx --yes --package=@fission-ai/openspec@1.15.0 openspec --version
+OPENSPEC_TELEMETRY=0 npx --yes --package=@fission-ai/openspec@1.16.0 openspec --version
 ```
 
 `npx` can download code into its cache; it is not a no-network check. The result
-must be `1.15.0`. The package's CLI version and a skill's `metadata.version` are
-not the same version namespace. The v1.15.0 CLI already exposes `context` and
+must be `1.16.0`. The package's CLI version and a skill's `metadata.version` are
+not the same version namespace. The v1.16.0 CLI already exposes `context` and
 `store`; seeing those commands in a skill is not evidence of incompatibility.
 
-Use the [v1.15.0 upstream packages](https://github.com/Fission-AI/OpenSpec/tree/v1.15.0/skills),
-reviewed at commit `8e0288df12d401b0e183e2f47254d22528c1dffb`. In a fresh review
+Use the [v1.16.0 upstream packages](https://github.com/Fission-AI/OpenSpec/tree/v1.16.0/skills),
+reviewed at commit `27c0515724decc633818c735ee596481eec78a8b`. In a fresh review
 directory outside this distribution and outside an agent's installed skills:
 
 ```sh
 # Release source and explicit workflow selection; reuse in the sections below.
 set -eu
 export OPENSPEC_TELEMETRY=0 DISABLE_TELEMETRY=1 DO_NOT_TRACK=1
-OPENSPEC_REF=8e0288df12d401b0e183e2f47254d22528c1dffb
-OPENSPEC_SOURCE="$PWD/openspec-v1.15.0-review"
+OPENSPEC_REF=27c0515724decc633818c735ee596481eec78a8b
+OPENSPEC_SOURCE="$PWD/openspec-v1.16.0-review"
 OPENSPEC_SKILLS='openspec-explore openspec-propose openspec-update-change openspec-apply-change openspec-sync-specs openspec-archive-change openspec-verify-change'
-git clone --depth 1 --branch v1.15.0 https://github.com/Fission-AI/OpenSpec.git "$OPENSPEC_SOURCE"
+git clone --depth 1 --branch v1.16.0 https://github.com/Fission-AI/OpenSpec.git "$OPENSPEC_SOURCE"
 test "$(git -C "$OPENSPEC_SOURCE" rev-parse HEAD)" = "$OPENSPEC_REF"
 git -C "$OPENSPEC_SOURCE" status --short
 for skill in $OPENSPEC_SKILLS; do
@@ -99,7 +100,7 @@ The explicit `skills/` source avoids discovering upstream-maintainer packages
 elsewhere in the checkout. Still select only the seven names above, never
 `--all` or `--skill '*'`. `skills-sh/fission-ai/openspec/<name>` in Hermes and
 `npx skills add Fission-AI/OpenSpec` resolve moving upstream content, not our
-1.15.0 release pin. Directory discovery is neither release compatibility evidence
+1.16.0 release pin. Directory discovery is neither release compatibility evidence
 nor Hermes scanner approval. Optional discovery telemetry is disabled above.
 
 ### What native initialization does
@@ -264,8 +265,9 @@ skills use `/openspec-propose`; do not use that write workflow as an installatio
 smoke test. Ask instead: “Read the installed OpenSpec skill instructions and
 report their paths and prerequisites. Do not create, edit, apply or archive.”
 
-The host needs local OpenSpec 1.15.0, Node 22+, Git, project tools and repository
-permissions. A local directory copy is not a Claude account upload and does not
+The host needs local OpenSpec 1.16.0 through its npm package on Node 22.12.0+,
+Git, project tools and repository permissions. A local directory copy is not a
+Claude account upload and does not
 sync back to the account. Avoid a second account/plugin/directory copy of the
 same skill. Companion plugin namespacing remains separate, for example
 `/openspec-development:openspec-delivery`.
@@ -305,7 +307,7 @@ this packaging step, choose a new output directory outside the source checkout:
 ```sh
 # Local ZIP preparation only; does not upload or install anything.
 export OPENSPEC_SOURCE OPENSPEC_SKILLS
-OPENSPEC_ZIPS="$PWD/openspec-v1.15.0-zips"
+OPENSPEC_ZIPS="$PWD/openspec-v1.16.0-zips"
 export OPENSPEC_ZIPS
 python3 - <<'PY'
 import os
@@ -389,7 +391,7 @@ Updates belong to the route that installed the copy:
   `hermes -p "$PROFILE" skills check <skill-name>`, then explicitly authorize
   `hermes -p "$PROFILE" skills update <skill-name>` after review. A commit-qualified
   URL stays on that commit; update does not choose a newer release. Moving
-  skills.sh sources can advance independently of CLI 1.15.0. Preserve edits and
+  skills.sh sources can advance independently of CLI 1.16.0. Preserve edits and
   registrations before an operator-reviewed source migration; never force it.
 - **Native copies above:** there is no updater registration. Review a new matching
   source revision, back up existing packages outside discovery paths, resolve

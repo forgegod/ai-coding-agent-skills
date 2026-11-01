@@ -9,8 +9,9 @@ already keep older records leave those records in place.
 OpenSpec's own CLI and native workflows remain a separate prerequisite. Follow
 [Install the upstream OpenSpec prerequisites](openspec-installation.md) for the
 authoritative seven-skill inventory, host-specific installation/enablement and
-loading checks. This repository does not vendor them. Use Node 22+, Git and
-OpenSpec 1.15.0. Review upstream packages before executing them. Verification is
+loading checks. This repository does not vendor them. Use OpenSpec 1.16.0 through
+its npm package on Node 22.12.0+, with Git. Review upstream packages before
+executing them. Verification is
 a mandatory setup skill but an advisory workflow: `/openspec-verify-change` for
 a direct Claude skill, or `/opsx:verify` only with that command adapter installed.
 It is not an `openspec verify` CLI command and does not block archival by itself.
