@@ -34,6 +34,13 @@ The documentation issue is a proposal-time risk snapshot. Later reviews and
 outcomes are separately authorized factual records, not blank future evidence
 fields or an editable issue-body permalink presented as an immutable revision.
 
+This legacy change is recovered rather than treated as a new proposal. The accepted
+main baseline is `a85ceff2e461a70fbeca1e8e2abf6ff5fddd7007`, which includes the
+integrated OpenSpec 1.16.0 / Node 22.12.0+ prerequisite change. Reconciliation keeps
+that complete accepted state, including its archived records, while preserving the
+unfinished local Git-environment hardening bytes independently. Earlier approval and
+failed-gate evidence remain historical and cannot approve this successor plan.
+
 New changes in projects selecting this naming convention use a readable slug and
 one lowercase ULID. The agent generates it before upstream proposal scaffolding;
 the operator supplies only the slug. A read-only package helper emits the name,
@@ -55,6 +62,98 @@ target, require successful exact-revision gates and evidence references, and ref
 unverified intervening product changes. Merge ancestry initially requires candidate
 reachability; squash/rebase content mapping is not implemented. No helper authenticates
 a reviewer, verifies GitHub state, runs tests, obtains a lock or grants writes.
+
+## Git child environment and scanner findings
+
+### Context and evidence limits
+
+The retained recovery scan reports four findings in `openspec-delivery` and a
+blocked community verdict. The supplied Secure Git environment feasibility probe
+report is PARTIAL: it reports six passing Node tests, exhaustive UTF-16 code-unit
+and selected multicharacter path comparisons, and a safe two-file prototype scan
+with unchanged `skills-guard-v10` scanner SHA-256
+`2b39ae73585709c51af62cbf8c3f23c5330ca1e297ac01453e9328996e281562`.
+It also reports that rescanning the existing complete packages reproduced all
+four findings. These are attributed scratch results, not production regression,
+full-package success, native Windows/macOS validation or independent review.
+
+The environment presence checks do not demonstrate exfiltration. Broad child
+environment inheritance is the hardening opportunity. The inspected prose and
+hex-escape findings are heuristic false positives, not demonstrated vulnerabilities;
+clarification must retain the original safeguards rather than disguise behavior.
+
+### Decisions
+
+Use one pure, package-local environment constructor for every Git subprocess in
+the evidence and workspace helpers. Inspect inherited names first and reject the
+existing forbidden set even when a value is empty: `GIT_DIR`, `GIT_WORK_TREE`,
+`GIT_COMMON_DIR`, `GIT_INDEX_FILE`, `GIT_OBJECT_DIRECTORY`,
+`GIT_ALTERNATE_OBJECT_DIRECTORIES`, `GIT_NAMESPACE`, `GIT_GRAFT_FILE`,
+`GIT_SHALLOW_FILE`, `GIT_REPLACE_REF_BASE`, `GIT_CONFIG_COUNT` and
+`GIT_CONFIG_PARAMETERS`. Do not read forbidden values to decide presence. Do not
+spread the inherited environment or enumerate its arbitrary values.
+
+Read and forward only present values from this execution allowlist:
+
+- Runtime locations: `PATH`, `HOME`, `XDG_CONFIG_HOME`, `TMPDIR`, `TMP`, `TEMP`.
+- Windows runtime locations: `SystemRoot`, `WINDIR`, `ComSpec`, `PATHEXT`,
+  `USERPROFILE`, `APPDATA`, `LOCALAPPDATA`, only on Windows.
+- Trusted Git configuration selectors: `GIT_CONFIG_GLOBAL`, `GIT_CONFIG_SYSTEM`,
+  `GIT_CONFIG_NOSYSTEM`, on all supported platforms.
+
+Absent configuration selectors stay absent, preserving normal Git configuration
+discovery. Present selectors retain their values, including deliberate empty
+values; Git interprets them. This explicitly differs from the prototype, which
+drops these selectors. Test selector behavior and isolation using synthetic config
+files, not host credentials. On Windows, compare environment names without case
+and reject duplicate aliases for an allowlisted name; use case-sensitive matching
+on Linux/macOS. Never read or forward unrelated credential or execution-injection
+values. Set `GIT_NO_REPLACE_OBJECTS=1`, `GIT_OPTIONAL_LOCKS=0` and `LC_ALL=C`
+independently of inherited values. Preserve the existing Git argument controls,
+including fsmonitor neutralization and disabled optional locks, and all topology,
+replacement-ref/graft, ancestry, identity and dirty-work checks.
+
+Reject broad inheritance because it exposes unnecessary child capabilities.
+Reject silent selector removal because it can re-enable host configuration in
+fixtures that explicitly disabled it. Blanket disabling of global/system config
+would be a different compatibility contract; it is not selected here. PATH,
+home/config locations, selected configuration files and repository configuration
+remain trusted inputs. This does not sandbox Git, make arbitrary config safe or
+claim that all subprocess execution is impossible.
+
+Replace only the workspace control-character regex with the explicit numeric
+predicate for character codes below 32 or equal to 127. Prove equivalence over
+every UTF-16 code unit and representative multicharacter paths, including Unicode.
+Keep absolute/normalized/canonical-path, symlink and overlap checks unchanged.
+Clarify the flagged issue-authorization wording while retaining explicit project
+adoption and bounded issue-write authority. No scanner patch, exclusion, suppression,
+encoded workaround or bypass flag is an acceptable remediation.
+
+### Risks, verification and rollout
+
+- Configuration compatibility risk: retain the documented selectors and exercise
+  both helpers with isolated global/system config, unset/empty selectors and
+  existing Git fixtures; a passing environment unit test alone is insufficient.
+- Platform risk: retain native Linux, macOS and Windows command/results evidence;
+  case simulation is supplementary, and unavailable native coverage blocks
+  hardening completion instead of becoming a support claim.
+- Regression risk: test synthetic getters for unread unrelated values, actual
+  child inheritance, every refused override and all existing integrity safeguards.
+- Distribution risk: synchronize affected contracts/docs, complete support-file
+  inventories and skill/plugin versions; validate generated packages and scratch
+  native packaging after the final edit without modifying installed profiles.
+- Scanner risk: retain the historical failure, require unchanged-scanner negative
+  controls and safe community verdicts for all five complete packages, then obtain
+  independent review of the actual candidate. Prototype success is not acceptance.
+
+Complete the hardening group before resuming recovery task 2.2. Retain prior
+approval and gate records unchanged. The changed scope, tasks and acceptance gates
+require a new immutable plan revision/digest and operator approval before execution;
+the earlier recovery approval does not cover this revision. Lossless closeout
+evidence remains sequenced behind an accepted integrated group-10 result; its
+planning workspace is untouched. Later source changes remain local until independently
+reviewed and separately authorized for protected integration. Failed verification
+leaves the change open; no automatic deployment, profile update or rollback is implied.
 
 ## Distribution
 
@@ -88,5 +187,12 @@ implementation review identity. Cleanup never deletes branches or discards work.
 
 Native tasks track implementation progress, not merge completion. Only actual target
 verification permits a Git-tracked receipt/archive PR. An unknown write outcome needs
-exact readback; already merged implementation is never replayed. Future live sandbox,
-security scan, publication and target-project migration require separate authority.
+exact readback; already merged implementation is never replayed. The recovery
+implements and verifies the newly approved hardening before resuming task 2.2,
+then synchronizes the delta for both previously shipped behavior and newly
+implemented requirements into a current capability spec. It reviews and publishes
+that correction as a normal protected implementation candidate. Current scanner,
+native-client and sandbox results are new evidence, not claims about the original
+delivery. Terminal integration, verified receipt/archive and cleanup remain finish
+obligations rather than candidate checkboxes, so the receipt guard is not made
+circular. Target-project migration remains outside scope.

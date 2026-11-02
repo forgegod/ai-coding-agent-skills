@@ -15,12 +15,39 @@ change: parallel-change-workflow
 - [x] 1.6 Verify byte-safe approval digests, complete task parsing, literal Git identity and append-only evidence history with regression tests.
 - [x] 1.7 Keep research outside the project and document selectable workflows without adoption-history claims.
 
-## Separately authorized publication and operational acceptance
+## 10. Operator revision: Git environment hardening
 
-- [ ] 2.1 Bind a real issue, the change name, operator activation and approved plan revision before collaborative admission.
-- [ ] 2.2 Run the real-scanner release gate and native-client installation/validation in isolated homes.
-- [ ] 2.3 Run the authorized live sandbox concurrency/recovery pilot; verify actual protections and required CI.
-- [ ] 2.4 Publish through an authorized PR, verify the real integrated revision, then commit the post-merge receipt/archive.
+This group precedes unfinished recovery group 2 in execution order. Its numbering
+preserves existing task identities. The accepted prerequisite baseline is main
+`a85ceff2e461a70fbeca1e8e2abf6ff5fddd7007`: OpenSpec 1.16.0, Node 22.12.0+ for the
+npm package, Git and the selected upstream/companion inventory. The archived
+prerequisite package and its historical evidence remain unchanged. Before implementation,
+freeze and obtain operator approval of this reconciled immutable plan and digest.
+Task 2.1 and `evidence/plan-approval.md` record the earlier recovery plan only;
+their historical completion does not approve this revision. Preserve that record and
+the retained failed scanner/native-client results unchanged.
+
+- [ ] 10.1 Implement the shared explicit Git environment contract in both helpers, including the documented configuration selectors; verify every forbidden override (including empty values), unread/unforwarded unrelated synthetic values, fixed controls, Windows alias handling and actual child inheritance with tests, and document the contract alongside the helper guidance.
+- [ ] 10.2 Replace the workspace control-character predicate and clarify scanner-flagged authorization prose without changing authority; verify equivalence over every UTF-16 code unit and representative multicharacter paths, retain other path safeguards, and add authorization-boundary regression coverage.
+- [ ] 10.3 Exercise both helpers with real Git fixtures and isolated global/system configuration, including absent/empty selectors and existing topology/fsmonitor/ancestry/dirty-work protections; retain native Linux, macOS and Windows commands/results separately from simulations and document limitations, leaving missing native coverage as a completion blocker.
+- [ ] 10.4 Synchronize affected support-file inventories, skill/plugin versions, owning contracts and current documentation; verify complete canonical package bytes, generated bundles and native validation/installation in isolated scratch homes without modifying installed profiles.
+- [ ] 10.5 Run `npm test`, `npm run build`, `npm run validate:openspec`, `npm run test:openspec`, strict OpenSpec validation, `git diff --check` and `HERMES_SOURCE=<trusted-checkout> npm run test:security` after the final source/doc edit; retain actual results and require unchanged-scanner negative controls plus safe community verdicts for all five complete packages without exclusions, suppressions or bypasses.
+- [ ] 10.6 Obtain independent review of the exact hardened candidate, including configuration compatibility, preserved safeguards, platform evidence and synchronized package/documentation changes; disposition findings and renew affected gates and exact-candidate review after corrections without treating the scratch probe as acceptance.
+
+## Historical recovery candidate
+
+Task 2.2 depends on completion of group 10 under the revised plan approval. Tasks
+2.3 and 2.4 remain pending and are not skipped because hardening passes. Retained
+gate output may be reused only for the exact applicable candidate and scope;
+changed candidates require renewed verification. Group 10 review does not replace
+review of the final spec-synchronized correction candidate in task 2.4. Lossless
+closeout evidence remains sequenced behind an accepted integrated group-10 result;
+its unchanged planning workspace is not the independent second pilot candidate.
+
+- [x] 2.1 Bind issue #8 to the recovery plan, preserve the missing historical admission evidence, and record approval of this exact recovery-plan revision and digest before executing the correction.
+- [ ] 2.2 Run the real-scanner release gate and native-client installation/validation in isolated homes, retaining exact command output.
+- [ ] 2.3 Run the authorized live sandbox concurrency/recovery pilot and verify the active main ruleset and required CI evidence.
+- [ ] 2.4 Synchronize the `openspec-integration` delta for previously shipped behavior and newly implemented hardening into the current-spec tree, validate metadata and OpenSpec artifacts, rerun affected gates, and freeze an independently reviewed correction candidate without claiming the new requirements were already shipped.
 
 ## Operator revision
 
@@ -29,9 +56,21 @@ change: parallel-change-workflow
 - [x] 3.3 Adapt the surviving skills and describe the SDLC as OpenSpec plus those skills.
 - [x] 3.4 Run `npm test` and `npm run build` on the reduced catalog.
 
-The unchecked release tasks are not permissions to create tickets, push, merge,
-install into shared profiles or start another change. Local completion is not target
-integration. The orchestrator alone updates these task checkboxes from evidence.
+The recovery does not assert that a proposal-time issue, immutable approval or
+dedicated review existed before the historical integration. Issue #8 documents this
+limitation and the new recovery scope. The unchecked candidate tasks are not
+permissions to push, merge, install into shared profiles or start another change.
+The orchestrator alone updates these task checkboxes from evidence.
+
+## Terminal delivery boundary
+
+After all candidate tasks are complete and independently reviewed, the existing
+`/openspec-delivery finish parallel-change-workflow` authority governs protected
+publication, actual integrated-revision verification, factual receipt, native archive,
+acceptance-bound issue closure and clean-worktree retirement. These terminal outcomes
+are intentionally not task checkboxes: making them candidate tasks would prevent the
+receipt guard from accepting the reviewed candidate. No task is checked from a
+prospective merge, receipt or archive.
 
 ## Operator revision: ticket, review, and identity
 
