@@ -2,7 +2,7 @@
 metadata_version: 1
 artifact: proposal
 change: parallel-change-workflow
-github_issue: null
+github_issue: https://github.com/forgegod/ai-coding-agent-skills/issues/8
 ---
 # Explicit OpenSpec parallel-change integration
 
@@ -48,8 +48,10 @@ None: consuming projects' record contracts are outside this source change.
 ## Impact
 
 Canonical source, package catalog/build, tests, current OpenSpec specifications and
-installation guidance change. The existing change name stays unchanged. The accepted
-baseline is main `a85ceff2e461a70fbeca1e8e2abf6ff5fddd7007`, including the integrated
+installation guidance change. The existing change name stays unchanged. Issue #8 is
+the recovery documentation record, not retrospective proof that a pre-admission
+issue or approval existed. The accepted baseline is main
+`a85ceff2e461a70fbeca1e8e2abf6ff5fddd7007`, including the integrated
 OpenSpec 1.16.0 / Node 22.12.0+ prerequisite contract and the archived
 `update-openspec-1-16-prerequisites-01m69z5ccp3mt47qa6d7g6bdjr` package. That archive
 and its approval, review, gate and receipt evidence remain byte-for-byte history.

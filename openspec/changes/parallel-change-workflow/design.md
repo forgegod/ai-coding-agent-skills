@@ -34,12 +34,17 @@ The documentation issue is a proposal-time risk snapshot. Later reviews and
 outcomes are separately authorized factual records, not blank future evidence
 fields or an editable issue-body permalink presented as an immutable revision.
 
-This legacy change is recovered rather than treated as a new proposal. The accepted
-main baseline is `a85ceff2e461a70fbeca1e8e2abf6ff5fddd7007`, which includes the
-integrated OpenSpec 1.16.0 / Node 22.12.0+ prerequisite change. Reconciliation keeps
-that complete accepted state, including its archived records, while preserving the
-unfinished local Git-environment hardening bytes independently. Earlier approval and
-failed-gate evidence remain historical and cannot approve this successor plan.
+This legacy change is recovered rather than treated as a new proposal. Issue #8 is
+the bounded recovery/closure record. It explicitly preserves that the original
+implementation was admitted and integrated without a dedicated issue or retained
+pre-admission approval. The correction plan binds this fact to its new plan digest;
+it does not backfill the historical gap or relabel the bundled implementation PR as
+a dedicated review. The accepted main baseline is
+`a85ceff2e461a70fbeca1e8e2abf6ff5fddd7007`, which includes the integrated OpenSpec
+1.16.0 / Node 22.12.0+ prerequisite change. Reconciliation keeps that complete
+accepted state, including its archived records, while preserving the unfinished local
+Git-environment hardening bytes independently. Earlier approval and failed-gate
+evidence remain historical and cannot approve this successor plan.
 
 New changes in projects selecting this naming convention use a readable slug and
 one lowercase ULID. The agent generates it before upstream proposal scaffolding;
