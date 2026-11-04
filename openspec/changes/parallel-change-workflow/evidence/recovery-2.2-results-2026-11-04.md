@@ -37,12 +37,33 @@ node scripts/install-local-skills.mjs --user-home <isolated-codex-home> --client
 node --test tests/local-profile-installation.test.mjs
 ```
 
-Both client installs exited 0 and reported installation of five complete skill
-packages. Readback compared every installed complete package byte-for-byte with
-its canonical source package: `autonomous-implementation-review`,
+Fresh isolated Claude Code and Codex homes were used for the retained
+reconciliation readback. Their installation stdout, stderr and exit triples are
+`recovery-2.2-claude-install-reconciliation-2026-11-04T141716Z.*` and
+`recovery-2.2-codex-install-reconciliation-2026-11-04T141716Z.*`; both exit
+artifacts contain `0`. Codex used its documented `.agents/skills` destination
+after detecting `.codex`.
+
+Each claimed package comparison was rerun with
+`diff -r --no-dereference --brief -- <canonical-package> <installed-package>`.
+Every comparison has its own retained stdout, stderr and exit triple (the
+stdout and stderr files are empty; each exit artifact contains `0`):
+
+- Claude Code: `recovery-2.2-claude-autonomous-implementation-review-comparison-2026-11-04T141716Z.*`,
+  `recovery-2.2-claude-capability-wireframes-comparison-2026-11-04T141716Z.*`,
+  `recovery-2.2-claude-git-commit-message-comparison-2026-11-04T141716Z.*`,
+  `recovery-2.2-claude-openspec-delivery-comparison-2026-11-04T141716Z.*`, and
+  `recovery-2.2-claude-openspec-next-comparison-2026-11-04T141716Z.*`.
+- Codex: `recovery-2.2-codex-autonomous-implementation-review-comparison-2026-11-04T141716Z.*`,
+  `recovery-2.2-codex-capability-wireframes-comparison-2026-11-04T141716Z.*`,
+  `recovery-2.2-codex-git-commit-message-comparison-2026-11-04T141716Z.*`,
+  `recovery-2.2-codex-openspec-delivery-comparison-2026-11-04T141716Z.*`, and
+  `recovery-2.2-codex-openspec-next-comparison-2026-11-04T141716Z.*`.
+
+The zero-exit recursive comparisons establish the claimed byte-for-byte
+package readback for `autonomous-implementation-review`,
 `capability-wireframes`, `git-commit-message`, `openspec-delivery`, and
-`openspec-next`. All comparisons exited 0. Codex readback used its documented
-`.agents/skills` destination after detecting `.codex`.
+`openspec-next` in both client homes.
 
 The isolated native-client suite exited 0: 52 passed, 0 failed, 0 skipped. Its
 stdout, empty stderr and exit status are retained as
