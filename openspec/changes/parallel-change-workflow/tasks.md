@@ -45,7 +45,7 @@ closeout evidence remains sequenced behind an accepted integrated group-10 resul
 its unchanged planning workspace is not the independent second pilot candidate.
 
 - [x] 2.1 Bind issue #8 to the recovery plan, preserve the missing historical admission evidence, and record approval of this exact recovery-plan revision and digest before executing the correction.
-- [ ] 2.2 Run the real-scanner release gate and native-client installation/validation in isolated homes, retaining exact command output.
+- [x] 2.2 Run the real-scanner release gate and native-client installation/validation in isolated homes, retaining exact command output.
 - [ ] 2.3 Run the authorized live sandbox concurrency/recovery pilot and verify the active main ruleset and required CI evidence.
 - [ ] 2.4 Synchronize the `openspec-integration` delta for previously shipped behavior and newly implemented hardening into the current-spec tree, validate metadata and OpenSpec artifacts, rerun affected gates, and freeze an independently reviewed correction candidate without claiming the new requirements were already shipped.
 
