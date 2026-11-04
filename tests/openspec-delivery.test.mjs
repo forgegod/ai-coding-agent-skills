@@ -3,6 +3,24 @@ import assert from "node:assert/strict";
 import { readFile, stat } from "node:fs/promises";
 
 const read = (file) => readFile(new URL(`../${file}`, import.meta.url), "utf8");
+test("proposal issue wording requires adoption and bounded operator authority without expanding planning", async () => {
+  const source = await read("skills/software-development/openspec-delivery/SKILL.md");
+  const paragraph = source.slice(source.indexOf("GitHub issues and pull requests are documentation"), source.indexOf("For metadata-enabled projects"));
+  assert.match(paragraph, /requires both explicit project adoption/);
+  assert.match(paragraph, /operator-authorized proposal that includes the bounded issue write/);
+  assert.match(paragraph, /Otherwise use the separately authorized `document <name>`/);
+  assert.match(paragraph, /PR creation and later issue updates need separate\s+authority/);
+  assert.match(source, /planning-only request ends at\s+proposal\/spec\/design\/tasks plus a bounded issue write only when the project's\s+explicitly selected proposal policy includes it/);
+  assert.match(source, /installation alone never grants that authority/);
+  assert.match(source, /does not authorize push, a pull request, merge, issue closure or retirement/);
+});
+test("Git helper guidance preserves explicit selectors, trust boundaries and native completion blockers", async () => {
+  const contract = await read("skills/software-development/openspec-delivery/references/git-environment.md");
+  for (const name of ["GIT_CONFIG_GLOBAL", "GIT_CONFIG_SYSTEM", "GIT_CONFIG_NOSYSTEM", "GIT_NO_REPLACE_OBJECTS=1", "GIT_OPTIONAL_LOCKS=0", "LC_ALL=C"]) assert.ok(contract.includes(name), name);
+  for (const pattern of [/Absent selectors stay absent/, /including deliberate empty values/, /case-insensitive/, /case-sensitive/, /before any value read/, /not a sandbox/, /Missing native platform evidence blocks hardening\s+completion/, /unchanged\s+trusted scanner/, /independent exact-candidate review/]) assert.match(contract, pattern);
+  for (const file of ["references/guard.md", "references/workspace.md", "SKILL.md"]) assert.match(await read(`skills/software-development/openspec-delivery/${file}`), /git-environment\.md/);
+  for (const file of ["README.md", "docs/openspec-workflow.md", "docs/openspec-installation.md"]) assert.match(await read(file), /git-environment\.md/);
+});
 test("short delivery invocations own local plumbing without granting remote or next-change authority", async () => {
   const source = await read("skills/software-development/openspec-delivery/SKILL.md");
   for (const pattern of [/\/openspec-delivery <name>/, /\/openspec-delivery finish <name>/, /\/openspec-delivery prepare <name>/, /Operator restrictions override/, /autonomous local commits/, /next unfinished task group/, /does not authorize push/, /plan approval/, /references\/workspace\.md/, /references\/continuation\.md/]) assert.match(source, pattern);

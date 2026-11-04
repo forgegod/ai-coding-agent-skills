@@ -714,6 +714,18 @@ gate, execute tests, call GitHub, acquire a lock or authorize a write. Full
 object IDs must already be local. Independent clones are supported. Preserve
 dirty work and uncertain API outcomes. Read back before retrying a write.
 
+The evidence and workspace helpers share the packaged
+[Git child environment contract](../skills/software-development/openspec-delivery/references/git-environment.md).
+Only explicit runtime locations and `GIT_CONFIG_GLOBAL`, `GIT_CONFIG_SYSTEM` and
+`GIT_CONFIG_NOSYSTEM` selectors are forwarded. Absent selectors remain absent;
+present values, including empty values, retain Git's interpretation. Forbidden
+overrides fail before value reads or Git execution. Fixed replacement/locking/locale
+controls and fsmonitor neutralization remain in force. On Windows, helper-controlled
+empty baseline names prevent Node's process launcher from leaking inherited system
+identity values, and Git-returned worktree paths are normalized before canonical
+checks. This is not a sandbox:
+PATH, home/config locations and repository/selected configuration remain trusted.
+
 ## Packages
 
 | Plugin | Skills |
@@ -747,6 +759,15 @@ Run `npm test` and `npm run build`. Tests cover Git fixtures, package inventorie
 and native-copy collision safety. Artifact validation does not prove model
 execution, protected integration or deployment acceptance. Publication, live
 issues, protection settings and installed profiles need separate authorization.
+
+For Git environment hardening, also run the focused command in the
+[environment contract](../skills/software-development/openspec-delivery/references/git-environment.md)
+on native Linux, macOS and Windows and retain each platform's actual command/results.
+WSL is Linux evidence, not native Windows evidence; case simulations and scratch
+plugin validation are supplementary. Missing native results block hardening
+completion. Require the unchanged trusted scanner's negative controls and safe
+community verdicts for all five complete packages, followed by independent review
+of the exact candidate. Do not replace retained failures with prototype results.
 
 ## References
 

@@ -51,6 +51,9 @@ test("documented recipes copy five complete packages to all four native user loc
       const { parsePaneOutput } = await import(url);
       assert.equal(parsePaneOutput("unrecognized UI").status, "unknown");
     }
+    for (const file of ["scripts/git-environment.mjs", "references/git-environment.md"]) {
+      assert.deepEqual(await readFile(path.join(destination, "openspec-delivery", file)), await readFile(path.join(root, "skills", packages["openspec-delivery"], file)));
+    }
   }
 });
 
