@@ -1,0 +1,77 @@
+{
+  "purpose": "Current planning-only path/identity corroboration; semantic decision is in proposal/design/tasks, not proof of sandbox readiness.",
+  "readbacks": [
+    {
+      "command": "git -C /home/raphael/src/ai-coding-agent-skills--parallel-change-workflow-reconciliation status --porcelain=v1 --untracked-files=all",
+      "cwd": "/home/raphael/src/ai-coding-agent-skills",
+      "result": {
+        "output": "",
+        "exit_code": 0,
+        "error": null
+      }
+    },
+    {
+      "command": "git -C /home/raphael/src/ai-coding-agent-skills status --porcelain=v1 --untracked-files=all",
+      "cwd": "/home/raphael/src/ai-coding-agent-skills",
+      "result": {
+        "output": "",
+        "exit_code": 0,
+        "error": null
+      }
+    },
+    {
+      "command": "git -C /home/raphael/src/ai-coding-agent-skills--parallel-change-workflow-reconciliation rev-parse --show-toplevel HEAD --path-format=absolute --git-common-dir",
+      "cwd": "/home/raphael/src/ai-coding-agent-skills",
+      "result": {
+        "output": "/home/raphael/src/ai-coding-agent-skills--parallel-change-workflow-reconciliation\n552382f2756703e7b57cb24d8088773d1e1aed51\n/home/raphael/src/ai-coding-agent-skills--parallel-change-workflow-reconciliation/.git",
+        "exit_code": 0,
+        "error": null
+      }
+    },
+    {
+      "command": "git -C /home/raphael/src/ai-coding-agent-skills rev-parse --show-toplevel HEAD --path-format=absolute --git-common-dir",
+      "cwd": "/home/raphael/src/ai-coding-agent-skills",
+      "result": {
+        "output": "/home/raphael/src/ai-coding-agent-skills\na85ceff2e461a70fbeca1e8e2abf6ff5fddd7007\n/home/raphael/src/ai-coding-agent-skills/.git",
+        "exit_code": 0,
+        "error": null
+      }
+    },
+    {
+      "command": "git -C /home/raphael/src/ai-coding-agent-skills merge-base main 552382f2756703e7b57cb24d8088773d1e1aed51",
+      "cwd": "/home/raphael/src/ai-coding-agent-skills",
+      "result": {
+        "output": "a85ceff2e461a70fbeca1e8e2abf6ff5fddd7007",
+        "exit_code": 0,
+        "error": null
+      }
+    },
+    {
+      "command": "git -C /home/raphael/src/ai-coding-agent-skills diff --name-only main...552382f2756703e7b57cb24d8088773d1e1aed51",
+      "cwd": "/home/raphael/src/ai-coding-agent-skills",
+      "result": {
+        "output": ".claude-plugin/marketplace.json\nREADME.md\ndocs/claude-installation.md\ndocs/openspec-installation.md\ndocs/openspec-workflow.md\nopenspec/changes/parallel-change-workflow/design.md\nopenspec/changes/parallel-change-workflow/evidence/git-environment-hardening-plan-approval-2026-11-01.md\nopenspec/changes/parallel-change-workflow/evidence/native-client-validation-2026-10-31.log\nopenspec/changes/parallel-change-workflow/evidence/plan-approval.md\nopenspec/changes/parallel-change-workflow/evidence/reconciled-plan-approval-2026-11-02.md\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-autonomous-implementation-review-comparison-2026-11-04T141716Z.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-autonomous-implementation-review-comparison-2026-11-04T141716Z.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-autonomous-implementation-review-comparison-2026-11-04T141716Z.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-capability-wireframes-comparison-2026-11-04T141716Z.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-capability-wireframes-comparison-2026-11-04T141716Z.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-capability-wireframes-comparison-2026-11-04T141716Z.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-capability-wireframes-validation-2026-11-04.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-capability-wireframes-validation-2026-11-04.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-capability-wireframes-validation-2026-11-04.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-git-commit-message-comparison-2026-11-04T141716Z.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-git-commit-message-comparison-2026-11-04T141716Z.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-git-commit-message-comparison-2026-11-04T141716Z.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-install-2026-11-04.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-install-2026-11-04.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-install-2026-11-04.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-install-reconciliation-2026-11-04T141716Z.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-install-reconciliation-2026-11-04T141716Z.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-install-reconciliation-2026-11-04T141716Z.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-openspec-delivery-comparison-2026-11-04T141716Z.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-openspec-delivery-comparison-2026-11-04T141716Z.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-openspec-delivery-comparison-2026-11-04T141716Z.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-openspec-next-comparison-2026-11-04T141716Z.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-openspec-next-comparison-2026-11-04T141716Z.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-openspec-next-comparison-2026-11-04T141716Z.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-validation-first-attempt-2026-11-04.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-claude-validation-first-attempt-2026-11-04.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-autonomous-implementation-review-comparison-2026-11-04T141716Z.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-autonomous-implementation-review-comparison-2026-11-04T141716Z.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-autonomous-implementation-review-comparison-2026-11-04T141716Z.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-capability-wireframes-comparison-2026-11-04T141716Z.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-capability-wireframes-comparison-2026-11-04T141716Z.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-capability-wireframes-comparison-2026-11-04T141716Z.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-git-commit-message-comparison-2026-11-04T141716Z.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-git-commit-message-comparison-2026-11-04T141716Z.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-git-commit-message-comparison-2026-11-04T141716Z.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-install-2026-11-04.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-install-2026-11-04.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-install-2026-11-04.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-install-reconciliation-2026-11-04T141716Z.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-install-reconciliation-2026-11-04T141716Z.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-install-reconciliation-2026-11-04T141716Z.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-openspec-delivery-comparison-2026-11-04T141716Z.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-openspec-delivery-comparison-2026-11-04T141716Z.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-openspec-delivery-comparison-2026-11-04T141716Z.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-openspec-next-comparison-2026-11-04T141716Z.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-openspec-next-comparison-2026-11-04T141716Z.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-codex-openspec-next-comparison-2026-11-04T141716Z.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-native-client-suite-2026-11-04.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-native-client-suite-2026-11-04.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-native-client-suite-2026-11-04.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-real-scanner-2026-11-04.exit\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-real-scanner-2026-11-04.stderr.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-real-scanner-2026-11-04.stdout.log\nopenspec/changes/parallel-change-workflow/evidence/recovery-2.2-results-2026-11-04.md\nopenspec/changes/parallel-change-workflow/evidence/security-scan-2026-10-31.log\nopenspec/changes/parallel-change-workflow/evidence/successor-plan-approval-2026-11-03.md\nopenspec/changes/parallel-change-workflow/proposal.md\nopenspec/changes/parallel-change-workflow/specs/openspec-integration/spec.md\nopenspec/changes/parallel-change-workflow/tasks.md\nskills/software-development/AGENTS.md\nskills/software-development/openspec-delivery/SKILL.md\nskills/software-development/openspec-delivery/references/git-environment.md\nskills/software-development/openspec-delivery/references/guard.md\nskills/software-development/openspec-delivery/references/workspace.md\nskills/software-development/openspec-delivery/scripts/change-guard.mjs\nskills/software-development/openspec-delivery/scripts/change-workspace.mjs\nskills/software-development/openspec-delivery/scripts/git-environment.mjs\ntests/claude-packaging.test.mjs\ntests/git-environment.test.mjs\ntests/native-installation.test.mjs\ntests/openspec-delivery.test.mjs\ntests/openspec-integration.test.mjs\ntests/openspec-workspace.test.mjs\ntests/well-known-skills.test.mjs",
+        "exit_code": 0,
+        "error": null
+      }
+    },
+    {
+      "command": "git -C /home/raphael/src/ai-coding-agent-skills diff --exit-code main...552382f2756703e7b57cb24d8088773d1e1aed51 -- tests/openspec-cli-compatibility.mjs",
+      "cwd": "/home/raphael/src/ai-coding-agent-skills",
+      "result": {
+        "output": "",
+        "exit_code": 0,
+        "error": null
+      }
+    },
+    {
+      "command": "git ls-remote --heads origin main change/parallel-change-workflow",
+      "cwd": "/home/raphael/src/ai-coding-agent-skills",
+      "result": {
+        "output": "552382f2756703e7b57cb24d8088773d1e1aed51\trefs/heads/change/parallel-change-workflow\na85ceff2e461a70fbeca1e8e2abf6ff5fddd7007\trefs/heads/main",
+        "exit_code": 0,
+        "error": null
+      }
+    }
+  ]
+}
