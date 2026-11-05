@@ -11,7 +11,9 @@ const change = "fixture-change";
 const changeRoot = `openspec/changes/${change}`;
 const archived = `openspec/changes/archive/2026-10-29-${change}`;
 const oneMiB = 1024 * 1024;
-const env = { ...process.env, GIT_CONFIG_NOSYSTEM: "1", GIT_CONFIG_GLOBAL: os.devNull };
+// Git for Windows accepts the Win32 device name, not Node's \\.\nul path.
+const gitNullDevice = process.platform === "win32" ? "NUL" : os.devNull;
+const env = { ...process.env, GIT_CONFIG_NOSYSTEM: "1", GIT_CONFIG_GLOBAL: gitNullDevice };
 const git = (cwd, ...args) => execFileSync("git", ["-C", cwd, ...args], { encoding: "utf8", env, stdio: ["ignore", "pipe", "pipe"] }).trim();
 const commit = (repo, message) => { git(repo, "add", "--", "."); git(repo, "commit", "-m", message); return git(repo, "rev-parse", "HEAD"); };
 
@@ -23,7 +25,7 @@ test("OpenSpec package documents explicit authority, writer separation and read-
   for (const pattern of [/candidate --repo/, /review --repo/, /receipt --repo/, /schemaVersion/, /planDigest/, /exitCode/, /does not authenticate/, /fences/, /append-only/]) assert.match(reference, pattern);
   for (const pattern of [/valid UTF-8/, /refs\/replace/, /grafts/, /fsmonitor/, /Every commit in `verified\.\.target`/, /--receipt-path/, /duplicate/i, /raw blob bytes/]) assert.match(reference, pattern);
   assert.doesNotMatch(skill, /adoption history|reviewer found|previously reported/i);
-  assert.match(skill, /version: 1\.0\.2/);
+  assert.match(skill, /version: 1\.0\.4/);
   assert.doesNotMatch(skill, /\/home\/|~\/.hermes/);
 });
 

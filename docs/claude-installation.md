@@ -159,6 +159,10 @@ files plus their generated plugin metadata, README, and license.
 
 Bump the affected plugin version in the catalog whenever its selected skills or
 support files change; skill versions alone do not update the enclosing plugin.
+The source catalog's `openspec-development` 1.0.5 includes `openspec-delivery`
+1.0.4 with its shared `scripts/git-environment.mjs` and
+`references/git-environment.md`; preserve both in copies and ZIP exports. These
+source versions do not assert that the public marketplace/downloads are updated.
 Tests reject omitted/duplicate packages, implicit orchestration or OpenSpec
 inclusion, unshared packages in multiple bundles, added active plugin components,
 unsafe paths, and symlinks, and verify archive bytes, repeatability, checksums,

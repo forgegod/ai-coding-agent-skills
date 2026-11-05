@@ -1,0 +1,67 @@
+▶ an explicit home root alone isolates API installation to its target family
+  ✔ hermesHome (64.946291ms)
+  ✔ userHome (34.02944ms)
+✔ an explicit home root alone isolates API installation to its target family (99.87502ms)
+▶ CLI home-root isolation applies to --all and explicit selectors opt in to other targets
+  ✔ default roots (77.639773ms)
+  ✔ --hermes-home /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/local-profile-skills-xJ0mK1/hermes (78.597395ms)
+  ✔ --hermes-home /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/local-profile-skills-xJ0mK1/hermes --all (78.998947ms)
+  ✔ --user-home /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/local-profile-skills-xJ0mK1/user (76.459481ms)
+  ✔ --user-home /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/local-profile-skills-xJ0mK1/user --all (74.004078ms)
+  ✔ --hermes-home /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/local-profile-skills-xJ0mK1/hermes --client codex (72.464218ms)
+  ✔ --user-home /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/local-profile-skills-xJ0mK1/user --profile default (78.183836ms)
+  ✔ --hermes-home /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/local-profile-skills-xJ0mK1/hermes --profile named --client codex (82.262862ms)
+  ✔ --user-home /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/local-profile-skills-xJ0mK1/user --profile default --client claude-code (80.002224ms)
+  ✔ --hermes-home /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/local-profile-skills-xJ0mK1/hermes --user-home /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/local-profile-skills-xJ0mK1/user (81.39795ms)
+✔ CLI home-root isolation applies to --all and explicit selectors opt in to other targets (795.937376ms)
+✔ installs every complete package into default and recognized named profiles (38.375198ms)
+✔ installs complete packages into existing global Claude Code and Codex directories (53.339193ms)
+✔ omits absent native clients without creating their configuration directories (36.65608ms)
+✔ limits native installation to an explicitly selected detected client (20.96004ms)
+✔ preflights a native client collision before changing Hermes profiles (17.958945ms)
+✔ native client dry runs write nothing and explicit updates preserve full backups (34.098639ms)
+✔ purges only the seven historical packages with explicit authority and preserves their backup (71.323978ms)
+▶ purge rollback reports only preserved backups and warns of earlier partial changes
+  ▶ registration backup
+    ✔ only existing backup paths are reported (1.173524ms)
+    ✔ failure text includes earlier purges (0.193279ms)
+  ✔ registration backup (48.925272ms)
+  ▶ registration removal
+    ✔ only existing backup paths are reported (1.422672ms)
+    ✔ failure text includes earlier purges (0.153948ms)
+  ✔ registration removal (52.827661ms)
+✔ purge rollback reports only preserved backups and warns of earlier partial changes (102.189874ms)
+✔ purge refuses a historical package with another Hermes source registration (16.648134ms)
+✔ purge uses a flat native client path and leaves no Hermes registration (25.668983ms)
+✔ limits installation to explicitly selected profiles (25.230984ms)
+✔ preflights collisions across every selected profile before copying (15.917096ms)
+✔ CLI accepts repeated --profile arguments and reports a dry run (91.323708ms)
+✔ CLI installs only a selected detected native client (84.872748ms)
+✔ update replaces complete packages, backs up local edits, and installs missing skills (52.831161ms)
+✔ CLI update supports dry-run and updates all five complete packages in selected scratch profiles (600.769571ms)
+▶ update preflights symlink destinations and backup parents before changing any profile
+  ✔ skills (13.224646ms)
+  ✔ skills/software-development (14.277883ms)
+  ✔ skills/software-development/demo (16.928327ms)
+  ✔ .skills-backups (16.446805ms)
+  ✔ skills/.hub (13.828205ms)
+✔ update preflights symlink destinations and backup parents before changing any profile (75.313169ms)
+✔ installer refuses destinations overlapping canonical skill source (12.288586ms)
+✔ local installs register the public update source and the exact installed hash without scanner claims (77.943031ms)
+✔ updates refresh provenance, preserve unrelated entries, and dry-run leaves the lock unchanged (40.321111ms)
+▶ malformed, unsupported and conflicting hub records fail before any profile is changed
+  ✔ malformed (15.963355ms)
+  ✔ unsupported (17.811482ms)
+  ✔ other source (15.491013ms)
+  ✔ other path (15.182228ms)
+✔ malformed, unsupported and conflicting hub records fail before any profile is changed (65.053696ms)
+✔ hub lock symlinks are refused without modifying their target (17.342975ms)
+✔ registration refuses a hub lock changed by another writer (22.068818ms)
+ℹ tests 52
+ℹ suites 0
+ℹ pass 52
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2560.351525

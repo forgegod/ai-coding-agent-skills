@@ -9,6 +9,11 @@ unexecuted templates, not permission to write or fabricated evidence.
 
 ## Inputs and trust
 
+Every Git child uses the shared [environment contract](git-environment.md): explicit
+runtime/configuration allowlists, name-only override refusal (including empty
+values), fixed safety controls and locale. Present global/system selectors retain
+their exact values; absence preserves normal Git discovery. This is not a sandbox.
+
 Use an exact absolute `<repo>` and literal lowercase full Git commit object IDs,
 not `HEAD`, branch names, abbreviations or repaired identifiers. SHA-1 and Git
 SHA-256 repositories use their respective full IDs. Objects must already exist

@@ -1,7 +1,7 @@
 ---
 name: openspec-delivery
 description: Automate setup, execution and closeout of OpenSpec changes.
-version: 1.0.2
+version: 1.0.4
 author: Raphael (forgegod), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -35,6 +35,9 @@ The agent handles the plumbing; the operator selects scope and exceptions.
 ## Prerequisites
 
 - Node 22+ and Git for the packaged read-only `scripts/change-guard.mjs` helper.
+  Install the complete package: both Git helpers require `scripts/git-environment.mjs`.
+  Read [references/git-environment.md](references/git-environment.md) for the child
+  allowlist, trusted configuration selectors and native-platform acceptance limits.
 - A separately reviewed OpenSpec CLI/native workflow installation; this package
   does not install it or assert host execution support.
 - Explicit project policy naming target, required gates, evidence retention and
@@ -90,9 +93,10 @@ for a ticket state.
 When two active changes touch the same capability spec, reconcile the overlap
 before either merges. A clean Git merge is not compatibility evidence.
 
-GitHub issues and pull requests are documentation and review records. Create or
-reuse one issue during a new proposal only when project policy explicitly includes
-that write. Otherwise use the separately authorized `document <name>` invocation
+GitHub issues and pull requests are documentation and review records. Proposal-time
+creation or reuse of one issue requires both explicit project adoption of that step and
+an operator-authorized proposal that includes the bounded issue write.
+Otherwise use the separately authorized `document <name>` invocation
 in `references/ticket.md`. PR creation and later issue updates need separate
 authority. Link the OpenSpec change and, for a review, the exact
 candidate SHA. Do not put the task list in the issue, and do not invent a ticket so a helper command will run. Do not write that the issue is ISO/IEC

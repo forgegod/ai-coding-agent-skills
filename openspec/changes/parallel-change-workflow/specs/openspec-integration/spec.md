@@ -172,3 +172,81 @@ previews, leaving execution and exact readback to the authorized orchestrator.
 - **WHEN** the selected branch already has one verified registered dedicated worktree
 - **THEN** the agent reuses it and preserves dirty or interrupted work rather than resetting or creating a competitor
 - **AND** removal requires exact clean head and reachable closure evidence, ignored-file inspection, no force and verified absence; branch refs remain recoverable
+
+### Requirement: Restricted Git child environment
+The evidence and workspace helpers SHALL read and forward inherited environment
+values only from a documented execution allowlist. They SHALL refuse inherited
+topology and command-config injection overrides before launching Git, even when
+those overrides have empty values.
+
+#### Scenario: Forbidden override presence
+- **WHEN** any previously refused Git override is present, including an empty value or a Windows case variant
+- **THEN** either helper fails before launching Git without reading the override value or silently dropping it and continuing
+
+#### Scenario: Unrelated inherited values
+- **WHEN** the inherited environment includes unrelated credential or execution-injection values
+- **THEN** neither helper reads those values or forwards them to a Git child
+- **AND** synthetic getter tests and actual child-environment tests demonstrate that restriction without accessing real credentials
+
+#### Scenario: Platform-specific names
+- **WHEN** a supported platform resolves inherited allowlisted names
+- **THEN** Windows matching is case-insensitive and ambiguous aliases are refused; Linux and macOS matching is case-sensitive
+- **AND** simulated Windows matching alone does not establish native Windows support
+
+### Requirement: Explicit Git configuration compatibility
+Both helpers SHALL retain present `GIT_CONFIG_GLOBAL`, `GIT_CONFIG_SYSTEM` and
+`GIT_CONFIG_NOSYSTEM` values as trusted configuration selectors. Absent selectors
+SHALL remain absent. Configuration selection SHALL NOT permit topology or
+command-config injection overrides or be described as a sandbox.
+
+#### Scenario: Explicit fixture configuration
+- **WHEN** isolated fixtures select synthetic global/system configuration or disable its use through the documented selectors
+- **THEN** both helpers preserve those values, including empty values, for Git to interpret rather than silently reverting to host configuration
+
+#### Scenario: Default configuration discovery
+- **WHEN** configuration selectors are absent
+- **THEN** both helpers leave them absent and retain documented runtime/home configuration discovery inputs
+- **AND** executable search paths, home/config locations and Git configuration remain explicit trust inputs
+
+### Requirement: Preserved Git integrity controls
+Environment hardening SHALL preserve fixed replacement-object and optional-lock
+controls, fsmonitor neutralization, and existing topology, identity, ancestry and
+dirty-work protections in both helpers. It SHALL NOT turn a refusal into permission
+to repair, discard or redirect repository state.
+
+#### Scenario: Conflicting inherited controls
+- **WHEN** inherited values conflict with replacement-object or optional-lock safety settings or the fixed output locale
+- **THEN** Git children receive `GIT_NO_REPLACE_OBJECTS=1`, `GIT_OPTIONAL_LOCKS=0` and `LC_ALL=C` independently of those values, with fsmonitor still neutralized
+
+#### Scenario: Existing integrity failure
+- **WHEN** a repository fails an existing replacement-ref/graft, topology, identity, ancestry or dirty-work check
+- **THEN** the relevant helper continues to refuse the operation and preserves the work
+
+### Requirement: Equivalent workspace path rejection
+Workspace validation SHALL reject C0 control characters and DEL without broadening
+or weakening the existing character restriction. Absolute, normalized and canonical
+path requirements, symlink refusal and workspace-overlap checks SHALL remain intact.
+
+#### Scenario: Control-character equivalence
+- **WHEN** every UTF-16 code unit and representative multicharacter Unicode paths are compared against the original character restriction
+- **THEN** the replacement predicate has identical results, rejecting character codes below 32 or equal to 127
+- **AND** other path-validation failures remain failures independently of the character predicate
+
+### Requirement: Complete-package security acceptance
+Hardening acceptance SHALL require safe community verdicts for all five complete
+packages using the unchanged trusted scanner with negative controls. It SHALL NOT
+rely on exclusions, suppressed findings, bypass flags or a prototype-only scan.
+Authorization wording changes SHALL preserve existing side-effect boundaries.
+
+#### Scenario: Safe prototype but blocked distribution
+- **WHEN** a scratch prototype scans safe but a complete package remains blocked
+- **THEN** the security gate and hardening acceptance remain incomplete, and historical failures are retained rather than rewritten
+
+#### Scenario: Clarified authorization wording
+- **WHEN** scanner-flagged issue-authorization prose is clarified
+- **THEN** explicit project adoption and bounded issue-write authority remain required, and installation or a planning-only request grants no additional side effects
+
+#### Scenario: Candidate acceptance evidence
+- **WHEN** a hardened candidate is presented for completion
+- **THEN** its complete package inventory, affected versions/documentation, native Linux/macOS/Windows results, full-package scanner output and independent exact-candidate review are verified
+- **AND** missing native platform evidence or unresolved findings block completion rather than being replaced with simulated results or release claims

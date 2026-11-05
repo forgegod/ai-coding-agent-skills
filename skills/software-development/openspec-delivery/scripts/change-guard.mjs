@@ -5,6 +5,7 @@ import { createHash } from "node:crypto";
 import { closeSync, constants, fstatSync, lstatSync, openSync, readFileSync, readSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { parseArgs } from "node:util";
+import { gitEnvironment } from "./git-environment.mjs";
 
 const requireThat = (condition, message) => { if (!condition) throw new Error(message); };
 const decoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
@@ -13,9 +14,7 @@ const decode = (bytes, message) => {
 };
 const text = (value) => typeof value === "string" && value.trim().length > 0;
 
-// Inherited Git topology/config overrides could redirect every check to different objects.
-const REFUSED_ENV = ["GIT_DIR", "GIT_WORK_TREE", "GIT_COMMON_DIR", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_NAMESPACE", "GIT_GRAFT_FILE", "GIT_SHALLOW_FILE", "GIT_REPLACE_REF_BASE", "GIT_CONFIG_COUNT", "GIT_CONFIG_PARAMETERS"];
-const childEnv = { ...Object.fromEntries(Object.entries(process.env).filter(([key]) => !REFUSED_ENV.includes(key))), GIT_NO_REPLACE_OBJECTS: "1", GIT_OPTIONAL_LOCKS: "0" };
+let childEnv;
 const MAX_EVIDENCE_BYTES = 1024 * 1024;
 const MAX_PLANNING_BYTES = 4 * 1024 * 1024;
 const MAX_CLOSURE_COMMITS = 200;
@@ -293,9 +292,9 @@ function receipt(o) {
   return { ...snapshot, integrated, verified, target, receiptSha256: record.sha256 };
 }
 function main() {
+  childEnv = gitEnvironment(process.env);
   const command = process.argv[2];
   requireThat(["candidate", "review", "receipt"].includes(command), "Expected candidate, review or receipt command");
-  for (const key of REFUSED_ENV) requireThat(process.env[key] === undefined, "Git topology overrides are unsupported");
   const args = process.argv.slice(3);
   const names = ["repo", "change", ...(command === "receipt" ? ["target", "receipt", "issue", "receipt-path", "max-closure-commits"] : ["base", "head", "plan", "expect-plan", ...(command === "review" ? ["issue", "review"] : [])])];
   const seen = new Set();

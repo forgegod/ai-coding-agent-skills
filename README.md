@@ -35,6 +35,13 @@ GitHub issues and pull requests document and review. They are not the task list 
 
 Installing these packages does not select the workflow for another project, transfer that project's records, or grant Git or GitHub authority.
 
+The delivery Git helpers share an explicit [child environment contract](skills/software-development/openspec-delivery/references/git-environment.md):
+only allowlisted runtime/configuration values reach Git, with global/system selectors
+preserved and topology overrides refused. Configuration remains trusted, not sandboxed.
+Copy complete packages, including the shared constructor; Node 22+ and Git remain
+the prerequisites. Native macOS/Windows results are required separately from WSL or
+case simulations; missing results block hardening completion, not just publication.
+
 Companion installation: [Claude Desktop (no terminal)](#install-with-claude-desktop) ·
 [Hermes](#install-with-hermes) ·
 [Other agents / advanced directory installation](#advanced-native-directory-installation).
