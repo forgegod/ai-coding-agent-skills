@@ -1,0 +1,99 @@
+
+> ai-coding-agent-skills@1.0.0 test:security
+> npm run build && python3 -B tests/security_scan_test.py && python3 -B scripts/check-skill-security.py
+
+
+> ai-coding-agent-skills@1.0.0 build
+> node scripts/build-distribution.mjs --out dist
+
+Built 5 skills and 2 Claude plugins at /home/raphael/src/ai-coding-agent-skills--parallel-change-workflow/dist
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.397s
+
+OK
+{
+  "scanner_version": "skills-guard-v10",
+  "scanner_sha256": "2b39ae73585709c51af62cbf8c3f23c5330ca1e297ac01453e9328996e281562",
+  "coverage": "all UTF-8 package files, including .mjs/.cjs; no ignore exclusions",
+  "packages": [
+    {
+      "name": "autonomous-implementation-review",
+      "files_scanned": 12,
+      "verdict": "safe",
+      "allowed": true,
+      "reason": "Allowed (community source, safe verdict)",
+      "findings": []
+    },
+    {
+      "name": "capability-wireframes",
+      "files_scanned": 2,
+      "verdict": "safe",
+      "allowed": true,
+      "reason": "Allowed (community source, safe verdict)",
+      "findings": []
+    },
+    {
+      "name": "git-commit-message",
+      "files_scanned": 2,
+      "verdict": "safe",
+      "allowed": true,
+      "reason": "Allowed (community source, safe verdict)",
+      "findings": []
+    },
+    {
+      "name": "openspec-delivery",
+      "files_scanned": 11,
+      "verdict": "caution",
+      "allowed": false,
+      "reason": "Blocked (community source + caution verdict, 4 findings). Use --force to override.",
+      "findings": [
+        {
+          "pattern_id": "fake_policy",
+          "severity": "medium",
+          "category": "injection",
+          "file": "SKILL.md",
+          "line": 94,
+          "match": "reuse one issue during a new proposal only when project policy explicitly includes",
+          "description": "claims new policy/guidelines (may be social engineering)"
+        },
+        {
+          "pattern_id": "node_process_env",
+          "severity": "high",
+          "category": "exfiltration",
+          "file": "scripts/change-workspace.mjs",
+          "line": 71,
+          "match": "for (const name of refused) requireThat(process.env[name] === undefined, `Unsupported Git environment override: ${nam...",
+          "description": "accesses process.env (Node.js environment)"
+        },
+        {
+          "pattern_id": "hex_encoded_string",
+          "severity": "medium",
+          "category": "obfuscation",
+          "file": "scripts/change-workspace.mjs",
+          "line": 15,
+          "match": "requireThat(path.isAbsolute(file) && !/[\\x00-\\x1f\\x7f]/.test(file), \"Expected an absolute safe workspace path\");",
+          "description": "hex-encoded string (possible obfuscation)"
+        },
+        {
+          "pattern_id": "node_process_env",
+          "severity": "high",
+          "category": "exfiltration",
+          "file": "scripts/change-guard.mjs",
+          "line": 298,
+          "match": "for (const key of REFUSED_ENV) requireThat(process.env[key] === undefined, \"Git topology overrides are unsupported\");",
+          "description": "accesses process.env (Node.js environment)"
+        }
+      ]
+    },
+    {
+      "name": "openspec-next",
+      "files_scanned": 1,
+      "verdict": "safe",
+      "allowed": true,
+      "reason": "Allowed (community source, safe verdict)",
+      "findings": []
+    }
+  ],
+  "ok": false
+}

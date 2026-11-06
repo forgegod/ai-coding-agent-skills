@@ -1,0 +1,15 @@
+✔ installs complete packages into existing global Claude Code and Codex directories (75.90913ms)
+✔ omits absent native clients without creating their configuration directories (38.635433ms)
+✔ preflights a native client collision before changing Hermes profiles (18.638701ms)
+✔ native client dry runs write nothing and explicit updates preserve full backups (37.338017ms)
+✔ purge uses a flat native client path and leaves no Hermes registration (27.296039ms)
+✔ CLI installs only a selected detected native client (80.545283ms)
+✔ tests/native-installation.test.mjs (41.672458ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 349.048507

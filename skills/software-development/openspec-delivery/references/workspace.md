@@ -5,6 +5,13 @@ host's `terminal` tool for commands, resolving scripts from this loaded package.
 The helper is read-only. It returns exact argument arrays, not authority, locks,
 remote truth, test results or proof of ownership. Keep operator-serialized starts.
 
+Both Git helpers share the [Git child environment contract](git-environment.md).
+Only allowlisted runtime locations and configuration selectors are forwarded;
+forbidden overrides fail even when empty. Configuration remains trusted, not
+sandboxed. Install the complete package including `scripts/git-environment.mjs`.
+On Windows, Git's `worktree --porcelain` paths are normalized after parsing before
+canonical-path checks; user-supplied workspace paths remain strict.
+
 ## Prepare or reuse
 
 1. Read root/owning contracts, native artifacts, target policy, `git status --short`,

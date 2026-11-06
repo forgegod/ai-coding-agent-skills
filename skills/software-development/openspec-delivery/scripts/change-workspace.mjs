@@ -4,15 +4,25 @@ import { execFileSync } from "node:child_process";
 import { existsSync, lstatSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { parseArgs } from "node:util";
+import { gitEnvironment } from "./git-environment.mjs";
 
 const requireThat = (condition, message) => { if (!condition) throw new Error(message); };
-const refused = ["GIT_DIR", "GIT_WORK_TREE", "GIT_COMMON_DIR", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_GRAFT_FILE", "GIT_REPLACE_REF_BASE", "GIT_SHALLOW_FILE", "GIT_CONFIG_COUNT", "GIT_CONFIG_PARAMETERS", "GIT_NAMESPACE"];
-const env = { ...process.env, GIT_NO_REPLACE_OBJECTS: "1", GIT_OPTIONAL_LOCKS: "0" };
+let env;
 function git(repo, ...args) {
   return execFileSync("git", ["--no-optional-locks", "-c", "core.fsmonitor=false", "-C", repo, ...args], { env, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 16 * 1024 * 1024 }).trimEnd();
 }
+export function hasControlCharacter(value) {
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code < 32 || code === 127) return true;
+  }
+  return false;
+}
+export function normalizeWorktreePath(value, platform = process.platform) {
+  return platform === "win32" ? path.win32.normalize(value) : value;
+}
 function canonical(file) {
-  requireThat(path.isAbsolute(file) && !/[\x00-\x1f\x7f]/.test(file), "Expected an absolute safe workspace path");
+  requireThat(path.isAbsolute(file) && !hasControlCharacter(file), "Expected an absolute safe workspace path");
   requireThat(path.normalize(file) === file, "Expected a normalized path");
   requireThat(file === path.join(realpathSync(path.dirname(file)), path.basename(file)), "Expected a canonical parent, not a symlink alias");
   requireThat(!lstatSync(file, { throwIfNoEntry: false })?.isSymbolicLink(), "Workspace path is a symlink");
@@ -46,7 +56,9 @@ const overlaps = (a, b) => { const relative = path.relative(a, b); return relati
 function inventory(repo) {
   return git(repo, "worktree", "list", "--porcelain", "-z").split("\0\0").filter(Boolean).map((block) => Object.fromEntries(block.split("\0").filter(Boolean).map((line) => {
     const at = line.indexOf(" ");
-    return at < 0 ? [line, true] : [line.slice(0, at), line.slice(at + 1)];
+    const key = line.slice(0, at);
+    const value = line.slice(at + 1);
+    return at < 0 ? [line, true] : [key, key === "worktree" ? normalizeWorktreePath(value) : value];
   })));
 }
 function locate(o, entries, branch) {
@@ -68,7 +80,7 @@ function locate(o, entries, branch) {
   return { workspace, branch, base: o.base, head, dirty: dirty(workspace) };
 }
 function main() {
-  for (const name of refused) requireThat(process.env[name] === undefined, `Unsupported Git environment override: ${name}`);
+  env = gitEnvironment(process.env);
   const command = process.argv[2];
   requireThat(["prepare", "locate", "retire"].includes(command), "Expected prepare, locate or retire");
   const args = process.argv.slice(3);
@@ -107,5 +119,11 @@ function main() {
   for (const entry of entries) requireThat(!overlaps(entry.worktree, workspace) && !overlaps(workspace, entry.worktree), "Workspace overlaps or is inside an existing checkout");
   return { action: "create", workspace, branch, base: o.base, argv: ["git", "-C", o.repo, "worktree", "add", "-b", branch, "--", workspace, o.base] };
 }
-try { console.log(JSON.stringify({ ok: true, ...main() })); }
-catch (error) { console.log(JSON.stringify({ ok: false, error: error.message })); process.exitCode = 1; }
+const isMain = () => {
+  try { return realpathSync(process.argv[1]) === realpathSync(new URL(import.meta.url)); }
+  catch { return false; }
+};
+if (isMain()) {
+  try { console.log(JSON.stringify({ ok: true, ...main() })); }
+  catch (error) { console.log(JSON.stringify({ ok: false, error: error.message })); process.exitCode = 1; }
+}

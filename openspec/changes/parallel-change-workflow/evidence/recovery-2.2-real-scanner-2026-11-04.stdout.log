@@ -1,0 +1,67 @@
+
+> ai-coding-agent-skills@1.0.0 test:security
+> npm run build && python3 -B tests/security_scan_test.py && python3 -B scripts/check-skill-security.py
+
+
+> ai-coding-agent-skills@1.0.0 build
+> node scripts/build-distribution.mjs --out dist
+
+Built 5 skills and 2 Claude plugins at /home/raphael/src/ai-coding-agent-skills--parallel-change-workflow-reconciliation/dist
+{
+  "scanner_version": "skills-guard-v10",
+  "scanner_sha256": "2b39ae73585709c51af62cbf8c3f23c5330ca1e297ac01453e9328996e281562",
+  "coverage": "all UTF-8 package files, including .mjs/.cjs; no ignore exclusions",
+  "packages": [
+    {
+      "name": "autonomous-implementation-review",
+      "files_scanned": 12,
+      "verdict": "safe",
+      "allowed": true,
+      "reason": "Allowed (community source, safe verdict)",
+      "findings": []
+    },
+    {
+      "name": "capability-wireframes",
+      "files_scanned": 2,
+      "verdict": "safe",
+      "allowed": true,
+      "reason": "Allowed (community source, safe verdict)",
+      "findings": []
+    },
+    {
+      "name": "git-commit-message",
+      "files_scanned": 2,
+      "verdict": "safe",
+      "allowed": true,
+      "reason": "Allowed (community source, safe verdict)",
+      "findings": []
+    },
+    {
+      "name": "openspec-delivery",
+      "files_scanned": 13,
+      "verdict": "safe",
+      "allowed": true,
+      "reason": "Allowed (community source, safe verdict)",
+      "findings": [
+        {
+          "pattern_id": "js_char_code",
+          "severity": "medium",
+          "category": "obfuscation",
+          "file": "scripts/change-workspace.mjs",
+          "line": 16,
+          "match": "const code = value.charCodeAt(index);",
+          "description": "JavaScript character code construction (possible obfuscation)"
+        }
+      ]
+    },
+    {
+      "name": "openspec-next",
+      "files_scanned": 1,
+      "verdict": "safe",
+      "allowed": true,
+      "reason": "Allowed (community source, safe verdict)",
+      "findings": []
+    }
+  ],
+  "ok": true
+}

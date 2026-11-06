@@ -1,12 +1,32 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const helper = fileURLToPath(new URL("../skills/software-development/openspec-delivery/scripts/change-workspace.mjs", import.meta.url));
+
+test("workspace inventory normalizes Git for Windows worktree paths", async () => {
+  const { normalizeWorktreePath } = await import("../skills/software-development/openspec-delivery/scripts/change-workspace.mjs");
+  assert.equal(normalizeWorktreePath("C:/work/repo--example", "win32"), "C:\\work\\repo--example");
+  assert.equal(normalizeWorktreePath("/work/repo--example", "linux"), "/work/repo--example");
+});
+
+test("workspace numeric C0/DEL predicate is equivalent over every UTF-16 code unit and Unicode paths", async () => {
+  const { hasControlCharacter } = await import("../skills/software-development/openspec-delivery/scripts/change-workspace.mjs");
+  assert.equal(typeof hasControlCharacter, "function");
+  const original = /[\x00-\x1f\x7f]/;
+  for (let code = 0; code <= 0xffff; code += 1) {
+    const character = String.fromCharCode(code);
+    assert.equal(hasControlCharacter(character), original.test(character), `code unit ${code}`);
+    assert.equal(hasControlCharacter(`/workspace/é/😀/${character}/end`), original.test(character), `embedded code unit ${code}`);
+  }
+  for (const value of ["", "/workspace/東京/😀", "C:\\work\\café", "/space here/文件", "/before\n/after", "/a\u007fb", "/a\u0080b", "/a\ud800b", "/a\udc00b"]) {
+    assert.equal(hasControlCharacter(value), original.test(value), JSON.stringify(value));
+  }
+});
 function run(command, args, cwd) {
   const result = spawnSync(command, args, { cwd, encoding: "utf8" });
   assert.equal(result.status, 0, result.stderr);
@@ -20,7 +40,8 @@ function invoke(f, command, extra = [], env = {}) {
   return { status: result.status, ...value };
 }
 async function fixture(t) {
-  const root = await mkdtemp(path.join(os.tmpdir(), "openspec-workspace-"));
+  // macOS /var and /tmp are symlink aliases. The helper rejects a non-canonical parent.
+  const root = await realpath(await mkdtemp(path.join(os.tmpdir(), "openspec-workspace-")));
   t.after(() => rm(root, { recursive: true, force: true }));
   const repo = path.join(root, "repo");
   await mkdir(repo);
@@ -107,6 +128,15 @@ test("workspace previews reject unsafe identity, symlinks, topology overrides an
   await symlink(outside, f.workspace, "dir");
   assert.notEqual(invoke(f, "prepare").status, 0);
   await rm(f.workspace);
+  for (const code of [...Array.from({ length: 31 }, (_, index) => index + 1), 127]) {
+    const result = invoke(f, "prepare", ["--workspace", `${f.workspace}${String.fromCharCode(code)}`]);
+    assert.equal(result.status, 1);
+    assert.match(result.error, /safe workspace path/);
+  }
+  assert.match(invoke(f, "prepare", ["--workspace", `${f.root}${path.sep}unused${path.sep}..${path.sep}destination`]).error, /normalized/);
+  const alias = path.join(f.root, "parent-alias");
+  await symlink(outside, alias, "dir");
+  assert.match(invoke(f, "prepare", ["--workspace", path.join(alias, "destination")]).error, /canonical parent/);
   for (const extra of [["--change", "../escape"], ["--base", "HEAD"], ["--unknown"], ["--branch", "-bad"], ["--workspace", "relative"]]) {
     assert.notEqual(invoke(f, "prepare", extra).status, 0, JSON.stringify(extra));
   }

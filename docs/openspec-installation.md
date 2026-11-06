@@ -19,6 +19,14 @@ Neither our marketplace, ZIPs, well-known endpoint nor `npm run install:local`
 installs upstream OpenSpec. The published inventory stays five companion packages
 and two plugins. No upstream packages are vendored here.
 
+Keep companion packages complete when installing or updating: the delivery Git
+helpers import `scripts/git-environment.mjs` and document their allowlist and trusted
+configuration selectors in
+[references/git-environment.md](../skills/software-development/openspec-delivery/references/git-environment.md).
+This adds no upstream skill or runtime dependency. Package installation/validation
+does not establish native Git behavior; missing native macOS/Windows results remain
+hardening completion blockers, and WSL or case simulations do not replace them.
+
 ## Required upstream inventory
 
 These are this project's seven mandatory setup prerequisites, not a claim that
