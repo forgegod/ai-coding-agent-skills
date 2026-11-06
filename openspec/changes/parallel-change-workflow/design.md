@@ -201,3 +201,29 @@ native-client and sandbox results are new evidence, not claims about the origina
 delivery. Terminal integration, verified receipt/archive and cleanup remain finish
 obligations rather than candidate checkboxes, so the receipt guard is not made
 circular. Target-project migration remains outside scope.
+
+### Strict-CI sequencing
+
+Tasks 2.3 and 2.4 must complete their candidate-local scope before final candidate
+freeze and independent exact-SHA review. Task 2.3's retained pilot/ruleset evidence
+remains partial until assessed against that scope; this repair completes neither
+task. Commit evidence-supported task progress before final freeze/review, not after
+the future PR's CI results. Required CI is a protected-integration acceptance
+prerequisite rather than a candidate checkbox.
+
+The correction must descend from integrated target
+`ec622395f4b0b26a5803181bae83ff02ab3e4f2e`. R2's retained passing gates verify
+that exact target only and must not be rerun for this repair. PR #13's successful
+non-required `verify` result remains historical, not strict required-CI acceptance.
+Before a separately authorized correction merge, read back the applicable live
+rules and require strict, successful required `verify` from GitHub Actions
+integration `15368` on the up-to-date PR head equal to the independently reviewed
+candidate. Missing, pending, failed or wrong-head required checks block merge;
+a changed candidate requires renewed applicable gates and independent review.
+No rule weakening or bypass is permitted.
+
+Actual correction-target verification follows protected integration; R2 cannot
+verify that later revision. Receipt/archive and acceptance-bound issue closure
+remain subsequent, distinct outcomes. These planning-byte changes require a
+separately authorized plan freeze and explicit approval of the new SHA/digest
+before recovery resumes; confirmation of edits is neither approval nor execution.

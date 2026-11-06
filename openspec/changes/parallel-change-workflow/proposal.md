@@ -79,6 +79,12 @@ negative controls must pass for all five packages. A safe scratch prototype is n
 that result. Affected package inventories, skill/plugin versions and documentation
 must remain synchronized, with independent review of the actual candidate.
 
+Strict required CI for the future correction PR is a protected-integration
+acceptance prerequisite, not a candidate-task checkbox. Complete tasks 2.3/2.4
+and commit their evidence-supported progress before final candidate freeze and
+independent exact-SHA review. Historical PR #13's non-required `verify` result
+and R2's integrated-target verification do not satisfy that pre-merge requirement.
+
 ## Out of Scope
 
 Unattended scheduling, distributed fencing, automatic installation, record conversion

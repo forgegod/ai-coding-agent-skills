@@ -46,8 +46,8 @@ its unchanged planning workspace is not the independent second pilot candidate.
 
 - [x] 2.1 Bind issue #8 to the recovery plan, preserve the missing historical admission evidence, and record approval of this exact recovery-plan revision and digest before executing the correction.
 - [x] 2.2 Run the real-scanner release gate and native-client installation/validation in isolated homes, retaining exact command output.
-- [ ] 2.3 Run the authorized live sandbox concurrency/recovery pilot and verify the active main ruleset and required CI evidence.
-- [ ] 2.4 Synchronize the `openspec-integration` delta for previously shipped behavior and newly implemented hardening into the current-spec tree, validate metadata and OpenSpec artifacts, rerun affected gates, and freeze an independently reviewed correction candidate without claiming the new requirements were already shipped.
+- [ ] 2.3 Verify the authorized live sandbox concurrency/recovery pilot and active main ruleset, retaining exact evidence and the historical required-CI gap; required-CI acceptance for the correction PR is a terminal prerequisite, not this candidate checkbox.
+- [ ] 2.4 Synchronize the `openspec-integration` delta for previously shipped behavior and newly implemented hardening into the current-spec tree, validate metadata and OpenSpec artifacts, and rerun affected local gates before final candidate freeze and independent review, without claiming the new requirements were already shipped.
 
 ## Operator revision
 
@@ -64,13 +64,30 @@ The orchestrator alone updates these task checkboxes from evidence.
 
 ## Terminal delivery boundary
 
-After all candidate tasks are complete and independently reviewed, the existing
-`/openspec-delivery finish parallel-change-workflow` authority governs protected
-publication, actual integrated-revision verification, factual receipt, native archive,
-acceptance-bound issue closure and clean-worktree retirement. These terminal outcomes
-are intentionally not task checkboxes: making them candidate tasks would prevent the
-receipt guard from accepting the reviewed candidate. No task is checked from a
-prospective merge, receipt or archive.
+This sequencing repair does not complete tasks 2.3/2.4. Retained pilot/ruleset
+evidence must be assessed against the candidate-local scope; historical PR #13
+and R2 alone do not complete either task. The orchestrator commits evidence-supported
+candidate-task progress before final clean candidate freeze and independent exact-SHA
+review. Neither task requires the future correction PR's required-CI result or merge
+as its completion condition.
+
+After all candidate tasks are complete and the final frozen candidate is independently
+reviewed, separately authorized `/openspec-delivery finish parallel-change-workflow`
+governs protected publication and integration. Before merge, read back the applicable
+live rules and require strict, successful required `verify` from GitHub Actions
+integration `15368` on the up-to-date PR head equal to that exact reviewed candidate.
+Missing, pending, failed or wrong-head checks block merge; changed candidates require
+renewed applicable gates and independent review, not a bypass or weakened rule.
+Do not change a task checkbox to record those later CI results.
+
+Actual correction-target verification follows protected integration, separately
+from R2's retained verification of its earlier exact target. Factual receipt,
+native archive, acceptance-bound issue closure and clean-worktree retirement follow
+successful correction-target verification. These terminal outcomes are intentionally
+not task checkboxes: making them candidate tasks would prevent the receipt guard
+from accepting the reviewed candidate. No task is checked from a prospective merge,
+receipt or archive. Changed planning bytes require a later plan freeze and explicit
+approval of the new SHA/digest before recovery resumes; this draft grants neither.
 
 ## Operator revision: ticket, review, and identity
 
