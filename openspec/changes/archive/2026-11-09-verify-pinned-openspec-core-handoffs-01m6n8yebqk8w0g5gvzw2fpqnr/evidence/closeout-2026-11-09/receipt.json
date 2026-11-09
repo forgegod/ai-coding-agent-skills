@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "change": "verify-pinned-openspec-core-handoffs-01m6n8yebqk8w0g5gvzw2fpqnr",
+  "issueUrl": "https://github.com/forgegod/ai-coding-agent-skills/issues/12",
+  "base": "a85ceff2e461a70fbeca1e8e2abf6ff5fddd7007",
+  "head": "9ca1f41bc9e3c0d252846f39dddebfaf076e134f",
+  "plan": "5bfac8510f2e7e5beb3052a7058595777b3198aa",
+  "planDigest": "b0f00832270d552e1a8ed7531c8217c9107183712152c0b5fa1d019df4cc96a9",
+  "integrated": "64a3783f3feb2a72cb7ce62972d8efeb5c0c68a2",
+  "verified": "64a3783f3feb2a72cb7ce62972d8efeb5c0c68a2",
+  "review": {
+    "schemaVersion": 1,
+    "recordType": "orchestrator-dispositioned-review",
+    "change": "verify-pinned-openspec-core-handoffs-01m6n8yebqk8w0g5gvzw2fpqnr",
+    "issueUrl": "https://github.com/forgegod/ai-coding-agent-skills/issues/12",
+    "head": "9ca1f41bc9e3c0d252846f39dddebfaf076e134f",
+    "planDigest": "b0f00832270d552e1a8ed7531c8217c9107183712152c0b5fa1d019df4cc96a9",
+    "verdict": "pass",
+    "findings": [],
+    "findingsInterpretation": "Unresolved findings after explicit operator disposition. This is NOT a no-findings independent report. The independent report contains L1 (low); preserve reportedFindings and the attributable acceptance below.",
+    "reportedFindings": [
+      {
+        "id": "L1",
+        "severity": "low",
+        "blocking": false,
+        "path": "tests/openspec-cli-compatibility.mjs:208-216,424-428",
+        "description": "Concurrent probe failure and log-write failure can mask the primary error; cleanup still executes.",
+        "disposition": "Operator accepted the non-blocking diagnostic limitation without a candidate edit."
+      }
+    ],
+    "reviewer": "Claude Code / claude-opus-5-5 / session 5b341b3a-2b0b-424d-bffd-6a5a9561262e",
+    "reference": "evidence/closeout-2026-11-09/independent-review.json",
+    "operatorDisposition": "evidence/closeout-2026-11-09/review-disposition.json",
+    "operator": "Raphael",
+    "operatorStatement": "Accept the documented low-severity limitation and finish B",
+    "gates": [
+      {
+        "command": "npm run test:openspec",
+        "commit": "9ca1f41bc9e3c0d252846f39dddebfaf076e134f",
+        "exitCode": 0,
+        "evidence": "evidence/closeout-2026-11-09/candidate-gate-1-test-openspec.json"
+      },
+      {
+        "command": "npm test",
+        "commit": "9ca1f41bc9e3c0d252846f39dddebfaf076e134f",
+        "exitCode": 0,
+        "evidence": "evidence/closeout-2026-11-09/candidate-gate-2-npm-test.json"
+      },
+      {
+        "command": "npm run build",
+        "commit": "9ca1f41bc9e3c0d252846f39dddebfaf076e134f",
+        "exitCode": 0,
+        "evidence": "evidence/closeout-2026-11-09/candidate-gate-3-build.json"
+      },
+      {
+        "command": "npm run validate:openspec",
+        "commit": "9ca1f41bc9e3c0d252846f39dddebfaf076e134f",
+        "exitCode": 0,
+        "evidence": "evidence/closeout-2026-11-09/candidate-gate-4-metadata.json"
+      },
+      {
+        "command": "openspec validate --all --strict --json --no-interactive",
+        "commit": "9ca1f41bc9e3c0d252846f39dddebfaf076e134f",
+        "exitCode": 0,
+        "evidence": "evidence/closeout-2026-11-09/candidate-gate-5-native-strict.json"
+      },
+      {
+        "command": "git diff --check a85ceff2e461a70fbeca1e8e2abf6ff5fddd7007..9ca1f41bc9e3c0d252846f39dddebfaf076e134f",
+        "commit": "9ca1f41bc9e3c0d252846f39dddebfaf076e134f",
+        "exitCode": 0,
+        "evidence": "evidence/closeout-2026-11-09/candidate-gate-6-whitespace.json"
+      }
+    ]
+  },
+  "integrationReference": "https://github.com/forgegod/ai-coding-agent-skills/pull/14",
+  "gates": [
+    {
+      "command": "npm run test:openspec",
+      "commit": "64a3783f3feb2a72cb7ce62972d8efeb5c0c68a2",
+      "exitCode": 0,
+      "evidence": "evidence/closeout-2026-11-09/integrated-1-test-openspec.json"
+    },
+    {
+      "command": "npm test",
+      "commit": "64a3783f3feb2a72cb7ce62972d8efeb5c0c68a2",
+      "exitCode": 0,
+      "evidence": "evidence/closeout-2026-11-09/integrated-2-test.json"
+    },
+    {
+      "command": "npm run build",
+      "commit": "64a3783f3feb2a72cb7ce62972d8efeb5c0c68a2",
+      "exitCode": 0,
+      "evidence": "evidence/closeout-2026-11-09/integrated-3-build.json"
+    },
+    {
+      "command": "npm run validate:openspec",
+      "commit": "64a3783f3feb2a72cb7ce62972d8efeb5c0c68a2",
+      "exitCode": 0,
+      "evidence": "evidence/closeout-2026-11-09/integrated-4-metadata.json"
+    },
+    {
+      "command": "openspec validate --all --strict --json --no-interactive",
+      "commit": "64a3783f3feb2a72cb7ce62972d8efeb5c0c68a2",
+      "exitCode": 0,
+      "evidence": "evidence/closeout-2026-11-09/integrated-5-strict.json"
+    },
+    {
+      "command": "git diff --check ec622395f4b0b26a5803181bae83ff02ab3e4f2e..64a3783f3feb2a72cb7ce62972d8efeb5c0c68a2",
+      "commit": "64a3783f3feb2a72cb7ce62972d8efeb5c0c68a2",
+      "exitCode": 0,
+      "evidence": "evidence/closeout-2026-11-09/integrated-6-whitespace.json"
+    }
+  ],
+  "priorProtectedTarget": "ec622395f4b0b26a5803181bae83ff02ab3e4f2e",
+  "integrationMergedAt": "2026-11-09T08:00:11Z",
+  "premergeEvidence": "evidence/closeout-2026-11-09/premerge-and-merge.json",
+  "limitations": [
+    "The old review remains rejected; historical capture-module provenance remains unproved.",
+    "L1 is operator-accepted non-blocking risk, not an empty independent report.",
+    "No scanner/native-installer rerun required by this test-only non-package change.",
+    "This receipt attests implementation integration and exact-target verification; it does not predeclare its own closure PR merge, issue closure or worktree removal."
+  ]
+}
