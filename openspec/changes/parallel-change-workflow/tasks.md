@@ -46,8 +46,8 @@ its unchanged planning workspace is not the independent second pilot candidate.
 
 - [x] 2.1 Bind issue #8 to the recovery plan, preserve the missing historical admission evidence, and record approval of this exact recovery-plan revision and digest before executing the correction.
 - [x] 2.2 Run the real-scanner release gate and native-client installation/validation in isolated homes, retaining exact command output.
-- [ ] 2.3 Verify the authorized live sandbox concurrency/recovery pilot and active main ruleset, retaining exact evidence and the historical required-CI gap; required-CI acceptance for the correction PR is a terminal prerequisite, not this candidate checkbox.
-- [ ] 2.4 Synchronize the `openspec-integration` delta for previously shipped behavior and newly implemented hardening into the current-spec tree, validate metadata and OpenSpec artifacts, and rerun affected local gates before final candidate freeze and independent review, without claiming the new requirements were already shipped.
+- [x] 2.3 Verify the authorized live sandbox concurrency/recovery pilot and active main ruleset, retaining exact evidence and the historical required-CI gap; required-CI acceptance for the correction PR is a terminal prerequisite, not this candidate checkbox.
+- [x] 2.4 Synchronize the `openspec-integration` delta for previously shipped behavior and newly implemented hardening into the current-spec tree, validate metadata and OpenSpec artifacts, and rerun affected local gates before final candidate freeze and independent review, without claiming the new requirements were already shipped.
 
 ## Operator revision
 
