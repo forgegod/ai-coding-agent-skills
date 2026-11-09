@@ -1,0 +1,9 @@
+{
+  "command": "OPENSPEC_TELEMETRY=0 openspec validate verify-pinned-openspec-core-handoffs-01m6n8yebqk8w0g5gvzw2fpqnr --strict --json --no-interactive",
+  "cwd": "/home/raphael/src/ai-coding-agent-skills--verify-pinned-openspec-core-handoffs-01m6n8yebqk8w0g5gvzw2fpqnr",
+  "result": {
+    "output": "{\n  \"items\": [\n    {\n      \"id\": \"verify-pinned-openspec-core-handoffs-01m6n8yebqk8w0g5gvzw2fpqnr\",\n      \"type\": \"change\",\n      \"valid\": true,\n      \"issues\": [\n        {\n          \"level\": \"INFO\",\n          \"path\": \"file\",\n          \"message\": \"skip_specs is set in .openspec.yaml: change declares no spec-level behavior changes, zero deltas accepted\"\n        }\n      ],\n      \"durationMs\": 19\n    }\n  ],\n  \"summary\": {\n    \"totals\": {\n      \"items\": 1,\n      \"passed\": 1,\n      \"failed\": 0\n    },\n    \"byType\": {\n      \"change\": {\n        \"items\": 1,\n        \"passed\": 1,\n        \"failed\": 0\n      }\n    }\n  },\n  \"version\": \"1.0\",\n  \"root\": {\n    \"path\": \"/home/raphael/src/ai-coding-agent-skills--verify-pinned-openspec-core-handoffs-01m6n8yebqk8w0g5gvzw2fpqnr\",\n    \"source\": \"nearest\"\n  }\n}",
+    "exit_code": 0,
+    "error": null
+  }
+}
