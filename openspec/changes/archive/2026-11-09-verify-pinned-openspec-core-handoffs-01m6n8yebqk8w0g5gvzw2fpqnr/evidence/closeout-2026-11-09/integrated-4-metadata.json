@@ -1,0 +1,40 @@
+{
+  "format": "lossless-utf8-file-map-v1",
+  "files": {
+    "command.txt": {
+      "sha256": "4d0e4eceeab940e9c5044274d64363eddccd7d16e97768575fe3b0727c498448",
+      "bytes": 26,
+      "text": "npm run validate:openspec\n"
+    },
+    "cwd.txt": {
+      "sha256": "b08ce61da6f2efb62979af662e7edbdab47e4d2b6dc68b6d1a9144f0de5c004e",
+      "bytes": 70,
+      "text": "/home/raphael/src/ai-coding-agent-skills--verify-b-integrated-64a3783\n"
+    },
+    "ended.txt": {
+      "sha256": "ee82ddf929f1845ad2b619bfb18f7d653d0d34e9ae1475e264bd98a7071d4f72",
+      "bytes": 36,
+      "text": "2026-11-09T08:02:18,293264725+00:00\n"
+    },
+    "exit.txt": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "text": "0\n"
+    },
+    "started.txt": {
+      "sha256": "72957d052cedf8b60e5ef7462ba89fcf64192a9b14d306479b150fd471225a32",
+      "bytes": 36,
+      "text": "2026-11-09T08:02:18,125048952+00:00\n"
+    },
+    "stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "text": ""
+    },
+    "stdout.log": {
+      "sha256": "906188fc77196a244cc9d7a086680f534af3e93c627db962d2067ce43e9cbe72",
+      "bytes": 1884,
+      "text": "\n> ai-coding-agent-skills@1.0.0 validate:openspec\n> node scripts/validate-openspec-metadata.mjs\n\n{\n  \"ok\": true,\n  \"files\": [\n    \"openspec/changes/archive/2026-10-31-document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/design.md\",\n    \"openspec/changes/archive/2026-10-31-document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/proposal.md\",\n    \"openspec/changes/archive/2026-10-31-document-openspec-prerequisites-01m69edkq8qyeb7tf1t4r7m7s4/tasks.md\",\n    \"openspec/changes/archive/2026-10-31-local-client-skill-install-01m6896x3994xcc0erw8jnr15z/design.md\",\n    \"openspec/changes/archive/2026-10-31-local-client-skill-install-01m6896x3994xcc0erw8jnr15z/proposal.md\",\n    \"openspec/changes/archive/2026-10-31-local-client-skill-install-01m6896x3994xcc0erw8jnr15z/specs/local-skill-installation/spec.md\",\n    \"openspec/changes/archive/2026-10-31-local-client-skill-install-01m6896x3994xcc0erw8jnr15z/tasks.md\",\n    \"openspec/changes/archive/2026-11-01-update-openspec-1-16-prerequisites-01m69z5ccp3mt47qa6d7g6bdjr/design.md\",\n    \"openspec/changes/archive/2026-11-01-update-openspec-1-16-prerequisites-01m69z5ccp3mt47qa6d7g6bdjr/proposal.md\",\n    \"openspec/changes/archive/2026-11-01-update-openspec-1-16-prerequisites-01m69z5ccp3mt47qa6d7g6bdjr/tasks.md\",\n    \"openspec/changes/parallel-change-workflow/design.md\",\n    \"openspec/changes/parallel-change-workflow/proposal.md\",\n    \"openspec/changes/parallel-change-workflow/specs/openspec-integration/spec.md\",\n    \"openspec/changes/parallel-change-workflow/tasks.md\",\n    \"openspec/changes/verify-pinned-openspec-core-handoffs-01m6n8yebqk8w0g5gvzw2fpqnr/design.md\",\n    \"openspec/changes/verify-pinned-openspec-core-handoffs-01m6n8yebqk8w0g5gvzw2fpqnr/proposal.md\",\n    \"openspec/changes/verify-pinned-openspec-core-handoffs-01m6n8yebqk8w0g5gvzw2fpqnr/tasks.md\",\n    \"openspec/specs/local-skill-installation/spec.md\"\n  ]\n}\n"
+    }
+  }
+}

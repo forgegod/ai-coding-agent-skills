@@ -1,0 +1,40 @@
+{
+  "format": "lossless-utf8-file-map-v1",
+  "files": {
+    "command.txt": {
+      "sha256": "84b27ea1cea4dd8ea4443353d408e6bab662a5173c583a65b20367cafc5e9282",
+      "bytes": 57,
+      "text": "openspec validate --all --strict --json --no-interactive\n"
+    },
+    "cwd.txt": {
+      "sha256": "b08ce61da6f2efb62979af662e7edbdab47e4d2b6dc68b6d1a9144f0de5c004e",
+      "bytes": 70,
+      "text": "/home/raphael/src/ai-coding-agent-skills--verify-b-integrated-64a3783\n"
+    },
+    "ended.txt": {
+      "sha256": "ab3fc16e7bf9661e7acfafc0f8b06fbdf098c06cbb57778b32cbf7a89de57ceb",
+      "bytes": 36,
+      "text": "2026-11-09T08:02:18,627467461+00:00\n"
+    },
+    "exit.txt": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "text": "0\n"
+    },
+    "started.txt": {
+      "sha256": "ce54a81b4d86b56a5e065b1d7cc4c24bddf91b98aa03a652e9e037977c416d2e",
+      "bytes": 36,
+      "text": "2026-11-09T08:02:18,498456620+00:00\n"
+    },
+    "stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "text": ""
+    },
+    "stdout.log": {
+      "sha256": "e0998958abab7f6cb5722480d631bdef97a0bd1cc1804c9d8a7f5662ea1071b4",
+      "bytes": 1127,
+      "text": "{\n  \"items\": [\n    {\n      \"id\": \"local-skill-installation\",\n      \"type\": \"spec\",\n      \"valid\": true,\n      \"issues\": [],\n      \"durationMs\": 5\n    },\n    {\n      \"id\": \"parallel-change-workflow\",\n      \"type\": \"change\",\n      \"valid\": true,\n      \"issues\": [],\n      \"durationMs\": 37\n    },\n    {\n      \"id\": \"verify-pinned-openspec-core-handoffs-01m6n8yebqk8w0g5gvzw2fpqnr\",\n      \"type\": \"change\",\n      \"valid\": true,\n      \"issues\": [\n        {\n          \"level\": \"INFO\",\n          \"path\": \"file\",\n          \"message\": \"skip_specs is set in .openspec.yaml: change declares no spec-level behavior changes, zero deltas accepted\"\n        }\n      ],\n      \"durationMs\": 28\n    }\n  ],\n  \"summary\": {\n    \"totals\": {\n      \"items\": 3,\n      \"passed\": 3,\n      \"failed\": 0\n    },\n    \"byType\": {\n      \"change\": {\n        \"items\": 2,\n        \"passed\": 2,\n        \"failed\": 0\n      },\n      \"spec\": {\n        \"items\": 1,\n        \"passed\": 1,\n        \"failed\": 0\n      }\n    }\n  },\n  \"version\": \"1.0\",\n  \"root\": {\n    \"path\": \"/home/raphael/src/ai-coding-agent-skills--verify-b-integrated-64a3783\",\n    \"source\": \"nearest\"\n  }\n}\n"
+    }
+  }
+}
