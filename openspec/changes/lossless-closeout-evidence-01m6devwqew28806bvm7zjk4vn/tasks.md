@@ -7,9 +7,9 @@ change: lossless-closeout-evidence-01m6devwqew28806bvm7zjk4vn
 
 ## 1. Reconcile prerequisites and bounded ownership
 
-- [ ] 1.1 After `parallel-change-workflow` group 10 reaches an accepted integrated revision, re-inspect its final source, documentation, configuration, probe, inventory, and focused-test paths against this dedicated workspace; preserve any dirty/unowned sibling state and verify a written ownership/sequencing decision before editing shared paths.
-- [ ] 1.2 Re-read the owning worktree/planning home, approved plan/digest inputs, and actual bootstrap state; document the covered guard paths, evidence-only additions, checkbox-only normalization, and the required response to authorized planning drift, verifying the focused guard/workspace fixtures cover each distinction.
-- [ ] 1.3 Reassess read-only hermes-dev differences against the accepted canonical base and classify every relevant addition as portable, already covered, out of scope, or owned by another change; verify no installed profile file is edited or used as a copied source.
+- [x] 1.1 After `parallel-change-workflow` group 10 reaches an accepted integrated revision, re-inspect its final source, documentation, configuration, probe, inventory, and focused-test paths against this dedicated workspace; preserve any dirty/unowned sibling state and verify a written ownership/sequencing decision before editing shared paths.
+- [x] 1.2 Re-read the owning worktree/planning home, approved plan/digest inputs, and actual bootstrap state; document the covered guard paths, evidence-only additions, checkbox-only normalization, and the required response to authorized planning drift, verifying the focused guard/workspace fixtures cover each distinction.
+- [x] 1.3 Reassess read-only hermes-dev differences against the accepted canonical base and classify every relevant addition as portable, already covered, out of scope, or owned by another change; verify no installed profile file is edited or used as a copied source.
 
 ## 2. Implement lossless representation and factual evidence procedure
 
