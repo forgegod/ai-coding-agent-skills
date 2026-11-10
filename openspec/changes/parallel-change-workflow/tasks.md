@@ -36,13 +36,13 @@ the retained failed scanner/native-client results unchanged.
 
 ## Historical recovery candidate
 
-Task 2.2 depends on completion of group 10 under the revised plan approval. Tasks
-2.3 and 2.4 remain pending and are not skipped because hardening passes. Retained
-gate output may be reused only for the exact applicable candidate and scope;
-changed candidates require renewed verification. Group 10 review does not replace
-review of the final spec-synchronized correction candidate in task 2.4. Lossless
-closeout evidence remains sequenced behind an accepted integrated group-10 result;
-its unchanged planning workspace is not the independent second pilot candidate.
+Task 2.2 depended on completion of group 10 under the revised plan approval.
+Tasks 2.3 and 2.4 were subsequently completed under the approved plan; hardening
+passes alone did not complete them. Retained gate output may be reused only for the
+exact applicable candidate and scope; changed candidates require renewed verification
+and a retained exact-SHA independent review. Lossless closeout evidence remains
+sequenced behind an accepted integrated group-10 result; its unchanged planning
+workspace is not the independent second pilot candidate.
 
 - [x] 2.1 Bind issue #8 to the recovery plan, preserve the missing historical admission evidence, and record approval of this exact recovery-plan revision and digest before executing the correction.
 - [x] 2.2 Run the real-scanner release gate and native-client installation/validation in isolated homes, retaining exact command output.
@@ -58,7 +58,7 @@ its unchanged planning workspace is not the independent second pilot candidate.
 
 The recovery does not assert that a proposal-time issue, immutable approval or
 dedicated review existed before the historical integration. Issue #8 documents this
-limitation and the new recovery scope. The unchecked candidate tasks are not
+limitation and the new recovery scope. These completed candidate tasks are not
 permissions to push, merge, install into shared profiles or start another change.
 The orchestrator alone updates these task checkboxes from evidence.
 
