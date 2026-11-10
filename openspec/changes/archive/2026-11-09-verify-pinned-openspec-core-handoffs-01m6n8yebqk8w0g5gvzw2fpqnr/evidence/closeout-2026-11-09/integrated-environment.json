@@ -1,0 +1,12 @@
+{
+  "commit": "64a3783f3feb2a72cb7ce62972d8efeb5c0c68a2",
+  "node": "v24.21.0",
+  "npm": "11.19.0",
+  "openspec": "1.16.0",
+  "dependencies": "private copy from clean B owner with byte-identical package-lock.json",
+  "npm_config_userconfig": "/home/raphael/verification-records/ai-coding-agent-skills/delivery-closeout-20261109T073839.788853Z/b-integrated-gates/npm-user.conf",
+  "npm_config_globalconfig": "/home/raphael/verification-records/ai-coding-agent-skills/delivery-closeout-20261109T073839.788853Z/b-integrated-gates/npm-global.conf",
+  "npm_config_cache": "/home/raphael/verification-records/ai-coding-agent-skills/delivery-closeout-20261109T073839.788853Z/b-integrated-gates/npm-cache",
+  "OPENSPEC_TELEMETRY": "0",
+  "TMPDIR": "inherited configured session scratch; no system temp override"
+}

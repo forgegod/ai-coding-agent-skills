@@ -1,0 +1,40 @@
+{
+  "format": "lossless-utf8-file-map-v1",
+  "files": {
+    "command.txt": {
+      "sha256": "dae58de3ddfde95b066b259e24d83e50d15aedeafb58b0b20d7b26dd324ef0ef",
+      "bytes": 14,
+      "text": "npm run build\n"
+    },
+    "cwd.txt": {
+      "sha256": "b08ce61da6f2efb62979af662e7edbdab47e4d2b6dc68b6d1a9144f0de5c004e",
+      "bytes": 70,
+      "text": "/home/raphael/src/ai-coding-agent-skills--verify-b-integrated-64a3783\n"
+    },
+    "ended.txt": {
+      "sha256": "9b3be9ab30545fd48419562d08300363bb52d80cd963d5826336ce592a29be96",
+      "bytes": 36,
+      "text": "2026-11-09T08:02:17,913459203+00:00\n"
+    },
+    "exit.txt": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "text": "0\n"
+    },
+    "started.txt": {
+      "sha256": "03e95afbc002ef82992563782c890d9d5aaa93f2296fa4d716eaa0ebb54359ee",
+      "bytes": 36,
+      "text": "2026-11-09T08:02:17,636326168+00:00\n"
+    },
+    "stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "text": ""
+    },
+    "stdout.log": {
+      "sha256": "75d478d1353917eaec58ccd00291e5c7521451c2cae79c48d289b8e1122a4aa0",
+      "bytes": 202,
+      "text": "\n> ai-coding-agent-skills@1.0.0 build\n> node scripts/build-distribution.mjs --out dist\n\nBuilt 5 skills and 2 Claude plugins at /home/raphael/src/ai-coding-agent-skills--verify-b-integrated-64a3783/dist\n"
+    }
+  }
+}

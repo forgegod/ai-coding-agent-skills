@@ -1,0 +1,45 @@
+{
+  "format": "lossless-utf8-file-map-v1",
+  "files": {
+    "command.txt": {
+      "sha256": "2591edadddd55e19ff75f1f70946cbbc9776eb311178f260bb9957b99bf2bc32",
+      "bytes": 601,
+      "text": "node /home/raphael/src/ai-coding-agent-skills--verify-pinned-openspec-core-handoffs-01m6n8yebqk8w0g5gvzw2fpqnr/skills/software-development/openspec-delivery/scripts/change-guard.mjs candidate --repo /home/raphael/src/ai-coding-agent-skills--verify-pinned-openspec-core-handoffs-01m6n8yebqk8w0g5gvzw2fpqnr --change verify-pinned-openspec-core-handoffs-01m6n8yebqk8w0g5gvzw2fpqnr --base a85ceff2e461a70fbeca1e8e2abf6ff5fddd7007 --head 9ca1f41bc9e3c0d252846f39dddebfaf076e134f --plan 5bfac8510f2e7e5beb3052a7058595777b3198aa --expect-plan b0f00832270d552e1a8ed7531c8217c9107183712152c0b5fa1d019df4cc96a9\n"
+    },
+    "cwd.txt": {
+      "sha256": "e1396c7ededa57ed1aa6a78c09cac99271cd9debaadb3ff22defe6b46204a952",
+      "bytes": 106,
+      "text": "/home/raphael/src/ai-coding-agent-skills--verify-pinned-openspec-core-handoffs-01m6n8yebqk8w0g5gvzw2fpqnr\n"
+    },
+    "endedAt": {
+      "sha256": "cf3140181dd68537ed31c9e2b6be0ea309821b5667c81ba8ef4c4c7bb8e3e65f",
+      "bytes": 31,
+      "text": "2026-11-06T10:45:02.950239709Z\n"
+    },
+    "environment.json": {
+      "sha256": "04150b70ef55de176679a97d990a72a6fea83cbb8920ff5666281eec460879a2",
+      "bytes": 6354,
+      "text": "{\n  \"explicitOverrides\": {\n    \"HOME\": \"/home/raphael/verification-records/ai-coding-agent-skills/candidate-b-R4b-exact-successor-20261106T104026.404686Z-b24esq15/home\",\n    \"XDG_CONFIG_HOME\": \"/home/raphael/verification-records/ai-coding-agent-skills/candidate-b-R4b-exact-successor-20261106T104026.404686Z-b24esq15/xdg-config\",\n    \"XDG_CACHE_HOME\": \"/home/raphael/verification-records/ai-coding-agent-skills/candidate-b-R4b-exact-successor-20261106T104026.404686Z-b24esq15/xdg-cache\",\n    \"TMPDIR\": \"/home/raphael/verification-records/ai-coding-agent-skills/candidate-b-R4b-exact-successor-20261106T104026.404686Z-b24esq15/tmp\",\n    \"TMP\": \"/home/raphael/verification-records/ai-coding-agent-skills/candidate-b-R4b-exact-successor-20261106T104026.404686Z-b24esq15/tmp\",\n    \"TEMP\": \"/home/raphael/verification-records/ai-coding-agent-skills/candidate-b-R4b-exact-successor-20261106T104026.404686Z-b24esq15/tmp\",\n    \"npm_config_cache\": \"/home/raphael/verification-records/ai-coding-agent-skills/candidate-b-R4b-exact-successor-20261106T104026.404686Z-b24esq15/npm-cache\",\n    \"npm_config_userconfig\": \"/home/raphael/verification-records/ai-coding-agent-skills/candidate-b-R4b-exact-successor-20261106T104026.404686Z-b24esq15/npm-user.conf\",\n    \"npm_config_globalconfig\": \"/home/raphael/verification-records/ai-coding-agent-skills/candidate-b-R4b-exact-successor-20261106T104026.404686Z-b24esq15/npm-global.conf\",\n    \"OPENSPEC_TELEMETRY\": \"0\",\n    \"GIT_OPTIONAL_LOCKS\": \"0\",\n    \"GIT_TERMINAL_PROMPT\": \"0\",\n    \"GIT_PAGER\": \"cat\",\n    \"LC_ALL\": \"C\",\n    \"PATH\": \"/home/raphael/.local/bin:/home/raphael/.hermes/hermes-agent/.hermes/bin:/home/raphael/.hermes/installs/5d506abaad0e4048/environments/4d2a885960674f9983b18d9ec8fef4e0/venv/bin:/home/raphael/.local/bin:/home/raphael/.nvm/versions/node/v24.21.0/bin:/home/raphael/.local/share/pnpm/bin:/home/raphael/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/usr/lib/linux-tools/6.18.54.1-microsoft-standard-WSL2/bin:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files (x86)/Common Files/Acronis/SnapAPI/:/mnt/c/Program Files (x86)/Common Files/Acronis/VirtualFile/:/mnt/c/Program Files (x86)/Common Files/Acronis/VirtualFile64/:/mnt/c/Program Files/dotnet/:/mnt/c/Program Files/Sunshine:/mnt/c/Program Files/Sunshine/tools:/mnt/c/Program Files/WezTerm:/mnt/c/Program Files/WSL/:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/Program Files/Git/cmd:/mnt/c/Program Files/Microsoft/Azure Functions Core Tools/:/mnt/c/Program Files/PowerShell/7/:/mnt/c/Users/raphael/AppData/Local/nvm:/mnt/c/nvm4w/nodejs:/mnt/c/Users/raphael/AppData/Local/hermes/bin:/mnt/c/Users/raphael/AppData/Local/Programs/Python/Launcher/:/mnt/c/Users/raphael/scoop/shims:/home/raphael/.hermes/tools/python-3.14.9+20261021-linux-x64/bin:/mnt/c/Users/raphael/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/raphael/AppData/Local/JetBrains/Toolbox/scripts:/mnt/c/Users/raphael/.local/bin:/mnt/c/Users/raphael/AppData/Local/PowerToys/DSCModules/:/mnt/c/Users/raphael/AppData/Local/AMD/AI_Bundle/Ollama:/mnt/c/Users/raphael/AppData/Local/Microsoft/WinGet/Links:/mnt/c/Users/raphael/.lmstudio/bin:/mnt/c/Users/raphael/.local/bin/llama.cpp-rocm-gfx120x:/mnt/c/Users/raphael/AppData/Local/Microsoft/WinGet/Packages/Starship.Starship_Microsoft.Winget.Source_8wekyb3d8bbwe:/mnt/c/Users/raphael/AppData/Local/Programs/Microsoft VS Code/bin:/mnt/c/Users/raphael/AppData/Local/Programs/Microsoft VS Code/bin/copilot-shim:/opt/homebrew/bin:/opt/homebrew/sbin:/home/raphael/.hermes/profiles/hermes-dev/bin:/home/raphael/.hermes/tools/agent-browser-0.26.0-linux-x64/bin:/home/raphael/.hermes/tools/cua-driver-0.21.0-linux-x64:/home/raphael/.hermes/tools/ffmpeg-9.0.1-linux-x64/bin:/home/raphael/.hermes/tools/npm-12.0.2-linux-x64/bin:/home/raphael/.hermes/tools/node-26.12.1-linux-x64/bin:/home/raphael/.hermes/tools/ripgrep-15.2.0-linux-x64:/snap/bin\"\n  },\n  \"inheritedVariableNames\": [\n    \"AI_AGENT\",\n    \"API_SERVER_CORS_ORIGINS\",\n    \"BASH_ENV\",\n    \"DBUS_SESSION_BUS_ADDRESS\",\n    \"DISCORD_HISTORY_BACKFILL\",\n    \"DISCORD_HISTORY_BACKFILL_LIMIT\",\n    \"DISCORD_REACTIONS\",\n    \"DISCORD_THREAD_REQUIRE_MENTION\",\n    \"EDITOR\",\n    \"GIT_PAGER\",\n    \"GSM_SKIP_SSH_AGENT_WORKAROUND\",\n    \"HERDR_BIN_PATH\",\n    \"HERDR_ENV\",\n    \"HERDR_PANE_ID\",\n    \"HERDR_SOCKET_PATH\",\n    \"HERDR_TAB_ID\",\n    \"HERDR_WORKSPACE_ID\",\n    \"HERMES_AGENT\",\n    \"HERMES_BROWSER_CONTROL_PRINCIPAL\",\n    \"HERMES_BROWSER_CONTROL_TRANSPORT_FAMILY\",\n    \"HERMES_CRON_SESSION\",\n    \"HERMES_DASHBOARD_FILES_ROOT\",\n    \"HERMES_EXEC_ASK\",\n    \"HERMES_HOME\",\n    \"HERMES_QUIET\",\n    \"HERMES_REAL_HOME\",\n    \"HERMES_REDACT_SECRETS\",\n    \"HERMES_SCRATCH_DIR\",\n    \"HERMES_SESSION_CHAT_ID\",\n    \"HERMES_SESSION_CHAT_NAME\",\n    \"HERMES_SESSION_CHAT_TYPE\",\n    \"HERMES_SESSION_ID\",\n    \"HERMES_SESSION_KEY\",\n    \"HERMES_SESSION_MESSAGE_ID\",\n    \"HERMES_SESSION_PARENT_CHAT_ID\",\n    \"HERMES_SESSION_PLATFORM\",\n    \"HERMES_SESSION_PROFILE\",\n    \"HERMES_SESSION_SCOPE_ID\",\n    \"HERMES_SESSION_SOURCE\",\n    \"HERMES_SESSION_THREAD_ID\",\n    \"HERMES_SESSION_USER_ID\",\n    \"HERMES_SESSION_USER_ID_ALT\",\n    \"HERMES_SESSION_USER_NAME\",\n    \"HERMES_STARTUP_WATCHDOG_TIMEOUT_S\",\n    \"HERMES_SUPERVISED_CHILD\",\n    \"HERMES_TURN_LEASE_TIMEOUT\",\n    \"HERMES_UI_SESSION_ID\",\n    \"HOME\",\n    \"HOSTNAME\",\n    \"INVOCATION_ID\",\n    \"JAVA_HOME\",\n    \"JOURNAL_STREAM\",\n    \"LANG\",\n    \"LOGNAME\",\n    \"MANAGERPID\",\n    \"MEMORY_PRESSURE_WATCH\",\n    \"MEMORY_PRESSURE_WRITE\",\n    \"NVM_BIN\",\n    \"NVM_CD_FLAGS\",\n    \"NVM_DIR\",\n    \"NVM_INC\",\n    \"OLDPWD\",\n    \"PAGER\",\n    \"PATH\",\n    \"PNPM_HOME\",\n    \"PWD\",\n    \"QT_ACCESSIBILITY\",\n    \"SHELL\",\n    \"SHLVL\",\n    \"SLACK_REQUIRE_MENTION\",\n    \"SSH_AGENT_PID\",\n    \"SSH_AUTH_SOCK\",\n    \"SYSTEMD_EXEC_PID\",\n    \"TELEGRAM_REACTIONS\",\n    \"TEMP\",\n    \"TERMINAL_DOCKER_IMAGE_PINNED\",\n    \"TMP\",\n    \"TMPDIR\",\n    \"TWINE_PASSWORD\",\n    \"TWINE_REPOSITORY\",\n    \"TWINE_USERNAME\",\n    \"USER\",\n    \"VIRTUALENVWRAPPER_SCRIPT\",\n    \"XDG_DATA_DIRS\",\n    \"XDG_RUNTIME_DIR\",\n    \"_\",\n    \"_HERMES_GATEWAY\",\n    \"_VIRTUALENVWRAPPER_API\",\n    \"_config_version\",\n    \"hooks_auto_accept\",\n    \"timezone\"\n  ],\n  \"scope\": \"subshell only; no persistent config; no credential values recorded\"\n}\n"
+    },
+    "exit": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "text": "0\n"
+    },
+    "startedAt": {
+      "sha256": "eadc2be07c35673e5c6244ebf5a7d1050c6509a4f5e936ad843ee5aece14df8c",
+      "bytes": 31,
+      "text": "2026-11-06T10:45:02.850972408Z\n"
+    },
+    "stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "text": ""
+    },
+    "stdout.log": {
+      "sha256": "e678d7893bdfc1ad5f55459c5fbf41e8807c23ab628457cf443b57c6d5eddcb8",
+      "bytes": 313,
+      "text": "{\"ok\":true,\"base\":\"a85ceff2e461a70fbeca1e8e2abf6ff5fddd7007\",\"head\":\"9ca1f41bc9e3c0d252846f39dddebfaf076e134f\",\"plan\":\"5bfac8510f2e7e5beb3052a7058595777b3198aa\",\"planDigest\":\"b0f00832270d552e1a8ed7531c8217c9107183712152c0b5fa1d019df4cc96a9\",\"tree\":\"d5c3a226af45638434c61666cce178e7deb4bb8e\",\"tasksComplete\":true}\n"
+    }
+  }
+}

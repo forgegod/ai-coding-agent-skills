@@ -1,0 +1,40 @@
+{
+  "format": "lossless-utf8-file-map-v1",
+  "files": {
+    "command.txt": {
+      "sha256": "88b2c262972d7e45bf4afe77caee3d131a81245966f3cd5baf1875ed861af0a7",
+      "bytes": 100,
+      "text": "git diff --check ec622395f4b0b26a5803181bae83ff02ab3e4f2e..64a3783f3feb2a72cb7ce62972d8efeb5c0c68a2\n"
+    },
+    "cwd.txt": {
+      "sha256": "b08ce61da6f2efb62979af662e7edbdab47e4d2b6dc68b6d1a9144f0de5c004e",
+      "bytes": 70,
+      "text": "/home/raphael/src/ai-coding-agent-skills--verify-b-integrated-64a3783\n"
+    },
+    "ended.txt": {
+      "sha256": "2578f3479e67945db3659d3fe7d26278027acf309d9ed059feabd8628981b3c4",
+      "bytes": 36,
+      "text": "2026-11-09T08:02:18,777498197+00:00\n"
+    },
+    "exit.txt": {
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "text": "0\n"
+    },
+    "started.txt": {
+      "sha256": "fcf0f991b4047f53ba44e848ab7737b77c115f6526d9f6cd448548220094e797",
+      "bytes": 36,
+      "text": "2026-11-09T08:02:18,773509531+00:00\n"
+    },
+    "stderr.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "text": ""
+    },
+    "stdout.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "text": ""
+    }
+  }
+}
