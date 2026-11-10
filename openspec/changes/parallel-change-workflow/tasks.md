@@ -32,7 +32,7 @@ the retained failed scanner/native-client results unchanged.
 - [x] 10.3 Exercise both helpers with real Git fixtures and isolated global/system configuration, including absent/empty selectors and existing topology/fsmonitor/ancestry/dirty-work protections; retain native Linux, macOS and Windows commands/results separately from simulations and document limitations, leaving missing native coverage as a completion blocker.
 - [x] 10.4 Synchronize affected support-file inventories, skill/plugin versions, owning contracts and current documentation; verify complete canonical package bytes, generated bundles and native validation/installation in isolated scratch homes without modifying installed profiles.
 - [x] 10.5 Run `npm test`, `npm run build`, `npm run validate:openspec`, `npm run test:openspec`, strict OpenSpec validation, `git diff --check` and `HERMES_SOURCE=<trusted-checkout> npm run test:security` after the final source/doc edit; retain actual results and require unchanged-scanner negative controls plus safe community verdicts for all five complete packages without exclusions, suppressions or bypasses.
-- [x] 10.6 Obtain independent review of the exact hardened candidate, including configuration compatibility, preserved safeguards, platform evidence and synchronized package/documentation changes; disposition findings and renew affected gates and exact-candidate review after corrections without treating the scratch probe as acceptance.
+- [x] 10.6 Establish the independent-review acceptance boundary for the exact hardened candidate, including configuration compatibility, preserved safeguards, platform evidence and synchronized package/documentation changes; a successor candidate requires a retained review bound to its exact SHA, disposition of findings and renewed affected gates/review after corrections without treating the scratch probe as acceptance.
 
 ## Historical recovery candidate
 
@@ -64,21 +64,24 @@ The orchestrator alone updates these task checkboxes from evidence.
 
 ## Terminal delivery boundary
 
-This sequencing repair does not complete tasks 2.3/2.4. Retained pilot/ruleset
-evidence must be assessed against the candidate-local scope; historical PR #13
-and R2 alone do not complete either task. The orchestrator commits evidence-supported
-candidate-task progress before final clean candidate freeze and independent exact-SHA
-review. Neither task requires the future correction PR's required-CI result or merge
-as its completion condition.
+The pre-execution sequencing repair did not itself complete tasks 2.3/2.4.
+Their candidate-local scope was subsequently completed under the approved plan
+recorded in the proposal; retained pilot/ruleset evidence was assessed against
+that scope, while historical PR #13 and R2 alone do not complete either task.
+Any successor amendment must preserve that history, obtain approval of its own
+planning identity, and renew applicable verification before final clean candidate
+freeze and independent exact-SHA review. Neither task requires the future
+correction PR's required-CI result or merge as its completion condition.
 
-After all candidate tasks are complete and the final frozen candidate is independently
-reviewed, separately authorized `/openspec-delivery finish parallel-change-workflow`
-governs protected publication and integration. Before merge, read back the applicable
-live rules and require strict, successful required `verify` from GitHub Actions
+After all implementation tasks are complete, the final frozen candidate requires
+an independently retained review bound to that exact SHA. Separately authorized
+`/openspec-delivery finish parallel-change-workflow` governs only the later
+protected publication and integration. Before merge, read back the applicable live
+rules and require strict, successful required `verify` from GitHub Actions
 integration `15368` on the up-to-date PR head equal to that exact reviewed candidate.
 Missing, pending, failed or wrong-head checks block merge; changed candidates require
 renewed applicable gates and independent review, not a bypass or weakened rule.
-Do not change a task checkbox to record those later CI results.
+Do not change a task checkbox to record those later CI or review results.
 
 Actual correction-target verification follows protected integration, separately
 from R2's retained verification of its earlier exact target. Factual receipt,

@@ -204,12 +204,19 @@ circular. Target-project migration remains outside scope.
 
 ### Strict-CI sequencing
 
-Tasks 2.3 and 2.4 must complete their candidate-local scope before final candidate
-freeze and independent exact-SHA review. Task 2.3's retained pilot/ruleset evidence
-remains partial until assessed against that scope; this repair completes neither
-task. Commit evidence-supported task progress before final freeze/review, not after
-the future PR's CI results. Required CI is a protected-integration acceptance
+The pre-execution repair draft did not itself complete tasks 2.3 and 2.4. Their
+candidate-local scope was subsequently completed under the exact approved plan
+and is traceable through the retained evidence/approval provenance recorded in
+the proposal. Future amendments must preserve that history, establish their own
+plan identity and approval, then renew applicable gates before their final
+candidate freeze/review. Required CI remains a protected-integration acceptance
 prerequisite rather than a candidate checkbox.
+
+Independent review is an exact-candidate acceptance boundary, not a mutable
+pre-completed task checkbox. The checked group-10 review task establishes that
+boundary and its required coverage; the review that accepts a successor candidate
+must be retained against that successor SHA. A failed review remains failed and
+cannot be repurposed as acceptance evidence.
 
 The correction must descend from integrated target
 `ec622395f4b0b26a5803181bae83ff02ab3e4f2e`. R2's retained passing gates verify
