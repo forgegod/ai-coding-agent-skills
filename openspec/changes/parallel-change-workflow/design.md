@@ -201,3 +201,36 @@ native-client and sandbox results are new evidence, not claims about the origina
 delivery. Terminal integration, verified receipt/archive and cleanup remain finish
 obligations rather than candidate checkboxes, so the receipt guard is not made
 circular. Target-project migration remains outside scope.
+
+### Strict-CI sequencing
+
+The pre-execution repair draft did not itself complete tasks 2.3 and 2.4. Their
+candidate-local scope was subsequently completed under the exact approved plan
+and is traceable through the retained evidence/approval provenance recorded in
+the proposal. Future amendments must preserve that history, establish their own
+plan identity and approval, then renew applicable gates before their final
+candidate freeze/review. Required CI remains a protected-integration acceptance
+prerequisite rather than a candidate checkbox.
+
+Independent review is an exact-candidate acceptance boundary, not a mutable
+pre-completed task checkbox. The checked group-10 review task establishes that
+boundary and its required coverage; the review that accepts a successor candidate
+must be retained against that successor SHA. A failed review remains failed and
+cannot be repurposed as acceptance evidence.
+
+The correction must descend from integrated target
+`ec622395f4b0b26a5803181bae83ff02ab3e4f2e`. R2's retained passing gates verify
+that exact target only and must not be rerun for this repair. PR #13's successful
+non-required `verify` result remains historical, not strict required-CI acceptance.
+Before a separately authorized correction merge, read back the applicable live
+rules and require strict, successful required `verify` from GitHub Actions
+integration `15368` on the up-to-date PR head equal to the independently reviewed
+candidate. Missing, pending, failed or wrong-head required checks block merge;
+a changed candidate requires renewed applicable gates and independent review.
+No rule weakening or bypass is permitted.
+
+Actual correction-target verification follows protected integration; R2 cannot
+verify that later revision. Receipt/archive and acceptance-bound issue closure
+remain subsequent, distinct outcomes. These planning-byte changes require a
+separately authorized plan freeze and explicit approval of the new SHA/digest
+before recovery resumes; confirmation of edits is neither approval nor execution.
