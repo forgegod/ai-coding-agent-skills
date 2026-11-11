@@ -31,9 +31,11 @@ A representation has:
 - `decodedOriginalSha256`, the SHA-256 of the decoded original bytes;
 - `wrapperSha256`, the SHA-256 of the canonical immutable wrapper payload;
 - provenance: source, command argv, environment scope, numeric exit status,
-  UTC observation time, revision, scope, pagination state, and verified readback
-  type (`original-response`, `lossless-representation`, `redacted-transformed`,
-  `historical-extract`, `fresh-corroboration`, or `merge-snapshot`); and
+  UTC source-capture time in `observedAt`, revision, scope, pagination state, and
+  verified readback type (`original-response`, `lossless-representation`,
+  `redacted-transformed`, `historical-extract`, `fresh-corroboration`, or
+  `merge-snapshot`). A `historical-extract` also has a distinct strict-UTC
+  `extractedAt`; and
 - fixed labels: that same readback type, completeness of `complete`, `partial`,
   or `not-applicable`, and confidentiality of `publishable`, `restricted`, or
   `redacted`.
@@ -63,21 +65,27 @@ fractional digits. A partial response cannot prove all threads were absent. A me
 response proves merge state only; it cannot replace retained check or review-thread
 data.
 
-For a claim that checks passed on a PR head, retain that exact head, applicable
-check identities, apps, conclusions, and completion times. Each applicable completion time
-must precede merge. A historical claim requires original captured output or a
-labeled historical extract from it. If the original is unavailable, retain the gap
-and narrow or block the claim rather than reconstructing a response from a narrative.
+For a claim that checks passed on a PR head, retain a decoded structured PR-check
+payload proving that exact head, every applicable check identity, successful
+conclusion, and completion time. Each applicable completion time must precede
+merge. For an `original-response`, `observedAt` is the source-capture time and
+must precede merge. For a `historical-extract`, `observedAt` remains that original
+source-capture time; `extractedAt` may be later and never substitutes for it. A
+historical claim requires original captured output or a labeled historical extract
+from it. If the original is unavailable, retain the gap and narrow or block the
+claim rather than reconstructing a response from a narrative.
 
-`assessClaimSupport` is a pure helper for this factual limit: it consumes verified
-readback semantics and returns `blocked` before any narrowing when evidence is
-missing or contrary. Missing or contrary evidence blocks support. A supported
-claim requires a successful exit status,
-publishable non-redacted evidence, strict UTC merge and completion instants, and
-every completion completed before merge. Partial pagination, fresh corroboration,
-and merge snapshots that meet those prerequisites return `narrowed`; only complete
-original responses or historical extracts return `supported`. It neither fetches
-nor proves facts that were not supplied.
+`assessClaimSupport` is a pure helper for this factual limit: it verifies and
+decodes the retained representation, then compares its structured payload with a
+caller-supplied expected head and applicable check identities. Caller-supplied
+completion times, conclusions, or opaque bytes cannot establish a claim. Missing
+or contrary evidence returns `blocked` before any narrowing. A supported claim
+requires complete original-response or historical-extract evidence with a
+successful exit status, publishable non-redacted labels, a strict UTC merge instant,
+the applicable source-capture rule, and every applicable decoded check successful
+and completed before merge. Partial pagination, fresh corroboration, and merge
+snapshots retain their existing `narrowed` result when otherwise valid; they never
+become `supported`. It neither fetches nor proves facts that were not retained.
 
 Secrets and confidential material remain subject to repository policy. Stop
 publication or retain an authorized transformation with its limitation. Neither a

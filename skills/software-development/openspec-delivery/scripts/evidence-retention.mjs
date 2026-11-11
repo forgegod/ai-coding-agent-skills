@@ -46,7 +46,7 @@ function validateProvenance(provenance) {
   if (!provenance || typeof provenance !== "object" || Array.isArray(provenance)) {
     throw new Error("provenance must be an object");
   }
-  const allowed = new Set(["source", "command", "environmentScope", "exitStatus", "observedAt", "revision", "scope", "pagination", "readbackType"]);
+  const allowed = new Set(["source", "command", "environmentScope", "exitStatus", "observedAt", "extractedAt", "revision", "scope", "pagination", "readbackType"]);
   if (Object.keys(provenance).some((field) => !allowed.has(field))) throw new Error("unknown provenance field");
   for (const field of ["source", "environmentScope", "revision", "scope"]) {
     requireText(provenance[field], `provenance.${field}`);
@@ -54,6 +54,11 @@ function validateProvenance(provenance) {
   requireUtcInstant(provenance.observedAt, "provenance.observedAt");
   if (!new Set(["original-response", "lossless-representation", "redacted-transformed", "historical-extract", "fresh-corroboration", "merge-snapshot"]).has(provenance.readbackType)) {
     throw new Error("provenance.readbackType must identify the readback type");
+  }
+  if (provenance.readbackType === "historical-extract") {
+    requireUtcInstant(provenance.extractedAt, "provenance.extractedAt");
+  } else if (Object.hasOwn(provenance, "extractedAt")) {
+    throw new Error("provenance.extractedAt is only valid for historical-extract evidence");
   }
   if (!Array.isArray(provenance.command) || provenance.command.length === 0 || provenance.command.some((part) => typeof part !== "string" || part.length === 0)) {
     throw new Error("provenance.command must be a non-empty string array");
@@ -190,20 +195,48 @@ export function verifyRepresentation(representation) {
   return original;
 }
 
-export function assessClaimSupport({ representation, mergedAt, completionTimes = [] }) {
-  verifyRepresentation(representation);
+function parsePrCheckPayload(original) {
+  let payload;
+  try {
+    payload = JSON.parse(original.toString("utf8"));
+  } catch {
+    return null;
+  }
+  if (!payload || typeof payload !== "object" || Array.isArray(payload) || typeof payload.head !== "string" || !Array.isArray(payload.checks)) return null;
+  if (payload.checks.some((check) => !check || typeof check !== "object" || Array.isArray(check) || typeof check.id !== "string" || typeof check.conclusion !== "string" || typeof check.completedAt !== "string")) return null;
+  return payload;
+}
+
+function hasSupportedChecks(payload, expectedHead, applicableCheckIds, mergeTime) {
+  if (typeof expectedHead !== "string" || expectedHead.length === 0 || !Array.isArray(applicableCheckIds) || applicableCheckIds.length === 0 || applicableCheckIds.some((id) => typeof id !== "string" || id.length === 0)) return false;
+  if (payload.head !== expectedHead || new Set(applicableCheckIds).size !== applicableCheckIds.length) return false;
+  const checksById = new Map();
+  for (const check of payload.checks) {
+    if (checksById.has(check.id)) return false;
+    checksById.set(check.id, check);
+  }
+  return applicableCheckIds.every((id) => {
+    const check = checksById.get(id);
+    const completedAt = check && parseUtcInstant(check.completedAt);
+    return check && check.conclusion === "success" && !Number.isNaN(completedAt) && completedAt < mergeTime;
+  });
+}
+
+export function assessClaimSupport({ representation, mergedAt, expectedHead, applicableCheckIds }) {
+  const original = verifyRepresentation(representation);
   const { readbackType: kind, pagination, exitStatus } = representation.provenance;
   if (exitStatus !== 0 || representation.labels.confidentiality !== "publishable") return "blocked";
   if (!new Set(["original-response", "historical-extract", "fresh-corroboration", "merge-snapshot"]).has(kind)) {
     throw new Error("kind must identify the readback type");
   }
   if (!new Set(["complete", "partial"]).has(pagination)) throw new Error("pagination must be complete or partial");
-  if (!Array.isArray(completionTimes)) return "blocked";
   const mergeTime = parseUtcInstant(mergedAt);
-  if (Number.isNaN(mergeTime) || completionTimes.length === 0 || completionTimes.some((time) => {
-    const completionTime = parseUtcInstant(time);
-    return Number.isNaN(completionTime) || completionTime >= mergeTime;
-  })) return "blocked";
-  if (pagination === "partial" || kind === "fresh-corroboration" || kind === "merge-snapshot") return "narrowed";
-  return "supported";
+  if (Number.isNaN(mergeTime)) return "blocked";
+  if (pagination === "partial") return kind === "original-response" ? "narrowed" : "blocked";
+  const payload = parsePrCheckPayload(original);
+  if (kind === "fresh-corroboration" || kind === "merge-snapshot") {
+    return payload && hasSupportedChecks(payload, expectedHead, applicableCheckIds, mergeTime) ? "narrowed" : "blocked";
+  }
+  if (representation.provenance.observedAt >= mergedAt) return "blocked";
+  return payload && hasSupportedChecks(payload, expectedHead, applicableCheckIds, mergeTime) ? "supported" : "blocked";
 }
