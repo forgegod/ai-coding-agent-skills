@@ -66,7 +66,15 @@ pagination or completeness state.
 #### Scenario: Original response is unavailable
 - **WHEN** the original response cannot be recovered
 - **THEN** the procedure records missing evidence or narrows or blocks the claim
+
 - **AND** it does not reconstruct an original response from a narrative summary
+
+#### Scenario: Fail-closed claim eligibility
+- **WHEN** a completion claim has failed, redacted, non-publishable, incoherent,
+  invalid-timestamp, missing, or post-merge evidence
+- **THEN** verification blocks the claim rather than reporting it supported
+- **AND** a supported claim uses a verified representation with coherent provenance
+  and labels, a successful exit status, strict UTC instants, and completion before merge
 
 ### Requirement: Factual closure review and successor evidence
 The delivery procedure SHALL require a fresh independent factual review for the

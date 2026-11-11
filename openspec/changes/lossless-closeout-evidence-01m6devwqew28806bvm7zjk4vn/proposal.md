@@ -36,6 +36,9 @@ record into a reconstructed passing narrative.
   contracts, and current documentation that implementation proves are required.
   A dependency-light representation/verification helper is conditional on the
   design assessment; it must not execute gates or issue API calls.
+- Amend the evidence contract after independent review findings: a supported claim
+  must fail closed unless verified evidence is coherent, successful, publishable,
+  strictly UTC-valid, and completed before merge.
 
 ## Capabilities
 

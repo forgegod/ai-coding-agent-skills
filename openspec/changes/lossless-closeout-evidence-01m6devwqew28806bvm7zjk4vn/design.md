@@ -93,6 +93,14 @@ head and conclusions. It never starts polling or grants merge authority. A
 merge-state response is retained as a narrower fact and does not substitute for
 check or fully paginated thread evidence.
 
+Verification and claim assessment fail closed. Verification rechecks provenance,
+representation, completeness, and confidentiality coherence after deserialization;
+redacted evidence cannot support a publishable claim. Observation, merge, and
+completion timestamps use one strict UTC instant validator. A claim is supported
+only when verified evidence has a successful exit status, publishable
+non-redacted confidentiality, valid applicable timestamps, and completion strictly
+before merge; otherwise it is blocked or explicitly narrowed.
+
 ### Preserve correction and closure boundaries
 
 Keep failed gate output and rejected review files byte-identical, bound to their
