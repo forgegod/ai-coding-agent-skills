@@ -31,8 +31,10 @@ A representation has:
 - `decodedOriginalSha256`, the SHA-256 of the decoded original bytes;
 - `wrapperSha256`, the SHA-256 of the canonical immutable wrapper payload;
 - provenance: source, command argv, environment scope, numeric exit status,
-  observation time, revision, scope, and pagination state; and
-- fixed labels: `lossless-representation`, completeness of `complete`, `partial`,
+  UTC observation time, revision, scope, pagination state, and verified readback
+  type (`original-response`, `lossless-representation`, `redacted-transformed`,
+  `historical-extract`, `fresh-corroboration`, or `merge-snapshot`); and
+- fixed labels: that same readback type, completeness of `complete`, `partial`,
   or `not-applicable`, and confidentiality of `publishable`, `restricted`, or
   `redacted`.
 
@@ -42,10 +44,11 @@ command, contact an API, or write a file. Empty, CRLF-only, and whitespace-only
 content are valid evidence bytes. Invalid UTF-8 is base64 represented; an invalid
 wrapper, unsupported encoding, malformed base64, changed provenance/label/encoding/
 content, or hash mismatch fails closed. `wrapperSha256` covers the canonical payload
-other than itself, avoiding a recursive self-hash. A helper-produced wrapper is always
-`lossless-representation`; an original byte copy is not a wrapper. A redacted or
-transformed artifact must be labeled `redacted` and must never be described as an
-original-byte copy.
+other than itself, avoiding a recursive self-hash. Canonical JSON recursively
+sorts object keys; unknown wrapper fields are rejected. The readback type and
+completeness label must agree with verified provenance. An original byte copy is
+not a wrapper. A redacted or transformed artifact must be `redacted-transformed`
+and labeled `redacted`; it must never be described as an original-byte copy.
 
 ## Provenance, completeness, and confidentiality
 
@@ -60,11 +63,13 @@ must precede merge. A historical claim requires original captured output or a
 labeled historical extract from it. If the original is unavailable, retain the gap
 and narrow or block the claim rather than reconstructing a response from a narrative.
 
-`assessClaimSupport` is a pure helper for this factual limit: partial pagination,
-fresh corroboration, and merge snapshots return `narrowed`; a check completion at or
-after a recorded merge returns `blocked`; only a complete original response or
-historical extract with timely completions returns `supported`. It neither fetches
-nor proves facts that were not supplied.
+`assessClaimSupport` is a pure helper for this factual limit: it consumes verified
+readback semantics, requires UTC ISO-8601 merge/completion timestamps for a
+historical check claim, and returns `blocked` before any narrowing when evidence is
+missing, ambiguous, or at/after merge. Otherwise partial pagination, fresh
+corroboration, and merge snapshots return `narrowed`; only complete original
+responses or historical extracts with timely completions return `supported`. It
+neither fetches nor proves facts that were not supplied.
 
 Secrets and confidential material remain subject to repository policy. Stop
 publication or retain an authorized transformation with its limitation. Neither a

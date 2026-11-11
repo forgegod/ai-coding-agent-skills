@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { assessClaimSupport, createRepresentation, verifyRepresentation } from "../skills/software-development/openspec-delivery/scripts/evidence-retention.mjs";
+import { assessClaimSupport, createRepresentation, sealRepresentation, storedArtifactSha256, verifyRepresentation } from "../skills/software-development/openspec-delivery/scripts/evidence-retention.mjs";
 
 const provenance = {
   source: "node --test fixture",
@@ -11,13 +11,20 @@ const provenance = {
   revision: "0123456789abcdef0123456789abcdef01234567",
   scope: "synthetic fixture",
   pagination: "not-applicable",
+  readbackType: "lossless-representation",
 };
 
 const labels = {
   representation: "lossless-representation",
-  completeness: "complete",
+  completeness: "not-applicable",
   confidentiality: "publishable",
 };
+
+const claim = (readbackType, pagination) => createRepresentation({
+  original: Buffer.from("claim\n"),
+  provenance: { ...provenance, readbackType, pagination },
+  labels: { ...labels, representation: readbackType, completeness: pagination },
+});
 
 test("represents UTF-8 CRLF bytes with trailing whitespace without normalization", () => {
   const original = Buffer.from("line one  \r\nline two\t\r\n", "utf8");
@@ -91,17 +98,27 @@ test("requires truthful labels and structured gate provenance", () => {
   );
 });
 
-test("narrows partial and current readbacks and blocks checks completed after merge", () => {
-  assert.equal(assessClaimSupport({ kind: "historical-extract", pagination: "partial" }), "narrowed");
-  assert.equal(assessClaimSupport({ kind: "fresh-corroboration", pagination: "complete" }), "narrowed");
-  assert.equal(assessClaimSupport({ kind: "merge-snapshot", pagination: "complete" }), "narrowed");
+test("derives claim limits from verified representations", () => {
+  assert.equal(assessClaimSupport({ representation: claim("original-response", "partial") }), "narrowed");
+  assert.equal(assessClaimSupport({ representation: claim("fresh-corroboration", "complete") }), "narrowed");
+  assert.equal(assessClaimSupport({ representation: claim("merge-snapshot", "complete") }), "narrowed");
+  assert.equal(assessClaimSupport({ representation: claim("historical-extract", "complete"), mergedAt: "2026-11-10T12:00:00Z", completionTimes: ["2026-11-10T12:00:00Z"] }), "blocked");
+  assert.equal(assessClaimSupport({ representation: claim("historical-extract", "complete"), mergedAt: "2026-11-10T12:00:00Z", completionTimes: ["2026-11-10T11:59:59Z"] }), "supported");
+});
+
+test("blocks historical check claims with missing, ambiguous, or post-merge completion evidence", () => {
   assert.equal(
-    assessClaimSupport({ kind: "historical-extract", pagination: "complete", mergedAt: "2026-11-10T12:00:00Z", completionTimes: ["2026-11-10T12:00:00Z"] }),
+    assessClaimSupport({ representation: claim("historical-extract", "partial"), mergedAt: "2026-11-10T12:00:00Z", completionTimes: ["2026-11-10T12:00:01Z"] }),
+    "blocked",
+  );
+  assert.equal(assessClaimSupport({ representation: claim("historical-extract", "complete") }), "blocked");
+  assert.equal(
+    assessClaimSupport({ representation: claim("historical-extract", "complete"), mergedAt: "2026-11-10T12:00:00", completionTimes: ["2026-11-10T11:59:59Z"] }),
     "blocked",
   );
   assert.equal(
-    assessClaimSupport({ kind: "historical-extract", pagination: "complete", mergedAt: "2026-11-10T12:00:00Z", completionTimes: ["2026-11-10T11:59:59Z"] }),
-    "supported",
+    assessClaimSupport({ representation: claim("historical-extract", "complete"), mergedAt: "2026-11-10T12:00:00Z", completionTimes: [42] }),
+    "blocked",
   );
 });
 
@@ -118,4 +135,46 @@ test("requires provenance, completeness, and confidentiality labels", () => {
     () => createRepresentation({ original: Buffer.from("evidence\n"), provenance, labels: { ...labels, confidentiality: "" } }),
     /labels\.confidentiality/i,
   );
+});
+
+test("rejects unverified wrapper fields and malformed encoded representations", () => {
+  const representation = createRepresentation({ original: Buffer.from("evidence\n"), provenance, labels });
+  assert.throws(() => verifyRepresentation({ ...representation, originalByteCopy: true }), /unknown representation field/i);
+  assert.throws(() => verifyRepresentation({ ...representation, encoding: "rot13" }), /wrapper SHA-256 mismatch|unsupported encoding/i);
+  assert.throws(() => verifyRepresentation({ ...representation, encoding: "base64", content: "?" }), /wrapper SHA-256 mismatch|base64 content is invalid/i);
+});
+
+test("requires readback type and coherent completeness semantics", () => {
+  assert.throws(
+    () => createRepresentation({ original: Buffer.from("evidence\n"), provenance: { ...provenance, readbackType: "historical-extract" }, labels: { ...labels, completeness: "complete" } }),
+    /readback type|pagination|completeness/i,
+  );
+});
+
+test("rejects unknown nested provenance and label fields", () => {
+  assert.throws(
+    () => createRepresentation({ original: Buffer.from("evidence\n"), provenance: { ...provenance, claimedOriginal: true }, labels }),
+    /unknown provenance field/i,
+  );
+  assert.throws(
+    () => createRepresentation({ original: Buffer.from("evidence\n"), provenance, labels: { ...labels, claim: "complete" } }),
+    /unknown labels field/i,
+  );
+});
+
+test("reaches direct hash and decoding failure paths after resealing", () => {
+  const representation = createRepresentation({ original: Buffer.from([0xff]), provenance, labels });
+  const reseal = (changes) => {
+    const candidate = { ...representation, ...changes };
+    return { ...candidate, wrapperSha256: sealRepresentation(candidate) };
+  };
+  assert.throws(() => verifyRepresentation(reseal({ storedArtifactSha256: "0".repeat(64) })), /stored artifact SHA-256 mismatch/i);
+  assert.throws(() => verifyRepresentation(reseal({ decodedOriginalSha256: "0".repeat(64) })), /decoded original SHA-256 mismatch/i);
+  assert.throws(() => verifyRepresentation(reseal({ content: "?", storedArtifactSha256: storedArtifactSha256("?") })), /base64 content is invalid/i);
+  assert.throws(() => verifyRepresentation(reseal({ encoding: "rot13", storedArtifactSha256: storedArtifactSha256(representation.content) })), /unsupported encoding/i);
+});
+
+test("derives claim limits from a verified representation and refuses free inputs", () => {
+  assert.equal(assessClaimSupport({ representation: claim("fresh-corroboration", "complete") }), "narrowed");
+  assert.throws(() => assessClaimSupport({ kind: "fresh-corroboration", pagination: "complete" }), /representation/i);
 });

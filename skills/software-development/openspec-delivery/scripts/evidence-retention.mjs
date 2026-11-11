@@ -1,7 +1,13 @@
 import { createHash } from "node:crypto";
 
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
-const canonicalBytes = (value) => Buffer.from(JSON.stringify(value), "utf8");
+export const storedArtifactSha256 = (content) => sha256(Buffer.from(requireString(content, "content"), "utf8"));
+const canonicalize = (value) => {
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (value && typeof value === "object") return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonicalize(value[key])]));
+  return value;
+};
+const canonicalBytes = (value) => Buffer.from(JSON.stringify(canonicalize(value)), "utf8");
 
 function requireString(value, field) {
   if (typeof value !== "string") throw new Error(`${field} must be a string`);
@@ -24,8 +30,13 @@ function validateProvenance(provenance) {
   if (!provenance || typeof provenance !== "object" || Array.isArray(provenance)) {
     throw new Error("provenance must be an object");
   }
+  const allowed = new Set(["source", "command", "environmentScope", "exitStatus", "observedAt", "revision", "scope", "pagination", "readbackType"]);
+  if (Object.keys(provenance).some((field) => !allowed.has(field))) throw new Error("unknown provenance field");
   for (const field of ["source", "environmentScope", "observedAt", "revision", "scope"]) {
     requireText(provenance[field], `provenance.${field}`);
+  }
+  if (!new Set(["original-response", "lossless-representation", "redacted-transformed", "historical-extract", "fresh-corroboration", "merge-snapshot"]).has(provenance.readbackType)) {
+    throw new Error("provenance.readbackType must identify the readback type");
   }
   if (!Array.isArray(provenance.command) || provenance.command.length === 0 || provenance.command.some((part) => typeof part !== "string" || part.length === 0)) {
     throw new Error("provenance.command must be a non-empty string array");
@@ -41,7 +52,11 @@ function validateLabels(labels) {
   if (!labels || typeof labels !== "object" || Array.isArray(labels)) {
     throw new Error("labels must be an object");
   }
-  if (labels.representation !== "lossless-representation") throw new Error("labels.representation must be lossless-representation");
+  const allowed = new Set(["representation", "completeness", "confidentiality"]);
+  if (Object.keys(labels).some((field) => !allowed.has(field))) throw new Error("unknown labels field");
+  if (!new Set(["original-response", "lossless-representation", "redacted-transformed", "historical-extract", "fresh-corroboration", "merge-snapshot"]).has(labels.representation)) {
+    throw new Error("labels.representation must identify the readback type");
+  }
   if (!new Set(["complete", "partial", "not-applicable"]).has(labels.completeness)) {
     throw new Error("labels.completeness must be complete, partial, or not-applicable");
   }
@@ -62,6 +77,10 @@ function wrapperPayload(representation) {
     provenance: representation.provenance,
     labels: representation.labels,
   };
+}
+
+export function sealRepresentation(representation) {
+  return sha256(canonicalBytes(wrapperPayload(representation)));
 }
 
 function decodedBytes(representation) {
@@ -87,6 +106,8 @@ export function createRepresentation({ original, provenance, labels }) {
   if (!Buffer.isBuffer(original)) throw new Error("original must be a Buffer");
   validateProvenance(provenance);
   validateLabels(labels);
+  if (provenance.readbackType !== labels.representation) throw new Error("readback type must match labels.representation");
+  if (provenance.pagination !== labels.completeness) throw new Error("provenance.pagination must match labels.completeness");
 
   const asUtf8 = original.toString("utf8");
   const utf8Bytes = Buffer.from(asUtf8, "utf8");
@@ -104,13 +125,15 @@ export function createRepresentation({ original, provenance, labels }) {
     provenance: { ...provenance },
     labels: { ...labels },
   };
-  return { ...representation, wrapperSha256: sha256(canonicalBytes(wrapperPayload(representation))) };
+  return { ...representation, wrapperSha256: sealRepresentation(representation) };
 }
 
 export function verifyRepresentation(representation) {
   if (!representation || typeof representation !== "object" || Array.isArray(representation)) {
     throw new Error("representation must be an object");
   }
+  const allowedFields = new Set(["schemaVersion", "kind", "encoding", "content", "storedArtifactSha256", "decodedOriginalSha256", "provenance", "labels", "wrapperSha256"]);
+  if (Object.keys(representation).some((field) => !allowedFields.has(field))) throw new Error("unknown representation field");
   if (representation.schemaVersion !== 1) throw new Error("schemaVersion must be 1");
   if (representation.kind !== "lossless-evidence-representation") {
     throw new Error("kind must be lossless-evidence-representation");
@@ -120,7 +143,7 @@ export function verifyRepresentation(representation) {
   requireSha256(representation.storedArtifactSha256, "storedArtifactSha256");
   requireSha256(representation.decodedOriginalSha256, "decodedOriginalSha256");
   requireSha256(representation.wrapperSha256, "wrapperSha256");
-  if (sha256(canonicalBytes(wrapperPayload(representation))) !== representation.wrapperSha256) {
+  if (sealRepresentation(representation) !== representation.wrapperSha256) {
     throw new Error("wrapper SHA-256 mismatch");
   }
 
@@ -135,18 +158,22 @@ export function verifyRepresentation(representation) {
   return original;
 }
 
-export function assessClaimSupport({ kind, pagination, mergedAt, completionTimes = [] }) {
+export function assessClaimSupport({ representation, mergedAt, completionTimes = [] }) {
+  verifyRepresentation(representation);
+  const { readbackType: kind, pagination } = representation.provenance;
   if (!new Set(["original-response", "historical-extract", "fresh-corroboration", "merge-snapshot"]).has(kind)) {
     throw new Error("kind must identify the readback type");
   }
   if (!new Set(["complete", "partial"]).has(pagination)) throw new Error("pagination must be complete or partial");
-  if (pagination === "partial" || kind === "fresh-corroboration" || kind === "merge-snapshot") return "narrowed";
-  if (!Array.isArray(completionTimes)) throw new Error("completionTimes must be an array");
-  if (mergedAt !== undefined) {
-    const mergeTime = Date.parse(mergedAt);
-    if (Number.isNaN(mergeTime) || completionTimes.some((time) => Number.isNaN(Date.parse(time)) || Date.parse(time) >= mergeTime)) {
-      return "blocked";
-    }
+  if (!Array.isArray(completionTimes)) return "blocked";
+  const parseUtc = (value) => typeof value === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/.test(value) ? Date.parse(value) : Number.NaN;
+  if (kind === "historical-extract") {
+    const mergeTime = parseUtc(mergedAt);
+    if (Number.isNaN(mergeTime) || completionTimes.length === 0 || completionTimes.some((time) => {
+      const completionTime = parseUtc(time);
+      return Number.isNaN(completionTime) || completionTime >= mergeTime;
+    })) return "blocked";
   }
+  if (pagination === "partial" || kind === "fresh-corroboration" || kind === "merge-snapshot") return "narrowed";
   return "supported";
 }
