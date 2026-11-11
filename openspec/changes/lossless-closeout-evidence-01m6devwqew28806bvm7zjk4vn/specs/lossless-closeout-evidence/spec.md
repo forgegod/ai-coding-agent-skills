@@ -58,6 +58,18 @@ pagination or completeness state.
   conclusions, and completion times
 - **AND** historical corroboration verifies the applicable completion times precede merge
 
+#### Scenario: Original-response observation after merge
+- **WHEN** a complete original PR-check response was observed at or after merge
+- **THEN** it does not establish earlier check conclusions and factual support is blocked
+
+#### Scenario: Historical extract has later extraction time
+- **WHEN** a historical extract is produced after merge from an original response
+  captured before merge
+- **THEN** it retains distinct strict UTC source-capture and extraction times
+- **AND** only the source-capture time is compared with merge for historical support
+- **AND** missing source-capture time blocks factual support rather than treating the
+  extract time or filesystem metadata as the original observation
+
 #### Scenario: Partial or current-only query
 - **WHEN** a readback is truncated, partially paginated, or obtained after merge
 - **THEN** the retained evidence labels its limitation and does not establish
@@ -74,7 +86,9 @@ pagination or completeness state.
   invalid-timestamp, missing, or post-merge evidence
 - **THEN** verification blocks the claim rather than reporting it supported
 - **AND** a supported claim uses a verified representation with coherent provenance
-  and labels, a successful exit status, strict UTC instants, and completion before merge
+  and labels, a successful exit status, strict UTC instants, applicable pre-merge
+  observation and completion times, and a decoded structured payload proving the
+  expected PR head, applicable check identities, and successful conclusions
 
 ### Requirement: Factual closure review and successor evidence
 The delivery procedure SHALL require a fresh independent factual review for the

@@ -36,9 +36,12 @@ record into a reconstructed passing narrative.
   contracts, and current documentation that implementation proves are required.
   A dependency-light representation/verification helper is conditional on the
   design assessment; it must not execute gates or issue API calls.
-- Amend the evidence contract after independent review findings: a supported claim
-  must fail closed unless verified evidence is coherent, successful, publishable,
-  strictly UTC-valid, and completed before merge.
+- Amend the evidence contract after independent review findings: retain
+  `supported` as a factual PR-check-claim result only when an integrity-verified,
+  structured payload proves the expected head, applicable check identities,
+  successful conclusions, strict UTC completion times before merge, and the
+  type-specific pre-merge observation-time rule. Missing, invalid, mismatched, or
+  contrary facts block support rather than being supplied as free caller inputs.
 
 ## Capabilities
 

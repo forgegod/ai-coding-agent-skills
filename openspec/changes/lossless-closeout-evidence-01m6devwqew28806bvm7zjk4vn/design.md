@@ -95,11 +95,19 @@ check or fully paginated thread evidence.
 
 Verification and claim assessment fail closed. Verification rechecks provenance,
 representation, completeness, and confidentiality coherence after deserialization;
-redacted evidence cannot support a publishable claim. Observation, merge, and
-completion timestamps use one strict UTC instant validator. A claim is supported
-only when verified evidence has a successful exit status, publishable
-non-redacted confidentiality, valid applicable timestamps, and completion strictly
-before merge; otherwise it is blocked or explicitly narrowed.
+redacted evidence cannot support a publishable claim. Observation, extraction,
+merge, and completion timestamps use one strict UTC instant validator. For an
+`original-response`, `observedAt` is the source-capture time and must be strictly
+before merge. For a `historical-extract`, `observedAt` remains the original
+source-capture time; the distinct `extractedAt` records later extraction and may be
+after merge, but cannot replace or infer the source-capture time. A claim is
+`supported` only when the verified decoded structured payload matches the expected
+PR head and identifies every applicable check's stable identity, successful
+conclusion, and strict UTC completion time before merge, in addition to complete,
+publishable, non-redacted, exit-zero evidence and the applicable observation-time
+rule. Those factual fields are not caller-supplied substitutes. Partial,
+fresh-current, merge-snapshot, missing, invalid, mismatched, failed, or contrary
+evidence is blocked or explicitly narrowed and never supported.
 
 ### Preserve correction and closure boundaries
 
