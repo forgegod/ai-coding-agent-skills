@@ -18,6 +18,9 @@ OpenSpec change in a project that explicitly selects this workflow. This is an
 orchestrator procedure, not a scheduler, distributed lock, approval service or
 GitHub API client, and installing OpenSpec or this package never selects it.
 The agent handles the plumbing; the operator selects scope and exceptions.
+For byte-preserving gate, readback, and review evidence, use
+[references/evidence-retention.md](references/evidence-retention.md); it retains
+captured facts without executing gates, polling APIs, or widening authority.
 
 ## When to Use
 

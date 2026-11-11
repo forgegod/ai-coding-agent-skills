@@ -2,6 +2,8 @@
 
 This procedure is operator-controlled; the package supplies no GitHub writer,
 merge queue, distributed fencing or default mutation authority.
+Use [evidence-retention.md](evidence-retention.md) for byte-preserving named-gate
+output, factual readback provenance, and limits on historical claims.
 
 ## Before any publication
 

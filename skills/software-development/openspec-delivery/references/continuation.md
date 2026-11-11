@@ -11,6 +11,9 @@ Use the named change, an unambiguous short slug via `change-name.mjs resolve`, o
 verified current branch/package context. Without context inspect active packages
 and registered change worktrees; one unambiguous unfinished change may be used.
 Several independent changes are operator choices, never newest-first priority.
+When a later step needs factual gate, readback, or review evidence, follow
+[evidence-retention.md](evidence-retention.md) before narrowing a claim or
+selecting a successor.
 Inspect both the current checkout and the owning workspace: a plan may exist only
 on its branch, not on the target. If active lookup fails, inspect exact archive
 identity and confirmed refs before claiming absence. Duplicate active/archive

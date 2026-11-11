@@ -57,3 +57,16 @@ test("old package is absent and installation rename is explicit rather than sile
   assert.match(source, /installed.*(?:unchanged|not updated)|does not.*installed/s);
   assert.match(source, /\/openspec-next inspect/);
 });
+
+test("delivery routes lossless evidence retention without adding a gate runner or polling authority", async () => {
+  const skill = await read("skills/software-development/openspec-delivery/SKILL.md");
+  const reference = await read("skills/software-development/openspec-delivery/references/evidence-retention.md");
+  const guard = await read("skills/software-development/openspec-delivery/references/guard.md");
+  const integration = await read("skills/software-development/openspec-delivery/references/integration.md");
+  const recovery = await read("skills/software-development/openspec-delivery/references/recovery.md");
+  const continuation = await read("skills/software-development/openspec-delivery/references/continuation.md");
+
+  for (const source of [skill, guard, integration, recovery, continuation]) assert.match(source, /evidence-retention\.md/);
+  for (const pattern of [/original-byte/i, /storedArtifactSha256/, /decodedOriginalSha256/, /provenance/i, /completeness/i, /confidentiality/i, /partial response/i, /fresh\s+corroboration/i, /merge response/i, /unattended polling/i, /fail/i]) assert.match(reference, pattern);
+  assert.match(reference, /not a command runner, scheduler, GitHub\s+client, polling loop, approval service, or publication authority/i);
+});

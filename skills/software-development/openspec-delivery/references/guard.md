@@ -6,6 +6,8 @@ required; there are no network calls, dependencies or Git writes. The helper
 prints one JSON result and exits zero only when its checks pass. Inspect exit
 status and `ok`; a malformed/missing result is failure. Commands below are
 unexecuted templates, not permission to write or fabricated evidence.
+For lossless representation, provenance, completeness, and confidentiality of
+the output those checks cite, use [evidence-retention.md](evidence-retention.md).
 
 ## Inputs and trust
 
