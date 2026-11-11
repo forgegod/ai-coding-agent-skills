@@ -67,6 +67,9 @@ test("delivery routes lossless evidence retention without adding a gate runner o
   const continuation = await read("skills/software-development/openspec-delivery/references/continuation.md");
 
   for (const source of [skill, guard, integration, recovery, continuation]) assert.match(source, /evidence-retention\.md/);
-  for (const pattern of [/original-byte/i, /storedArtifactSha256/, /decodedOriginalSha256/, /provenance/i, /completeness/i, /confidentiality/i, /partial response/i, /fresh\s+corroboration/i, /merge response/i, /unattended polling/i, /fail/i]) assert.match(reference, pattern);
+  for (const pattern of [/original-byte/i, /storedArtifactSha256/, /decodedOriginalSha256/, /provenance/i, /completeness/i, /confidentiality/i, /partial\s+response/i, /fresh\s+corroboration/i, /merge\s+response/i, /unattended polling/i, /fail/i]) assert.match(reference, pattern);
+  assert.match(reference, /completion time.*precede.*merge/is);
+  assert.match(reference, /wrapperSha256/);
+  assert.match(reference, /assessClaimSupport/);
   assert.match(reference, /not a command runner, scheduler, GitHub\s+client, polling loop, approval service, or publication authority/i);
 });

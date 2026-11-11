@@ -29,29 +29,42 @@ A representation has:
 - `content`, the stored textual artifact;
 - `storedArtifactSha256`, the SHA-256 of UTF-8 bytes of that stored content;
 - `decodedOriginalSha256`, the SHA-256 of the decoded original bytes;
-- provenance: source, observation time, revision, and scope; and
-- labels for representation, completeness, and confidentiality.
+- `wrapperSha256`, the SHA-256 of the canonical immutable wrapper payload;
+- provenance: source, command argv, environment scope, numeric exit status,
+  observation time, revision, scope, and pagination state; and
+- fixed labels: `lossless-representation`, completeness of `complete`, `partial`,
+  or `not-applicable`, and confidentiality of `publishable`, `restricted`, or
+  `redacted`.
 
-The verifier compares both SHA-256 values and returns the exact decoded bytes. It
+The verifier compares all declared SHA-256 values and returns the exact decoded bytes. It
 does not trim trailing whitespace, rewrite CRLF, normalize Unicode, execute a
-command, contact an API, or write a file. Invalid UTF-8 is base64 represented; an
-invalid wrapper, unsupported encoding, malformed base64, or hash mismatch fails
-closed. A redacted or transformed artifact must be labeled as such and must never
-be described as an original-byte copy.
+command, contact an API, or write a file. Empty, CRLF-only, and whitespace-only
+content are valid evidence bytes. Invalid UTF-8 is base64 represented; an invalid
+wrapper, unsupported encoding, malformed base64, changed provenance/label/encoding/
+content, or hash mismatch fails closed. `wrapperSha256` covers the canonical payload
+other than itself, avoiding a recursive self-hash. A helper-produced wrapper is always
+`lossless-representation`; an original byte copy is not a wrapper. A redacted or
+transformed artifact must be labeled `redacted` and must never be described as an
+original-byte copy.
 
 ## Provenance, completeness, and confidentiality
 
-Name the real capture source, observation time, revision, and scope. For paginated
-or filtered readbacks, record pagination and completeness in the scope or an
-adjacent factual record. A partial response cannot prove all threads were absent.
-A merge response proves merge state only; it cannot replace retained check or
-review-thread data.
+Name the real capture source, command argv, environment scope, numeric exit status,
+observation time, revision, scope, and pagination/completeness state. A partial
+response cannot prove all threads were absent. A merge response proves merge state
+only; it cannot replace retained check or review-thread data.
 
 For a claim that checks passed on a PR head, retain that exact head, applicable
-check identities, apps, conclusions, and completion times. A historical claim
-requires original captured output or a labeled historical extract from it. If the
-original is unavailable, retain the gap and narrow or block the claim rather than
-reconstructing a response from a narrative.
+check identities, apps, conclusions, and completion times. Each applicable completion time
+must precede merge. A historical claim requires original captured output or a
+labeled historical extract from it. If the original is unavailable, retain the gap
+and narrow or block the claim rather than reconstructing a response from a narrative.
+
+`assessClaimSupport` is a pure helper for this factual limit: partial pagination,
+fresh corroboration, and merge snapshots return `narrowed`; a check completion at or
+after a recorded merge returns `blocked`; only a complete original response or
+historical extract with timely completions returns `supported`. It neither fetches
+nor proves facts that were not supplied.
 
 Secrets and confidential material remain subject to repository policy. Stop
 publication or retain an authorized transformation with its limitation. Neither a
