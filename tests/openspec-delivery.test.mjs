@@ -73,3 +73,10 @@ test("delivery routes lossless evidence retention without adding a gate runner o
   assert.match(reference, /assessClaimSupport/);
   assert.match(reference, /not a command runner, scheduler, GitHub\s+client, polling loop, approval service, or publication authority/i);
 });
+
+test("lossless evidence guidance documents the fail-closed claim contract", async () => {
+  const reference = await read("skills/software-development/openspec-delivery/references/evidence-retention.md");
+  for (const pattern of [/coherence.*after deserialization/is, /strict UTC instant/i, /successful exit status/i, /publishable non-redacted/i, /completed before merge/i, /missing or contrary evidence blocks/i]) {
+    assert.match(reference, pattern);
+  }
+});

@@ -19,6 +19,22 @@ function requireText(value, field) {
   return value;
 }
 
+function parseUtcInstant(value) {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value)) {
+    return Number.NaN;
+  }
+  const timestamp = Date.parse(value);
+  if (Number.isNaN(timestamp)) return Number.NaN;
+  const expected = value.includes(".") ? value : value.replace("Z", ".000Z");
+  return new Date(timestamp).toISOString() === expected ? timestamp : Number.NaN;
+}
+
+function requireUtcInstant(value, field) {
+  requireText(value, field);
+  if (Number.isNaN(parseUtcInstant(value))) throw new Error(`${field} must be a strict UTC instant`);
+  return value;
+}
+
 function requireSha256(value, field) {
   if (typeof value !== "string" || !/^[a-f0-9]{64}$/.test(value)) {
     throw new Error(`${field} must be a lowercase SHA-256 hex digest`);
@@ -32,9 +48,10 @@ function validateProvenance(provenance) {
   }
   const allowed = new Set(["source", "command", "environmentScope", "exitStatus", "observedAt", "revision", "scope", "pagination", "readbackType"]);
   if (Object.keys(provenance).some((field) => !allowed.has(field))) throw new Error("unknown provenance field");
-  for (const field of ["source", "environmentScope", "observedAt", "revision", "scope"]) {
+  for (const field of ["source", "environmentScope", "revision", "scope"]) {
     requireText(provenance[field], `provenance.${field}`);
   }
+  requireUtcInstant(provenance.observedAt, "provenance.observedAt");
   if (!new Set(["original-response", "lossless-representation", "redacted-transformed", "historical-extract", "fresh-corroboration", "merge-snapshot"]).has(provenance.readbackType)) {
     throw new Error("provenance.readbackType must identify the readback type");
   }
@@ -64,6 +81,21 @@ function validateLabels(labels) {
     throw new Error("labels.confidentiality must be publishable, restricted, or redacted");
   }
   return labels;
+}
+
+function validateCoherence(provenance, labels) {
+  if (provenance.readbackType !== labels.representation) {
+    throw new Error("readback type must match labels.representation");
+  }
+  if (provenance.pagination !== labels.completeness) {
+    throw new Error("provenance.pagination must match labels.completeness");
+  }
+  if (provenance.readbackType === "redacted-transformed" && labels.confidentiality !== "redacted") {
+    throw new Error("redacted-transformed evidence must be labeled redacted");
+  }
+  if (labels.confidentiality === "redacted" && provenance.readbackType !== "redacted-transformed") {
+    throw new Error("redacted evidence must use redacted-transformed provenance");
+  }
 }
 
 function wrapperPayload(representation) {
@@ -106,8 +138,7 @@ export function createRepresentation({ original, provenance, labels }) {
   if (!Buffer.isBuffer(original)) throw new Error("original must be a Buffer");
   validateProvenance(provenance);
   validateLabels(labels);
-  if (provenance.readbackType !== labels.representation) throw new Error("readback type must match labels.representation");
-  if (provenance.pagination !== labels.completeness) throw new Error("provenance.pagination must match labels.completeness");
+  validateCoherence(provenance, labels);
 
   const asUtf8 = original.toString("utf8");
   const utf8Bytes = Buffer.from(asUtf8, "utf8");
@@ -140,6 +171,7 @@ export function verifyRepresentation(representation) {
   }
   validateProvenance(representation.provenance);
   validateLabels(representation.labels);
+  validateCoherence(representation.provenance, representation.labels);
   requireSha256(representation.storedArtifactSha256, "storedArtifactSha256");
   requireSha256(representation.decodedOriginalSha256, "decodedOriginalSha256");
   requireSha256(representation.wrapperSha256, "wrapperSha256");
@@ -160,20 +192,18 @@ export function verifyRepresentation(representation) {
 
 export function assessClaimSupport({ representation, mergedAt, completionTimes = [] }) {
   verifyRepresentation(representation);
-  const { readbackType: kind, pagination } = representation.provenance;
+  const { readbackType: kind, pagination, exitStatus } = representation.provenance;
+  if (exitStatus !== 0 || representation.labels.confidentiality !== "publishable") return "blocked";
   if (!new Set(["original-response", "historical-extract", "fresh-corroboration", "merge-snapshot"]).has(kind)) {
     throw new Error("kind must identify the readback type");
   }
   if (!new Set(["complete", "partial"]).has(pagination)) throw new Error("pagination must be complete or partial");
   if (!Array.isArray(completionTimes)) return "blocked";
-  const parseUtc = (value) => typeof value === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/.test(value) ? Date.parse(value) : Number.NaN;
-  if (kind === "historical-extract") {
-    const mergeTime = parseUtc(mergedAt);
-    if (Number.isNaN(mergeTime) || completionTimes.length === 0 || completionTimes.some((time) => {
-      const completionTime = parseUtc(time);
-      return Number.isNaN(completionTime) || completionTime >= mergeTime;
-    })) return "blocked";
-  }
+  const mergeTime = parseUtcInstant(mergedAt);
+  if (Number.isNaN(mergeTime) || completionTimes.length === 0 || completionTimes.some((time) => {
+    const completionTime = parseUtcInstant(time);
+    return Number.isNaN(completionTime) || completionTime >= mergeTime;
+  })) return "blocked";
   if (pagination === "partial" || kind === "fresh-corroboration" || kind === "merge-snapshot") return "narrowed";
   return "supported";
 }

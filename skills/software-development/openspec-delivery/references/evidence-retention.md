@@ -45,17 +45,23 @@ content are valid evidence bytes. Invalid UTF-8 is base64 represented; an invali
 wrapper, unsupported encoding, malformed base64, changed provenance/label/encoding/
 content, or hash mismatch fails closed. `wrapperSha256` covers the canonical payload
 other than itself, avoiding a recursive self-hash. Canonical JSON recursively
-sorts object keys; unknown wrapper fields are rejected. The readback type and
-completeness label must agree with verified provenance. An original byte copy is
-not a wrapper. A redacted or transformed artifact must be `redacted-transformed`
-and labeled `redacted`; it must never be described as an original-byte copy.
+sorts object keys; unknown wrapper fields are rejected. Provenance/label coherence
+is rechecked after deserialization: the readback type and completeness label must
+agree with verified provenance. A
+redacted-transformed representation must have a `redacted` confidentiality label,
+and a redacted label must use `redacted-transformed` provenance. An original byte
+copy is not a wrapper. A redacted or transformed artifact must never be described
+as an original-byte copy.
 
 ## Provenance, completeness, and confidentiality
 
 Name the real capture source, command argv, environment scope, numeric exit status,
-observation time, revision, scope, and pagination/completeness state. A partial
-response cannot prove all threads were absent. A merge response proves merge state
-only; it cannot replace retained check or review-thread data.
+observation time, revision, scope, and pagination/completeness state. Observation,
+merge, and completion times are strict UTC instants: a valid calendar date and
+clock time ending in `Z`, with either no fractional seconds or exactly three
+fractional digits. A partial response cannot prove all threads were absent. A merge
+response proves merge state only; it cannot replace retained check or review-thread
+data.
 
 For a claim that checks passed on a PR head, retain that exact head, applicable
 check identities, apps, conclusions, and completion times. Each applicable completion time
@@ -64,12 +70,14 @@ labeled historical extract from it. If the original is unavailable, retain the g
 and narrow or block the claim rather than reconstructing a response from a narrative.
 
 `assessClaimSupport` is a pure helper for this factual limit: it consumes verified
-readback semantics, requires UTC ISO-8601 merge/completion timestamps for a
-historical check claim, and returns `blocked` before any narrowing when evidence is
-missing, ambiguous, or at/after merge. Otherwise partial pagination, fresh
-corroboration, and merge snapshots return `narrowed`; only complete original
-responses or historical extracts with timely completions return `supported`. It
-neither fetches nor proves facts that were not supplied.
+readback semantics and returns `blocked` before any narrowing when evidence is
+missing or contrary. Missing or contrary evidence blocks support. A supported
+claim requires a successful exit status,
+publishable non-redacted evidence, strict UTC merge and completion instants, and
+every completion completed before merge. Partial pagination, fresh corroboration,
+and merge snapshots that meet those prerequisites return `narrowed`; only complete
+original responses or historical extracts return `supported`. It neither fetches
+nor proves facts that were not supplied.
 
 Secrets and confidential material remain subject to repository policy. Stop
 publication or retain an authorized transformation with its limitation. Neither a
