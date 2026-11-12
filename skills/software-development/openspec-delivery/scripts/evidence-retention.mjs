@@ -51,7 +51,9 @@ function validateProvenance(provenance) {
   for (const field of ["source", "environmentScope", "revision", "scope"]) {
     requireText(provenance[field], `provenance.${field}`);
   }
-  requireUtcInstant(provenance.observedAt, "provenance.observedAt");
+  if (provenance.readbackType !== "historical-extract" || Object.hasOwn(provenance, "observedAt")) {
+    requireUtcInstant(provenance.observedAt, "provenance.observedAt");
+  }
   if (!new Set(["original-response", "lossless-representation", "redacted-transformed", "historical-extract", "fresh-corroboration", "merge-snapshot"]).has(provenance.readbackType)) {
     throw new Error("provenance.readbackType must identify the readback type");
   }

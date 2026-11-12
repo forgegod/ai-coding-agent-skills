@@ -30,7 +30,34 @@ const claim = (readbackType, pagination) => createRepresentation({
   },
   labels: { ...labels, representation: readbackType, completeness: pagination },
 });
-const timelyClaimInputs = { mergedAt: "2026-11-10T12:00:00Z", completionTimes: ["2026-11-10T11:59:59Z"] };
+const expectedClaim = {
+  mergedAt: "2026-11-10T12:00:00Z",
+  expectedHead: "0123456789abcdef0123456789abcdef01234567",
+  applicableCheckIds: ["build / test"],
+};
+const structuredClaim = ({
+  readbackType = "original-response",
+  pagination = "complete",
+  observedAt = "2026-11-10T11:59:59.500Z",
+  omitObservedAt = false,
+  extractedAt,
+  head = expectedClaim.expectedHead,
+  checks = [{ id: "build / test", conclusion: "success", completedAt: "2026-11-10T11:59:59Z" }],
+} = {}) => {
+  const provenanceWithoutObservedAt = { ...provenance };
+  delete provenanceWithoutObservedAt.observedAt;
+  return createRepresentation({
+  original: Buffer.from(JSON.stringify({ head, checks })),
+  provenance: {
+    ...provenanceWithoutObservedAt,
+    readbackType,
+    pagination,
+    ...(omitObservedAt ? {} : { observedAt }),
+    ...(extractedAt === undefined ? {} : { extractedAt }),
+  },
+  labels: { ...labels, representation: readbackType, completeness: pagination },
+  });
+};
 
 test("represents UTF-8 CRLF bytes with trailing whitespace without normalization", () => {
   const original = Buffer.from("line one  \r\nline two\t\r\n", "utf8");
@@ -105,94 +132,43 @@ test("requires truthful labels and structured gate provenance", () => {
 });
 
 test("derives claim limits from verified representations", () => {
-  assert.equal(assessClaimSupport({ representation: claim("original-response", "partial"), ...timelyClaimInputs }), "blocked");
-  assert.equal(assessClaimSupport({ representation: claim("fresh-corroboration", "complete"), ...timelyClaimInputs }), "blocked");
-  assert.equal(assessClaimSupport({ representation: claim("merge-snapshot", "complete"), ...timelyClaimInputs }), "blocked");
-  assert.equal(assessClaimSupport({ representation: claim("historical-extract", "complete"), mergedAt: "2026-11-10T12:00:00Z", completionTimes: ["2026-11-10T12:00:00Z"] }), "blocked");
-  assert.equal(assessClaimSupport({ representation: claim("historical-extract", "complete"), mergedAt: "2026-11-10T12:00:00Z", completionTimes: ["2026-11-10T11:59:59Z"] }), "blocked");
+  assert.equal(assessClaimSupport({ representation: claim("original-response", "partial"), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: claim("fresh-corroboration", "complete"), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: claim("merge-snapshot", "complete"), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: claim("historical-extract", "complete"), ...expectedClaim }), "blocked");
 });
 
 test("supports only verified structured PR-check payloads with source-capture semantics", () => {
-  const structuredClaim = ({
-    readbackType = "original-response",
-    observedAt = "2026-11-10T11:00:00Z",
-    extractedAt,
-    head = "0123456789abcdef0123456789abcdef01234567",
-    conclusion = "success",
-    completedAt = "2026-11-10T11:59:59Z",
-  } = {}) => createRepresentation({
-    original: Buffer.from(JSON.stringify({
-      head,
-      checks: [{ id: "build / test", conclusion, completedAt }],
-    })),
-    provenance: {
-      ...provenance,
-      readbackType,
-      pagination: "complete",
-      observedAt,
-      ...(extractedAt === undefined ? {} : { extractedAt }),
-    },
-    labels: { ...labels, representation: readbackType, completeness: "complete" },
-  });
-  const expected = {
-    mergedAt: "2026-11-10T12:00:00Z",
-    expectedHead: "0123456789abcdef0123456789abcdef01234567",
-    applicableCheckIds: ["build / test"],
-  };
-
-  assert.equal(assessClaimSupport({ representation: structuredClaim({ observedAt: "2026-11-10T12:00:00Z" }), ...expected }), "blocked");
-  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "historical-extract", observedAt: "2026-11-10T11:00:00Z", extractedAt: "2026-11-10T12:01:00Z" }), ...expected }), "supported");
-  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "fresh-corroboration" }), ...expected }), "narrowed");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ observedAt: "2026-11-10T12:00:00Z" }), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim(), ...expectedClaim }), "supported");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "historical-extract", extractedAt: "2026-11-10T12:01:00Z" }), ...expectedClaim }), "supported");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "fresh-corroboration" }), ...expectedClaim }), "narrowed");
   assert.throws(() => structuredClaim({ readbackType: "historical-extract" }), /extractedAt/i);
-  assert.equal(assessClaimSupport({ representation: structuredClaim({ head: "ffffffffffffffffffffffffffffffffffffffff" }), ...expected }), "blocked");
-  assert.equal(assessClaimSupport({ representation: structuredClaim({ conclusion: "failure" }), ...expected }), "blocked");
-  assert.equal(assessClaimSupport({ representation: structuredClaim({ conclusion: "unknown" }), ...expected }), "blocked");
-  assert.equal(assessClaimSupport({ representation: claim("historical-extract", "complete"), ...expected, completionTimes: ["2026-11-10T11:59:59Z"] }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "historical-extract", omitObservedAt: true, extractedAt: "2026-11-10T12:01:00Z" }), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ head: "ffffffffffffffffffffffffffffffffffffffff" }), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ checks: [{ id: "build / test", conclusion: "failure", completedAt: "2026-11-10T11:59:59Z" }] }), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ checks: [{ id: "build / test", conclusion: "unknown", completedAt: "2026-11-10T11:59:59Z" }] }), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ checks: [{ id: "build / test", conclusion: "failure", completedAt: "2026-11-10T11:59:59Z" }] }), ...expectedClaim, completionTimes: ["2026-11-10T11:59:59Z"] }), "blocked");
 });
 
 test("narrows only validated structured partial, fresh, and merge readbacks", () => {
-  const structuredClaim = ({
-    readbackType = "original-response",
-    pagination = "complete",
-    observedAt = "2026-11-10T11:00:00Z",
-    head = "0123456789abcdef0123456789abcdef01234567",
-    checks = [{ id: "build / test", conclusion: "success", completedAt: "2026-11-10T11:59:59.000Z" }],
-  } = {}) => createRepresentation({
-    original: Buffer.from(JSON.stringify({ head, checks })),
-    provenance: { ...provenance, readbackType, pagination, observedAt },
-    labels: { ...labels, representation: readbackType, completeness: pagination },
-  });
-  const expected = {
-    mergedAt: "2026-11-10T12:00:00Z",
-    expectedHead: "0123456789abcdef0123456789abcdef01234567",
-    applicableCheckIds: ["build / test"],
-  };
-
-  assert.equal(assessClaimSupport({ representation: structuredClaim({ pagination: "partial" }), ...expected }), "narrowed");
-  assert.equal(assessClaimSupport({ representation: structuredClaim({ pagination: "partial", observedAt: "2026-11-10T12:00:00.000Z" }), ...expected }), "blocked");
-  assert.equal(assessClaimSupport({ representation: structuredClaim({ pagination: "partial", checks: [{ id: "build / test", conclusion: "success", completedAt: "2026-11-10T12:00:00.000Z" }] }), ...expected }), "blocked");
-  assert.equal(assessClaimSupport({ representation: structuredClaim({ pagination: "partial", checks: [] }), ...expected }), "blocked");
-  assert.equal(assessClaimSupport({ representation: structuredClaim({ pagination: "partial", checks: [{ id: "build / test", conclusion: "success", completedAt: "2026-11-10T11:59:59Z" }, { id: "build / test", conclusion: "success", completedAt: "2026-11-10T11:59:59Z" }] }), ...expected }), "blocked");
-  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "fresh-corroboration" }), ...expected }), "narrowed");
-  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "merge-snapshot" }), ...expected }), "narrowed");
-  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "fresh-corroboration", pagination: "partial" }), ...expected }), "blocked");
-  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "merge-snapshot", checks: [{ id: "build / test", conclusion: "failure", completedAt: "2026-11-10T11:59:59Z" }] }), ...expected }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ pagination: "partial" }), ...expectedClaim }), "narrowed");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ pagination: "partial", observedAt: "2026-11-10T12:00:00.000Z" }), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ pagination: "partial", checks: [{ id: "build / test", conclusion: "success", completedAt: "2026-11-10T12:00:00.000Z" }] }), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ pagination: "partial", checks: [] }), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ pagination: "partial", checks: [{ id: "build / test", conclusion: "success", completedAt: "2026-11-10T11:59:59Z" }, { id: "build / test", conclusion: "success", completedAt: "2026-11-10T11:59:59Z" }] }), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "fresh-corroboration" }), ...expectedClaim }), "narrowed");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "merge-snapshot" }), ...expectedClaim }), "narrowed");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "fresh-corroboration", pagination: "partial" }), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "merge-snapshot", checks: [{ id: "build / test", conclusion: "failure", completedAt: "2026-11-10T11:59:59Z" }] }), ...expectedClaim }), "blocked");
 });
 
 test("blocks historical check claims with missing, ambiguous, or post-merge completion evidence", () => {
-  assert.equal(
-    assessClaimSupport({ representation: claim("historical-extract", "partial"), mergedAt: "2026-11-10T12:00:00Z", completionTimes: ["2026-11-10T12:00:01Z"] }),
-    "blocked",
-  );
-  assert.equal(assessClaimSupport({ representation: claim("historical-extract", "complete") }), "blocked");
-  assert.equal(
-    assessClaimSupport({ representation: claim("historical-extract", "complete"), mergedAt: "2026-11-10T12:00:00", completionTimes: ["2026-11-10T11:59:59Z"] }),
-    "blocked",
-  );
-  assert.equal(
-    assessClaimSupport({ representation: claim("historical-extract", "complete"), mergedAt: "2026-11-10T12:00:00Z", completionTimes: [42] }),
-    "blocked",
-  );
+  const historical = (changes = {}) => structuredClaim({ readbackType: "historical-extract", extractedAt: "2026-11-10T12:01:00Z", ...changes });
+  assert.equal(assessClaimSupport({ representation: historical({ pagination: "partial" }), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: historical(), mergedAt: "2026-11-10T12:00:00" }), "blocked");
+  assert.equal(assessClaimSupport({ representation: historical({ checks: [{ id: "build / test", conclusion: "success", completedAt: "2026-11-10T12:00:00Z" }] }), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: historical({ checks: [{ id: "build / test", conclusion: "success", completedAt: "2026-02-30T11:59:59Z" }] }), ...expectedClaim }), "blocked");
 });
 
 test("requires provenance, completeness, and confidentiality labels", () => {
@@ -290,9 +266,9 @@ test("blocks unsupported claims for failed, confidential, missing, or post-merge
     labels: { ...labels, representation: readbackType, completeness: "complete", confidentiality },
   });
 
-  assert.equal(assessClaimSupport({ representation: factual({ exitStatus: 1 }), ...timelyClaimInputs }), "blocked");
-  assert.equal(assessClaimSupport({ representation: factual({ confidentiality: "restricted" }), ...timelyClaimInputs }), "blocked");
-  assert.equal(assessClaimSupport({ representation: factual({ readbackType: "redacted-transformed", confidentiality: "redacted" }), ...timelyClaimInputs }), "blocked");
+  assert.equal(assessClaimSupport({ representation: factual({ exitStatus: 1 }), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: factual({ confidentiality: "restricted" }), ...expectedClaim }), "blocked");
+  assert.equal(assessClaimSupport({ representation: factual({ readbackType: "redacted-transformed", confidentiality: "redacted" }), ...expectedClaim }), "blocked");
   assert.equal(assessClaimSupport({ representation: factual() }), "blocked");
   for (const readbackType of ["original-response", "historical-extract", "fresh-corroboration", "merge-snapshot"]) {
     assert.equal(
@@ -330,6 +306,6 @@ test("reaches direct hash and decoding failure paths after resealing", () => {
 });
 
 test("derives claim limits from a verified representation and refuses free inputs", () => {
-  assert.equal(assessClaimSupport({ representation: claim("fresh-corroboration", "complete"), ...timelyClaimInputs }), "blocked");
+  assert.equal(assessClaimSupport({ representation: claim("fresh-corroboration", "complete"), ...expectedClaim }), "blocked");
   assert.throws(() => assessClaimSupport({ kind: "fresh-corroboration", pagination: "complete" }), /representation/i);
 });
