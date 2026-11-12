@@ -105,7 +105,7 @@ test("requires truthful labels and structured gate provenance", () => {
 });
 
 test("derives claim limits from verified representations", () => {
-  assert.equal(assessClaimSupport({ representation: claim("original-response", "partial"), ...timelyClaimInputs }), "narrowed");
+  assert.equal(assessClaimSupport({ representation: claim("original-response", "partial"), ...timelyClaimInputs }), "blocked");
   assert.equal(assessClaimSupport({ representation: claim("fresh-corroboration", "complete"), ...timelyClaimInputs }), "blocked");
   assert.equal(assessClaimSupport({ representation: claim("merge-snapshot", "complete"), ...timelyClaimInputs }), "blocked");
   assert.equal(assessClaimSupport({ representation: claim("historical-extract", "complete"), mergedAt: "2026-11-10T12:00:00Z", completionTimes: ["2026-11-10T12:00:00Z"] }), "blocked");
@@ -148,6 +148,35 @@ test("supports only verified structured PR-check payloads with source-capture se
   assert.equal(assessClaimSupport({ representation: structuredClaim({ conclusion: "failure" }), ...expected }), "blocked");
   assert.equal(assessClaimSupport({ representation: structuredClaim({ conclusion: "unknown" }), ...expected }), "blocked");
   assert.equal(assessClaimSupport({ representation: claim("historical-extract", "complete"), ...expected, completionTimes: ["2026-11-10T11:59:59Z"] }), "blocked");
+});
+
+test("narrows only validated structured partial, fresh, and merge readbacks", () => {
+  const structuredClaim = ({
+    readbackType = "original-response",
+    pagination = "complete",
+    observedAt = "2026-11-10T11:00:00Z",
+    head = "0123456789abcdef0123456789abcdef01234567",
+    checks = [{ id: "build / test", conclusion: "success", completedAt: "2026-11-10T11:59:59.000Z" }],
+  } = {}) => createRepresentation({
+    original: Buffer.from(JSON.stringify({ head, checks })),
+    provenance: { ...provenance, readbackType, pagination, observedAt },
+    labels: { ...labels, representation: readbackType, completeness: pagination },
+  });
+  const expected = {
+    mergedAt: "2026-11-10T12:00:00Z",
+    expectedHead: "0123456789abcdef0123456789abcdef01234567",
+    applicableCheckIds: ["build / test"],
+  };
+
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ pagination: "partial" }), ...expected }), "narrowed");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ pagination: "partial", observedAt: "2026-11-10T12:00:00.000Z" }), ...expected }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ pagination: "partial", checks: [{ id: "build / test", conclusion: "success", completedAt: "2026-11-10T12:00:00.000Z" }] }), ...expected }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ pagination: "partial", checks: [] }), ...expected }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ pagination: "partial", checks: [{ id: "build / test", conclusion: "success", completedAt: "2026-11-10T11:59:59Z" }, { id: "build / test", conclusion: "success", completedAt: "2026-11-10T11:59:59Z" }] }), ...expected }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "fresh-corroboration" }), ...expected }), "narrowed");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "merge-snapshot" }), ...expected }), "narrowed");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "fresh-corroboration", pagination: "partial" }), ...expected }), "blocked");
+  assert.equal(assessClaimSupport({ representation: structuredClaim({ readbackType: "merge-snapshot", checks: [{ id: "build / test", conclusion: "failure", completedAt: "2026-11-10T11:59:59Z" }] }), ...expected }), "blocked");
 });
 
 test("blocks historical check claims with missing, ambiguous, or post-merge completion evidence", () => {

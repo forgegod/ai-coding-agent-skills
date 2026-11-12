@@ -232,11 +232,15 @@ export function assessClaimSupport({ representation, mergedAt, expectedHead, app
   if (!new Set(["complete", "partial"]).has(pagination)) throw new Error("pagination must be complete or partial");
   const mergeTime = parseUtcInstant(mergedAt);
   if (Number.isNaN(mergeTime)) return "blocked";
-  if (pagination === "partial") return kind === "original-response" ? "narrowed" : "blocked";
   const payload = parsePrCheckPayload(original);
-  if (kind === "fresh-corroboration" || kind === "merge-snapshot") {
-    return payload && hasSupportedChecks(payload, expectedHead, applicableCheckIds, mergeTime) ? "narrowed" : "blocked";
+  const observedTime = parseUtcInstant(representation.provenance.observedAt);
+  if (!payload || !hasSupportedChecks(payload, expectedHead, applicableCheckIds, mergeTime)) return "blocked";
+  if (pagination === "partial") {
+    return kind === "original-response" && !Number.isNaN(observedTime) && observedTime < mergeTime ? "narrowed" : "blocked";
   }
-  if (representation.provenance.observedAt >= mergedAt) return "blocked";
-  return payload && hasSupportedChecks(payload, expectedHead, applicableCheckIds, mergeTime) ? "supported" : "blocked";
+  if (kind === "fresh-corroboration" || kind === "merge-snapshot") {
+    return "narrowed";
+  }
+  if (Number.isNaN(observedTime) || observedTime >= mergeTime) return "blocked";
+  return "supported";
 }

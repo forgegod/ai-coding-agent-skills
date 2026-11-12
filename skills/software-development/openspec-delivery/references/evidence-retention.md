@@ -65,11 +65,13 @@ fractional digits. A partial response cannot prove all threads were absent. A me
 response proves merge state only; it cannot replace retained check or review-thread
 data.
 
-For a claim that checks passed on a PR head, retain a decoded structured PR-check
-payload proving that exact head, every applicable check identity, successful
-conclusion, and completion time. Each applicable completion time must precede
-merge. For an `original-response`, `observedAt` is the source-capture time and
-must precede merge. For a `historical-extract`, `observedAt` remains that original
+For a claim that checks passed on a PR head, retain decoded JSON with a string
+`head` equal to the expected head and a `checks` array. Each check must provide a
+unique string `id`, a string `conclusion`, and a strict-UTC `completedAt`. Every
+caller-supplied applicable check identity must occur exactly once, have conclusion
+`success`, and have a completion instant before the merge instant. For an
+`original-response`, `observedAt` is the source-capture time and must precede
+merge. For a `historical-extract`, `observedAt` remains that original
 source-capture time; `extractedAt` may be later and never substitutes for it. A
 historical claim requires original captured output or a labeled historical extract
 from it. If the original is unavailable, retain the gap and narrow or block the
@@ -78,14 +80,18 @@ claim rather than reconstructing a response from a narrative.
 `assessClaimSupport` is a pure helper for this factual limit: it verifies and
 decodes the retained representation, then compares its structured payload with a
 caller-supplied expected head and applicable check identities. Caller-supplied
-completion times, conclusions, or opaque bytes cannot establish a claim. Missing
-or contrary evidence returns `blocked` before any narrowing. A supported claim
+completion times, conclusions, or opaque bytes cannot establish a claim. Missing or contrary evidence blocks
+before any narrowing. A supported claim
 requires complete original-response or historical-extract evidence with a
 successful exit status, publishable non-redacted labels, a strict UTC merge instant,
 the applicable source-capture rule, and every applicable decoded check successful
-and completed before merge. Partial pagination, fresh corroboration, and merge
-snapshots retain their existing `narrowed` result when otherwise valid; they never
-become `supported`. It neither fetches nor proves facts that were not retained.
+and completed before merge. A partial `original-response` can only return
+`narrowed` after that same decoded-payload, head, applicable-check, completion, and
+pre-merge source-capture validation; it never becomes `supported`. A complete
+`fresh-corroboration` or `merge-snapshot` can return `narrowed` only after the
+decoded-payload, head, applicable-check, and completion validation. Partial
+fresh-corroboration and merge-snapshot evidence blocks. It neither fetches nor
+proves facts that were not retained.
 
 Secrets and confidential material remain subject to repository policy. Stop
 publication or retain an authorized transformation with its limitation. Neither a
