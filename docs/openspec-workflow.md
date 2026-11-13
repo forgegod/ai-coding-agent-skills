@@ -605,6 +605,12 @@ convention, not enforcement.
   evidence after integrated verification. It is not a scheduler and not a
   GitHub client. Its short invocation owns setup/bootstrap, local execution and
   bounded finish; the operator supplies exceptions, not a Git recipe.
+  Its local lossless representation support retains captured bytes and hashes,
+  not gate execution, reviewer authentication or new approval authority. Distinct
+  rejected records and successor dispositions carry the inherited two-cycle
+  limit; missing cycle evidence blocks continuation. Closure orders local closure
+  gates, fresh independent factual review at the exact closure SHA, then separately
+  authorized publication; implementation/integrated/closure evidence stays distinct.
 - `/openspec-next` finds the actual approved unfinished group and advances it
   under the selected local policy; inspect mode performs no mutations.
 - `/git-commit-message` keeps logical batches, a preview, exact staging and
@@ -714,7 +720,7 @@ gate, execute tests, call GitHub, acquire a lock or authorize a write. Full
 object IDs must already be local. Independent clones are supported. Preserve
 dirty work and uncertain API outcomes. Read back before retrying a write.
 
-The evidence and workspace helpers share the packaged
+The Git evidence-guard and workspace helpers share the packaged
 [Git child environment contract](../skills/software-development/openspec-delivery/references/git-environment.md).
 Only explicit runtime locations and `GIT_CONFIG_GLOBAL`, `GIT_CONFIG_SYSTEM` and
 `GIT_CONFIG_NOSYSTEM` selectors are forwarded. Absent selectors remain absent;
@@ -726,6 +732,18 @@ identity values, and Git-returned worktree paths are normalized before canonical
 checks. This is not a sandbox:
 PATH, home/config locations and repository/selected configuration remain trusted.
 
+The separate `references/evidence-retention.md` and
+`scripts/evidence-retention.mjs` pair is local representation support, not a Git
+helper or runtime lifecycle validator. Ship both complete in well-known output,
+skill/plugin ZIPs and native copies. Stored/original hashes, wrapper round-trips,
+archive identity and source/claim completeness belong in factual closure review;
+structural or synthetic procedure assertions cannot authenticate that review.
+Evidence-only additions, checkbox-only progress and covered planning-text drift
+are distinct. An owner plan may be absent from a lagging target; incomplete
+authorized bootstrap is not implementation. Plan drift requires separately
+approved recovery. `--plan` equal to `--head` computes identity only, granting
+neither approval nor commit authority nor restriction/correction-budget reset.
+
 ## Packages
 
 | Plugin | Skills |
@@ -736,6 +754,12 @@ PATH, home/config locations and repository/selected configuration remain trusted
 Orchestration is optional. It requires the workflow plugin, explicit role and
 model configuration, and a supported host. Package installation does not create
 those roles.
+
+Current source: delivery 1.0.5 in `openspec-development` 1.0.6;
+`openspec-next` 0.1.1 and `autonomous-orchestration` 1.4.0 are unchanged.
+Representation support adds no upstream workflow, runtime dependency or
+installation route. Package availability/byte checks do not establish account
+sync, host execution, native client discovery, Desktop acceptance or scanner approval.
 
 ## Verification
 

@@ -13,7 +13,7 @@ const marketplacePath = path.join(root, ".claude-plugin/marketplace.json");
 
 const expectedBundles = {
   "openspec-development": {
-    version: "1.0.5",
+    version: "1.0.6",
     skills: ["openspec-delivery", "openspec-next", "git-commit-message", "capability-wireframes"],
   },
   "autonomous-orchestration": {
@@ -116,6 +116,17 @@ test("distribution builds complete skill and plugin ZIPs from canonical bytes", 
   assert.deepEqual(await pluginPackages(catalog.plugins[0]), expectedBundles["openspec-development"].skills.slice().sort());
   assert.deepEqual(await pluginPackages(catalog.plugins[1]), ["autonomous-implementation-review"]);
   const integrationArchive = unzipSync(await readFile(path.join(output, "downloads", catalog.plugins[0].file)));
+  const deliveryEntry = catalog.skills.find(({ name }) => name === "openspec-delivery");
+  assert.ok(deliveryEntry, "individual delivery ZIP must be advertised");
+  const deliveryArchive = unzipSync(await readFile(path.join(output, "downloads", deliveryEntry.file)));
+  // Explicit pair checks must not depend on the generator's discovery inventory.
+  for (const file of ["references/evidence-retention.md", "scripts/evidence-retention.mjs"]) {
+    const canonical = await readFile(path.join(root, "skills/software-development/openspec-delivery", file));
+    for (const [archive, key] of [[deliveryArchive, `openspec-delivery/${file}`], [integrationArchive, `skills/openspec-delivery/${file}`]]) {
+      assert.ok(Object.hasOwn(archive, key), `ZIP omits ${key}`);
+      assert.deepEqual(Buffer.from(archive[key]), canonical, key);
+    }
+  }
   assert.ok(integrationArchive["skills/openspec-delivery/scripts/change-guard.mjs"], "OpenSpec ZIP must ship its guard");
   assert.ok(integrationArchive["skills/openspec-delivery/scripts/git-environment.mjs"], "OpenSpec ZIP must ship the shared Git environment constructor");
   assert.ok(integrationArchive["skills/openspec-delivery/references/git-environment.md"], "OpenSpec ZIP must ship the environment contract");

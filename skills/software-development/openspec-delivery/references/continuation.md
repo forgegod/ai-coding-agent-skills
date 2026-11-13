@@ -88,6 +88,24 @@ in change-owned evidence or verified review references; derive the two-cycle
 budget from them on resume. Missing cycle evidence is a recovery blocker, never
 a reset to cycle zero. Do not ask to authorize every Git command already covered.
 
+Keep distinct rejected-candidate, rejected-review and successor-disposition
+records. A successor disposition names the rejected candidate/review and the new
+candidate, carries the consumed correction/re-review cycles forward, and links
+fresh gates and review bound to that exact successor SHA. Retain the old bytes
+and hashes after a later pass; never overwrite or relabel rejection as acceptance.
+The two-cycle limit is inherited across successors and resumes. Missing attempt
+or cycle evidence refuses continuation until a separately authorized recovery
+resolves it; a new filename or reviewer does not restart the budget. This is an
+orchestrator procedure, not a product budget validator or persistent ledger.
+
+Distinguish evidence-only additions from actual checkbox-only progress and
+covered planning-text changes. Only real task checkbox normalization preserves
+covered task identity; evidence additions do not approve a plan. Covered planning
+drift refuses continuation pending separately approved recovery of the exact new
+plan identity. Setting `--plan` equal to `--head` computes identity only: neither
+approval nor commit authority, and no restriction or correction-budget reset.
+Missing actual approval or unresolved operator restrictions still stop execution.
+
 ## Finish is one bounded terminal authorization
 
 `finish <name>` covers the named change's protected publication/integration,
@@ -130,6 +148,16 @@ into the repository default branch. If it does not target the default branch,
 or the issue is still open after readback, perform the authorized documentation
 close. No extra PR attests the previous receipt. Then perform `workspace.md`
 cleanup.
+
+Closure ordering is local closure gates, then fresh independent factual closure
+review at the exact closure SHA, then separately authorized publication. Retain
+distinct implementation-review identity/session and candidate gates, integrated
+verified revision and integrated gates, closure SHA and local closure gates, and
+fresh closure-review identity/session. Do not reuse or relabel implementation or
+integrated evidence as closure gates/review. Use the factual checklist in
+`integration.md`: stored/original hashes, wrapper round-trips, archive identity,
+and source/claim completeness. These are procedural obligations; structural JSON
+validation does not authenticate a real reviewer or enforce lifecycle ordering.
 
 Report change/group, workspace/branch, actual plan/candidate/review identities,
 executed commands/results, remote readbacks when applicable, remaining boundary

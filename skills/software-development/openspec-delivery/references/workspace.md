@@ -78,6 +78,16 @@ change tracked inputs, need new credentials/system installation, or leave its
 established recipe, stop with that specific decision. Preserve gate failures.
 Record bootstrap commands/environment/results separately from acceptance gates.
 
+For example, an owning branch can contain the committed plan while a lagging
+target does not. Inspect the owner and require plan reachability there; absence
+from that target is not plan absence and a clean lagging base is not ready for
+implementation. Incomplete authorized bootstrap remains bootstrap, not accepted
+implementation. Preserve its residue and report the missing prerequisite rather
+than treating setup authority as implementation authority. Covered plan drift
+refuses continuation until separately approved recovery; an identity-only
+`--plan` equal to `--head` check grants neither approval nor commit authority and
+resets neither restrictions nor the correction/re-review budget.
+
 A common Git directory is shared across worktrees: refs, objects and config are
 not isolated. Ports, databases, build outputs and caches may also be shared;
 isolate mutable resources per change. An independent clone is supported by the

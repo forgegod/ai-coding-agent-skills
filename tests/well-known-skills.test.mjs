@@ -44,7 +44,13 @@ test("well-known build publishes every skill and all advertised files", async ()
     const autonomous = index.skills.find((skill) => skill.name === "autonomous-implementation-review");
     assert.deepEqual(autonomous?.files, ["references/claude-code-host.md", "references/claude-code-roles.md", "references/environment-passthrough.md", "references/herdr.md", "references/lifecycle-watch.md", "references/openspec.md", "scripts/herdr_lifecycle_watch.mjs", "scripts/herdr_panes.py", "scripts/herdr-pane-state.mjs", "SKILL.md", "templates/phase-implementer.md", "templates/phase-reviewer.md"]);
     const integration = index.skills.find((skill) => skill.name === "openspec-delivery");
-    assert.deepEqual(integration?.files, ["references/continuation.md", "references/git-environment.md", "references/guard.md", "references/integration.md", "references/naming.md", "references/recovery.md", "references/ticket.md", "references/workspace.md", "scripts/change-guard.mjs", "scripts/change-name.mjs", "scripts/change-workspace.mjs", "scripts/git-environment.mjs", "SKILL.md"]);
+    assert.deepEqual(integration?.files, ["references/continuation.md", "references/evidence-retention.md", "references/git-environment.md", "references/guard.md", "references/integration.md", "references/naming.md", "references/recovery.md", "references/ticket.md", "references/workspace.md", "scripts/change-guard.mjs", "scripts/change-name.mjs", "scripts/change-workspace.mjs", "scripts/evidence-retention.mjs", "scripts/git-environment.mjs", "SKILL.md"]);
+    // Independent of dynamic package discovery: both representation files are required.
+    for (const file of ["references/evidence-retention.md", "scripts/evidence-retention.mjs"]) {
+      assert.ok(integration.files.includes(file), `delivery inventory omits ${file}`);
+      assert.ok((await stat(path.join(endpoint, "openspec-delivery", file))).isFile());
+      assert.deepEqual(await readFile(path.join(endpoint, "openspec-delivery", file)), await readFile(path.join(root, "skills/software-development/openspec-delivery", file)));
+    }
   } finally {
     await rm(output, { recursive: true, force: true });
   }

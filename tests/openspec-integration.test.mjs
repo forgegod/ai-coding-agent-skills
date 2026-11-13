@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
 import { chmod, cp, mkdir, mkdtemp, readFile, rename, rm, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
@@ -25,7 +26,7 @@ test("OpenSpec package documents explicit authority, writer separation and read-
   for (const pattern of [/candidate --repo/, /review --repo/, /receipt --repo/, /schemaVersion/, /planDigest/, /exitCode/, /does not authenticate/, /fences/, /append-only/]) assert.match(reference, pattern);
   for (const pattern of [/valid UTF-8/, /refs\/replace/, /grafts/, /fsmonitor/, /Every commit in `verified\.\.target`/, /--receipt-path/, /duplicate/i, /raw blob bytes/]) assert.match(reference, pattern);
   assert.doesNotMatch(skill, /adoption history|reviewer found|previously reported/i);
-  assert.match(skill, /version: 1\.0\.4/);
+  assert.match(skill, /version: 1\.0\.5/);
   assert.doesNotMatch(skill, /\/home\/|~\/.hermes/);
 });
 
@@ -282,6 +283,88 @@ function reviewFor(f, snapshot) {
     gates: [{ command: "fixture-test", commit: f.head, exitCode: 0, evidence: "https://example.invalid/run/1" }] };
 }
 
+test("synthetic successor procedure retains rejected bytes after fresh exact-candidate review", async (t) => {
+  const f = await fixture(t);
+  const original = invoke(f);
+  assert.equal(original.status, 0, original.error);
+  const rejectedHead = f.head;
+  const rejectedReview = { ...reviewFor(f, original), verdict: "fail", findings: [{ severity: "high", message: "synthetic correction required" }] };
+  const candidateFile = path.join(f.scratch, "rejected-candidate.json");
+  const rejectedFile = path.join(f.scratch, "rejected-review.json");
+  await writeFile(candidateFile, JSON.stringify(original), { flag: "wx" });
+  await writeFile(rejectedFile, JSON.stringify(rejectedReview), { flag: "wx" });
+  assert.notEqual(invoke(f, "review", ["--review", rejectedFile]).status, 0);
+  await writeFile(path.join(f.repo, "implementation.txt"), "synthetic corrected successor\n");
+  f.head = commit(f.repo, "Synthetic successor correction");
+  assert.notEqual(f.head, rejectedHead);
+  const successor = invoke(f);
+  assert.equal(successor.status, 0, successor.error);
+  assert.equal(successor.planDigest, original.planDigest);
+  const staleFile = path.join(f.scratch, "stale-binding.json");
+  const oldBinding = reviewFor({ ...f, head: rejectedHead }, original);
+  await writeFile(staleFile, JSON.stringify(oldBinding));
+  assert.notEqual(invoke(f, "review", ["--review", staleFile]).status, 0, "old head cannot bind the exact successor");
+  await writeFile(staleFile, JSON.stringify({ ...oldBinding, head: f.head }));
+  assert.notEqual(invoke(f, "review", ["--review", staleFile]).status, 0, "old gate cannot be relabeled as a successor gate");
+  const fresh = reviewFor(f, successor);
+  const freshFile = path.join(f.scratch, "successor-review.json");
+  await writeFile(freshFile, JSON.stringify(fresh), { flag: "wx" });
+  const dispositionFile = path.join(f.scratch, "successor-disposition.json");
+  // Procedure data, not a persistent ledger or a product correction-budget validator.
+  await writeFile(dispositionFile, JSON.stringify({ rejectedCandidate: rejectedHead, rejectedReview: rejectedFile, successor: f.head, consumedCycles: 1, gates: fresh.gates, review: freshFile }), { flag: "wx" });
+  const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
+  const retained = await Promise.all([candidateFile, rejectedFile, dispositionFile].map(async (file) => {
+    const bytes = await readFile(file);
+    return { file, bytes, sha256: hash(bytes) };
+  }));
+  const pass = invoke(f, "review", ["--review", freshFile]);
+  assert.equal(pass.status, 0, pass.error);
+  assert.equal(fresh.head, f.head);
+  assert.equal(fresh.gates[0].commit, f.head);
+  for (const record of retained) {
+    const after = await readFile(record.file);
+    assert.deepEqual(after, record.bytes);
+    assert.equal(hash(after), record.sha256, "a later synthetic pass must not rewrite rejected history or disposition");
+  }
+  assert.equal(JSON.parse(await readFile(rejectedFile, "utf8")).verdict, "fail");
+  // A passing structural fixture does not authenticate an independent real reviewer.
+});
+
+test("synthetic plan procedure distinguishes evidence, actual checkbox progress and separately approved drift recovery", async (t) => {
+  const pending = "# Tasks\n- [ ] 1.1 Implement and test\n";
+  const f = await fixture(t, { planTasks: pending, headTasks: pending });
+  const approved = invoke(f);
+  assert.equal(approved.status, 0, approved.error);
+  assert.equal(approved.tasksComplete, false);
+  await mkdir(path.join(f.repo, changeRoot, "evidence"));
+  await writeFile(path.join(f.repo, changeRoot, "evidence/synthetic.log"), "evidence is not approval\n");
+  f.head = commit(f.repo, "Evidence-only addition");
+  const evidenceOnly = invoke(f);
+  assert.equal(evidenceOnly.status, 0, evidenceOnly.error);
+  assert.equal(evidenceOnly.planDigest, approved.planDigest);
+  assert.equal(evidenceOnly.tasksComplete, false);
+  await writeFile(path.join(f.repo, changeRoot, "tasks.md"), pending.replace("[ ]", "[x]"));
+  f.head = commit(f.repo, "Actual checkbox-only progress");
+  const checkboxOnly = invoke(f);
+  assert.equal(checkboxOnly.status, 0, checkboxOnly.error);
+  assert.equal(checkboxOnly.planDigest, approved.planDigest);
+  assert.equal(checkboxOnly.tasksComplete, true);
+  await writeFile(path.join(f.repo, changeRoot, "proposal.md"), "# Scope\nSeparately approved synthetic recovery scope.\n");
+  f.head = commit(f.repo, "Covered planning-text drift");
+  assert.match(invoke(f).error, /Planning content changed/);
+  const identityOnly = invoke({ ...f, plan: f.head });
+  assert.equal(identityOnly.status, 0, identityOnly.error);
+  assert.notEqual(identityOnly.planDigest, approved.planDigest);
+  // Separate synthetic operator decision, not authority produced by --plan == --head.
+  // It neither approves this real change nor authenticates a reviewer or enforces policy.
+  const recoveryApproval = { plan: f.head, digest: identityOnly.planDigest, approvedBy: "synthetic-operator", restrictions: ["no publication"], consumedCycles: 1 };
+  assert.equal(recoveryApproval.plan, f.head);
+  const recovered = invoke({ ...f, plan: recoveryApproval.plan }, "candidate", ["--expect-plan", recoveryApproval.digest]);
+  assert.equal(recovered.status, 0, recovered.error);
+  assert.deepEqual(recoveryApproval.restrictions, ["no publication"]);
+  assert.equal(recoveryApproval.consumedCycles, 1, "recovery does not reset inherited restrictions or budget");
+});
+
 test("OpenSpec review binds exact candidate, plan and successful gate evidence", async (t) => {
   const f = await fixture(t);
   const snapshot = invoke(f);
@@ -388,6 +471,9 @@ test("OpenSpec receipt refuses evidence that is not one regular bounded JSON obj
 
 test("OpenSpec receipt permits exact archival plus new evidence, never unverified product changes", async (t) => {
   const f = await integrated(t);
+  const originalReceipt = await readFile(f.file);
+  const planFiles = [".openspec.yaml", "proposal.md", "tasks.md", "specs/example/spec.md"];
+  const originalPlan = await Promise.all(planFiles.map((file) => readFile(path.join(f.repo, changeRoot, file))));
   await mkdir(path.join(f.repo, "openspec/changes/archive"), { recursive: true });
   await rename(path.join(f.repo, changeRoot), path.join(f.repo, archived));
   await mkdir(path.join(f.repo, archived, "evidence"));
@@ -395,6 +481,33 @@ test("OpenSpec receipt permits exact archival plus new evidence, never unverifie
   f.target = commit(f.repo, "Archive with actual fixture evidence");
   let result = invoke(f, "receipt", ["--receipt", f.file]);
   assert.equal(result.status, 0, result.error);
+  assert.equal(f.receipt.change, change, "archive movement preserves full change identity");
+  assert.deepEqual(await readFile(path.join(f.repo, archived, "evidence/receipt.json")), originalReceipt);
+  for (const [index, file] of planFiles.entries()) assert.deepEqual(await readFile(path.join(f.repo, archived, file)), originalPlan[index]);
+  // Synthetic representation/procedure illustration, not a packaged-helper call,
+  // reviewer authentication, lifecycle validator or publication authorization.
+  const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
+  const wrapperBytes = Buffer.from(JSON.stringify({ originalUtf8: originalReceipt.toString("utf8"), originalSha256: hash(originalReceipt) }));
+  const wrapper = JSON.parse(wrapperBytes.toString("utf8"));
+  const decoded = Buffer.from(wrapper.originalUtf8, "utf8");
+  assert.deepEqual(decoded, originalReceipt);
+  assert.equal(hash(decoded), wrapper.originalSha256);
+  assert.notEqual(hash(wrapperBytes), hash(originalReceipt), "stored wrapper and original have distinct identities");
+  const implementation = { head: f.head, session: "synthetic-implementation-review", gates: f.receipt.review.gates };
+  const integratedVerification = { verified: f.receipt.verified, gates: f.receipt.gates };
+  const localClosure = { head: f.target, gates: [{ command: "synthetic-local-closure-gate", commit: f.target, exitCode: 0 }] };
+  const factualReview = { head: f.target, session: "synthetic-fresh-closure-review", sources: [f.file], claims: [{ source: f.file, originalSha256: hash(originalReceipt), storedWrapperSha256: hash(wrapperBytes), archive: archived }] };
+  assert.notEqual(implementation.head, integratedVerification.verified);
+  assert.notEqual(integratedVerification.verified, localClosure.head);
+  assert.equal(localClosure.gates[0].commit, factualReview.head);
+  assert.notEqual(factualReview.session, implementation.session);
+  assert.notDeepEqual(localClosure.gates, implementation.gates);
+  assert.notDeepEqual(localClosure.gates, integratedVerification.gates);
+  assert.ok(factualReview.claims.every((claim) => factualReview.sources.includes(claim.source)));
+  assert.ok(factualReview.sources.every((source) => factualReview.claims.some((claim) => claim.source === source)));
+  assert.equal(factualReview.claims[0].archive, archived);
+  // Ordering, completeness and no-reuse policy are asserted textually in delivery tests;
+  // these distinct synthetic records do not prove any real closure gate/reviewer ran.
   await writeFile(path.join(f.repo, "implementation.txt"), "changed after verification\n");
   f.target = commit(f.repo, "Unverified product change");
   result = invoke(f, "receipt", ["--receipt", f.file]);

@@ -84,6 +84,33 @@ test("prepare previews creation without writes, locates the result and reuses it
   assert.equal(await readFile(path.join(f.workspace, "unfinished.txt"), "utf8"), "retain me");
 });
 
+test("synthetic owner-plan and incomplete-bootstrap procedure does not promote setup to implementation", async (t) => {
+  const f = await fixture(t);
+  const laggingTarget = f.base;
+  executePreview(invoke(f, "prepare"));
+  const planFile = "openspec/changes/example/proposal.md";
+  await mkdir(path.dirname(path.join(f.workspace, planFile)), { recursive: true });
+  await writeFile(path.join(f.workspace, planFile), "# Synthetic owner-only plan\n");
+  git(f.workspace, "add", "--", planFile);
+  git(f.workspace, "commit", "-m", "Synthetic owner plan");
+  const ownerPlan = git(f.workspace, "rev-parse", "HEAD");
+  assert.notEqual(ownerPlan, laggingTarget);
+  assert.equal(git(f.repo, "ls-tree", "--name-only", laggingTarget, "--", planFile), "");
+  assert.equal(git(f.workspace, "ls-tree", "--name-only", ownerPlan, "--", planFile), planFile);
+  assert.equal(git(f.workspace, "merge-base", ownerPlan, "HEAD"), ownerPlan);
+  await writeFile(path.join(f.workspace, "incomplete-bootstrap.txt"), "synthetic setup residue; not implementation\n");
+  const resumed = invoke(f, "prepare");
+  assert.equal(resumed.status, 0, resumed.error);
+  assert.equal(resumed.action, "reuse");
+  assert.equal(resumed.dirty, true);
+  assert.equal(git(f.workspace, "rev-parse", "HEAD"), ownerPlan);
+  assert.equal(await readFile(path.join(f.workspace, "source.txt"), "utf8"), "original\n");
+  assert.equal(await readFile(path.join(f.workspace, "incomplete-bootstrap.txt"), "utf8"), "synthetic setup residue; not implementation\n");
+  // Policy/textual assertions, not workspace-helper approval/authority enforcement.
+  const guidance = await readFile(new URL("../skills/software-development/openspec-delivery/references/workspace.md", import.meta.url), "utf8");
+  for (const pattern of [/owning branch can contain the committed plan while a lagging\s+target does not/, /absence\s+from that target is not plan absence/, /Incomplete authorized bootstrap remains bootstrap, not accepted\s+implementation/, /Preserve its residue/, /rather\s+than treating setup authority as implementation authority/, /Covered plan drift\s+refuses continuation until separately approved recovery/, /grants neither approval nor commit authority/, /resets neither restrictions nor the correction\/re-review budget/]) assert.match(guidance, pattern);
+});
+
 test("prepare refuses dirty sources, branch and destination collisions, nested paths and stale bases", async (t) => {
   const f = await fixture(t);
   await writeFile(path.join(f.repo, "unowned.txt"), "retain");
