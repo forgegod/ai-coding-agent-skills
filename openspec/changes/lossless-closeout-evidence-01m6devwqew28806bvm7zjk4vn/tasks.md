@@ -32,7 +32,7 @@ change: lossless-closeout-evidence-01m6devwqew28806bvm7zjk4vn
 - [x] 4.2 Add or update packaging tests that prove complete canonical bytes and the new support file across well-known output, skill ZIPs, affected Claude-plugin ZIPs, and isolated native-copy fixtures; verify unaffected companion/package versions remain unchanged.
 - [x] 4.3 Run the applicable focused evidence, guard, packaging, and documentation tests plus `npm test`, `npm run build`, and `npm run validate:openspec` after the final source/doc edit; assess and record whether `npm run test:openspec` changed under the selected OpenSpec 1.16.0 and Node 22.12.0+ contract rather than inventing an OpenSpec verify command.
 - [x] 4.4 Run `HERMES_SOURCE=<trusted-checkout> npm run test:security` only when its trusted Hermes source and Python prerequisites are available; retain actual output and unchanged negative-control/safe-package verdicts, or record the missing prerequisite as a pending release gate without exclusion, suppression, bypass, or a false pass.
-- [ ] 4.5 Freeze the final plan revision/digest, run `git diff --check` and strict OpenSpec validation, and obtain independent review of the exact candidate; verify the review distinguishes local candidate evidence from unperformed protected publication, integrated verification, closure publication, archive, issue closure, and cleanup.
+- [x] 4.5 Freeze the final plan revision/digest, run `git diff --check` and strict OpenSpec validation, and obtain independent review of the exact candidate; verify the review distinguishes local candidate evidence from unperformed protected publication, integrated verification, closure publication, archive, issue closure, and cleanup.
 
 ## Workflow follow-up
 
