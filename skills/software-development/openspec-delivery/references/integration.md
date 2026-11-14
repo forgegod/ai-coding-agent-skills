@@ -2,6 +2,8 @@
 
 This procedure is operator-controlled; the package supplies no GitHub writer,
 merge queue, distributed fencing or default mutation authority.
+Use [evidence-retention.md](evidence-retention.md) for byte-preserving named-gate
+output, factual readback provenance, and limits on historical claims.
 
 ## Before any publication
 
@@ -61,9 +63,31 @@ CLI help and select its no-spec-update path only when the deltas were already
 incorporated and current specs are correct. If current specs differ, stop for
 explicit reconciliation and new verification; never overwrite newer requirements.
 
-Validate receipt structure and exact archive paths with the helper, then obtain
-independent factual review of completion prose/output references. Publish/integrate
-only if authorized; verify the exact closure merge and any authorized cleanup.
+Run the required local closure gates on the exact closure SHA, including receipt
+structure and exact archive-path validation. Then obtain a fresh independent
+factual closure review bound to that exact closure SHA. Only after those gates
+and review may separately authorized publication/integration proceed; verify the
+exact closure merge and any authorized cleanup. A changed closure SHA requires
+renewed local closure gates and fresh exact-SHA review before publication.
+
+Keep distinct evidence identities: implementation candidate and gates plus its
+implementation-review identity/session; integrated verified revision and its
+gates; closure SHA and local closure gates; fresh closure-review identity/session.
+Never reuse the implementation-review session, packet or JSON, or relabel
+implementation/integrated gates as closure evidence. The factual review checks:
+
+- Stored-artifact and original-byte hashes against the retained bytes, including
+  decoded-original hashes and lossless wrapper round-trips where used.
+- Exact archive identity and byte/mode-identical movement without omitted records.
+- Source/claim completeness: every completion claim has the actual named source,
+  command/result, revision and provenance; partial/missing/contrary evidence is
+  not a pass, and historical failures/rejections remain retained.
+- Distinct implementation, integrated and closure identities, with local closure
+  gates before fresh independent factual review before authorized publication.
+
+This checklist is an orchestrator procedure. Structural guard checks and textual
+or synthetic procedure tests do not authenticate a real reviewer or implement
+lifecycle-order enforcement; they do not grant publication authority.
 If cleanup is blocked, state that honestly without erasing accepted source evidence.
 Close a documentation issue only when its declared acceptance boundary is
 satisfied and that write is authorized. Closing it is not archival.

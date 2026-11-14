@@ -6,6 +6,8 @@ required; there are no network calls, dependencies or Git writes. The helper
 prints one JSON result and exits zero only when its checks pass. Inspect exit
 status and `ok`; a malformed/missing result is failure. Commands below are
 unexecuted templates, not permission to write or fabricated evidence.
+For lossless representation, provenance, completeness, and confidentiality of
+the output those checks cite, use [evidence-retention.md](evidence-retention.md).
 
 ## Inputs and trust
 
@@ -54,6 +56,11 @@ Capture the digest while reviewing the plan; record the actual operator approval
 with that immutable commit/digest. Subsequent candidate checks should add
 `--expect-plan <approved-digest>`. Comparing a plan with itself computes a digest,
 not approval. Both base and plan must be ancestors of candidate.
+
+Explicitly setting `--plan` equal to `--head` computes identity only. It grants
+neither approval nor commit authority and resets neither operator restrictions
+nor the inherited correction/re-review budget. A successful structural check
+cannot replace the actual approval record or a separately approved recovery.
 
 The digest covers regular committed `openspec/config.yaml`, change `.openspec.yaml`,
 `proposal.md`, `tasks.md`, optional `design.md`, and every file below the change's

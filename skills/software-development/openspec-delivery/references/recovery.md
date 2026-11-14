@@ -4,6 +4,9 @@ Preserve all work and evidence. This helper never repairs failures or authorizes
 Git/GitHub writes. Recovery starts by reading exact local refs and dirty state,
 issue/assignment/activation, candidate/review, actual PR heads and target history.
 A failed command or unknown remote result is not proof of absence.
+Use [evidence-retention.md](evidence-retention.md) to preserve failed output,
+rejected reviews, historical extracts, fresh corroboration, and explicit gaps
+without rewriting the original record.
 
 | Observed state | Required bounded response |
 | --- | --- |

@@ -27,6 +27,16 @@ This adds no upstream skill or runtime dependency. Package installation/validati
 does not establish native Git behavior; missing native macOS/Windows results remain
 hardening completion blockers, and WSL or case simulations do not replace them.
 
+Delivery 1.0.5 (in `openspec-development` 1.0.6) also includes
+`references/evidence-retention.md` and `scripts/evidence-retention.mjs`; keep both
+in complete companion copies and ZIPs. This is local lossless representation and
+claim-support checking, not a Git helper, gate runner, reviewer authenticator or
+approval/publication authority. It adds no upstream workflow, runtime dependency
+or installation route. `openspec-next` remains 0.1.1 and the separate optional
+`autonomous-orchestration` plugin remains 1.4.0. Installation, account sync and
+host execution verification remain separate; package byte checks establish none
+of native client discovery, Desktop acceptance or scanner approval.
+
 ## Required upstream inventory
 
 These are this project's seven mandatory setup prerequisites, not a claim that

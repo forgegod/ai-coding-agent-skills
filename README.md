@@ -16,7 +16,7 @@ The five packages below are companions, not a replacement for those prerequisite
 
 | Skill | What it adds |
 | --- | --- |
-| [openspec-delivery](skills/software-development/openspec-delivery/SKILL.md) | Automatic workspace setup, bounded execution and verified closeout. |
+| [openspec-delivery](skills/software-development/openspec-delivery/SKILL.md) | Automatic workspace setup, bounded execution and verified closeout, with lossless evidence representation. |
 | [openspec-next](skills/software-development/openspec-next/SKILL.md) | Find and advance the next approved local task group; inspect mode is read-only. |
 | [git-commit-message](skills/software-development/git-commit-message/SKILL.md) | Logical batches, a preview, and exact staging. Commit authority stays explicit. |
 | [capability-wireframes](skills/software-development/capability-wireframes/SKILL.md) | Stable HTML/PNG review for a primary human-facing surface. |
@@ -41,6 +41,16 @@ preserved and topology overrides refused. Configuration remains trusted, not san
 Copy complete packages, including the shared constructor; Node 22+ and Git remain
 the prerequisites. Native macOS/Windows results are required separately from WSL or
 case simulations; missing results block hardening completion, not just publication.
+
+Separately, delivery's local representation support comprises
+`references/evidence-retention.md` and `scripts/evidence-retention.mjs`.
+Keep both in complete packages and copies. It preserves captured bytes/hashes
+and checks claim support; it is not a Git helper, gate runner, reviewer
+authenticator, scheduler, polling client or approval/publication authority.
+Rejected records remain distinct from successor dispositions with inherited
+two-cycle continuity. Closure requires local closure gates, fresh independent
+factual review at the exact closure SHA, then separately authorized publication;
+implementation, integrated and closure evidence are not interchangeable.
 
 Companion installation: [Claude Desktop (no terminal)](#install-with-claude-desktop) ·
 [Hermes](#install-with-hermes) ·
@@ -685,6 +695,15 @@ an HTML download page, and a JSON inventory with SHA-256 checksums. The checked-
 no generated skill copies are committed. Its explicit skill lists separate the
 OpenSpec companion workflow from opt-in orchestration. Bump every affected plugin's version when
 its bundled content changes. See the [Claude release checks](docs/claude-installation.md#maintainer-verification).
+
+Current source versions are delivery 1.0.5 and its affected
+`openspec-development` plugin 1.0.6; `openspec-next` remains 0.1.1 and
+`autonomous-orchestration` remains 1.4.0. Complete well-known output, the delivery
+skill ZIP, workflow plugin ZIP and isolated native copies must retain the lossless
+reference/helper pair byte-for-byte. Source assertions are not executed packaging
+proof or a claim of updated public downloads, native client discovery, Desktop
+acceptance or scanner approval. No upstream prerequisite or installation route is
+added by this representation facility.
 
 The optional `npm run test:local-update` probe requires the installed `hermes`
 CLI and internet access. It installs all local packages into a disposable scratch

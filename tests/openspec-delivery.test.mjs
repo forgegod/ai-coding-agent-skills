@@ -57,3 +57,61 @@ test("old package is absent and installation rename is explicit rather than sile
   assert.match(source, /installed.*(?:unchanged|not updated)|does not.*installed/s);
   assert.match(source, /\/openspec-next inspect/);
 });
+
+test("delivery routes lossless evidence retention without adding a gate runner or polling authority", async () => {
+  const skill = await read("skills/software-development/openspec-delivery/SKILL.md");
+  const reference = await read("skills/software-development/openspec-delivery/references/evidence-retention.md");
+  const guard = await read("skills/software-development/openspec-delivery/references/guard.md");
+  const integration = await read("skills/software-development/openspec-delivery/references/integration.md");
+  const recovery = await read("skills/software-development/openspec-delivery/references/recovery.md");
+  const continuation = await read("skills/software-development/openspec-delivery/references/continuation.md");
+
+  for (const source of [skill, guard, integration, recovery, continuation]) assert.match(source, /evidence-retention\.md/);
+  for (const pattern of [/original-byte/i, /storedArtifactSha256/, /decodedOriginalSha256/, /provenance/i, /completeness/i, /confidentiality/i, /partial\s+response/i, /fresh\s+corroboration/i, /merge\s+response/i, /unattended polling/i, /fail/i]) assert.match(reference, pattern);
+  assert.match(reference, /completion time.*precede.*merge/is);
+  assert.match(reference, /wrapperSha256/);
+  assert.match(reference, /assessClaimSupport/);
+  assert.match(reference, /not a command runner, scheduler, GitHub\s+client, polling loop, approval service, or publication authority/i);
+});
+
+test("lossless evidence guidance documents the fail-closed claim contract", async () => {
+  const reference = await read("skills/software-development/openspec-delivery/references/evidence-retention.md");
+  for (const pattern of [/coherence.*after deserialization/is, /strict UTC instant/i, /successful exit status/i, /publishable non-redacted/i, /completed before merge/i, /missing or contrary evidence blocks/i]) {
+    assert.match(reference, pattern);
+  }
+});
+
+test("policy/textual procedure retains successor history and inherits the two-cycle limit", async () => {
+  const continuation = await read("skills/software-development/openspec-delivery/references/continuation.md");
+  for (const pattern of [/distinct rejected-candidate, rejected-review and successor-disposition/, /names the rejected candidate\/review and the new\s+candidate/, /carries the consumed correction\/re-review cycles forward/, /fresh gates and review bound to that exact successor SHA/, /Retain the old bytes\s+and hashes after a later pass/, /never overwrite or relabel rejection as acceptance/, /two-cycle limit is inherited across successors and resumes/, /Missing attempt\s+or cycle evidence refuses continuation until a separately authorized recovery/, /new filename or reviewer does not restart the budget/, /not a product budget validator or persistent ledger/]) assert.match(continuation, pattern);
+  // Synthetic procedure illustration only: no scheduler, ledger or runtime budget check.
+  const first = { candidate: "synthetic-rejected-1", review: "synthetic-review-1", consumedCycles: 1 };
+  const successor = { rejectedCandidate: first.candidate, rejectedReview: first.review, candidate: "synthetic-successor", consumedCycles: first.consumedCycles };
+  const second = { ...successor, consumedCycles: 2 };
+  assert.equal(successor.consumedCycles, first.consumedCycles);
+  assert.equal(second.consumedCycles, 2, "a resume does not restart at zero");
+  const missingCycle = { ...second, consumedCycles: undefined };
+  assert.equal(missingCycle.consumedCycles, undefined);
+  assert.match(continuation, /Missing cycle evidence is a recovery blocker, never\s+a reset to cycle zero/);
+  assert.match(continuation, /at most two correction\/review cycles/);
+});
+
+test("policy/textual closure procedure separates exact identities and orders gates, fresh review and publication", async () => {
+  const integration = await read("skills/software-development/openspec-delivery/references/integration.md");
+  const continuation = await read("skills/software-development/openspec-delivery/references/continuation.md");
+  const gates = integration.indexOf("Run the required local closure gates on the exact closure SHA");
+  const review = integration.indexOf("Then obtain a fresh independent");
+  const publication = integration.indexOf("Only after those gates");
+  assert.ok(gates >= 0 && review > gates && publication > review);
+  for (const pattern of [/factual closure review bound to that exact closure SHA/, /separately authorized publication\/integration/, /changed closure SHA requires\s+renewed local closure gates and fresh exact-SHA review/, /implementation candidate and gates plus its\s+implementation-review identity\/session/, /integrated verified revision and its\s+gates/, /closure SHA and local closure gates/, /fresh closure-review identity\/session/, /Never reuse the implementation-review session, packet or JSON/, /relabel\s+implementation\/integrated gates as closure evidence/, /Stored-artifact and original-byte hashes/, /decoded-original hashes and lossless wrapper round-trips/, /Exact archive identity and byte\/mode-identical movement without omitted records/, /Source\/claim completeness/, /partial\/missing\/contrary evidence/, /historical failures\/rejections remain retained/, /do not authenticate a real reviewer or implement\s+lifecycle-order enforcement/]) assert.match(integration, pattern);
+  assert.match(continuation, /local closure gates, then fresh independent factual closure\s+review at the exact closure SHA, then separately authorized publication/);
+  assert.match(continuation, /structural JSON\s+validation does not authenticate a real reviewer or enforce lifecycle ordering/);
+});
+
+test("policy/textual plan self-comparison never manufactures approval, commit authority or a reset", async () => {
+  const guard = await read("skills/software-development/openspec-delivery/references/guard.md");
+  const continuation = await read("skills/software-development/openspec-delivery/references/continuation.md");
+  assert.match(guard, /setting `--plan` equal to `--head` computes identity only/);
+  assert.match(guard, /neither approval nor commit authority and resets neither operator restrictions\s+nor the inherited correction\/re-review budget/);
+  for (const pattern of [/evidence-only additions from actual checkbox-only progress and\s+covered planning-text changes/, /evidence additions do not approve a plan/, /drift refuses continuation pending separately approved recovery of the exact new\s+plan identity/, /Missing actual approval or unresolved operator restrictions still stop execution/]) assert.match(continuation, pattern);
+});
