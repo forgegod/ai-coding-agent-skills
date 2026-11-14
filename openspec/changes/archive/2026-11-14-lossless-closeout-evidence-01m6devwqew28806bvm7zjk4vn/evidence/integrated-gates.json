@@ -1,0 +1,154 @@
+[
+  {
+    "command": "node --test tests/evidence-retention.test.mjs tests/openspec-delivery.test.mjs tests/openspec-routing.test.mjs tests/openspec-workspace.test.mjs tests/openspec-integration.test.mjs tests/openspec-references.test.mjs tests/git-environment.test.mjs tests/claude-packaging.test.mjs tests/native-installation.test.mjs tests/well-known-skills.test.mjs tests/documentation.test.mjs tests/skills.test.mjs",
+    "commit": "87d98d65d246012616755605d0a5f7d303458a8c",
+    "exitCode": 0,
+    "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/lossless-outcome-closeout-20261114T104632454955Z/integrated-focused",
+    "hashes": {
+      "command.txt": "3123d54c7076c53b8dec58a9a29b030805149b64648f947e7c15ea62b896942c",
+      "cwd": "2cd280c6078c18f16418c298de5c7e9fe81e066abee7a5a1747e8ec061a7de39",
+      "revision": "8eed5c9126ea7308189dddacdc1d85d31ae9223570cdfe4c74aa89099770bdd7",
+      "environment.json": "1ab4fc0dba296d669bb70334322303e21125fbf6ce8f4a80058a08dd6ec5d40e",
+      "started": "c73e475a68f747c0a95cb99711042ef650637d6ceb7c78b36e3bc42d3dfcbd95",
+      "stdout.log": "0d47708cdd56a5b609c615c60b094ea1dc85639f50057733452a5fd747dd766c",
+      "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "finished": "7b9893355a5942b6d7f428dd54764cf5de9def80edf08db02e4ecfa6e4095538"
+    },
+    "start": "2026-11-14T10:50:46.721Z",
+    "finish": "2026-11-14T10:51:02.095Z"
+  },
+  {
+    "command": "npm test",
+    "commit": "87d98d65d246012616755605d0a5f7d303458a8c",
+    "exitCode": 0,
+    "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/lossless-outcome-closeout-20261114T104632454955Z/integrated-npm-test",
+    "hashes": {
+      "command.txt": "f135f9fa4f38fd0c92563221116e2f79df0838f5ff86440ae44d4b428576fc62",
+      "cwd": "2cd280c6078c18f16418c298de5c7e9fe81e066abee7a5a1747e8ec061a7de39",
+      "revision": "8eed5c9126ea7308189dddacdc1d85d31ae9223570cdfe4c74aa89099770bdd7",
+      "environment.json": "1ab4fc0dba296d669bb70334322303e21125fbf6ce8f4a80058a08dd6ec5d40e",
+      "started": "600d5eeb393021c93ab4f1ab696ca8c0abbaa28e334645143f6e4c504ec3b89e",
+      "stdout.log": "039da3f8f8c6be1268628918c466dba9df4d7f99b475538f8c48fee783be94e7",
+      "stderr.log": "b8f6cf77459e8bdad9321d12a5e073c303af4bc92b7efe326f5484093ea89f9c",
+      "exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "finished": "832c9e39bfad3c5a04ff6bbe3a3efd018c73a0cb9af35d4a9d4463bca3d86c94"
+    },
+    "start": "2026-11-14T10:51:09.492Z",
+    "finish": "2026-11-14T10:51:24.831Z"
+  },
+  {
+    "command": "npm run build",
+    "commit": "87d98d65d246012616755605d0a5f7d303458a8c",
+    "exitCode": 0,
+    "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/lossless-outcome-closeout-20261114T104632454955Z/integrated-build",
+    "hashes": {
+      "command.txt": "dae58de3ddfde95b066b259e24d83e50d15aedeafb58b0b20d7b26dd324ef0ef",
+      "cwd": "2cd280c6078c18f16418c298de5c7e9fe81e066abee7a5a1747e8ec061a7de39",
+      "revision": "8eed5c9126ea7308189dddacdc1d85d31ae9223570cdfe4c74aa89099770bdd7",
+      "environment.json": "1ab4fc0dba296d669bb70334322303e21125fbf6ce8f4a80058a08dd6ec5d40e",
+      "started": "809eeabe74a12d042f932286337800ffd74078a540a47f8a5938bb4ea1c33a3d",
+      "stdout.log": "a17c3fcad436b4315ae8681a1688a7fba8fcf9ab5ee4a11a09527b9222603ad5",
+      "stderr.log": "02e775a724a749a8a6d7a8ff0bb1641a176ae701d052916e8b9aee7574c9b80d",
+      "exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "finished": "4fd8e87fbd676d0b749af2f9c6a03e1e35e7dc563d2278096d80f8a553ecc69f"
+    },
+    "start": "2026-11-14T10:51:32.221Z",
+    "finish": "2026-11-14T10:51:32.485Z"
+  },
+  {
+    "command": "npm run validate:openspec",
+    "commit": "87d98d65d246012616755605d0a5f7d303458a8c",
+    "exitCode": 0,
+    "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/lossless-outcome-closeout-20261114T104632454955Z/integrated-metadata",
+    "hashes": {
+      "command.txt": "4d0e4eceeab940e9c5044274d64363eddccd7d16e97768575fe3b0727c498448",
+      "cwd": "2cd280c6078c18f16418c298de5c7e9fe81e066abee7a5a1747e8ec061a7de39",
+      "revision": "8eed5c9126ea7308189dddacdc1d85d31ae9223570cdfe4c74aa89099770bdd7",
+      "environment.json": "1ab4fc0dba296d669bb70334322303e21125fbf6ce8f4a80058a08dd6ec5d40e",
+      "started": "1a3c4b0f910eaefb389673428e0134462a6c6df1272fa030b57195a53b8ce083",
+      "stdout.log": "4902cdfae35f66f159d42d86fead6d8b35585f256865696733c1990c4313266a",
+      "stderr.log": "11d6b7225bb68761e8c47f14d7ab3f878f76d92a1428f11671d3baff1b43427d",
+      "exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "finished": "49e12fa366291390973cf6fb96bb984c1c1106b0fad4829faad395d43ae19dce"
+    },
+    "start": "2026-11-14T10:51:40.460Z",
+    "finish": "2026-11-14T10:51:40.638Z"
+  },
+  {
+    "command": "npm run test:openspec",
+    "commit": "87d98d65d246012616755605d0a5f7d303458a8c",
+    "exitCode": 0,
+    "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/lossless-outcome-closeout-20261114T104632454955Z/integrated-compatibility",
+    "hashes": {
+      "command.txt": "cc17a4d557bb6d78fa5108670611fe03fd4917c8c43f5263f013b9c1bea1122c",
+      "cwd": "2cd280c6078c18f16418c298de5c7e9fe81e066abee7a5a1747e8ec061a7de39",
+      "revision": "8eed5c9126ea7308189dddacdc1d85d31ae9223570cdfe4c74aa89099770bdd7",
+      "environment.json": "1f6b1bd8b0b83674ec9e074de456f2ca47f1d4f5805dc88ca1ca237033681628",
+      "started": "64570cd1edcf9bba50332f1f95d73e1d56519002df24757a87d9b687ec892741",
+      "stdout.log": "f01a20cea21df843b83283c82adb709f6338a80e39dc424d4782f683285deffb",
+      "stderr.log": "ebe111a8d7138088a64061bf45c52b26ea6ef7a488d29dd5a651e47e98ce87b8",
+      "exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "finished": "1da72f5bef3db0b9a657e48131cfc40888f19ca997096fcf2905f732ae0b7268"
+    },
+    "start": "2026-11-14T10:51:49.172Z",
+    "finish": "2026-11-14T10:51:59.122Z"
+  },
+  {
+    "command": "npm run test:security",
+    "commit": "87d98d65d246012616755605d0a5f7d303458a8c",
+    "exitCode": 0,
+    "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/lossless-outcome-closeout-20261114T104632454955Z/integrated-security",
+    "hashes": {
+      "command.txt": "f6fe4c91b42807716add34e030ef5d9c753133efa77534d46d95bc426af8441b",
+      "cwd": "2cd280c6078c18f16418c298de5c7e9fe81e066abee7a5a1747e8ec061a7de39",
+      "revision": "8eed5c9126ea7308189dddacdc1d85d31ae9223570cdfe4c74aa89099770bdd7",
+      "environment.json": "548e92a450c2daeb968c8d3efd20c4fbed9c4bda0e755f7967bcd8a8efe11ffd",
+      "started": "4e77b7c63abb7e7cc6233b8a9b842f1ae69cb32249edb289e47f6db2d78a7ea8",
+      "stdout.log": "bcc342cba2cdfbc6ba1255e79fe9167f30ad6408801fbd1eb20c08a1d03db115",
+      "stderr.log": "d7935c6fb9c37b5381391d05391412f9b178056ee47ec1c33b44519215d69d34",
+      "exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "finished": "1941fdfc2735f2453718cfb96a3f8777b990efe912cfcfeacf3446f3ba92c327"
+    },
+    "start": "2026-11-14T10:52:06.938Z",
+    "finish": "2026-11-14T10:52:08.175Z"
+  },
+  {
+    "command": "git diff --check 38140894ee08d2bd738de1abc9e91a621104c889..87d98d65d246012616755605d0a5f7d303458a8c",
+    "commit": "87d98d65d246012616755605d0a5f7d303458a8c",
+    "exitCode": 0,
+    "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/lossless-outcome-closeout-20261114T104632454955Z/integrated-whitespace",
+    "hashes": {
+      "command.txt": "12ee9af839898e434e313acc8fb3b9557efc09e222c5d352c4d6a286c7947dcf",
+      "cwd": "2cd280c6078c18f16418c298de5c7e9fe81e066abee7a5a1747e8ec061a7de39",
+      "revision": "8eed5c9126ea7308189dddacdc1d85d31ae9223570cdfe4c74aa89099770bdd7",
+      "environment.json": "1ab4fc0dba296d669bb70334322303e21125fbf6ce8f4a80058a08dd6ec5d40e",
+      "started": "237d003380d66a573d12ab5f4fd1c8e55a50f47024e6784eefe1da11f3e9b944",
+      "stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "finished": "03c6b4306b4a50fac4b1438d7943258798cea397430abb2ab4009fe3bbd43c42"
+    },
+    "start": "2026-11-14T10:52:17.442Z",
+    "finish": "2026-11-14T10:52:17.450Z"
+  },
+  {
+    "command": "npm exec --cache /home/raphael/.hermes/profiles/hermes-dev/cache/scratch/lossless-integrated-20261114T105030058347Z/npm-cache --yes --ignore-scripts --package=@fission-ai/openspec@1.16.0 -- openspec validate --all --strict --json --no-interactive",
+    "commit": "87d98d65d246012616755605d0a5f7d303458a8c",
+    "exitCode": 0,
+    "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/lossless-outcome-closeout-20261114T104632454955Z/integrated-strict",
+    "hashes": {
+      "command.txt": "bf1cb3a3da456576761001ad6af224ce552087e251154042b78770e0deb253e7",
+      "cwd": "2cd280c6078c18f16418c298de5c7e9fe81e066abee7a5a1747e8ec061a7de39",
+      "revision": "8eed5c9126ea7308189dddacdc1d85d31ae9223570cdfe4c74aa89099770bdd7",
+      "environment.json": "1f6b1bd8b0b83674ec9e074de456f2ca47f1d4f5805dc88ca1ca237033681628",
+      "started": "6e398454f07ace71664848a9138a39e31fe8e50e8bae8f73731db6494237298c",
+      "stdout.log": "369d5bbdb5808f47553615d3e3abf326c89f70dff94fb88fc60694da351315d9",
+      "stderr.log": "5e3620fc28016c426c7bdb4fb8762919427d4631c8b70acb67ecfc528d69dc9f",
+      "exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "finished": "254c30b0b756f509aafc90c18bed55afe67536ae8cd1560a206e47c4ad7ad93b"
+    },
+    "start": "2026-11-14T10:53:13.959Z",
+    "finish": "2026-11-14T10:53:17.038Z"
+  }
+]

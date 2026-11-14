@@ -1,0 +1,64 @@
+[
+  {
+    "file": "implementation-premerge-check-runs.json",
+    "source": "/home/raphael/verification-records/ai-coding-agent-skills/lossless-integrated-delivery-20261114T094035216775Z/check-runs/stdout.log",
+    "representation": "original-byte copy",
+    "sha256": "ad00ca7175d6d7e03516b364d9bc47db0cd66fbba75a5e98ae0d24d3102eab66",
+    "confidentiality": "publishable public GitHub object",
+    "completeness": "complete",
+    "capture": {
+      "argv": [
+        "gh",
+        "api",
+        "--paginate",
+        "repos/forgegod/ai-coding-agent-skills/commits/169c68356b75402f29a794b395766c1950eb9507/check-runs?per_page=100"
+      ],
+      "cwd": "/home/raphael/src/ai-coding-agent-skills--lossless-closeout-evidence-38140894",
+      "environment": null,
+      "start": "2026-11-14T09:40:37.376156+00:00",
+      "finish": "2026-11-14T09:40:37.818011+00:00",
+      "exit": 0,
+      "stdout_sha256": "ad00ca7175d6d7e03516b364d9bc47db0cd66fbba75a5e98ae0d24d3102eab66",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "file": "implementation-premerge-threads.json",
+    "source": "/home/raphael/verification-records/ai-coding-agent-skills/lossless-integrated-delivery-20261114T094035216775Z/pr-threads-page-1/stdout.log",
+    "representation": "original-byte copy",
+    "sha256": "6fc0642a5b757b2c381b486312dea369a17defe6390d63ed3335d3bba97a4333",
+    "confidentiality": "publishable public GitHub object",
+    "completeness": "complete",
+    "capture": {
+      "argv": [
+        "gh",
+        "api",
+        "graphql",
+        "-f",
+        "query=query($owner:String!,$repo:String!,$number:Int!,$cursor:String){repository(owner:$owner,name:$repo){pullRequest(number:$number){number headRefOid baseRefName reviewDecision reviewThreads(first:100,after:$cursor){nodes{id isResolved isOutdated} pageInfo{hasNextPage endCursor}}}}}",
+        "-f",
+        "owner=forgegod",
+        "-f",
+        "repo=ai-coding-agent-skills",
+        "-F",
+        "number=19"
+      ],
+      "cwd": "/home/raphael/src/ai-coding-agent-skills--lossless-closeout-evidence-38140894",
+      "environment": null,
+      "start": "2026-11-14T09:41:06.875634+00:00",
+      "finish": "2026-11-14T09:41:07.344869+00:00",
+      "exit": 0,
+      "stdout_sha256": "6fc0642a5b757b2c381b486312dea369a17defe6390d63ed3335d3bba97a4333",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "file": "implementation-merge-response.json",
+    "source": "/home/raphael/verification-records/ai-coding-agent-skills/lossless-integrated-delivery-20261114T094035216775Z/implementation-merge.stdout.json",
+    "representation": "original-byte copy",
+    "sha256": "dd82c65314447dd40626f303b1e1710f45e15e78a269934229ca687050efe309",
+    "confidentiality": "publishable public GitHub object",
+    "completeness": "complete",
+    "limitation": "Native merge-command stdout retained with exit; no synthetic command-start/finish timestamp added. Actual merge time and later exact-target readbacks are separate."
+  }
+]
