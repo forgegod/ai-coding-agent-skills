@@ -235,11 +235,14 @@ worker-created multiplexers and native-subagent role executors.
 
 #### Scenario: Iteration-cap continuation boundary
 - **WHEN** the integration contract verifies a once-only worker iteration-cap
-  continuation before any group or authority budget, unexpected exit, or stop decision
+  continuation before any group/authority budget exhaustion, unexpected exit or stop decision
 - **THEN** the adapter preserves the identified worker session and reports the cap
 - **AND** only the orchestrator may send that contract's one fresh bounded same-role
   session through the qualified route in the same checkout, never into the capped
-  session, and retains one continuation record per group and worker-session id
+  session, and retains one continuation record per group and unfinished native task/action
+- **AND** the record binds the original and continuation session ids as lineage;
+  a new session id does not reset the action's limit, and a second cap on that
+  same action stops rather than spawning another continuation
 
 #### Scenario: Implementation process violates process boundary
 - **WHEN** an implementation role starts a multiplexer or delegates its role to a subagent
@@ -288,6 +291,9 @@ every attempt, including authorized refreezes.
 - **THEN** the orchestrator applies the correction, validates, and requests a
   fresh full-package read-only review without a separate operator prompt unless
   *Review-record continuity* requires per-cycle operator authorization
+- **AND** this omits per-fix permission only: any post-freeze planning-byte change
+  still requires the explicit exact-plan approval in *Post-freeze planning finding*
+  before implementation starts or resumes
 
 #### Scenario: Routine implementation finding
 - **WHEN** review reports a grounded correction to source, tests or implementation
@@ -316,6 +322,8 @@ The orchestrator SHALL preserve the operator-requested goal while refreshing
 derived planning/review state under *Orchestrator-owned correction loop*. Such
 refresh grants neither plan approval nor execution authority and SHALL NOT create
 a second task list or an artificial operator decision.
+Any post-freeze planning-byte change SHALL retain explicit exact-plan approval
+before implementation starts or resumes under *Post-freeze planning finding*.
 
 #### Scenario: Ordinary planning drift
 - **WHEN** an ordinary planning edit changes reviewed hashes while the requested goal
@@ -323,10 +331,13 @@ a second task list or an artificial operator decision.
 - **THEN** the orchestrator updates the review revision and repeats validation and
   independent review automatically
 - **AND** it preserves the same operator-requested goal without starting a task group
-- **AND** it does not create a new operator decision, task group, narrower authority,
-  or stop unless it requires an Operator disposition required decision or reaches
+- **AND** it does not require per-fix permission or create a new task group,
+  narrower authority or stop unless it requires an Operator disposition required decision or reaches
   the *Non-converging routine findings* boundary, or is subject to a *Review-record
   continuity* count-recovery stop or per-cycle authorization
+- **AND** the no-per-fix-prompt rule never waives *Post-freeze planning finding*:
+  changed frozen planning bytes require fresh identity/review and explicit exact-plan
+  approval before implementation starts or resumes
 
 #### Scenario: Non-converging routine findings
 - **WHEN** a routine finding repeats unchanged after correction, routine findings contradict,

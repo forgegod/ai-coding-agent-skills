@@ -45,8 +45,9 @@ Operator restrictions SHALL override defaults and remain effective on continuati
   on-track progress against the group's acceptance evidence, one unfinished action
   identified by an existing native task id inside that group, and positive worker
   identity readback
-- **THEN** the orchestrator may continue that cap event once, without widening the
-  group, authority, restrictions, outcome, acceptance evidence, or stop boundary
+- **THEN** the orchestrator may continue once per group and unfinished native
+  task/action, without widening the authority, restrictions, outcome, acceptance
+  evidence or stop boundary
 - **AND** the worker does not resume itself; an allowed continuation is one fresh
   bounded same-role session in the same checkout through the selected qualified
   adapter route and never resumes or injects into the capped session or a broader goal
@@ -54,8 +55,11 @@ Operator restrictions SHALL override defaults and remain effective on continuati
   conversation
 - **AND** a native prompt, failed gate, identity drift, contradictory evidence, a new
   stop boundary, exhausted group/authority budget, unsupported continuation route,
-  or any second per-turn iteration cap for that group and worker-session record
+  or any second per-turn iteration cap on that same group and unfinished action
   preserves state and stops delivery
+- **AND** the continuation record binds the stable native task/action identity and
+  both session ids; changing the worker session or relabeling the same action does
+  not create another continuation allowance
 - **AND** until this change integrates, the integrated contributor contract's existing
   handoff gate remains in force for this change; the future contract change is inert here
 - **AND** it does not ask the operator merely to continue routine progress

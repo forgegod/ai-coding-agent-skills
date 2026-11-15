@@ -56,7 +56,9 @@ on-track progress against acceptance evidence, one unfinished in-group action,
 positive identity readback, and unchanged boundaries. They distinguish a stopping
 group/authority budget from a once-only worker iteration-cap continuation; native
 prompts, failed gates, drift, contradictory evidence, another stop boundary, or a
-second exhaustion of the same action remain non-continuable.
+second exhaustion of the same action remain non-continuable. Verify the stable
+group/native-task/action key survives a fresh session and cannot be reset by
+changing a session id or relabeling the same action.
 Completion stays blocked by any unsatisfied contract or failed gate. In-scope
 repairs use the canonical correction loop; missing authority, non-convergence or
 another operator-disposition boundary stops for the operator.
@@ -70,7 +72,9 @@ one adapter supports implementation and fresh read-only review before any old
 route is retired. One-client sequential execution works without requiring distinct
 models. Compatible Hermes profile preparation ships only if Hermes qualifies.
 Stop: no qualifying implementation/review adapter, an unsafe or unverifiable
-boundary, or a native human-input wait after automatic session exposure.
+boundary, or an unresolved native human-input wait after automatic session exposure.
+A native decision resolved through the qualified same-session surface does not
+itself fail qualification or terminate the outcome; its result follows the contract.
 
 ## 4. Document, package, and verify the candidate
 

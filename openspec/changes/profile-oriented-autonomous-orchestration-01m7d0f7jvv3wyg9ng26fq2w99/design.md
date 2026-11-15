@@ -280,14 +280,16 @@ guidance is synchronized in this change; no stale-context exemption or follow-up
 
 Within that contract, distinguish a group/authority budget from a worker iteration
 cap. Exhausting the former stops advancement. A verified iteration cap may be
-continued only once for that cap event, inside the current group and under the
+continued only once per group and unfinished native task/action, under the
 unchanged outcome, acceptance evidence, scope, restrictions, and stop boundary.
 Before continuation, the orchestrator retains evidence of on-track progress against
 the group's acceptance evidence, identifies one unfinished action already inside that
 group, and positively re-reads the worker identity. A native prompt, failed gate,
 identity drift, contradictory evidence, a new stop boundary, a second exhaustion of
 the same action, or an exhausted group/authority budget preserves state and stops
-delivery. The worker does not resume itself: an allowed continuation is one fresh, bounded
+delivery. The record keys the allowance to that stable group/task/action identity
+and binds both session ids as lineage; a fresh session id or relabeling does not
+reset it. The worker does not resume itself: an allowed continuation is one fresh, bounded
 same-role packet only through its supported adapter route, or an unsupported
 continuation stop. It never resumes a broader delivery goal. A reviewer continuation
 remains read-only and never resumes an implementer conversation. Until this change
@@ -317,7 +319,8 @@ retained in this change is immutable historical provenance, not the current
 acceptance record. The current successor chain starts at
 `evidence/plan-approval-reconciliation-20261115.json`, followed by
 `evidence/plan-review-correction-1-20261115.json`,
-`evidence/plan-requirement-streamlining-20261115.json` and the separately retained
+`evidence/plan-requirement-streamlining-20261115.json`,
+`evidence/plan-review-consistency-corrections-20261115.json` and the separately retained
 fresh review packet, full report, lifecycle receipt, identity and validation captures.
 These append-only supplements identify superseded records and rejected reviews
 without editing them. A later authorized correction adds its own supplement;
@@ -341,6 +344,13 @@ unchanged. The operator subsequently authorized requirement streamlining and
 resumption. That permits this revised planning package's validation, successor
 freeze and fresh review; it is not a historical count reset or approval. Further
 correction cycles remain subject to the retained count-recovery disposition.
+The fresh review of the streamlined frozen plan reported three consistency
+findings. The operator authorized their proposed corrections because the overall
+goal was unchanged: preserve exact-plan approval, bind continuation to the action
+rather than session, and distinguish resolved from unresolved native input waits.
+This authorizes their one planning-correction/validation/successor-review batch,
+not plan approval, implementation or a historical count reset. Its new append-only
+supplement binds the rejected review and current amended hashes.
 The new supplement distinguishes this authorized revision from the failed attempt
 and binds its complete amended hashes. The future correction policy does not
 self-select for this recovery: the original source/remote/native-prompt and
