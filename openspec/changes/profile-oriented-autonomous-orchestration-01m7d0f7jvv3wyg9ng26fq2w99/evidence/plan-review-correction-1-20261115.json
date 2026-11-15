@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "kind": "append-only-authorized-plan-review-correction",
+  "change": "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99",
+  "recorded_at": "2026-11-15T14:41:17.245361+00:00",
+  "predecessor_plan": "d4b87045a72354519af69e0b9b6085c5b4bc5b83",
+  "predecessor_tree": "225a90a0c12a2065cb96c6bbd19e54564375236c",
+  "predecessor_digest": "afeb9cd9688ee19ac50f599e0dcf63a673acb733d5fabde9deb43211f19f2c8d",
+  "original_reconciliation": {
+    "path": "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/plan-approval-reconciliation-20261115.json",
+    "sha256": "9668c3916fdda363f1a1616ac6259926e98cd1180f44f1ba772ea76bf9e01b0a"
+  },
+  "rejected_review": {
+    "report": "/home/raphael/verification-records/ai-coding-agent-skills/profile-plan-reconciliation-review-20261115T143714767397Z/review/reviewer-visible-report.txt",
+    "sha256": "8f0dd43fa1940a4fe29f6ea1239e6bac9c1fee06b913b4b55e3c0b5feeab8ce2",
+    "receipt": "/home/raphael/verification-records/ai-coding-agent-skills/profile-plan-reconciliation-review-20261115T143714767397Z/review/lifecycle.jsonl",
+    "result": "/home/raphael/verification-records/ai-coding-agent-skills/profile-plan-reconciliation-review-20261115T143714767397Z/review/result.json",
+    "verdict": "two High findings; not No findings; no approval"
+  },
+  "operator_authorization": {
+    "literal": "authorized",
+    "context": "Direct reply to the proposed planning-only correction of the two review findings, revalidation, successor local freeze and fresh exact-identity review; no reset, implementation, historical edits or remote writes.",
+    "scope": "This one correction/re-review cycle only; not plan approval."
+  },
+  "dispositions": [
+    {
+      "finding": "High: active reset/sole-parent recipe conflicts with preservation successor and inherited authority.",
+      "correction": "Design, proposal and tasks now classify initial reset/config preparation as historical; pin preserved cc5f23a and first replacement d4b87045; use preceding frozen plan as correction parent; task 1 verifies preservation/non-acceptance without reset. Integrated ae6488e contracts plus explicit operator grants, not inherited child-contract edits, govern this recovery.",
+      "status": "corrected-in-planning; fresh review pending"
+    },
+    {
+      "finding": "High: review acceptance requires rewriting or matching immutable historical approach-review.json.",
+      "correction": "Design and Review-record continuity delta now recognize explicitly authorized append-only successor reconciliation supplements plus a separate exact-identity reviewer receipt. Historical mismatches cannot accept the new plan, and no historical file is edited.",
+      "status": "corrected-in-planning; fresh review pending"
+    }
+  ],
+  "amended_planning_sha256": {
+    "openspec/config.yaml": "5719878578ec6a96877ee711a20ff22cda46f92dfc41f96d41b313b9b5ddbd31",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/.openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/proposal.md": "cdefffdfe7b93884bd284ee6f35c813112b76f92fb0ea9dd9d80b9cdfde02a28",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/design.md": "96d77dc4baa11329fb09ab6102fc71da7d6bf3bcbdd675135316b754f4732cc2",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/tasks.md": "51849f21a76b23b9479b00813212259faa309ad3e7f2c7677ff3ab7afe17dcc2",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/specs/autonomous-role-orchestration/spec.md": "82f2e1877148c5a53b41851c6770cf0eb690b7c28605d0d859c46130a404996a",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/specs/openspec-integration/spec.md": "9cf58e852c4039087c39440d3569a0000529a5dfd68134d1cb6cbf8b0ffa276f"
+  },
+  "preserved_evidence_sha256": {
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/approach-review.json": "e97b89c562eeeb86c56f3216da7a93ef9f024207c31b4b845cfe3f646d460f74",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/freeze-record.json": "3b149663dd64dfbc79159024f427f0b0f18ae5737b3a17eda7075181ab7a145b",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/group-1-reconstruction-verification.json": "ac9a410e846eb43d1cf4e58fe5cd492780e66f27149f0c3239105c1d567eed33",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/plan-approval.json": "de293df646169ec2dab5b1dd0e026d415b60b6ef67572bdd58081f3aca969065",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/plan-approval-reconciliation-20261115.json": "9668c3916fdda363f1a1616ac6259926e98cd1180f44f1ba772ea76bf9e01b0a"
+  },
+  "policy_source": {
+    "commit": "ae6488e23414a07d12959bf22bcd283b84d9d8a3",
+    "contract_sha256": {
+      "AGENTS.md": "fe015001d5b2476afa68a60e692a4b772aa3a242cecca58fb242910bae33be45",
+      "skills/AGENTS.md": "d997188fd0fee68c0b8d196c8d139c663c29b7efa58259101fe1755bbcbbc10d",
+      "skills/autonomous-ai-agents/AGENTS.md": "8944e98c4fad63fd16da427a72dd6d71ac0255f231768ebf7440104f03542bba",
+      "skills/software-development/AGENTS.md": "90fcec81fcfecdcd1a4642ff0380491332e718e893b3ab13f8d051cd43c19569"
+    },
+    "inherited_contracts": "Three child-contract files differ at cc5f23a; they are preserved source, not authority for this recovery."
+  },
+  "cycle_continuity": {
+    "historical_cumulative_count": null,
+    "status": "unavailable; not reset or inferred",
+    "current_authorized_correction": "One cycle correcting this exact retained review; not a historical cumulative count.",
+    "next_correction": "Separate operator authorization required while historical count remains unavailable."
+  },
+  "pending": [
+    "successor validation captures",
+    "successor SHA/tree/digest capture",
+    "fresh exact-identity No findings review",
+    "explicit operator approval; not granted"
+  ],
+  "source_implementation_accepted": false,
+  "task_execution_authorized": false
+}

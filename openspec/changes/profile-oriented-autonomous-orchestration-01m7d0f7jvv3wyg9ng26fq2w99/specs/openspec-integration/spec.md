@@ -6,31 +6,24 @@
 Projects explicitly adopting the invocation contract SHALL let the agent perform
 workspace setup, bootstrap, verification, task updates and previewed autonomous
 local commits for one approved task group, or for consecutive eligible groups
-when continuous-goal continuation is selected below, without repeated plumbing prompts.
+under *Delivery policy selection*, without repeated plumbing prompts.
 Operator restrictions SHALL override defaults and remain effective on continuation.
-When the project selects the pre-execution-review policy, delivery SHALL
-require its retained independent pre-execution approach-review record before plan
-freeze and execution; delivery owns the freeze stop, while the orchestration
-package owns the review protocol.
-When the project’s contributor contract explicitly selects continuous-goal
-continuation, `/openspec-next` SHALL start that policy; otherwise it retains the
-single-group behavior below.
-Delivery owns the continuation contract and stops; the orchestration package owns
-process execution within that contract. If a selected policy's package is unavailable, delivery SHALL stop before
-freeze or execution.
 
 #### Scenario: Next approved local group
 - **WHEN** the operator sends `/openspec-next` in verified current-change context
   and the project has not selected continuous-goal continuation
 - **THEN** the agent resolves actual tasks, approval, dependencies and interrupted work and advances one eligible unfinished group
 - **AND** it does not infer plan approval, perform remote writes or start another change
+- **AND** it performs the authorized workspace/bootstrap, verification, task updates
+  and previewed local commits without asking the operator to repeat plumbing
 
 #### Scenario: Selected continuous-goal policy
 - **WHEN** a project selected the continuous-goal policy and the operator sends
   `/openspec-next` in verified current-change context without a narrower group restriction
 - **THEN** the orchestrator resolves and advances consecutive eligible groups,
   including verification, task updates, and required independent reviews
-- **AND** it stops before a missing authority, failed gate, review finding needing
+- **AND** it stops before a missing authority, an unresolved failed gate or finding
+  after the orchestration correction policy, a review finding needing
   disposition, conflicting ownership, host block, remote write, next change, the
   current group’s declared stop condition, a missing budget in both the group and
   the project/global authority contract, a missing declared stop condition,
@@ -71,9 +64,12 @@ freeze or execution.
 - **WHEN** a project selected the pre-execution-review policy and the plan
   lacks a retained no-blocking-findings review record matching the complete planning
   hash set
-- **THEN** delivery stops before freeze or execution
+- **THEN** delivery stops before accepting an execution-plan freeze or execution
 - **AND** it does not treat a reviewer recommendation, draft review, or partial
   hash record as plan approval
+- **AND** a provisional historical-successor freeze follows *Review-record continuity*
+  in the orchestration contract without acceptance, approval, execution authority
+  or a waiver of any adopted integrity guard
 
 #### Scenario: Policy selected after plan freeze
 - **WHEN** the contributor contract at the frozen plan commit's parent, an integrated
@@ -139,6 +135,35 @@ freeze or execution.
 - **AND** changed candidates require renewed gates/review, already merged implementation is not replayed, and branch deletion, bypass, release or another change remains unauthorized
 
 ## ADDED Requirements
+
+### Requirement: Delivery policy selection
+Delivery SHALL resolve optional policies from the integrated contributor contract,
+own their freeze/continuation gates, and delegate process/review protocols to the
+orchestration package. It SHALL retain single-group behavior unless continuous-goal
+is selected and SHALL NOT proceed without a selected policy's required package.
+
+#### Scenario: Selected policy behavior
+- **WHEN** the integrated contributor contract selects continuous-goal continuation
+  and the operator invokes `/openspec-next` without a narrower restriction
+- **THEN** delivery starts the selected continuation policy within the invocation's
+  existing authority; otherwise single-group behavior remains the default
+- **AND** a selected pre-execution-review policy requires the retained independent
+  matching planning review before execution-plan acceptance and execution
+- **AND** delivery owns that stop and the continuation contract, while the
+  orchestration package owns process execution and the review protocol
+
+#### Scenario: Missing selected policy package
+- **WHEN** a selected policy's required package is unavailable
+- **THEN** delivery stops before freeze or execution without substituting a policy
+
+#### Scenario: Routine correction during delivery
+- **WHEN** a gate or independent review reports an in-scope repairable issue
+- **THEN** delivery keeps the current group incomplete while the orchestrator uses
+  *Orchestrator-owned correction loop* and *Role ownership* in the orchestration contract
+- **AND** no later group advances, no failed gate is waived, and no operator prompt
+  is required merely to approve a correction already within the grant
+- **AND** material decisions, native human waits, identity failures and budget
+  exhaustion remain stop boundaries under that contract
 
 ### Requirement: Minimum outcome task authoring
 Projects adopting this workflow SHALL author the fewest goal-oriented tasks needed

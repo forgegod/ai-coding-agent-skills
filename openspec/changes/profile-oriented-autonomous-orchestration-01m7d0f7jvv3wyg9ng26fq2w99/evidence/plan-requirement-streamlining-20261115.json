@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "kind": "append-only-authorized-planning-streamlining",
+  "change": "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99",
+  "recorded_at": "2026-11-15T15:00:12.230908+00:00",
+  "parent_plan": "d4b87045a72354519af69e0b9b6085c5b4bc5b83",
+  "preserved_candidate": "cc5f23a7f3892fb9e0e5eb858ca8b32e319ac566",
+  "authority": {
+    "literal_user_message": "agree the recommendations regarding streamliningthe requirements: if applied restart the progress",
+    "scope": "Streamline the two existing capability specs, synchronize proposal/design/tasks and resume planning validation, local successor freeze and fresh exact-identity read-only review in w1B:pR. Stop before operator plan approval or implementation.",
+    "not_authorized": [
+      "source implementation",
+      "task execution or checkbox changes",
+      "reset or history rewrite",
+      "historical evidence edits",
+      "remote writes, issues, PRs, merges, archive or release",
+      "profile or installed-skill changes",
+      "another workspace"
+    ]
+  },
+  "predecessor_records_sha256": {
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/approach-review.json": "e97b89c562eeeb86c56f3216da7a93ef9f024207c31b4b845cfe3f646d460f74",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/freeze-record.json": "3b149663dd64dfbc79159024f427f0b0f18ae5737b3a17eda7075181ab7a145b",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/group-1-reconstruction-verification.json": "ac9a410e846eb43d1cf4e58fe5cd492780e66f27149f0c3239105c1d567eed33",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/plan-approval.json": "de293df646169ec2dab5b1dd0e026d415b60b6ef67572bdd58081f3aca969065",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/plan-approval-reconciliation-20261115.json": "9668c3916fdda363f1a1616ac6259926e98cd1180f44f1ba772ea76bf9e01b0a",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/plan-review-correction-1-20261115.json": "ad21023332e50ba945f3f7a92ec62c21a734fb21dee484343688368a0070db2b"
+  },
+  "failed_attempt": {
+    "record": "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/plan-review-correction-1-20261115.json",
+    "sha256": "ad21023332e50ba945f3f7a92ec62c21a734fb21dee484343688368a0070db2b",
+    "validation_capture": "/home/raphael/verification-records/ai-coding-agent-skills/profile-plan-correction-1-validation-block-20261115T144502961132Z",
+    "strict_exit": 1,
+    "reason": "ADDED Independent pre-execution approach review introduction exceeded 500 characters.",
+    "disposition": "Retained unchanged as failed-attempt provenance. Its amended hashes are not the current planning hashes. The new supplement supplies the successor inventory; no historical report or gate output was rewritten."
+  },
+  "rejected_exact_identity_review": {
+    "plan": "d4b87045a72354519af69e0b9b6085c5b4bc5b83",
+    "report": "/home/raphael/verification-records/ai-coding-agent-skills/profile-plan-reconciliation-review-20261115T143714767397Z/review/reviewer-visible-report.txt",
+    "sha256": "8f0dd43fa1940a4fe29f6ea1239e6bac9c1fee06b913b4b55e3c0b5feeab8ce2",
+    "verdict": "two High findings; not accepted as current approval",
+    "corrections": "The reset/sole-parent and historical-review-record conflicts remain addressed in current planning; the fresh successor review must verify them, not assume acceptance."
+  },
+  "current_planning_sha256": {
+    "openspec/config.yaml": "5719878578ec6a96877ee711a20ff22cda46f92dfc41f96d41b313b9b5ddbd31",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/.openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/proposal.md": "d6eb4c8df5b1c74f870549d10903d318f9b38cdcb89f228f626a4c0d7944b4d5",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/design.md": "6afd8e177ba4c635095d2483176d84235efaea0057e9280eeb991ad08e82f475",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/tasks.md": "50778c201bc42803e89353c3f3d345ab3d7a4ac4a833a48992fcd72207661181",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/specs/autonomous-role-orchestration/spec.md": "b6a36d4c4b1eeca5319cc066d90d494809f4edfc34470216c25bc1acec540fe4",
+    "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/specs/openspec-integration/spec.md": "aabc21c164f76c75d4b0b220ab45aae6d6ef37d35efc12c52e10c6c98ca60017"
+  },
+  "changes": [
+    "Short requirement obligations with ordering/recovery in scenarios; retained two capability paths and every pre-streamlining scenario heading.",
+    "Separated Delivery policy selection from the modified invocation requirement without dropping its original scenarios.",
+    "Canonical Role ownership: source/test/implementation-doc corrections go to a qualified implementer; orchestrator retains planning/Git/progress and outcome accountability.",
+    "Canonical bounded correction loop for authorized routine planning, source and repairable validation findings; no per-fix approval within the grant.",
+    "Material conflicts, native human-input waits, identity/evidence failures, unsupported roles, scope/authority limits, count continuity and exhausted budgets remain stops.",
+    "Planning amendments require fresh exact identity/review and explicit operator approval before implementation.",
+    "Recovery-specific SHAs/locators and original reset history stay in design/evidence, not the portable requirement text."
+  ],
+  "verification_capture_root": "/home/raphael/verification-records/ai-coding-agent-skills/profile-plan-streamlining-20261115T145727955667Z",
+  "coverage_capture": "/home/raphael/verification-records/ai-coding-agent-skills/profile-plan-streamlining-20261115T145727955667Z/requirement-coverage.json",
+  "history_count": {
+    "cumulative": null,
+    "status": "unavailable; not reconstructed or reset",
+    "revision": "Separately operator-authorized streamlining/resumption, not a claim about cumulative correction count. Further cycles retain the existing count-recovery disposition."
+  },
+  "review_acceptance": "Pending new exact-identity No findings receipt; a provisional commit is not approval.",
+  "source_accepted": false,
+  "plan_approved": false
+}

@@ -45,15 +45,31 @@ pane on demand or provide a portable adapter layer for other local coding client
 
 ## Decisions
 
-### Reconstruct from the exact pre-change integrated base
+### Preserve the reconstruction history and freeze a successor plan
 
-The reconstruction base is `ae6488e23414a07d12959bf22bcd283b84d9d8a3`, the
-current `origin/main` revision that is an ancestor of local `850244e` and does
-not contain `5f48fbe`. It retains the integrated PR #19/#20 work that a literal
-parent-of-`5f48fbe` base would omit. The local `main` commits remain preserved
-input until an operator explicitly authorizes history reconciliation.
+The retained integrated reconstruction base is
+`ae6488e23414a07d12959bf22bcd283b84d9d8a3`. It retains the integrated PR #19/#20
+work and excludes `5f48fbe`; it is a pinned historical base, not a claim about the
+current remote tip. The original branch-reset/config-reapplication recipe and
+sole-parent/base-to-plan expectations belong to the initial reconstruction only.
+They are historical provenance, not instructions or acceptance criteria for this
+replacement plan. Do not replay a reset, restore config, or reconstruct missing
+historical validation or review logs.
 
-The existing named change branch/worktree is a pre-freeze draft only. The declared
+The current recovery preserves candidate
+`cc5f23a7f3892fb9e0e5eb858ca8b32e319ac566` and its complete history unchanged.
+The first replacement freeze, `d4b87045a72354519af69e0b9b6085c5b4bc5b83`, has
+that candidate as its sole parent; an authorized planning-correction freeze has
+the preceding frozen plan as its sole parent. Neither parent is represented as
+an integrated target revision. Each successor diff contains only permitted
+planning edits and new append-only reconciliation evidence. Source and the four
+original historical evidence files remain byte-identical to the preserved candidate;
+an ancestry or digest guard pass does not certify their implementation, acceptance,
+or authority.
+Task 1.1 verifies these preservation and non-acceptance boundaries without
+another reset. No new name, branch, or worktree is created.
+
+The declared
 implementation contract paths are ordinary implementation surfaces when their
 changes remain within the approved goal and acceptance evidence. An independent
 reviewer, not an additional operator checkpoint, determines that alignment. The
@@ -72,57 +88,41 @@ declared paths are:
 Task 4.1 verifies that actual contract edits align with the approved goal and
 declared purposes; a reviewer uncertainty or a material scope, authority, safety,
 external-write, dependency, or contradictory-evidence conflict stops for operator
-disposition. The plan parent remains the policy source for this plan, so a changed
-contract cannot self-select or alter its own frozen policy. Any unintegrated
-contributor-contract edit, whether working-tree or committed, is inert for this
-change through integration: authority, review, commit, and continuation rules derive
-only from the integrated plan parent and approved frozen plan. Independent candidate
-review determines alignment, not effectiveness for the current change; the edit
-becomes effective for later changes only after integration.
-Before
-freeze, an authorized proposal-time issue is created/read back and its URL is
-bound in `proposal.md`; validation and an independent re-review then bind the
-canonical *Complete planning input inventory*. The orchestrator captures the final
-reviewed inventory bytes and hashes, including tracked `openspec/config.yaml` and
-change-local artifacts, outside repositories and verifies that no other
-change-owned work exists there. It records the full local `main` SHA, the named
-branch tip, and stops unless every commit reachable from that branch tip is already
-reachable from a ref the reset will not move; `5f48fbe` is separately retained by
-local `main`, not described as a branch-tip commit. Before reset, it restores
-`openspec/config.yaml` to the exact base blob, records that base-config hash as the
-pre-reset expectation, and proves no staged or unstaged tracked changes exist;
-otherwise it stops before reset. Under separately authorized branch-reset authority
-it runs a hard reset of that same named draft branch to the exact base without
-`git clean`. Immediately after that reset, the separately authorized pre-freeze
-planning-write grant reapplies the externally captured reviewed config bytes and
-only its invocation-summary context and `rules.tasks` update. The invocation
-summary defers to the integrated contributor contract: single-group by default,
-continuous-goal only when selected, with restrictions and inspect boundaries intact.
-This wording must describe both policies without selecting one for this change.
-The task rules express *Minimum outcome task authoring*, preserving native syntax,
-dependency ordering, and verification while preferring the fewest complete outcomes
-over the stock template's procedural examples. Neither update patches upstream
-OpenSpec. Revalidate, refresh the complete input hashes, and independently
-re-review after reapplying that config update.
-Before the plan commit, the only tracked diff is that reviewed config update; the
-only untracked paths are the change-local planning set plus
-`evidence/approach-review.json` and `evidence/freeze-record.json`, captured externally
-after their final writes. The plan commit has the exact base as its sole parent.
-Its base-to-plan diff lists only the reviewed repository config, change-local set,
-and those two evidence records; planning-file identity follows
-the canonical *Review-record continuity* requirement.
-The freeze record never contains its own hash; the external capture records hashes
-for both evidence records and the planning set.
-The freeze record retains the reviewed complete planning-input hashes and the
-independent review reference. A refreeze creates a new plan identity and requires
-the normal exact-plan approval before execution; it does not turn a goal-aligned
-contract edit into a separate operator grant.
-The plan is then approved before reapplying the profile-preparation implementation.
-No new name, branch, or worktree is minted.
+disposition. For this historical-successor recovery, current authority, review,
+commit, and continuation rules come from the contributor-contract set at the
+integrated base `ae6488e23414a07d12959bf22bcd283b84d9d8a3` plus the explicit
+operator recovery grants and any later exact-plan approval/execution grant.
+They do not come from the unintegrated successor parent or inherited child-contract
+edits at `cc5f23a`. Those edits remain inert for this change through integration.
+The delta's integrated-plan-parent rule is future behavior to implement, not an
+already-adopted rule that forces a reset of this recovery. This named recovery
+exception does not waive that rule for future plans. Candidate review determines
+alignment of future contract changes, not their effectiveness for this change;
+they become effective for later changes only after integration.
 
-Alternative rejected: attach a new plan after the existing implementation and
-mark it complete. That would preserve the unplanned execution order and make the
-plan digest meaningless as an approval boundary.
+Keep the existing proposal issue binding; do not create another issue or imply
+that historical issue/approval records approve the replacement bytes. Keep
+`openspec/config.yaml` unchanged in this correction: its captured policy-neutral
+context and minimum-outcome task rules remain covered planning inputs. There is
+no config restoration or reapplication step in the current recovery.
+
+Validate the complete current planning set, then freeze only that set's changed
+files plus required new reconciliation evidence under explicit local commit
+authority. Capture the new SHA, parent, tree, Git modes, complete input SHA-256
+inventory and supported-guard digest outside the checkout; independently reproduce
+the identity in place without creating another workspace. Obtain a fresh read-only
+review bound to that exact identity. A freeze here establishes provisional identity,
+not review acceptance, operator approval, or implementation acceptance. The current
+reconciliation chain is defined below under *Review-record continuity*; historical
+evidence is never rewritten to match. A correction requires renewed validation,
+successor identity, and review. Only a no-findings receipt permits presenting the
+exact SHA/digest for explicit operator approval; a later execution grant remains
+separate. Future implementation must verify or rework inherited source against
+the newly approved contract, not count its presence as completed work.
+
+Alternative rejected: attach a plan after existing source and mark it complete.
+Preserving inherited source for audit is not accepting its execution order or
+implementation; no task is checked by this recovery.
 
 ### Keep roles goal-oriented and OpenSpec-owned
 
@@ -144,18 +144,32 @@ not become a second mutable tracker.
 `tasks.md` remains the sole durable progress writer, updated only by the
 orchestrator after evidence is checked.
 
+*Role ownership* is the canonical assignment contract. The orchestrator owns
+outcome accountability and permitted planning/reconciliation edits; the qualified
+implementer makes source, test and implementation-documentation changes, including
+review fixes. The independent reviewer stays read-only. An unavailable implementer
+does not turn the orchestrator into the worker. This recovery edits planning only
+and does not dispatch or impersonate an implementation role.
+
 Alternative rejected: let individual agents create or advance their own checklists.
 That duplicates authority and makes an independent reviewer unable to identify the
 actual completion boundary.
 
-### Treat pre-freeze evidence as derived state, not operator work
+### Keep requirement ownership and correction policy singular
 
-Before freeze, artifact hashes, review records, validation captures, and review
-rounds are derived evidence for the operator’s existing goal. A stale item causes
-the orchestrator to refresh that item and its dependent review automatically. It
-does not create a new task, require approval, or shrink the goal. Operator
-interruption classes are defined canonically by the autonomous-role-orchestration
-specification.
+Keep the two capability files. Requirement introductions state short obligations;
+scenarios carry triggers, ordering and recovery variants. *Role ownership*,
+*Orchestrator-owned correction loop*, *Blocking-finding classification* and
+*Review-record continuity* in the orchestration delta are the canonical behavioral
+rules; delivery references them rather than inventing another repair/approval loop.
+*Delivery policy selection* owns optional policy routing and readiness without
+mixing it into the invocation's core obligation. Preserve native requirement and
+scenario coverage, not duplicated paragraphs or a prescribed file-size target.
+
+Expected planning edits refresh their hashes and dependent review; unexplained
+identity/evidence drift is not routine refresh. Neither produces a second task
+list or permission to narrow the operator's goal. This separates derived evidence
+maintenance from decisions that genuinely require the operator.
 
 ### Use an explicit host adapter boundary
 
@@ -259,8 +273,8 @@ verification in *Short bounded delivery invocations*. That integrity guard appli
 to every project adopting that invocation contract, independently of the two
 optional policies. The orchestrator follows the canonical continuation selection,
 budget, stop, and advance rules in the OpenSpec integration contract.
-The policy-neutral repository OpenSpec context is prepared under the separate
-pre-freeze grant above and included in the approved digest. Implementation verifies
+The policy-neutral repository OpenSpec context was prepared during initial planning
+and remains a frozen digest input in this recovery. Implementation verifies
 it against the new `AGENTS.md` selection without editing it after freeze. All affected
 guidance is synchronized in this change; no stale-context exemption or follow-up is used.
 
@@ -282,45 +296,70 @@ force for this change; the future contract change is inert here.
 
 ### Automatically incorporate bounded review improvements
 
-Treat a pre-freeze reviewer recommendation as presumptively applicable only when it is
-grounded in current files, has an exact minimal remedy, stays inside authorized
-planning paths, and does not require a canonical Operator disposition required
-decision. The orchestrator applies those corrections, retains the
-finding/hash/review chain in the change’s review record, validates, and dispatches
-a fresh whole-package review. The *Non-converging routine findings* scenario
-defines the cumulative correction-cycle limit and stop triggers; *Review-record
-continuity* prevents a record restart from resetting that count. A separately
-authorized issue-binding re-review does not count as an automatic correction.
-Post-freeze planning findings follow their separately defined operator-disposition
-boundary; the operator is not asked merely to repeat a routine accepted correction.
+*Orchestrator-owned correction loop* assigns routine planning, implementation and
+validation repairs to their permitted writer without per-fix approval. The
+orchestrator is accountable for applying or evidentially rejecting a suggestion,
+not obliged to obey every recommendation. Candidate changes repeat affected gates
+and exact-candidate review. Planning changes repeat full planning validation,
+identity capture and whole-package review; execution remains paused until explicit
+approval of the new SHA/digest. A correction grant is not that approval.
 
-The review record is the change-owned
-`openspec/changes/<name>/evidence/approach-review.json`: it binds the complete
-planning hash set, cycle counter, findings, and re-review results. It is committed
-with the frozen plan but outside the planning digest. Missing, unreadable, or
-hash-mismatched evidence follows *Review-record continuity*: acceptance is invalidated;
-validation/review restarts automatically only after the prior cumulative correction
-count is recovered from retained external report references. An unrecoverable count
-requires operator disposition, never an invented zero or a reset.
-The retained disposition establishes a verified baseline count or requires separate
-authorization for every later correction cycle while the count remains unavailable.
-The first record is created from retained operator-authorized review reports; an
-unavailable earlier chain is labeled unavailable, not reconstructed, and grants no
-disposition or acceptance.
-Each review entry records its input hashes, verdict, findings or finding digest,
-automatic-cycle status, and report reference. Freeze acceptance follows the
-canonical *Review-record continuity* requirement.
+*Blocking-finding classification* owns the decision boundary, including material
+scope/authority/safety changes and identity failures. Restoring an existing security
+requirement is not automatically a new security-policy decision, and a High label
+alone does not require operator intervention. *Non-converging routine findings*
+and *Review-record continuity* own the budget and history rules; no role session
+or refreeze resets a count. A separately authorized issue-binding re-review does
+not count as an automatic correction.
+
+The default change-owned record is `evidence/approach-review.json`, but the copy
+retained in this change is immutable historical provenance, not the current
+acceptance record. The current successor chain starts at
+`evidence/plan-approval-reconciliation-20261115.json`, followed by
+`evidence/plan-review-correction-1-20261115.json`,
+`evidence/plan-requirement-streamlining-20261115.json` and the separately retained
+fresh review packet, full report, lifecycle receipt, identity and validation captures.
+These append-only supplements identify superseded records and rejected reviews
+without editing them. A later authorized correction adds its own supplement;
+neither it nor a passing review overwrites a predecessor or certifies past events.
+
+The new reconciliation supplements are committed outside the planning digest.
+The exact-SHA review receipt stays outside the frozen checkout so it cannot claim
+to contain its own future commit identity. It must bind the full planning hash
+set, SHA, tree and digest, fresh reviewer session/model, literal verdict, and
+finding dispositions. Only a matching no-findings review with successful retained
+validation and unchanged post-review input/package hashes establishes current
+review acceptance; stale historical hashes cannot satisfy it. The acceptance
+binding is the successor chain plus that receipt, never a rewritten entry in the
+historical `approach-review.json`. Operator approval remains separate.
+
+Missing or mismatched current-chain evidence invalidates acceptance. Recover the
+prior cumulative count from retained references when possible; never reconstruct
+an unavailable count or reset it. Here it remains unavailable. The first correction
+stopped on a strict-validation length warning; its record and failed captures stay
+unchanged. The operator subsequently authorized requirement streamlining and
+resumption. That permits this revised planning package's validation, successor
+freeze and fresh review; it is not a historical count reset or approval. Further
+correction cycles remain subject to the retained count-recovery disposition.
+The new supplement distinguishes this authorized revision from the failed attempt
+and binds its complete amended hashes. The future correction policy does not
+self-select for this recovery: the original source/remote/native-prompt and
+validation/identity stop boundaries remain unless expressly changed by the operator.
 
 ### Review the approach before freezing execution authority
 
-Before a plan commit/digest exists, use a fresh selected client's documented
-read-only review mode to assess the canonical *Complete planning input inventory*.
+For ordinary initial planning, before a plan commit/digest exists, use a fresh
+selected client's documented read-only review mode to assess the canonical
+*Complete planning input inventory*. In this explicitly authorized historical
+successor recovery, freeze provisional identity first and bind the fresh review
+to that exact SHA, tree, digest and complete inventory before accepting the plan
+for an operator decision. No historical review substitutes for this new review.
 The
 packet records SHA-256 values for every reviewed input and names the exact
 workspace and input paths. It forbids edits, shell execution, Git writes,
 profile/config writes, persistence, and implementation, and requires
 severity-ordered `path:line` findings or `No findings`. The orchestrator alone
-evaluates and incorporates accepted feedback, then reruns planning validation and
+evaluates findings, assigns the permitted writer, then reruns planning validation and
 re-reviews the complete planning hash set. Freeze acceptance follows
 *Review-record continuity*.
 The orchestrator re-hashes that complete set after review completion and rejects a
@@ -370,18 +409,19 @@ immediate positive identity/no-input checks; otherwise preserve it.
   skip the probe and retain an unverified unsupported result.
 - [Bootstrap reviewer is mistaken for plan approval] → retain the literal review
   report and require a separate frozen plan SHA/digest plus explicit operator approval.
-- [Pre-change local `main` history] → preserve it and reconstruct in a dedicated
-  branch; require an explicit later decision before any reset or rewrite of local
-  `main`, or any publication.
+- [Pre-change local `main` and candidate history] → preserve it; the current
+  successor procedure performs no reset or rewrite and accepts no inherited source
+  as completed work. Publication remains a separate authority boundary.
 - [Goal wording becomes vague] → require acceptance evidence and a stop condition
   in the task group and packets.
 
 ## Migration Plan
 
-1. Under the separate issue, branch-reset, pre-freeze repository-config, and freeze
-   grants, follow the canonical
-   **Reconstruct from the exact pre-change integrated base** decision above before
-   any source changes.
+1. Follow **Preserve the reconstruction history and freeze a successor plan**.
+   Task 1.1 verifies preservation, the current successor approval/review binding,
+   and non-acceptance of inherited source; it does not repeat initial reset/config
+   preparation or grant execution. No source changes precede separate approval
+   and implementation authority.
 2. Define the portable contract and qualify client routes before implementing adapters.
    Reapply compatible profile-preparation behavior only if Hermes qualifies; otherwise
    record it unsupported and do not ship it. Implement only the Hermes,

@@ -66,16 +66,21 @@ outcome-oriented unit above fine-grained checklist steps.
   sequentially when necessary, as well as mixed-client operation. Let the operator
   select client/model per role within project constraints; different clients or
   models are not mandatory unless project policy requires diversity.
-- Add a bounded automatic review-feedback disposition rule: the orchestrator
-  applies grounded, non-contradictory planning corrections automatically for a
-  bounded number of converging routine correction/review cycles (see design/spec),
-  but stops for the canonical Operator disposition required classes,
-  non-convergence, or unrecoverable review-count continuity in the
-  autonomous-role-orchestration contract.
-- Make operator-goal continuity the pre-freeze control boundary: ordinary planning
-  drift and review evidence refresh automatically restart the affected validation
-  and review step; they never become a new operator decision, a new task, or a
-  reason to narrow the operator-requested goal.
+- Make *Role ownership* explicit: the orchestrator is accountable for the outcome,
+  finding disposition, assignment and verification; qualified implementers make
+  source/test/implementation-documentation edits and reviewers remain read-only.
+  Planning and Git/task-progress ownership do not make the orchestrator a source worker.
+- Use one bounded *Orchestrator-owned correction loop* for grounded review findings
+  and repairable validation failures, including authorized planning refreezes.
+  Routine in-scope remedies do not require per-fix approval; the canonical
+  classification, authority, history and non-convergence boundaries still apply.
+  Changed planning bytes require fresh review and exact-plan approval before execution.
+- Preserve operator-goal continuity while refreshing expected derived evidence.
+  Routine corrections do not create new tasks or narrow the goal; unexplained
+  identity/evidence drift is a stop, not a routine evidence refresh.
+- Keep the two capability files, short obligation-focused introductions, and
+  scenario-based ordering/recovery details. Separate delivery policy selection
+  from the invocation obligation and retain all acceptance conditions.
 - Treat Hermes skill frontmatter configuration as declarative configuration input,
   not a profile switch or launcher. Hermes profile/client selection must remain an
   explicit launch binding; other clients require their own documented launch
@@ -86,9 +91,13 @@ outcome-oriented unit above fine-grained checklist steps.
   Code, Codex, Grok Build, OpenCode, Kilo, Pi, or another compatible client.
 - Require an independent, read-only approach review of the canonical *Complete
   planning input inventory* before the plan is frozen for execution, including
-  the repository OpenSpec configuration. The orchestrator incorporates accepted findings, revalidates the
+  the repository OpenSpec configuration. The orchestrator assigns accepted corrections, revalidates the
   amended draft, and only then presents a specific plan SHA/digest for operator
   approval.
+- For the explicitly authorized historical-successor recovery described in the
+  design, a provisional local identity freeze precedes its exact-identity review;
+  review acceptance and operator approval still follow that fresh review. The
+  initial reset recipe and historical review/approval records are not replayed.
 - Qualify each client's unattended-to-interactive route before launch, including
   same-session identity, native decision delivery, safe view creation/attachment,
   and failure preservation. Never assume Herdr can adopt an arbitrary running process.
@@ -124,12 +133,11 @@ Primary scope is `skills/autonomous-ai-agents/autonomous-implementation-review/`
 `skills/software-development/openspec-delivery/`,
 `skills/software-development/openspec-next/`, their role/delivery references,
 README, SDLC/install documentation, package inventories, and synchronized tests.
-Repository `openspec/config.yaml` also needs a policy-neutral context update before
-plan freeze under a separate planning-write grant; it is a frozen digest input and
-cannot be deferred to implementation or left stale after policy integration.
-That grant also covers the task-authoring rule in `rules.tasks`. This finalized
-draft records the resulting reviewed config bytes as a pre-freeze prerequisite;
-any later config change requires renewed validation, review, and plan freeze.
+Repository `openspec/config.yaml` already contains the policy-neutral invocation
+context and minimum-outcome `rules.tasks` update prepared during initial planning.
+Preserve those bytes in this recovery as covered digest inputs, not work deferred
+to implementation or a config-reapplication prerequisite. Any later authorized
+config change requires renewed validation, review, plan identity and approval.
 Every client adapter is an external prerequisite and must prove its own exact
 versioned interface before it is advertised. A Grok Bot chat surface is not an
 execution host without a tested local CLI or supported control API. Grok Bot
@@ -137,12 +145,18 @@ remains unsupported unless a future change qualifies an executable/control
 protocol. No adapter may claim that Hermes profiles configure another client, that
 an interaction view starts a second worker, or that a Herdr pane label proves session identity.
 
-The local `5f48fbe` commit is input to this draft, not a valid implementation
-checkpoint: it predates this plan, has no plan digest or approval, and currently
-sits on local `main`. The release path resets the named draft branch to the
-pre-change base, freezes and obtains operator approval of the plan, then
-reconstructs the work and obtains an independent candidate review. This proposal
-does not authorize a reset, force
-push, cherry-pick, release, profile modification, issue creation, or publication.
+The local `5f48fbe` commit is preserved pre-plan input, not a valid implementation
+checkpoint. The initial reset-to-`ae6488e` reconstruction recipe is historical
+provenance only. The replacement path preserves candidate
+`cc5f23a7f3892fb9e0e5eb858ca8b32e319ac566` and its complete history without
+resetting the branch or accepting inherited source. Its first replacement freeze
+is `d4b87045a72354519af69e0b9b6085c5b4bc5b83`; authorized planning corrections
+append to that frozen chain. The design defines the pinned integrated policy
+source, append-only reconciliation/review chain, validation and exact-identity
+review before explicit SHA/digest approval. No historical approval transfers to
+this replacement, and no task is completed merely by preserving source. Later
+implementation and exact-candidate review require their own authority. This
+proposal authorizes no reset, force push, cherry-pick, release, profile change,
+issue creation or publication.
 `github_issue` is the verified proposal-time documentation record. It does not
 approve the plan, authorize execution, or become a second task list.
