@@ -191,17 +191,25 @@ worker-created multiplexers and native-subagent role executors.
   assigned dedicated worktree
 - **AND** it prohibits worker-created tmux, screen, zellij, Orca, or another multiplexer
 
-#### Scenario: Stop or budget boundary
-- **WHEN** a worker reaches its budget, exits
-  unexpectedly, or receives a stop decision
+#### Scenario: Stop or group-budget boundary
+- **WHEN** a worker reaches the group or authority budget, exits unexpectedly, or
+  receives a stop decision
 - **THEN** the selected adapter reports its process/session result and, after positive
   identity readback immediately before action, stops only the exact owned process
   tree and cleans only its recorded scratch root
 - **AND** otherwise preserves the process state and stops
-- **AND** it does not inject a second packet, answer a client prompt, or clean an
-  unverified process tree
+- **AND** it does not inject a continuation packet, answer a client prompt, or clean
+  an unverified process tree
 - **AND** it reports every preserved PID, session, and scratch root in the stop record
 - **AND** a human-input request instead follows *Automatic operator interaction exposure*
+
+#### Scenario: Iteration-cap continuation boundary
+- **WHEN** the integration contract verifies a once-only worker iteration-cap
+  continuation before any group or authority budget, unexpected exit, or stop decision
+- **THEN** the adapter preserves the identified worker session and reports the cap
+- **AND** only the orchestrator may send that contract's one fresh bounded same-role
+  session through the qualified route in the same checkout, never into the capped
+  session, and retains one continuation record per group and worker-session id
 
 #### Scenario: Implementation process violates process boundary
 - **WHEN** an implementation role starts a multiplexer or delegates its role to a subagent
@@ -315,7 +323,8 @@ SHALL retain that classification.
 
 #### Scenario: Operator disposition required
 - **WHEN** a finding changes scope, client topology, authority, safety posture,
-  dependencies, external state, security, host, or an accepted contract
+  dependencies, external state, security, host, or an accepted contract, or the
+  reviewer cannot determine whether a proposed change aligns with the accepted goal
 - **THEN** the orchestrator preserves the finding and stops for an operator decision
 
 #### Scenario: Post-freeze planning finding

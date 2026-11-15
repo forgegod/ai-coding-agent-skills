@@ -34,7 +34,7 @@ freeze or execution.
   disposition, conflicting ownership, host block, remote write, next change, the
   current group’s declared stop condition, a missing budget in both the group and
   the project/global authority contract, a missing declared stop condition,
-  budget exhaustion, an unresolved native human-input wait after automatic
+  group/authority-budget exhaustion, an unresolved native human-input wait after automatic
   same-session exposure, or approved-plan/digest mismatch
 
 #### Scenario: Worker needs native human input
@@ -45,6 +45,27 @@ freeze or execution.
   replaying the task, or substituting another worker
 - **AND** native response, timeout, or exposure failure follows *Automatic operator
   interaction exposure* in the orchestration contract within existing authority
+
+#### Scenario: Worker iteration-cap continuation
+- **WHEN** a qualified worker reaches its per-turn iteration cap while the group and
+  authority budgets remain available, and the orchestrator retains evidence of
+  on-track progress against the group's acceptance evidence, one unfinished action
+  identified by an existing native task id inside that group, and positive worker
+  identity readback
+- **THEN** the orchestrator may continue that cap event once, without widening the
+  group, authority, restrictions, outcome, acceptance evidence, or stop boundary
+- **AND** the worker does not resume itself; an allowed continuation is one fresh
+  bounded same-role session in the same checkout through the selected qualified
+  adapter route and never resumes or injects into the capped session or a broader goal
+- **AND** a reviewer continuation remains read-only and never resumes an implementer
+  conversation
+- **AND** a native prompt, failed gate, identity drift, contradictory evidence, a new
+  stop boundary, exhausted group/authority budget, unsupported continuation route,
+  or any second per-turn iteration cap for that group and worker-session record
+  preserves state and stops delivery
+- **AND** until this change integrates, the integrated contributor contract's existing
+  handoff gate remains in force for this change; the future contract change is inert here
+- **AND** it does not ask the operator merely to continue routine progress
 
 #### Scenario: Selected pre-execution review policy
 - **WHEN** a project selected the pre-execution-review policy and the plan
@@ -69,11 +90,10 @@ freeze or execution.
 
 #### Scenario: Legacy plan before integrity-guard adoption
 - **WHEN** retained evidence verifies that a plan was frozen before the project
-  adopted the delivery version containing the integrated-parent and
-  contributor-contract authority guards
-- **THEN** those two guards apply only at its next freeze or refreeze
-- **AND** they do not retroactively require a pre-freeze grant or invalidate that
-  plan's existing approval; other execution restrictions remain effective
+  adopted the delivery version containing the integrated-parent verification guard
+- **THEN** that guard applies only at its next freeze or refreeze
+- **AND** it does not retroactively invalidate that plan's existing approval; other
+  execution restrictions remain effective
 
 #### Scenario: Unintegrated plan parent
 - **WHEN** the prospective or frozen plan commit's parent is not a verified
@@ -81,22 +101,32 @@ freeze or execution.
 - **THEN** delivery stops before freeze or execution without deriving policy
   selection from that unintegrated contract
 
-#### Scenario: Contributor-contract change
-- **WHEN** the planning artifacts declare, or the plan-commit diff includes, a change
-  to any `AGENTS.md` or `CLAUDE.md` at any path, or a file the integrated contributor
-  contract explicitly designates as a contributor contract, directly or through a
-  designated contract's child-contract index
-- **THEN** delivery stops before freeze or execution pending explicit operator approval
-- **AND** that approval is a separate pre-freeze authority grant for the contract
-  change, not the later execution approval of the frozen plan SHA/digest
-- **AND** the pre-freeze grant records the complete planning input hashes and declared
-  contract paths; retained freeze evidence binds it to the frozen planning digest
-  only after verifying exact input-hash and path identity
-- **AND** execution proceeds only with that matching retained grant binding;
-  refreeze or changed contract paths require a new grant
-- **AND** the changed file cannot select, disable, or alter policy for that same plan
-- **AND** merely mentioning an ordinary file, such as README, does not designate
-  it as a contributor contract or trigger this stop
+#### Scenario: Goal-aligned contributor-contract change
+- **WHEN** an implementation changes an `AGENTS.md`, `CLAUDE.md`, or a file the
+  integrated contributor contract explicitly designates as a contributor contract,
+  directly or through a designated child-contract index, and the path is declared in
+  the approved plan's contributor-contract path set
+- **THEN** delivery treats that change as ordinary implementation work when it remains
+  within the approved goal and its acceptance evidence
+- **AND** an independent reviewer determines whether the contract change aligns with
+  that goal; no separate operator confirmation or notification is required for an
+  aligned change
+- **AND** the changed file cannot select, disable, or alter policy for that same frozen
+  plan, whose policy remains derived from the integrated plan parent
+- **AND** any unintegrated contributor-contract edit, whether working-tree or
+  committed, is inert for the current change through integration: its authority,
+  review, commit, and continuation rules remain those of the integrated plan parent
+  and approved frozen plan, and it becomes effective for later changes only after integration
+- **AND** uncertain alignment, a material scope or authority expansion, safety or
+  security impact, an external write, dependency conflict, or contradictory evidence
+  stops for operator disposition
+
+#### Scenario: Undeclared contributor-contract path
+- **WHEN** implementation proposes a contributor-contract edit outside the approved
+  plan's declared contributor-contract path set
+- **THEN** delivery stops for operator disposition even if a reviewer considers it goal-aligned
+- **AND** merely mentioning an ordinary file, such as README, does not designate it as
+  a contributor contract
 
 #### Scenario: Inspect or restricted execution
 - **WHEN** the operator requests inspect-only assessment or excludes commits

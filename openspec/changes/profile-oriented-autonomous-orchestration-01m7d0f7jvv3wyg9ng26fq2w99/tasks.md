@@ -18,20 +18,32 @@ qualification and replacement-readiness gate; 4 independently verifies the integ
 
 ## 1. Verify the reconstruction boundary
 
-- [x] 1.1 Verify the approved reconstruction/freeze evidence and preserve the old profile-preparation inputs without treating them as accepted implementation.
+- [ ] 1.1 Verify the reconstruction boundary and preserve the old profile-preparation inputs without treating them as accepted implementation.
 
-Acceptance: the design's base, planning identity, grants, preserved commits, and
-input inventory verify; local `main` and installed state remain untouched.
+Acceptance: the design's base, preserved commits, historical evidence, and input
+inventory verify without treating a superseded planning identity or historical grant
+as current approval; local `main` and installed state remain untouched.
 Stop: missing authority, preservation, approval, or identity mismatch.
 
 ## 2. Implement the portable core and delivery policies
 
-- [x] 2.1 Implement and test the agent-neutral orchestration core and `openspec-delivery`/`openspec-next` behavior defined by both delta specs.
+- [ ] 2.1 Implement and test the agent-neutral orchestration core and `openspec-delivery`/`openspec-next` behavior defined by both delta specs.
 
 Acceptance: focused tests cover minimum-outcome task generation/review, the core,
-approach-review, review-record, grant,
+approach-review and review-record,
 and delivery-policy scenarios, including planning-input identity, single-writer
 ownership, legacy/default behavior, and operation without Hermes or Herdr.
+Goal-aligned contributor-contract and documentation changes are reviewed as part of
+the outcome; they do not complete the later package/consistency checkpoint by
+themselves and do not require a separate operator checkpoint.
+Those working-tree or committed contract edits are inert for the current change through integration and
+cannot alter its authority, review, commit, or continuation rules.
+Focused tests also cover autonomous turn-budget continuation only after verified
+on-track progress against acceptance evidence, one unfinished in-group action,
+positive identity readback, and unchanged boundaries. They distinguish a stopping
+group/authority budget from a once-only worker iteration-cap continuation; native
+prompts, failed gates, drift, contradictory evidence, another stop boundary, or a
+second exhaustion of the same action remain non-continuable.
 Stop: an unsatisfied contract, failed gate, or operator-disposition boundary.
 
 ## 3. Deliver qualified terminal workers
@@ -50,8 +62,8 @@ boundary, or a native human-input wait after automatic session exposure.
 - [ ] 4.1 Verify cross-outcome documentation/routing/test consistency, synchronize final versions and package inventories, run the required gates, and obtain independent review of the exact frozen local candidate.
 
 Acceptance: *Operator configuration documentation* covers every advertised client
-and all affected guidance is current; contract edits match the design's declared,
-grant-bound paths and purposes. Retired routes and package contents match
+and all affected guidance is current; contract edits are independently confirmed to
+align with the accepted goal and declared purposes. Retired routes and package contents match
 the qualified behavior. Focused suites, `npm run validate:openspec`, `npm test`,
 and `npm run build` pass after the final edit, and independent review passes for
 the exact candidate SHA. Verify the pre-freeze repository config is unchanged

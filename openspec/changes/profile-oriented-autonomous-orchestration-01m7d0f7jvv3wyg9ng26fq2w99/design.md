@@ -53,10 +53,11 @@ not contain `5f48fbe`. It retains the integrated PR #19/#20 work that a literal
 parent-of-`5f48fbe` base would omit. The local `main` commits remain preserved
 input until an operator explicitly authorizes history reconciliation.
 
-The existing named change branch/worktree is a pre-freeze draft only. A separate
-contributor-contract authority grant must cover every declared contract change
-under the canonical *Contributor-contract change* trigger before freeze; it does
-not approve execution. The declared implementation contract paths are:
+The existing named change branch/worktree is a pre-freeze draft only. The declared
+implementation contract paths are ordinary implementation surfaces when their
+changes remain within the approved goal and acceptance evidence. An independent
+reviewer, not an additional operator checkpoint, determines that alignment. The
+declared paths are:
 
 - `AGENTS.md`: select both delivery policies only for changes frozen after integration;
   adopt *Minimum outcome task authoring* for task generation and planning review.
@@ -65,11 +66,19 @@ not approve execution. The declared implementation contract paths are:
 - `skills/autonomous-ai-agents/AGENTS.md`: replace Herdr/code-tab-only contracts
   and obsolete ownership entries with qualified terminal/interaction behavior.
 - `skills/software-development/AGENTS.md`: align delivery/next policy, review,
-  grant, and continuation responsibilities with the implemented boundaries, and
+  and continuation responsibilities with the implemented boundaries and
   assign ownership of minimum-outcome task generation and planning review.
 
-Task 4.1 verifies that actual contract edits match this grant-bound path set;
-additional contract paths require a new grant and refreeze, not implicit scope.
+Task 4.1 verifies that actual contract edits align with the approved goal and
+declared purposes; a reviewer uncertainty or a material scope, authority, safety,
+external-write, dependency, or contradictory-evidence conflict stops for operator
+disposition. The plan parent remains the policy source for this plan, so a changed
+contract cannot self-select or alter its own frozen policy. Any unintegrated
+contributor-contract edit, whether working-tree or committed, is inert for this
+change through integration: authority, review, commit, and continuation rules derive
+only from the integrated plan parent and approved frozen plan. Independent candidate
+review determines alignment, not effectiveness for the current change; the edit
+becomes effective for later changes only after integration.
 Before
 freeze, an authorized proposal-time issue is created/read back and its URL is
 bound in `proposal.md`; validation and an independent re-review then bind the
@@ -77,8 +86,9 @@ canonical *Complete planning input inventory*. The orchestrator captures the fin
 reviewed inventory bytes and hashes, including tracked `openspec/config.yaml` and
 change-local artifacts, outside repositories and verifies that no other
 change-owned work exists there. It records the full local `main` SHA, the named
-branch tip, and reachability of every commit on that branch tip from local `main`
-or another preserved ref, including `5f48fbe`. Before reset, it restores
+branch tip, and stops unless every commit reachable from that branch tip is already
+reachable from a ref the reset will not move; `5f48fbe` is separately retained by
+local `main`, not described as a branch-tip commit. Before reset, it restores
 `openspec/config.yaml` to the exact base blob, records that base-config hash as the
 pre-reset expectation, and proves no staged or unstaged tracked changes exist;
 otherwise it stops before reset. Under separately authorized branch-reset authority
@@ -93,8 +103,7 @@ The task rules express *Minimum outcome task authoring*, preserving native synta
 dependency ordering, and verification while preferring the fewest complete outcomes
 over the stock template's procedural examples. Neither update patches upstream
 OpenSpec. Revalidate, refresh the complete input hashes, and independently
-re-review after reapplying that config update; bind the final contributor-contract
-grant to those new hashes.
+re-review after reapplying that config update.
 Before the plan commit, the only tracked diff is that reviewed config update; the
 only untracked paths are the change-local planning set plus
 `evidence/approach-review.json` and `evidence/freeze-record.json`, captured externally
@@ -104,12 +113,10 @@ and those two evidence records; planning-file identity follows
 the canonical *Review-record continuity* requirement.
 The freeze record never contains its own hash; the external capture records hashes
 for both evidence records and the planning set.
-The contributor-contract grant records the reviewed complete input hashes and all
-declared contract paths before freeze. The freeze record retains that grant; the
-external post-freeze capture maps it to the frozen planning digest only after exact
-hash/path identity verifies. Execution checks the retained binding, not a fresh
-request for unchanged scope. Refreeze or changed contract paths invalidate the
-binding and require a new pre-freeze grant, separate from execution-plan approval.
+The freeze record retains the reviewed complete planning-input hashes and the
+independent review reference. A refreeze creates a new plan identity and requires
+the normal exact-plan approval before execution; it does not turn a goal-aligned
+contract edit into a separate operator grant.
 The plan is then approved before reapplying the profile-preparation implementation.
 No new name, branch, or worktree is minted.
 
@@ -248,14 +255,30 @@ update implemented by this change. That selection applies only to changes frozen
 after its integration, never to this change. One `/openspec-next` then starts
 advancement through eligible approved groups; other projects retain single-group
 invocation authority, subject to the new integrated-parent and contributor-contract
-authority guards in *Short bounded delivery invocations*. Those integrity guards
-apply to every project adopting that invocation contract, independently of the two
+verification in *Short bounded delivery invocations*. That integrity guard applies
+to every project adopting that invocation contract, independently of the two
 optional policies. The orchestrator follows the canonical continuation selection,
 budget, stop, and advance rules in the OpenSpec integration contract.
 The policy-neutral repository OpenSpec context is prepared under the separate
 pre-freeze grant above and included in the approved digest. Implementation verifies
 it against the new `AGENTS.md` selection without editing it after freeze. All affected
 guidance is synchronized in this change; no stale-context exemption or follow-up is used.
+
+Within that contract, distinguish a group/authority budget from a worker iteration
+cap. Exhausting the former stops advancement. A verified iteration cap may be
+continued only once for that cap event, inside the current group and under the
+unchanged outcome, acceptance evidence, scope, restrictions, and stop boundary.
+Before continuation, the orchestrator retains evidence of on-track progress against
+the group's acceptance evidence, identifies one unfinished action already inside that
+group, and positively re-reads the worker identity. A native prompt, failed gate,
+identity drift, contradictory evidence, a new stop boundary, a second exhaustion of
+the same action, or an exhausted group/authority budget preserves state and stops
+delivery. The worker does not resume itself: an allowed continuation is one fresh, bounded
+same-role packet only through its supported adapter route, or an unsupported
+continuation stop. It never resumes a broader delivery goal. A reviewer continuation
+remains read-only and never resumes an implementer conversation. Until this change
+integrates, the integrated contributor contract's existing handoff gate remains in
+force for this change; the future contract change is inert here.
 
 ### Automatically incorporate bounded review improvements
 
@@ -355,8 +378,8 @@ immediate positive identity/no-input checks; otherwise preserve it.
 
 ## Migration Plan
 
-1. Under the separate issue, contributor-contract, branch-reset, pre-freeze repository-config,
-   and freeze grants, follow the canonical
+1. Under the separate issue, branch-reset, pre-freeze repository-config, and freeze
+   grants, follow the canonical
    **Reconstruct from the exact pre-change integrated base** decision above before
    any source changes.
 2. Define the portable contract and qualify client routes before implementing adapters.

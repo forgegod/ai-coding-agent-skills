@@ -33,6 +33,12 @@ outcome-oriented unit above fine-grained checklist steps.
   the orchestrator resolves and advances eligible approved groups without asking
   the operator to repeat a `next` command, following the canonical continuation
   boundaries in the OpenSpec integration contract.
+- When a qualified worker exhausts its Hermes turn budget, let the orchestrator
+  continue it autonomously only after it verifies concrete on-track progress, a
+  bounded remaining action, unchanged goal/scope/authority, and no native prompt,
+  failed gate, drift, or contradictory evidence. An allowed continuation is one
+  fresh bounded same-role packet through the qualified adapter; it never uses a
+  bare chat `continue` or resumes a broader delivery goal.
 - Select the pre-execution-review and continuous-goal policies for future changes
   through this repository’s updated `AGENTS.md`; neither retroactively widens
   authority for this change.
@@ -106,9 +112,11 @@ outcome-oriented unit above fine-grained checklist steps.
   Adopting the updated workflow also includes minimum-outcome task authoring for
   new or revised unfrozen plans, without rewriting already-approved frozen plans.
   Every project adopting the invocation contract also receives integrated-plan-parent
-  verification and a distinct pre-freeze authority guard for contributor-contract
-  changes; single-group invocation authority remains the default without the optional
-  policies, but does not bypass those new integrity guards.
+  verification. Goal-aligned contributor-contract changes are ordinary implementation
+  work whose alignment is independently reviewed; they do not require a separate
+  operator checkpoint or notification. Single-group invocation authority remains the
+  default without the optional policies, but does not bypass the remaining integrity
+  guards.
 
 ## Impact
 
