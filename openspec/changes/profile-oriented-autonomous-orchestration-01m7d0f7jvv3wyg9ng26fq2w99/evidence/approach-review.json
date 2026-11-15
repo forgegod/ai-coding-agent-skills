@@ -1,0 +1,1211 @@
+{
+  "schema_version": 1,
+  "change": "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99",
+  "kind": "pre-freeze-approach-review",
+  "historical_chain_status": "unavailable",
+  "historical_chain_note": "Earlier draft reviews predate this durable record; their incomplete cycle chain is unavailable, not reconstructed, and grants no disposition or acceptance.",
+  "automatic_correction_cycles": null,
+  "planning_hashes": {
+    "openspec/config.yaml": "5719878578ec6a96877ee711a20ff22cda46f92dfc41f96d41b313b9b5ddbd31",
+    ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+    "proposal.md": "1afecfab6023ac653224453b4daed21a1afbcafc9d94854b52687c6770998fa3",
+    "design.md": "a12040911b22b982cea162c9c07ffb75baabfd9b543457b34a065c7a733d83e0",
+    "tasks.md": "3e1b7de25d0fc73d9576f255fbc178ebb85d5796d911118f9d7a63214f6ef07c",
+    "specs/autonomous-role-orchestration/spec.md": "48b8395aadb165186e032ce35fa84f4c9ae0686d1cbb8899c9a8c93d0345f993",
+    "specs/openspec-integration/spec.md": "f19c03527a6d6f3c523a7b6daabbfa6d4a542c517dc8e47c356957c037f74d63"
+  },
+  "reviews": [
+    {
+      "input_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "a1749df39a80c6517fb067ff52a8d6421a3b0c1cde449b6dacbbb7d7aa168a19",
+        "design.md": "da385fc34eb6c7354abe27639a808a08d91131758fb84a670ab7166956025b28",
+        "tasks.md": "0fcfcda2763c710580071e9ab7dc8fe368b249662cb93dca72eb897a71748f1e",
+        "specs/autonomous-role-orchestration/spec.md": "589b9050e21f0a4431352d2d7d2c6fb3d382a0d697a376405a78f521c77a3262",
+        "specs/openspec-integration/spec.md": "fdd1372afc1a4499d1935c3c03a25745813fa7bac6cd96bafa61663442c04547"
+      },
+      "verdict": "**Medium: `specs/autonomous-role-orchestration/spec.md:159-183`.** The *Non-orchestrator client process ownership* requirement is broader than intended. It covers Hermes/Herdr pane workers and conflicts with how the Herdr adapter is meant to keep working.\n\n- **What the text says:**\n  - Line 160 requires the selected host adapter to launch \"a qualified non-orchestrator client as an adapter-owned process in its assigned dedicated worktree.\"\n  - The *Stop or budget boundary* scenario (lines 174-183) says it \"stops only the exact owned process tree\" and \"does not inject a second packet.\"\n  - Line 171 names \"a Hermes/Herdr adapter\" inside this requirement, which puts Hermes panes in scope.\n- **Where it conflicts:**\n  - The package already calls Hermes executor panes \"non-orchestrator\" (`references/herdr.md:32`, `scripts/herdr_panes.py:139`).\n  - The operator picks those panes. The adapter does not launch or own them.\n  - The current Herdr stop contract (`references/herdr.md:100-105`) asks the operator to run `/goal pause` and then sends `/stop` into the pane. That is both pane input and a non-kill stop.\n  - The plan says to keep the operator-selected-pane behavior (`design.md:107-108`, `design.md:244-245`). The proposal says this ownership model is for \"foreign clients\" only (`proposal.md:42-45`).\n- **Impact:** Task 3.6 (`tasks.md:43`) has to implement and test this requirement. An implementer would have to pick one of two bad options:\n  - make Herdr Hermes workers adapter-launched processes with PID/scratch-root ownership and process-tree kill, which breaks the existing selection and `/stop` contract; or\n  - silently exempt them, which leaves the requirement unmet as written.\n- **Trigger:** Any stop, budget limit, or unexpected exit for an operator-selected Herdr Hermes executor.\n- **Fix (stays in scope):** Limit the requirement and its scenarios to qualified clients that are not Hermes and are not hosted in Herdr. For example, change line 160 to \"a qualified non-Hermes client that is not hosted in a Herdr pane.\" Add one sentence saying Herdr-hosted Hermes executors keep the Herdr adapter's selection, lifecycle and stop contract, plus the *On-demand Herdr executor creation* requirement. Update the wording at `design.md:129` and `tasks.md:43` to match.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T164300.070459Z/review.json",
+      "report_sha256": "1d8b4416e6b266b940d7092ca5553015ae1fca213fff4ca71719d3203bb6747c",
+      "session_id": "e6359098-0e1d-430a-9c51-10fda4afe441",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 10,
+          "outputTokens": 8711,
+          "cacheReadInputTokens": 149495,
+          "cacheCreationInputTokens": 36935,
+          "webSearchRequests": 0,
+          "costUSD": 0.499639,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 6885,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 36935,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T164300.070459Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "a1749df39a80c6517fb067ff52a8d6421a3b0c1cde449b6dacbbb7d7aa168a19",
+        "design.md": "dc5e4482c1037a2e34405c70eb72aadec040f8ec94412a648a11c8c9c110e547",
+        "tasks.md": "18cbd98f18a9a0cfa948d1c1541c5a450935616f4468c193877934f932487d70",
+        "specs/autonomous-role-orchestration/spec.md": "2be34d17b9b07b75b3e61cb567780ad82d8622d331664572f73587917d5c3c2e",
+        "specs/openspec-integration/spec.md": "4d37b3b4c4c58157d9412cc05787a73d73d52ee150611115b03a9e4e4ebf5015"
+      }
+    },
+    {
+      "input_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "a1749df39a80c6517fb067ff52a8d6421a3b0c1cde449b6dacbbb7d7aa168a19",
+        "design.md": "8a0514a824870f4956f530ebd85e41e354666995e8a230fef5535c0c09713504",
+        "tasks.md": "f13f50ed17e1b343ea3b443f520ab8e53883ef54b0d7ceb38e5d6e34f7c66b86",
+        "specs/autonomous-role-orchestration/spec.md": "998fd3867c8d32ac7bfeb9631e3f8d9a58515a4b9ca39da5ad7e087bf3fa44f5",
+        "specs/openspec-integration/spec.md": "fdd1372afc1a4499d1935c3c03a25745813fa7bac6cd96bafa61663442c04547"
+      },
+      "verdict": "**Medium \u2014 `design.md:250-252` contradicts `specs/autonomous-role-orchestration/spec.md:112-113`, `spec.md:159-161` and `tasks.md:41`.**\n- **What conflicts:** The risk mitigation lets a client without an isolated state location still be used, by serializing that client or marking only concurrent use unsupported. The spec says something different. Qualification needs an isolated scratch state location or an explicit unverified stop. Foreign-client ownership needs a recorded scratch root to clean. Task 3.4 says any \"unisolated interface\" is documented as unsupported and its adapter stays absent.\n- **Impact:** During tasks 3.3/3.4, a client that cannot isolate its state gets opposite answers. The design allows it as a serialized supported adapter. The spec and tasks reject it. If the implementer follows the design, the client is advertised as supported without the isolation and cleanup boundary the spec requires.\n- **Fix:** Replace \"otherwise serialize that client or mark concurrent use unsupported\" with \"otherwise record that client variant unsupported\". If serialization is meant only to limit concurrency on top of a required per-role scratch root, say exactly that.\n\n**Low \u2014 `specs/autonomous-role-orchestration/spec.md:201-205` versus `spec.md:176-182` and `spec.md:187-191`.**\n- **What conflicts:** When an implementation role breaks the process boundary, the spec stops the process after identity readback and keeps the scratch root as evidence. When a read-only reviewer escalates (subagent, writing tool or multiplexer), the spec only invalidates the review. It says nothing about stopping the process or keeping evidence. That leaves the generic *Stop or budget boundary* path, which cleans the recorded scratch root after a stop decision.\n- **Impact:** A reviewer violation can lose its scratch-state evidence, while the same violation by an implementer keeps it. That leaves task 3.6's \"preservation\" check unclear for reviewers.\n- **Fix:** Add to *Read-only review escalation*: \"the adapter stops the exact owned process tree after identity readback and preserves the scratch root as evidence without cleanup; a failed identity readback preserves the process and scratch root.\"\n\n**Low \u2014 `specs/openspec-integration/spec.md:47-58` and `tasks.md:52`.**\n- **What is missing:** Policy selection comes from \"the contributor contract at the frozen plan commit's parent, an integrated target-branch revision\". No scenario covers a parent that is not an integrated target-branch revision. *Contributor-contract change* (`spec.md:60-64`) only handles a plan that edits `AGENTS.md` itself, not an unintegrated parent commit.\n- **Trigger:** A plan is frozen on top of a local-only commit that changes `AGENTS.md`. This repository's own unplanned `5f48fbe` on local `main` is exactly that case.\n- **Impact:** The unintegrated contract could select or disable pre-execution review or continuous-goal policy. Task 4.2 has no defined result to check against.\n- **Fix:** Add a scenario: when the frozen plan commit's parent is not a verified integrated target-branch revision, delivery stops before freeze or execution. Have task 4.2 verify that stop.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T164533.297511Z/review.json",
+      "report_sha256": "1d5aace86e38b51500f19cf058c56fd2514ca0f37286b266d31d8d7408e00501",
+      "session_id": "e7aa670c-7be8-4758-8bee-6d6e09aee862",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 4,
+          "outputTokens": 7472,
+          "cacheReadInputTokens": 35952,
+          "cacheCreationInputTokens": 34767,
+          "webSearchRequests": 0,
+          "costUSD": 0.4347824,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 6176,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 34767,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T164533.297511Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "a1749df39a80c6517fb067ff52a8d6421a3b0c1cde449b6dacbbb7d7aa168a19",
+        "design.md": "dc5e4482c1037a2e34405c70eb72aadec040f8ec94412a648a11c8c9c110e547",
+        "tasks.md": "18cbd98f18a9a0cfa948d1c1541c5a450935616f4468c193877934f932487d70",
+        "specs/autonomous-role-orchestration/spec.md": "2be34d17b9b07b75b3e61cb567780ad82d8622d331664572f73587917d5c3c2e",
+        "specs/openspec-integration/spec.md": "4d37b3b4c4c58157d9412cc05787a73d73d52ee150611115b03a9e4e4ebf5015"
+      }
+    },
+    {
+      "input_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "a1749df39a80c6517fb067ff52a8d6421a3b0c1cde449b6dacbbb7d7aa168a19",
+        "design.md": "bf300a607f7e10214bb12db31747b2ab8042fbeab48eb936b749d8b1bc4ef988",
+        "tasks.md": "18cbd98f18a9a0cfa948d1c1541c5a450935616f4468c193877934f932487d70",
+        "specs/autonomous-role-orchestration/spec.md": "3d41542985bb6a0109f7004dd55451f2b28a35e723b10dc4d313825ec0c40806",
+        "specs/openspec-integration/spec.md": "8ccd46d0afa9ceaf3b17eaf1cde1a89b891cbf4bd16efe34436efe7832df3826"
+      },
+      "verdict": "**Medium: `specs/autonomous-role-orchestration/spec.md:256-260` asks for something the plan cannot do, and `design.md:191-196` contradicts it.**\n- **The conflict:** Scenario *Missing or revised record* says that when `approach-review.json` is missing, unreadable or hash-mismatched, a fresh record is created without operator disposition, and the cumulative automatic-correction count \"does not reset\". But that record is the only place the count is kept (`design.md:188-191`). The plan names no external copy of the count before freeze; the external hash capture in `design.md:58-73` happens only at freeze. And `design.md:194-196` says an unavailable earlier chain is \"labeled unavailable, not reconstructed\". In practice that restarts the count at zero, which is what the current record does (`historical_chain_status: unavailable`, `automatic_correction_cycles: 0`).\n- **Trigger:** The record is deleted, corrupted or overwritten before freeze, or its hash stops matching.\n- **Impact:** Task 2.4 (`tasks.md:28`) has no defined expected result for a \"does not reset\" test. Worse, losing or replacing the record quietly skips the eight-cycle stop in *Non-converging routine findings* (`spec.md:238-241`). That is the safety bound on automatic corrections.\n- **Fix:** In *Missing or revised record*, add: \"if the prior cumulative count cannot be recovered from retained external report references, the orchestrator stops for operator disposition instead of restarting the count.\" Make the same change to `design.md:191-193`.\n\n**Low: `specs/openspec-integration/spec.md:60` is an empty duplicate scenario heading.**\n- **The defect:** `#### Scenario: Contributor-contract change` appears with no WHEN/THEN lines, directly before `#### Scenario: Unintegrated plan parent`. The real scenario with the same name follows at line 67.\n- **Impact:** Strict validation passed, but when the change is archived or synced, the MODIFIED requirement can bring a content-free scenario and a duplicate scenario name into `openspec/specs/openspec-integration/spec.md`. That makes the scenario that task 4.2 must verify ambiguous.\n- **Fix:** Delete line 60.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T164726.928075Z/review.json",
+      "report_sha256": "d0deaa25baa7495a1a2026dc36d2111f2958ce2c4d3646cf262390e017c77e02",
+      "session_id": "05efcda9-def0-4ffb-a788-8497c9f17d18",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 8,
+          "outputTokens": 6743,
+          "cacheReadInputTokens": 117765,
+          "cacheCreationInputTokens": 36545,
+          "webSearchRequests": 0,
+          "costUSD": 0.45080499999999996,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 5302,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 36545,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T164726.928075Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "a1749df39a80c6517fb067ff52a8d6421a3b0c1cde449b6dacbbb7d7aa168a19",
+        "design.md": "dc5e4482c1037a2e34405c70eb72aadec040f8ec94412a648a11c8c9c110e547",
+        "tasks.md": "18cbd98f18a9a0cfa948d1c1541c5a450935616f4468c193877934f932487d70",
+        "specs/autonomous-role-orchestration/spec.md": "2be34d17b9b07b75b3e61cb567780ad82d8622d331664572f73587917d5c3c2e",
+        "specs/openspec-integration/spec.md": "4d37b3b4c4c58157d9412cc05787a73d73d52ee150611115b03a9e4e4ebf5015"
+      }
+    },
+    {
+      "input_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "a1749df39a80c6517fb067ff52a8d6421a3b0c1cde449b6dacbbb7d7aa168a19",
+        "design.md": "dc5e4482c1037a2e34405c70eb72aadec040f8ec94412a648a11c8c9c110e547",
+        "tasks.md": "18cbd98f18a9a0cfa948d1c1541c5a450935616f4468c193877934f932487d70",
+        "specs/autonomous-role-orchestration/spec.md": "2be34d17b9b07b75b3e61cb567780ad82d8622d331664572f73587917d5c3c2e",
+        "specs/openspec-integration/spec.md": "4d37b3b4c4c58157d9412cc05787a73d73d52ee150611115b03a9e4e4ebf5015"
+      },
+      "verdict": "**Medium: `specs/openspec-integration/spec.md:60-64` adds a stop for every adopting project, which contradicts `tasks.md:52` and `design.md:170-171`.**\n- **What the text says:** *Unintegrated plan parent* stops delivery before freeze or execution whenever the plan commit's parent is not a verified integrated target-branch revision. Nothing ties this to the pre-execution-review or continuous-goal policies.\n- **Why it conflicts:** The current requirement (`openspec/specs/openspec-integration/spec.md:151-170`) has no rule about where a plan's parent comes from. The design says \"default single-group behavior remains for other projects\", and task 4.2 must verify \"unchanged default single-group/inspect behavior\". A project that selects neither policy would still be blocked by the new rule.\n- **Trigger:** A project that selects neither policy freezes a plan on top of an unmerged dependency commit or another local-only base.\n- **Impact:** Task 4.2 cannot satisfy both of its acceptance checks. Either the default-behavior test fails or the unintegrated-parent stop is left unenforced.\n- **Fix:** Pick one of these:\n  - Narrow the scenario. Delivery derives policy selection from the contributor contract at the parent's nearest integrated target-branch ancestor. It stops only when the parent changes a contributor-contract file relative to that ancestor. This keeps an unintegrated `AGENTS.md`, such as `5f48fbe`, from selecting or disabling policy.\n  - Keep the scenario as it is, and change `design.md:170-171` and `tasks.md:52` to say the default behavior now includes this stop.\n\n**Low: `specs/autonomous-role-orchestration/spec.md:262-263` and `design.md:194-198` stop for operator disposition when the cycle count cannot be recovered, but never say what applies afterwards.**\n- **What is missing:** Once the operator disposes of an unrecoverable count, neither file says which correction-cycle bound applies next. *Routine grounded correction* (`spec.md:216-220`) goes back to applying fixes without asking. *Non-converging routine findings* (`spec.md:238-241`) cannot count to its eight-cycle limit from an unknown starting value.\n- **Trigger:** The current record already has `automatic_correction_cycles: null` and `historical_chain_status: unavailable`.\n- **Impact:** After the disposition, automatic corrections have no limit. Task 2.4 (`tasks.md:28`) has no defined expected result to test for this path.\n- **Fix:** Add one clause to *Missing or revised record* and its mirror at `design.md:194-195`. The operator disposition must record either an explicit baseline count, or that each later correction cycle needs operator authorization while the count stays unavailable. The record then retains that disposition.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T164933.842895Z/review.json",
+      "report_sha256": "ffdfaad3a0448dd6246773ac9509161354811ca0ed96b485063f852badf44370",
+      "acceptance": "not-accepted",
+      "reason": "Permission-limited review retained verbatim; supplied planning findings independently checked before correction.",
+      "permission_denials": [
+        {
+          "tool_name": "Grep",
+          "tool_use_id": "toolu_013T22quGXLrc98PTHwuwpqC",
+          "tool_input": {
+            "pattern": "ae6488e|5f48fbe|850244e",
+            "path": "/home/raphael/src/ai-coding-agent-skills/.git",
+            "glob": "{packed-refs,refs/**,HEAD,ORIG_HEAD,FETCH_HEAD,logs/HEAD,logs/refs/heads/main,logs/refs/remotes/origin/main}",
+            "output_mode": "content",
+            "head_limit": 30
+          }
+        }
+      ],
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "9c38a5a5b5904a39b65c41aa0de7545dc9ae0b282e5acf2e272818d98648923e",
+        "design.md": "04e29f1a0678bbbe2d6b4e42b6652af5201502128e62f5fbfd35e3419d531a9a",
+        "tasks.md": "b69f5e76cc8e038b8a12d3535c37b0a1257f88e263d2431c27b5b96690800a58",
+        "specs/autonomous-role-orchestration/spec.md": "c27b3f3e80e32bfb26fdcf6dd47033e4e81682fe6d6763fa7f3f2cc850667366",
+        "specs/openspec-integration/spec.md": "74e7030135d40476eda63b4af924ed311680fe9c4f275c6b4865098f9b156e9a"
+      }
+    },
+    {
+      "input_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "9c38a5a5b5904a39b65c41aa0de7545dc9ae0b282e5acf2e272818d98648923e",
+        "design.md": "04e29f1a0678bbbe2d6b4e42b6652af5201502128e62f5fbfd35e3419d531a9a",
+        "tasks.md": "b69f5e76cc8e038b8a12d3535c37b0a1257f88e263d2431c27b5b96690800a58",
+        "specs/autonomous-role-orchestration/spec.md": "c27b3f3e80e32bfb26fdcf6dd47033e4e81682fe6d6763fa7f3f2cc850667366",
+        "specs/openspec-integration/spec.md": "74e7030135d40476eda63b4af924ed311680fe9c4f275c6b4865098f9b156e9a"
+      },
+      "verdict": "**Medium: the new adapter requirements would also cover the existing Hermes/Herdr adapter, but no task makes it comply \u2014 `specs/autonomous-role-orchestration/spec.md:109-132`, `tasks.md:34`, `tasks.md:39-41`**\n- **What the text says:**\n  - *Qualified client adapters* (lines 109-124) applies to every \"client adapter\". A selected client with missing probe evidence stops dispatch (lines 121-124).\n  - *Qualification controls* (lines 116-119) requires a non-argv prompt route.\n  - *Launch payload transport* (lines 126-132) says every adapter must keep generated prompts out of argv.\n  - Unlike *Foreign-client process ownership* (line 160), neither requirement excludes Hermes.\n- **Where it conflicts:**\n  - The plan treats Hermes/Herdr as the existing adapter, not a candidate (`design.md:112`, `proposal.md:35-37`).\n  - Task 3.3 qualifies only the seven foreign candidates. Task 3.3a tests transport only for adapters that pass that qualification. Group 3's acceptance evidence (`tasks.md:34`) never requires a Hermes qualification record.\n  - The current Herdr adapter sends each packet as an argv element: `herdr agent prompt <pane-id> \"<text>\"` (`skills/autonomous-ai-agents/autonomous-implementation-review/references/herdr.md:66`). No task changes this.\n- **Impact:** Read literally, the spec stops all Hermes/Herdr dispatch for lack of a qualification record and makes the existing delivery path non-compliant. If the implementer quietly exempts Hermes instead, these requirements are left unmet as written and tasks 3.3a/3.5 have no defined expected result for Hermes.\n- **Trigger:** Any Hermes/Herdr role dispatch after implementation, or any packet near the argv limit sent through `herdr agent prompt`.\n- **Fix:** Limit both requirements to non-Hermes client adapters, worded like line 160. Add one sentence saying Herdr-hosted Hermes roles keep the existing Herdr adapter's named-profile prerequisites and `herdr agent prompt` delivery contract. If argv-size protection is also wanted for Herdr, add an explicit Herdr scenario and a task for it instead.\n\n**Low: two requirements have no implementing or verifying task \u2014 `specs/autonomous-role-orchestration/spec.md:47-66`, `spec.md:268-293`, `tasks.md:28`**\n- **What is missing:**\n  - *Independent pre-execution approach review*: a review packet bound to complete SHA-256 hashes, read-only and no-edit constraints, re-hashing after the review with rejection on drift (`design.md:210-221`), and use of the selected host adapter for later reviews (`design.md:223-226`).\n  - *Blocking-finding classification*, including its *Operator disposition required* and *Post-freeze planning finding* scenarios.\n- **Where coverage stops:** Task 2.4 names only automatic correction, goal-first control and review-record continuity. Task 4.2 covers only the delivery-side policy stop. The spec assigns the review protocol to the orchestration package (`specs/openspec-integration/spec.md:13-14`).\n- **Impact:** Group 2 can pass its acceptance evidence (`tasks.md:22`) without implementing or testing the review protocol, blocking classification, or the stop for post-freeze planning findings.\n- **Fix:** Extend task 2.4 to \"implement and test the independent pre-execution approach-review protocol (complete-hash packet, read-only constraints, post-review drift rejection), blocking-finding classification, operator-disposition stops, and the post-freeze planning-finding refreeze boundary\". Add matching wording to group 2's acceptance evidence.\n\n**Low: the trigger for the contributor-contract stop is undefined \u2014 `specs/openspec-integration/spec.md:66-72`, `tasks.md:52`**\n- **What is unclear:** \"a proposed plan changes `AGENTS.md`, `CLAUDE.md`, or another selected contributor-contract file\" can be read two ways:\n  - **The plan commit's diff.** By design that diff contains only change-directory files (`design.md:69-71`), so the stop could never fire.\n  - **The planned implementation scope.** Then no detection criterion is defined. \"Selected\" also names no selector.\n- **Trigger:** A plan whose tasks edit `AGENTS.md`, as this change's own task 4.2 does.\n- **Impact:** Task 4.2 must test \"contributor-contract authority stops\" for every adopting project but has no defined input that triggers the stop.\n- **Fix:** Reword the WHEN clause as: \"the plan's planning artifacts declare, or its plan-commit diff includes, a change to `AGENTS.md`, `CLAUDE.md`, or a contributor-contract file named by the project's integrated contributor contract\". Reference that criterion in task 4.2.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T165334.121853Z/review.json",
+      "report_sha256": "b4b9329ec4f40b9672a58eeaef2bc2e7019d8ed47563f17ee73fb97dad00dc33",
+      "session_id": "dafe5642-ad84-4ed5-8d74-eec1c2e53094",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 10,
+          "outputTokens": 11506,
+          "cacheReadInputTokens": 183943,
+          "cacheCreationInputTokens": 44526,
+          "webSearchRequests": 0,
+          "costUSD": 0.6231566,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 8974,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 44526,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T165334.121853Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "1954da247cf20bdaf5e697f188f5296efd5f4bb08736319da68a80911270a887",
+        "design.md": "c065565b0cc48e2f55da269746725f771cb35f025a9a693c26ec72b23c41bb6f",
+        "tasks.md": "3e1b7de25d0fc73d9576f255fbc178ebb85d5796d911118f9d7a63214f6ef07c",
+        "specs/autonomous-role-orchestration/spec.md": "48b8395aadb165186e032ce35fa84f4c9ae0686d1cbb8899c9a8c93d0345f993",
+        "specs/openspec-integration/spec.md": "f19c03527a6d6f3c523a7b6daabbfa6d4a542c517dc8e47c356957c037f74d63"
+      },
+      "disposition_correction_note": "The earlier blanket applied claim was premature for the task-coverage and contributor-contract-trigger findings. That original record is preserved in prior-approach-review.json captures. Both findings are now corrected in this bound revision."
+    },
+    {
+      "input_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "9c38a5a5b5904a39b65c41aa0de7545dc9ae0b282e5acf2e272818d98648923e",
+        "design.md": "16108062440a152a046612451c0004069b639dc7ae052b3835dda1e2b9cb016f",
+        "tasks.md": "b69f5e76cc8e038b8a12d3535c37b0a1257f88e263d2431c27b5b96690800a58",
+        "specs/autonomous-role-orchestration/spec.md": "04f589190c929e174d8db5419ed31825ab733fbc52587542173378678f0060fc",
+        "specs/openspec-integration/spec.md": "74e7030135d40476eda63b4af924ed311680fe9c4f275c6b4865098f9b156e9a"
+      },
+      "verdict": "**Medium: `tasks.md:22` and `tasks.md:28` have no task that implements or tests two required behaviors: *Independent pre-execution approach review* (`specs/autonomous-role-orchestration/spec.md:47-66`, `design.md:208-226`) and *Blocking-finding classification* (`spec.md:271-296`).**\n- **Coverage gap:** Task 2.4 and the group 2 acceptance evidence cover only three things: automatic correction, goal-first control and review-record continuity. None of the following is covered:\n  - the approach-review packet: complete-hash binding, the forbidden-action list, `path:line` or `No findings` output, and rejection when inputs drift after the review (`design.md:213-221`);\n  - the switch from the bootstrap reviewer to the qualified adapter (`design.md:225-226`);\n  - blocking/unfounded classification;\n  - the *Operator disposition required* stop;\n  - the *Post-freeze planning finding* re-freeze boundary.\n\n  Task 4.2 checks only the delivery-side policy stop. Task 4.4 is the candidate review, not this protocol.\n- **Impact:** Group 2 can be checked off in `tasks.md` while the review protocol, the classification rule and the post-freeze stop are missing. Delivery would then be relying on a review record whose rules the package never enforces.\n- **Correction:** Extend task 2.4 to \"implement and test the pre-execution approach-review protocol (complete-hash packet, read-only constraints, post-review drift rejection, bootstrap-to-adapter transition), blocking-finding classification, operator-disposition stops, and the post-freeze planning-finding re-freeze boundary.\" Add the same items to the acceptance evidence at `tasks.md:22`.\n\n**Low: the trigger for the contributor-contract stop is still undefined \u2014 `specs/openspec-integration/spec.md:66-68`, `tasks.md:52`, `design.md:170-174`.**\n- **Ambiguity:** \"a proposed plan changes `AGENTS.md`, `CLAUDE.md`, or another selected contributor-contract file\" can be read two ways:\n  - **The plan-commit diff.** By design that diff holds only change-directory files (`design.md:69-71`), so the stop could never fire.\n  - **The planned implementation scope.** Then no detection rule is given, and \"selected\" names no selector.\n- **Trigger:** Any plan whose tasks edit `AGENTS.md`. This plan's own task 4.2 does.\n- **Second gap:** `design.md:172-174` applies these guards to every adopting project. But the plan never says whether this bootstrap change needs the separate contributor-contract grant. Migration step 1 (`design.md:273`) lists only the issue, branch-reset and freeze grants.\n- **Impact:** Task 4.2 has no defined input to test this stop against. It is also unclear whether freezing this change needs one more authority grant.\n- **Correction:**\n  - Reword the WHEN clause to: \"the planning artifacts declare, or the plan-commit diff includes, a change to `AGENTS.md`, `CLAUDE.md`, or a contributor-contract file named by the integrated contributor contract.\" Reference that wording in task 4.2.\n  - Either add \"contributor-contract\" to the grants in `design.md:273`, or state that, like policy selection, the guard binds only changes frozen after it is integrated.\n\n**Low: `openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/approach-review.json`, `reviews[4].disposition`, says \"Applied in subsequent planning revision\", but two of that review's three findings were not applied.**\n- **Evidence:** In that entry, `corrected_planning_hashes` for `tasks.md` (`b69f5e76\u2026`) and `specs/openspec-integration/spec.md` (`74e70301\u2026`) equal its `input_hashes`. Only `design.md` and the orchestration spec changed. So the task-coverage finding and the contributor-contract-trigger finding were neither applied nor recorded as unfounded.\n- **Impact:** Under `spec.md:271-275`, both still count as blocking. Leaving the record as it is would let freeze bind to an entry that misstates what was done with those findings.\n- **Correction:** Record a separate disposition for each finding in that entry: applied, or unfounded with evidence and reason. Or resolve the first two findings above and record them as applied in the next revision.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T165611.318132Z/review.json",
+      "report_sha256": "84945f6a2a80b257fe77873756b404676bbe6a5ce436804f10e3029892f39a6c",
+      "session_id": "3cdc9c89-bf94-4afa-a0a6-55db7cad443b",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 6,
+          "outputTokens": 9586,
+          "cacheReadInputTokens": 95532,
+          "cacheCreationInputTokens": 46013,
+          "webSearchRequests": 0,
+          "costUSD": 0.5789544,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 7696,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 46013,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T165611.318132Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "9c38a5a5b5904a39b65c41aa0de7545dc9ae0b282e5acf2e272818d98648923e",
+        "design.md": "9b2a2734cae50a4a32c42cc494d5bfda87c20285638cf9b872e9ad293b9c1ce1",
+        "tasks.md": "5c4063bf46c3baa517dea2df97e5e9604be90adda562e82e0fd2ab77408181d9",
+        "specs/autonomous-role-orchestration/spec.md": "04f589190c929e174d8db5419ed31825ab733fbc52587542173378678f0060fc",
+        "specs/openspec-integration/spec.md": "2e7c60034eb299877d0368f1366f07ffc223fdbd32eccfe47e7156eb188819e6"
+      }
+    },
+    {
+      "input_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "9c38a5a5b5904a39b65c41aa0de7545dc9ae0b282e5acf2e272818d98648923e",
+        "design.md": "9b2a2734cae50a4a32c42cc494d5bfda87c20285638cf9b872e9ad293b9c1ce1",
+        "tasks.md": "5c4063bf46c3baa517dea2df97e5e9604be90adda562e82e0fd2ab77408181d9",
+        "specs/autonomous-role-orchestration/spec.md": "04f589190c929e174d8db5419ed31825ab733fbc52587542173378678f0060fc",
+        "specs/openspec-integration/spec.md": "2e7c60034eb299877d0368f1366f07ffc223fdbd32eccfe47e7156eb188819e6"
+      },
+      "verdict": "**Low: the general auto-correction rules conflict with the special rule for an unrecoverable correction count.** Affected lines: `specs/autonomous-role-orchestration/spec.md:219-223` and `spec.md:237-239`, which conflict with `spec.md:265-269`. The same conflict is repeated in `proposal.md:46-50`.\n\n- **What the text says:**\n  - *Routine grounded correction* (219-223) applies fixes \"without a separate operator prompt\".\n  - *Ordinary planning drift* (237-239) gives a complete list of when it may stop or create an operator decision. The only two cases are an *Operator disposition required* decision or the *Non-converging routine findings* boundary.\n  - `proposal.md:49` says the orchestrator \"stops only for the canonical Operator disposition required classes\".\n  - *Missing or revised record* (265-269) adds two operator interruptions that neither list mentions:\n    - a stop when the cumulative count cannot be recovered;\n    - if the operator's disposition keeps the count unavailable, separate operator authorization before every later correction cycle.\n- **Why the existing classes don't cover it:** The *Operator disposition required* scenario (288-291) lists scope, topology, authority, safety, dependencies, external state, security, host, and accepted contracts. An unrecoverable count is not one of these, so it is not covered.\n- **Trigger:** This is the current state of the record (`automatic_correction_cycles: null`, `historical_chain_status: unavailable`). Any routine grounded correction after a disposition that chose per-cycle authorization would hit it.\n- **Impact:**\n  - Task 2.4 (`tasks.md:28`) must test automatic correction, goal-first control and review-record continuity together. In this state the three requirements give opposite expected results: prompt the operator, or don't.\n  - An implementer who follows the two general scenarios would skip the per-cycle authorization. That removes the only bound on automatic corrections while the eight-cycle count is unavailable.\n- **Minimal correction:**\n  - At `spec.md:238-239`, extend the stop clause to \"\u2026requires an Operator disposition required decision, reaches the *Non-converging routine findings* boundary, or is subject to a *Review-record continuity* count-recovery stop or per-cycle authorization\".\n  - In *Routine grounded correction* (222-223), add \"unless *Review-record continuity* requires per-cycle operator authorization\".\n  - At `proposal.md:49-50`, replace \"stops only for the canonical Operator disposition required classes\" with \"stops for the canonical Operator disposition required classes, non-convergence, or unrecoverable review-count continuity\".",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T165852.457980Z/review.json",
+      "report_sha256": "43533e8f3b30f62144fb0d7612efe473712451a2dff8dd0c3a20980fefc40e2b",
+      "session_id": "3ec6f069-b5a3-4e0f-9ea8-5ab169b28d0b",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 6,
+          "outputTokens": 9347,
+          "cacheReadInputTokens": 103667,
+          "cacheCreationInputTokens": 50941,
+          "webSearchRequests": 0,
+          "costUSD": 0.6152254,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 7933,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 50941,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T165852.457980Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "3bffe1520a7bcfbb836fad403d908448d869a734556350c8c715e13afcea662b",
+        "design.md": "9b2a2734cae50a4a32c42cc494d5bfda87c20285638cf9b872e9ad293b9c1ce1",
+        "tasks.md": "5c4063bf46c3baa517dea2df97e5e9604be90adda562e82e0fd2ab77408181d9",
+        "specs/autonomous-role-orchestration/spec.md": "556316ae3d16a56639758af45e6ad76dbcafc20d7b9d7f5ea9b3b1ef1ee003dd",
+        "specs/openspec-integration/spec.md": "2e7c60034eb299877d0368f1366f07ffc223fdbd32eccfe47e7156eb188819e6"
+      }
+    },
+    {
+      "input_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "3bffe1520a7bcfbb836fad403d908448d869a734556350c8c715e13afcea662b",
+        "design.md": "9b2a2734cae50a4a32c42cc494d5bfda87c20285638cf9b872e9ad293b9c1ce1",
+        "tasks.md": "5c4063bf46c3baa517dea2df97e5e9604be90adda562e82e0fd2ab77408181d9",
+        "specs/autonomous-role-orchestration/spec.md": "556316ae3d16a56639758af45e6ad76dbcafc20d7b9d7f5ea9b3b1ef1ee003dd",
+        "specs/openspec-integration/spec.md": "2e7c60034eb299877d0368f1366f07ffc223fdbd32eccfe47e7156eb188819e6"
+      },
+      "verdict": "**Low: `specs/openspec-integration/spec.md:60-73` and `tasks.md:52`. The spec doesn't say whether the new integrity guards apply to plans frozen before this change, and task 4.2 tests a \"legacy-plan exemption\" that doesn't cover that case.**\n- **What the text says:**\n  - *Unintegrated plan parent* stops \"the prospective or **frozen** plan\" before execution.\n  - *Contributor-contract change* stops before execution until the operator gives \"a separate **pre-freeze** authority grant\".\n  - Both guards apply to every adopting project, whatever policy it selects (`proposal.md:87-90`, `design.md:173-176`).\n  - The only legacy rules in the spec are the two policy scenarios at lines 47-58. They exempt legacy plans from policy selection, not from these guards.\n- **Trigger:** An adopting project upgrades delivery while it has an already-approved frozen plan that either:\n  - sits on a stacked, local-only parent, or\n  - plans changes to `AGENTS.md` or `CLAUDE.md`. This is common here: task 4.1 routinely updates \"AGENTS indexes\".\n- **Impact:**\n  - The unintegrated-parent guard blocks that plan's execution with no recovery path.\n  - The contributor-contract guard asks for a pre-freeze grant, which can't be given for a plan that is already frozen. Nothing says whether an operator grant now is enough, or whether the plan must be refrozen and reapproved.\n  - Task 4.2's \"legacy-plan exemption\" test has no defined expected result for either guard.\n- **Fix:** Add one scenario to the MODIFIED requirement covering plans frozen before the adopted delivery version that contains these guards. It should state one of two outcomes:\n  - The guards apply only at that plan's next freeze or refreeze.\n  - The plan stops and needs refreezing plus explicit reapproval.\n\n  Then name that scenario in task 4.2 next to \"legacy-plan exemption\".\n\n**Low: `evidence/approach-review.json` (fields `current_goal_authority`, `automatic_correction_cycles`, `cycle_count_status`) doesn't record either disposition that `design.md:199-202` and `specs/autonomous-role-orchestration/spec.md:267-271` require when the correction count can't be recovered.**\n- **What the record says:**\n  - The count is `null` and marked unavailable, so the design's continuity rule applies.\n  - The retained disposition must be one of two things: a verified baseline count, or a separate operator authorization for each later correction cycle.\n  - Instead, the record holds one open-ended grant: \"planning-only convergence until exactly No findings\". Each entry only says `operator-authorized-planning-convergence`, with no reference to a separate per-cycle authorization.\n  - `retained_goal_review_count: 7` isn't labelled as a verified baseline.\n- **Trigger:** Freeze binds this change to the record (`design.md:193-208`; tasks Workflow follow-up line 58).\n- **Impact:** The freeze would rest on a record with no limit on correction cycles. That is the gap the two allowed dispositions exist to close. A later continuity check can't tell whether the eight-cycle stop was replaced by per-cycle authority or simply bypassed.\n- **Fix:** Before freeze, the parent should record one of the two allowed dispositions:\n  - an operator-established verified baseline count, for example the 7 retained cycles explicitly adopted as the baseline; or\n  - a reference to a separate operator authorization for each correction cycle in each `reviews[]` entry and for any later cycles.\n\n  This is a change to derived evidence only; no planning file needs to change.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T170046.597590Z/review.json",
+      "report_sha256": "52cb9618edf30819f4273c1982d44ba6f2de308ed72e24b39d2ecbda393d780b",
+      "session_id": "ec440ae1-4122-448f-ba4e-e1b20fc7a3fe",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 12,
+          "outputTokens": 14459,
+          "cacheReadInputTokens": 282565,
+          "cacheCreationInputTokens": 56468,
+          "webSearchRequests": 0,
+          "costUSD": 0.7974849999999999,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 12021,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 56468,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T170046.597590Z/post-review-hashes.json",
+      "disposition": "Legacy-guard applicability corrected in the planning spec/tasks. Historical count disposition remains an explicit pre-freeze blocker, not satisfied by or inferred from this planning-only goal.",
+      "corrected_planning_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "3bffe1520a7bcfbb836fad403d908448d869a734556350c8c715e13afcea662b",
+        "design.md": "9b2a2734cae50a4a32c42cc494d5bfda87c20285638cf9b872e9ad293b9c1ce1",
+        "tasks.md": "460b2fa315c6e5a101723f6c0846ea16f875133490a75be46407bf8fffe1f440",
+        "specs/autonomous-role-orchestration/spec.md": "556316ae3d16a56639758af45e6ad76dbcafc20d7b9d7f5ea9b3b1ef1ee003dd",
+        "specs/openspec-integration/spec.md": "d937db7cef28f093d69b4699d7785aeab2cbb5f578620eab86fbea9a2cfa0f83"
+      },
+      "finding_dispositions": [
+        {
+          "finding": "Legacy integrity-guard applicability",
+          "status": "applied",
+          "corrected_planning_hashes": {
+            "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+            ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+            "proposal.md": "1954da247cf20bdaf5e697f188f5296efd5f4bb08736319da68a80911270a887",
+            "design.md": "c065565b0cc48e2f55da269746725f771cb35f025a9a693c26ec72b23c41bb6f",
+            "tasks.md": "3e1b7de25d0fc73d9576f255fbc178ebb85d5796d911118f9d7a63214f6ef07c",
+            "specs/autonomous-role-orchestration/spec.md": "48b8395aadb165186e032ce35fa84f4c9ae0686d1cbb8899c9a8c93d0345f993",
+            "specs/openspec-integration/spec.md": "f19c03527a6d6f3c523a7b6daabbfa6d4a542c517dc8e47c356957c037f74d63"
+          }
+        },
+        {
+          "finding": "Historical correction-count disposition before freeze",
+          "status": "retained-pre-freeze-blocker",
+          "evidence": "automatic_correction_cycles remains null; freeze_readiness explicitly blocks freeze until a separate operator disposition. No baseline or per-cycle consent is fabricated."
+        }
+      ]
+    },
+    {
+      "input_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "3bffe1520a7bcfbb836fad403d908448d869a734556350c8c715e13afcea662b",
+        "design.md": "9b2a2734cae50a4a32c42cc494d5bfda87c20285638cf9b872e9ad293b9c1ce1",
+        "tasks.md": "460b2fa315c6e5a101723f6c0846ea16f875133490a75be46407bf8fffe1f440",
+        "specs/autonomous-role-orchestration/spec.md": "556316ae3d16a56639758af45e6ad76dbcafc20d7b9d7f5ea9b3b1ef1ee003dd",
+        "specs/openspec-integration/spec.md": "d937db7cef28f093d69b4699d7785aeab2cbb5f578620eab86fbea9a2cfa0f83"
+      },
+      "verdict": "**Low: `design.md:162-164` conflicts with the existing delivery contract, and task 4.2 (`tasks.md:52`) carries that conflict into implementation.**\n\n- **What the text says:** \"`openspec-delivery` refers to it only when the project explicitly selects the pre-execution-review or continuous-goal policy.\"\n- **What delivery does today:** `openspec-delivery` already depends on `autonomous-implementation-review` in three places, whichever policy is selected:\n  - Before merge, a non-implementer must give a verdict from `/autonomous-implementation-review` (`skills/software-development/openspec-delivery/SKILL.md:118-123`).\n  - When the project's role loop is selected, delivery loads the package (`SKILL.md:189-191`, `references/continuation.md:71-76`).\n  - The package is listed in `related_skills` (`SKILL.md:11`).\n- **Trigger:** An implementer follows the design while doing task 4.2's \"Implement and synchronize `openspec-delivery` \u2026 for the selected pre-execution-review and continuous-goal policies.\"\n- **Impact:** Read literally, the design requires removing or hiding those references for projects that select neither policy. That would drop the mandatory pre-merge independent candidate review and the role-loop dispatch path, which are safety gates. If the implementer keeps them instead, the shipped docs contradict the design. Either way, task 4.2's \"preserve default single-group invocation authority\" check has no consistent expected result.\n- **Minimal correction:** At `design.md:163-164`, replace \"refers to it only when the project explicitly selects the pre-execution-review or continuous-goal policy\" with: \"additionally routes to its pre-execution review protocol or continuous-goal process execution only when the project explicitly selects the corresponding policy; existing candidate-review and selected role-loop references remain unchanged.\" Optionally, add \"existing candidate-review dependency\" to the items task 4.2 must preserve.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T170441.477947Z/review.json",
+      "report_sha256": "9a05be6c1a116b7cfc2777d669934db212d7ac34225edb99f66a7a8fd7e938fc",
+      "session_id": "83649da1-c866-4c3e-88bc-396ec7d2138d",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 12,
+          "outputTokens": 8150,
+          "cacheReadInputTokens": 291501,
+          "cacheCreationInputTokens": 59299,
+          "webSearchRequests": 0,
+          "costUSD": 0.6957401999999999,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 6575,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 59299,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T170441.477947Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "3bffe1520a7bcfbb836fad403d908448d869a734556350c8c715e13afcea662b",
+        "design.md": "0a8153fc3aa74b13e8737fbe62bcf02092f1e076946071ebc2429cb53d11d083",
+        "tasks.md": "460b2fa315c6e5a101723f6c0846ea16f875133490a75be46407bf8fffe1f440",
+        "specs/autonomous-role-orchestration/spec.md": "556316ae3d16a56639758af45e6ad76dbcafc20d7b9d7f5ea9b3b1ef1ee003dd",
+        "specs/openspec-integration/spec.md": "d937db7cef28f093d69b4699d7785aeab2cbb5f578620eab86fbea9a2cfa0f83"
+      }
+    },
+    {
+      "input_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "3bffe1520a7bcfbb836fad403d908448d869a734556350c8c715e13afcea662b",
+        "design.md": "0a8153fc3aa74b13e8737fbe62bcf02092f1e076946071ebc2429cb53d11d083",
+        "tasks.md": "460b2fa315c6e5a101723f6c0846ea16f875133490a75be46407bf8fffe1f440",
+        "specs/autonomous-role-orchestration/spec.md": "556316ae3d16a56639758af45e6ad76dbcafc20d7b9d7f5ea9b3b1ef1ee003dd",
+        "specs/openspec-integration/spec.md": "d937db7cef28f093d69b4699d7785aeab2cbb5f578620eab86fbea9a2cfa0f83"
+      },
+      "verdict": "**Medium: the `openspec-next` skill is missing from the implementation scope. `/openspec-next` is the command that starts continuous-goal continuation, and that skill still forces a stop after one group.** Affected lines: `proposal.md:94-96`, `tasks.md:52` and `specs/openspec-integration/spec.md:15-17`, `spec.md:28-37`.\n\n- **What the spec says:** When continuous-goal continuation is selected, `/openspec-next` must start it, and the orchestrator advances consecutive eligible groups.\n- **What the code does today:** `/openspec-next` is handled by its own skill. Step 7 of that skill says \"Stop after one task group, or a real approval/review/authority blocker\" (`skills/software-development/openspec-next/SKILL.md:71-72`). That skill also owns `/openspec-next inspect`.\n- **Where the scope stops:** The proposal's primary scope lists only `autonomous-implementation-review/`, `openspec-delivery/`, their references, README, SDLC/install docs, inventories and tests. Task 4.2's list of files to implement and synchronize covers the same ground: `openspec-delivery`, the workflow doc, README, root `AGENTS.md`, launch examples, inventory/bundle tests and delivery tests. Neither one names `skills/software-development/openspec-next/`.\n- **Trigger:** Under the selected policy, this repository or any adopting project sends a bare `/openspec-next` after this change is integrated.\n- **Impact:** If the implementer follows the declared scope, `openspec-next` still stops after one group. That breaks the *Selected continuous-goal policy* scenario and this repository's own selection of the policy. If the implementer edits the skill anyway, the work falls outside the declared primary scope and outside task 4.2's sync and test list. It would also need a skill version bump that no task covers. Either way, task 4.2's test of continuous-goal continuation and \"this repository's selection of both policies\" has no consistent expected result.\n- **Minimal correction:**\n  - Add `skills/software-development/openspec-next/` to the primary scope in `proposal.md:94-96`.\n  - Add `openspec-next` to task 4.2's list of files to implement and synchronize.\n  - Have task 4.2 verify two things:\n    - the one-group stop in step 7 applies only when continuous-goal continuation is not selected;\n    - `inspect` stays mutation-free under both settings.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T170631.587204Z/review.json",
+      "report_sha256": "a4dcf6bc1f683475fe1389b87ed62b639a7146f94f9828f09926b2e3c3404fdb",
+      "session_id": "76a571e0-30f5-4ca8-bc1b-bcd0c00f1d49",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 16,
+          "outputTokens": 12238,
+          "cacheReadInputTokens": 445153,
+          "cacheCreationInputTokens": 65818,
+          "webSearchRequests": 0,
+          "costUSD": 0.8603986000000001,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 10055,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 65818,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T170631.587204Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "d59cb06b84161d168ce6523b93d60abf6883f51389f79bc6d5a41905993ca3d7",
+        "design.md": "0a8153fc3aa74b13e8737fbe62bcf02092f1e076946071ebc2429cb53d11d083",
+        "tasks.md": "14e6e40b9e133d692be82575ff8920df14b1c272b2a4deb4e7538ff1b2204455",
+        "specs/autonomous-role-orchestration/spec.md": "556316ae3d16a56639758af45e6ad76dbcafc20d7b9d7f5ea9b3b1ef1ee003dd",
+        "specs/openspec-integration/spec.md": "d937db7cef28f093d69b4699d7785aeab2cbb5f578620eab86fbea9a2cfa0f83"
+      }
+    },
+    {
+      "input_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "d59cb06b84161d168ce6523b93d60abf6883f51389f79bc6d5a41905993ca3d7",
+        "design.md": "0a8153fc3aa74b13e8737fbe62bcf02092f1e076946071ebc2429cb53d11d083",
+        "tasks.md": "14e6e40b9e133d692be82575ff8920df14b1c272b2a4deb4e7538ff1b2204455",
+        "specs/autonomous-role-orchestration/spec.md": "556316ae3d16a56639758af45e6ad76dbcafc20d7b9d7f5ea9b3b1ef1ee003dd",
+        "specs/openspec-integration/spec.md": "d937db7cef28f093d69b4699d7785aeab2cbb5f578620eab86fbea9a2cfa0f83"
+      },
+      "verdict": "**Low: the orchestration spec requires a pre-execution approach review in every case, but the delivery spec makes that review depend on a policy.** Affected lines: `specs/autonomous-role-orchestration/spec.md:47-52`, which conflicts with `specs/openspec-integration/spec.md:11-14` and `:53-58`, `design.md:161-165` and `proposal.md:84-90`.\n\n- **What the text says:**\n  - *Independent pre-execution approach review* states with no condition: \"The orchestration package SHALL require a fresh read-only review of the complete planning artifacts before freezing a plan for execution.\"\n  - The delivery delta requires that review record only \"when the project selects the pre-execution-review policy\".\n  - Projects that do not select that policy keep their existing approval \"and [are] not blocked for lacking a pre-execution review record\".\n  - The design routes delivery to the review protocol \"only when the project explicitly selects the corresponding policy\". It also keeps the existing candidate-review and selected role-loop references to `autonomous-implementation-review` \"unchanged\", so the package still runs for projects that select neither policy.\n- **Trigger:** A project that selects neither policy, or a legacy-policy plan, uses the existing role loop or candidate review from `autonomous-implementation-review` after this change is integrated.\n- **Impact:** An implementer reading the orchestration requirement literally would make the package require an approach-review record before freeze or dispatch. That blocks projects that delivery says must not be blocked. If the implementer leaves this out, the requirement as written is not met. In both cases, task 2.4 (`tasks.md:28`) and task 4.2 (`tasks.md:52`: \"Preserve default single-group invocation authority \u2026 legacy-policy exemptions\") have no single expected result for a no-policy project.\n- **Minimal correction:** At `specs/autonomous-role-orchestration/spec.md:48-49`, make the requirement conditional. For example: \"When delivery's selected pre-execution-review policy invokes it, or for this change's bootstrap review, the orchestration package SHALL require a fresh read-only review \u2026\". Optionally, have task 2.4 verify that the protocol is not required when the policy is not selected.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T170921.644795Z/review.json",
+      "report_sha256": "02b32e189b9bbf7d44a5ab1437562f30c4d99aee917ede31c5f239d8fa1bc3ed",
+      "session_id": "04ab0e90-08e6-4609-b184-6fc0c887bb76",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 4,
+          "outputTokens": 5701,
+          "cacheReadInputTokens": 60127,
+          "cacheCreationInputTokens": 56655,
+          "webSearchRequests": 0,
+          "costUSD": 0.5793014000000001,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 4754,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 56655,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T170921.644795Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "d59cb06b84161d168ce6523b93d60abf6883f51389f79bc6d5a41905993ca3d7",
+        "design.md": "0a8153fc3aa74b13e8737fbe62bcf02092f1e076946071ebc2429cb53d11d083",
+        "tasks.md": "14e6e40b9e133d692be82575ff8920df14b1c272b2a4deb4e7538ff1b2204455",
+        "specs/autonomous-role-orchestration/spec.md": "3d408a0bcda13091a3cc3f00ec57aaab93a736a47ed3479aac70c330bfdf1793",
+        "specs/openspec-integration/spec.md": "d937db7cef28f093d69b4699d7785aeab2cbb5f578620eab86fbea9a2cfa0f83"
+      }
+    },
+    {
+      "input_hashes": {
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "d59cb06b84161d168ce6523b93d60abf6883f51389f79bc6d5a41905993ca3d7",
+        "design.md": "0a8153fc3aa74b13e8737fbe62bcf02092f1e076946071ebc2429cb53d11d083",
+        "tasks.md": "14e6e40b9e133d692be82575ff8920df14b1c272b2a4deb4e7538ff1b2204455",
+        "specs/autonomous-role-orchestration/spec.md": "3d408a0bcda13091a3cc3f00ec57aaab93a736a47ed3479aac70c330bfdf1793",
+        "specs/openspec-integration/spec.md": "d937db7cef28f093d69b4699d7785aeab2cbb5f578620eab86fbea9a2cfa0f83"
+      },
+      "verdict": "**Low: the reviewed \"complete planning hash set\" leaves out `openspec/config.yaml`, which the plan digest includes.** Affected lines: `design.md:58-60`, `design.md:214-216`, `proposal.md:64-65`, `specs/autonomous-role-orchestration/spec.md:50-51`, `specs/openspec-integration/spec.md:40-42` and `tasks.md:28`, `tasks.md:52`.\n\n- **What the plan says:** The complete planning hash set is `.openspec.yaml`, proposal, design, tasks and every delta spec (`design.md:58-60`, `:214-216`). The approach review binds that set. Freeze binds to a review entry that matches it. Under the selected policy, delivery stops unless a retained review record matches \"the complete planning hash set\".\n- **What the existing guard does:** The guard that computes the approved plan digest also hashes the committed `openspec/config.yaml` (`skills/software-development/openspec-delivery/scripts/change-guard.mjs:110-112`, documented at `references/guard.md:65`). So the plan digest the operator approves covers a file that no approach review ever saw or bound.\n- **Trigger:** `openspec/config.yaml` differs between review time and the plan commit. For example, it changes on the target branch, or the branch reset moves the worktree to a base whose config differs from the reviewed checkout. A second trigger is task 4.2, where delivery must check that a record matches \"the complete planning hash set\" and has two plausible definitions to choose from.\n- **Impact:**\n  - A no-blocking-findings record can satisfy the pre-execution-review stop while the frozen digest binds unreviewed planning input.\n  - The re-hash after review cannot detect drift in that file.\n  - Tasks 2.4 and 4.2 have no single expected input set for the complete-hash packet and the record-match check.\n- **Minimal correction:**\n  - Define the complete planning hash set once as exactly the delivery guard's planning-digest inputs: committed `openspec/config.yaml` plus the change's `.openspec.yaml`, proposal, optional design, tasks and every delta spec. Add this in the *Independent pre-execution approach review* requirement (`specs/autonomous-role-orchestration/spec.md:50`).\n  - Reference that definition at `design.md:58-60`, `design.md:214-216` and `proposal.md:64-65`.\n  - Have tasks 2.4 and 4.2 verify that the review packet and the delivery-side record match use the same input list as `change-guard.mjs` `planning()`.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T171039.209046Z/review.json",
+      "report_sha256": "3b7944b896bc89e9389f0f2efad31267b7d189737e797001846c3dd238b9d164",
+      "session_id": "ff3cf753-0109-4cef-acf4-1f8acb7a9fb2",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 18,
+          "outputTokens": 10006,
+          "cacheReadInputTokens": 537986,
+          "cacheCreationInputTokens": 70133,
+          "webSearchRequests": 0,
+          "costUSD": 0.8688532,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 7449,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 70133,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T171039.209046Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "ef534faa6eb35994cc4c0aaf17673d8640f09b217ea3df6155ca517e46cd1a31",
+        "design.md": "f1a00257f7ae233730341ef54d1db1108c9dc13ee9bdace02dba64e0550ce175",
+        "tasks.md": "0e48866843c39a39fe2e5094f00c9b86074d112034ed447bf77be3289f0cd5d8",
+        "specs/autonomous-role-orchestration/spec.md": "cbc78ed403e9996783d8dc41c2098111929db80619850074a3d9aacd7f02d802",
+        "specs/openspec-integration/spec.md": "d937db7cef28f093d69b4699d7785aeab2cbb5f578620eab86fbea9a2cfa0f83"
+      }
+    },
+    {
+      "input_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "ef534faa6eb35994cc4c0aaf17673d8640f09b217ea3df6155ca517e46cd1a31",
+        "design.md": "f1a00257f7ae233730341ef54d1db1108c9dc13ee9bdace02dba64e0550ce175",
+        "tasks.md": "0e48866843c39a39fe2e5094f00c9b86074d112034ed447bf77be3289f0cd5d8",
+        "specs/autonomous-role-orchestration/spec.md": "cbc78ed403e9996783d8dc41c2098111929db80619850074a3d9aacd7f02d802",
+        "specs/openspec-integration/spec.md": "d937db7cef28f093d69b4699d7785aeab2cbb5f578620eab86fbea9a2cfa0f83"
+      },
+      "verdict": "**Low: `specs/autonomous-role-orchestration/spec.md:126-127`. The *Qualification controls* sentence can be read as banning the prompt route it is meant to require.**\n- **What the text says:** \"its probe verifies enforceable prohibition of worker-created multiplexers, unqualified subagents, reviewer write escalation, and a non-argv prompt route\". All four items share the object of \"prohibition of\", so a literal reading makes the probe verify that a non-argv prompt route is prohibited.\n- **What it conflicts with:** That reading contradicts *Launch payload transport* (`spec.md:134-140`), which requires a stdin or prompt-file route. It also contradicts task 3.3a (`tasks.md:43`) and `design.md:138-150`.\n- **Trigger:** Someone writes the task 3.3 qualification probe or its acceptance test from this normative scenario.\n- **Impact:** For each candidate client, task 3.3 has two opposite expected results for the prompt-route check. A careful implementer will follow the intended meaning. Still, an acceptance check derived from this scenario could fail a client that supports stdin or prompt-file transport, or pass one that only accepts argv.\n- **Minimal correction:** Split the sentence into two verbs: \"its probe verifies enforceable prohibition of worker-created multiplexers, unqualified subagents, and reviewer write escalation, and verifies a supported non-argv prompt route\".",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T171356.786311Z/review.json",
+      "report_sha256": "650952cd470a8ab2531b9d1d85a05d2164e84cc72d76c716f61ae30dfadbd63b",
+      "session_id": "4d17eb64-93c0-41f0-ada6-1c1c04692a25",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 6,
+          "outputTokens": 8952,
+          "cacheReadInputTokens": 130486,
+          "cacheCreationInputTokens": 68374,
+          "webSearchRequests": 0,
+          "costUSD": 0.7521532000000001,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 7977,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 68374,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T171356.786311Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "ef534faa6eb35994cc4c0aaf17673d8640f09b217ea3df6155ca517e46cd1a31",
+        "design.md": "f1a00257f7ae233730341ef54d1db1108c9dc13ee9bdace02dba64e0550ce175",
+        "tasks.md": "0e48866843c39a39fe2e5094f00c9b86074d112034ed447bf77be3289f0cd5d8",
+        "specs/autonomous-role-orchestration/spec.md": "4961073b07422c16d7093e62b14c87ea20535167fad6998c3d0539d0da82f61c",
+        "specs/openspec-integration/spec.md": "d937db7cef28f093d69b4699d7785aeab2cbb5f578620eab86fbea9a2cfa0f83"
+      }
+    },
+    {
+      "input_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "ef534faa6eb35994cc4c0aaf17673d8640f09b217ea3df6155ca517e46cd1a31",
+        "design.md": "f1a00257f7ae233730341ef54d1db1108c9dc13ee9bdace02dba64e0550ce175",
+        "tasks.md": "0e48866843c39a39fe2e5094f00c9b86074d112034ed447bf77be3289f0cd5d8",
+        "specs/autonomous-role-orchestration/spec.md": "4961073b07422c16d7093e62b14c87ea20535167fad6998c3d0539d0da82f61c",
+        "specs/openspec-integration/spec.md": "d937db7cef28f093d69b4699d7785aeab2cbb5f578620eab86fbea9a2cfa0f83"
+      },
+      "verdict": "**Low \u2014 `specs/openspec-integration/spec.md:74-78`, carried into `tasks.md:55` and `design.md:55-56`. The contributor-contract stop doesn't say whether `AGENTS.md` and `CLAUDE.md` mean only the repository-root files or any file with that name.**\n- **What the text says:** The stop fires on \"a change to `AGENTS.md`, `CLAUDE.md`, or a contributor-contract file named by the project's integrated contributor contract.\" It never says whether that means the root file or a file of that name at any depth. Task 4.2 tests the trigger \"using `AGENTS.md`, `CLAUDE.md`, and contract paths named by the integrated contributor contract.\" The design's grant covers \"this plan's declared `AGENTS.md` implementation change\", singular.\n- **Repository context:**\n  - This repository has nested contracts that set rules: `skills/AGENTS.md`, `skills/autonomous-ai-agents/AGENTS.md`, `skills/software-development/AGENTS.md`, `scripts/AGENTS.md` and `.github/AGENTS.md`. For example, `skills/AGENTS.md:14-21` has its own \"Local Contracts\" section.\n  - The root `AGENTS.md:57-59` names only the first-level children. `skills/autonomous-ai-agents/AGENTS.md` and `skills/software-development/AGENTS.md` are named only through `skills/AGENTS.md:35-36`.\n  - Task 4.1 (`tasks.md:54`) routinely updates \"AGENTS indexes\".\n- **Trigger:** A plan declares, or its plan-commit diff includes, a change to a nested `AGENTS.md`, such as `skills/software-development/AGENTS.md`. This plan's own task 4.1 is an example.\n- **Impact:**\n  - **Task 4.2 has no single expected result.** Its trigger test could pass whether the implementation matches root only, any depth, or only paths the root contract names directly.\n  - **Root-only matching opens a bypass.** A plan could change a nested contributor contract without the separate pre-freeze grant.\n  - **The grant's scope is unclear for this change.** The design names one `AGENTS.md` change, but task 4.1 also edits nested index contracts, so it's unclear whether the grant covers them.\n- **Minimal correction:**\n  - At `spec.md:76`, say \"any `AGENTS.md` or `CLAUDE.md` at any path, or a contributor-contract file named directly or transitively by the integrated contributor contract\". Alternatively, state explicitly that only the root files count.\n  - Mirror that wording in task 4.2's trigger test (`tasks.md:55`).\n  - At `design.md:55-56`, say the contributor-contract grant covers every declared `AGENTS.md` change, including the nested index updates in task 4.1.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T171538.225920Z/review.json",
+      "report_sha256": "8008314bbbf5af25bf5c1525c5d3b5c3b755c52179acb5c8b472675999335e16",
+      "session_id": "dc8dd184-6aa6-47c1-b3f4-3e28dfd6284b",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 16,
+          "outputTokens": 8878,
+          "cacheReadInputTokens": 483091,
+          "cacheCreationInputTokens": 69802,
+          "webSearchRequests": 0,
+          "costUSD": 0.8326581999999998,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 6762,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 69802,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T171538.225920Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "ef534faa6eb35994cc4c0aaf17673d8640f09b217ea3df6155ca517e46cd1a31",
+        "design.md": "00614da0d4b919a37f4b1a56c7d76acc91453e3bd298a49a32e23ba466a9b1fe",
+        "tasks.md": "fcc6d6b3c81dc917bb9f8285a507879a202ccb6cbb6a94b1f469d1755c3ce71f",
+        "specs/autonomous-role-orchestration/spec.md": "4961073b07422c16d7093e62b14c87ea20535167fad6998c3d0539d0da82f61c",
+        "specs/openspec-integration/spec.md": "807317e35a879d5bf237c3013a3deb98bb6395e998ccf7df41d33d357c275fd2"
+      }
+    },
+    {
+      "input_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "ef534faa6eb35994cc4c0aaf17673d8640f09b217ea3df6155ca517e46cd1a31",
+        "design.md": "00614da0d4b919a37f4b1a56c7d76acc91453e3bd298a49a32e23ba466a9b1fe",
+        "tasks.md": "fcc6d6b3c81dc917bb9f8285a507879a202ccb6cbb6a94b1f469d1755c3ce71f",
+        "specs/autonomous-role-orchestration/spec.md": "4961073b07422c16d7093e62b14c87ea20535167fad6998c3d0539d0da82f61c",
+        "specs/openspec-integration/spec.md": "807317e35a879d5bf237c3013a3deb98bb6395e998ccf7df41d33d357c275fd2"
+      },
+      "verdict": "**Medium: the plan never says what happens to the existing Claude Code `code-tab-phase-roles` loop, and the new requirements would break it as written.** Affected lines: `specs/autonomous-role-orchestration/spec.md:117-133`, `spec.md:167-171`, `spec.md:206-211`, `design.md:14-16`, `tasks.md:42-46` and `tasks.md:54`.\n\n- **What ships today:** The package already has a non-Hermes host path. A Claude Code parent session acts as the orchestrator and sends work to project subagents `.claude/agents/phase-implementer.md` and `phase-reviewer.md`. This is documented in `skills/autonomous-ai-agents/autonomous-implementation-review/references/claude-code-roles.md:1-25` and `references/claude-code-host.md:1-33`. It is advertised in `README.md:343-345` and `docs/claude-installation.md`, and asserted by `tests/openspec-routing.test.mjs:89` and `:115`.\n- **What the new spec requires:**\n  - A non-Hermes adapter is supported only after a qualification probe passes. Otherwise dispatch stops and the adapter is not advertised (`spec.md:117-133`).\n  - Foreign clients run as processes the adapter launches in dedicated worktrees, with PID, session and scratch-root ownership (`spec.md:167-171`).\n  - A delegated child may act as a worker only if it meets the same qualification, identity-readback, owned-process stop and scratch-cleanup rules as a launched client. Otherwise it is ineligible (`spec.md:206-211`).\n- **Why the existing loop fails those rules:** Code-tab subagents run inside the parent session. They have no separate PID, no scratch root of their own and no dedicated worktree.\n- **What the plan leaves open:** `design.md:15` mentions this path only as current state. No task keeps it, qualifies it as Claude Code delegated children, moves it to the new adapter, or retires it. Task 3.3 qualifies \"Claude Code\" generically. Task 4.1 updates \"unsupported hosts are not advertised\" but names neither the code-tab references nor their tests.\n- **Trigger:** After this change is integrated, an operator sends `/openspec-delivery <name> code-tab-phase-roles`.\n- **Impact:** The implementer has two options, and both are wrong:\n  - Leave the loop as it is. It then breaks the new qualification and delegated-child requirements, and the docs and tests still advertise it.\n  - Remove or block it. That drops a shipped host path outside the declared scope, with no task, test update or version bump covering the removal.\n\n  Either way, tasks 3.4, 3.5 and 4.1 have no defined expected result for this path.\n- **Minimal correction:**\n  1. Add one scenario under *Qualified client adapters* or *Delegated child eligibility*: the existing Claude Code `code-tab-phase-roles` subagent loop is supported only if Claude Code qualification covers its subagents as eligible delegated children. Otherwise it is recorded as unsupported, its launch command is withdrawn, and dispatch stops.\n  2. Mirror that rule at `design.md:14-16`.\n  3. Extend task 3.4 or 3.5 to implement and test that outcome.\n  4. Extend task 4.1 to update `claude-code-host.md`, `claude-code-roles.md`, `README.md:343-345`, `docs/claude-installation.md` and `tests/openspec-routing.test.mjs` to match.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T171806.071110Z/review.json",
+      "report_sha256": "b1ad27e3cc0bad3a0a663af62d01c8fee94ae52982091e8aea345e8c69f6f00d",
+      "session_id": "5d15b6ef-08b5-49fd-8e3c-0113b09a834b",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 12,
+          "outputTokens": 5389,
+          "cacheReadInputTokens": 356335,
+          "cacheCreationInputTokens": 69354,
+          "webSearchRequests": 0,
+          "costUSD": 0.7339270000000002,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 3008,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 69354,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T171806.071110Z/post-review-hashes.json",
+      "disposition": "Operator selected standalone CLI replacement (option A); planning now explicitly retires code-tab-phase-roles and covers source documentation/tests migration without installed-file changes.",
+      "corrected_planning_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "277ae9d9d4e6ec88ccbb92d63e8a623b4d5ea177868fd75fd99e3bfd02047d54",
+        "design.md": "ed9a748ce1649d5fa6a10d8d76ca6b269533dc16fd0dd50010b375b9511164d4",
+        "tasks.md": "9878fdb51f2e71d697983eb3f5a995241f8e9aa33309868e7077b7b7933dae85",
+        "specs/autonomous-role-orchestration/spec.md": "85ce83852ca01c9e501e95aee55cf5b15ca33830e45d86df9f6df2ebe62067ab",
+        "specs/openspec-integration/spec.md": "c9b35e8bd006638be3f4a501fbd8f22dbdbfecbe3ac3a9785a4cad745fdccb5a"
+      },
+      "finding_dispositions": [
+        {
+          "finding": "Existing code-tab route compatibility",
+          "status": "operator-disposed-and-applied",
+          "authority": "operator_architecture_decisions",
+          "corrected_planning_hashes": {
+            "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+            ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+            "proposal.md": "1954da247cf20bdaf5e697f188f5296efd5f4bb08736319da68a80911270a887",
+            "design.md": "c065565b0cc48e2f55da269746725f771cb35f025a9a693c26ec72b23c41bb6f",
+            "tasks.md": "3e1b7de25d0fc73d9576f255fbc178ebb85d5796d911118f9d7a63214f6ef07c",
+            "specs/autonomous-role-orchestration/spec.md": "48b8395aadb165186e032ce35fa84f4c9ae0686d1cbb8899c9a8c93d0345f993",
+            "specs/openspec-integration/spec.md": "f19c03527a6d6f3c523a7b6daabbfa6d4a542c517dc8e47c356957c037f74d63"
+          }
+        }
+      ]
+    },
+    {
+      "input_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "277ae9d9d4e6ec88ccbb92d63e8a623b4d5ea177868fd75fd99e3bfd02047d54",
+        "design.md": "ed9a748ce1649d5fa6a10d8d76ca6b269533dc16fd0dd50010b375b9511164d4",
+        "tasks.md": "9878fdb51f2e71d697983eb3f5a995241f8e9aa33309868e7077b7b7933dae85",
+        "specs/autonomous-role-orchestration/spec.md": "85ce83852ca01c9e501e95aee55cf5b15ca33830e45d86df9f6df2ebe62067ab",
+        "specs/openspec-integration/spec.md": "c9b35e8bd006638be3f4a501fbd8f22dbdbfecbe3ac3a9785a4cad745fdccb5a"
+      },
+      "verdict": "**Medium: `tasks.md:16` (with `tasks.md:10-12`, `tasks.md:42-44`, `design.md:311-313`). Task 1.2 puts the profile-preparation work inside a Hermes adapter that has no contract yet and may never qualify.**\n- **What the text says:**\n  - Task 1.2 rebuilds the profile-preparation behavior \"only in the Hermes terminal adapter\" and removes its Herdr launch dependence.\n  - Group 1's acceptance evidence requires that this behavior \"verif[ies]\".\n  - The portable adapter contract is defined later, in task 2.3.\n  - The terminal-first and interaction-route qualification for Hermes comes later still, in task 3.3.\n  - Task 3.4 and Migration step 2 ship only the adapters that pass qualification. Absent or failed adapters \"remain unsupported\".\n- **Why the order breaks:** Delivery selects groups in native document order (`skills/software-development/openspec-delivery/references/continuation.md:42`). So group 1 has to build and accept Hermes adapter behavior before the adapter contract and the Hermes qualification exist.\n- **Trigger:** Hermes fails task 3.3. For example, it has no qualified same-session human-input route without Herdr, which the plan treats as unproven. Or task 2.3 defines an adapter shape that differs from what task 1.2 built.\n- **Impact:** Group 1 would already be checked off in `tasks.md` with behavior that lives in an unsupported or non-conforming adapter. No task reconciles the two outcomes, and group 1's accepted evidence would contradict the support claims in group 3 and task 4.1.\n- **Minimal correction:**\n  - Move the adapter part of 1.2 into group 3 after task 3.3, for example as a Hermes-specific item next to 3.4.\n  - Narrow group 1 to the reconstruction-boundary checks (1.1, 1.3).\n  - State that if Hermes is recorded unsupported, the profile-preparation behavior is also recorded unsupported and not shipped.\n\n**Low: `specs/openspec-integration/spec.md:84-91` and `tasks.md:55-57`. Execution has no defined way to recognise a contributor-contract grant that was already given.**\n- **What the text says:** The scenario stops delivery \"before freeze or execution pending explicit operator approval\" and calls that approval \"a separate pre-freeze authority grant\". It never says where the grant is recorded or what it binds to (planning digest, declared contract paths). It also doesn't say how a later `/openspec-next` confirms it before going ahead. Plan approval, by contrast, is recorded with its SHA/digest in retained evidence (`continuation.md:32`). `design.md:56-58` and `:70-79` don't add the grant to the freeze record either.\n- **Trigger:** Any plan that declares an `AGENTS.md` change, including this one through tasks 4.1 and 4.2. The trigger still matches the declared planning scope on every execution invocation after freeze.\n- **Impact:** There are two possible implementations, and neither is right. Delivery might ask again on every group, which breaks \"without repeated plumbing prompts\" and the continuous-goal continuation. Or it might go ahead on an unverified, unbound grant. Task 4.2 tests only that the trigger fires, so either implementation passes, and a grant from an earlier planning revision could carry over after a refreeze.\n- **Minimal correction:** Add one THEN/AND clause:\n  - The grant is retained with the freeze evidence and bound to the frozen planning digest and the declared contract paths.\n  - Execution proceeds only when a retained grant matches.\n  - A refreeze or changed contract paths need a new grant.\n  \n  Then have task 4.2 test three cases: a matching retained grant, a missing grant, and a grant for a different digest.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T222350.879232Z/review.json",
+      "report_sha256": "661461454cca8ae1e6e742fc918b685065ad73ecccf16123cbda9114777d941a",
+      "session_id": "60b370c8-2f99-4598-bbf5-a1119752e865",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 12,
+          "outputTokens": 10787,
+          "cacheReadInputTokens": 395165,
+          "cacheCreationInputTokens": 80483,
+          "webSearchRequests": 0,
+          "costUSD": 0.938685,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 8329,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 80483,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T222350.879232Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "277ae9d9d4e6ec88ccbb92d63e8a623b4d5ea177868fd75fd99e3bfd02047d54",
+        "design.md": "d51e09ccab23e41b867b825c269ddd50b68e6bd590dc82e4cc7f68fb5b43df04",
+        "tasks.md": "e2a21ee67616cda84df87704ac3abc01b21d4abecddd1fa63d524a3f2d59f01e",
+        "specs/autonomous-role-orchestration/spec.md": "85ce83852ca01c9e501e95aee55cf5b15ca33830e45d86df9f6df2ebe62067ab",
+        "specs/openspec-integration/spec.md": "806dee9fffe898f2894937ed9a58278588142c3c9e87d68d9bf9a92b9a761a2c"
+      }
+    },
+    {
+      "input_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "277ae9d9d4e6ec88ccbb92d63e8a623b4d5ea177868fd75fd99e3bfd02047d54",
+        "design.md": "d51e09ccab23e41b867b825c269ddd50b68e6bd590dc82e4cc7f68fb5b43df04",
+        "tasks.md": "e2a21ee67616cda84df87704ac3abc01b21d4abecddd1fa63d524a3f2d59f01e",
+        "specs/autonomous-role-orchestration/spec.md": "85ce83852ca01c9e501e95aee55cf5b15ca33830e45d86df9f6df2ebe62067ab",
+        "specs/openspec-integration/spec.md": "806dee9fffe898f2894937ed9a58278588142c3c9e87d68d9bf9a92b9a761a2c"
+      },
+      "verdict": "**Medium: the plan retires every existing role route unconditionally, but adding the replacement routes depends on qualification. Group 3 can then pass with zero supported adapters.** Affected lines: `tasks.md:37-38`, `tasks.md:44`, `design.md:118`, `design.md:145-147`, `design.md:199-200`, `design.md:318-321` and `specs/autonomous-role-orchestration/spec.md:205-210`.\n- **What the text says:**\n  - Herdr-only dispatch is \"replaced, not retained\" (`design.md:118`).\n  - Task 3.4 always retires `code-tab-phase-roles` and native-subagent role routing.\n  - New adapters ship only if they pass qualification (`design.md:318-321`, `tasks.md:44`).\n  - Group 3's acceptance evidence is met when every candidate has \"either a complete \u2026 qualification record or an unsupported record\" (`tasks.md:37`). Its stop condition treats each unqualified candidate as non-halting (`tasks.md:38`).\n  - Nothing covers the case where no candidate qualifies, or none can run a fresh read-only reviewer.\n- **Why this matters:** `openspec-delivery` still needs a reviewer verdict from `/autonomous-implementation-review` before merge, from someone other than the implementer. It says \"If the host cannot run a different reviewer, stop\" (`skills/software-development/openspec-delivery/SKILL.md:118-123`). The new spec allows no fallback dispatch (`spec.md:108-110`, `spec.md:132-135`).\n- **Trigger:** In task 3.3, every candidate fails. A plausible example: no client offers a non-argv route that also keeps a native human-input wait in the same session (`design.md:174-176`, `spec.md:319`).\n- **Impact:** A candidate can pass groups 3 and 4 while removing both working role paths (Herdr-hosted Hermes and Claude code-tab) with nothing in their place. Every adopting project's mandatory pre-merge review would then stop, and so would this change's own task 4.4 review. No operator decision is required anywhere before that regression ships.\n- **Minimal correction:**\n  - Add to group 3's stop condition at `tasks.md:38`: if qualification leaves no supported adapter that can run both an implementer and a fresh read-only reviewer, stop for operator disposition before the retirement in task 3.4 or candidate freeze.\n  - Mirror that in Migration step 2 (`design.md:318-321`).\n\n**Low: this change can never update `openspec/config.yaml`, which will contradict this repository's continuous-goal selection once integrated.** Affected lines: `openspec/config.yaml:12-14`, which conflicts with `tasks.md:54-55`, `design.md:69-76` and `design.md:206-208`.\n- **What the text says:**\n  - `config.yaml` tells agents the invocation scope is \"previewed commits for one approved group\".\n  - Task 4.2 updates root `AGENTS.md` so this repository selects continuous-goal continuation. That `AGENTS.md` line (currently `AGENTS.md:28`, \"one approved local task group\") will change.\n- **Why config.yaml cannot follow:**\n  - The plan commit's diff may contain only change-local files (`design.md:74-76`).\n  - `change-guard.mjs` `planning()` hashes `openspec/config.yaml` into the approved digest. It rejects any candidate where that file differs from the plan commit (`skills/software-development/openspec-delivery/scripts/change-guard.mjs:110`, `:146-148`).\n  - No task lists the file anyway.\n- **Trigger:** The first change frozen after this one is integrated runs `/openspec-next`.\n- **Impact:** The OpenSpec context injected into every later change says \"one approved group\", while `AGENTS.md` selects consecutive groups. Task 4.1 also blocks completion \"on stale affected guidance\", and `config.yaml` is in the operational-documentation test list (`tests/documentation.test.mjs:149`). That gives task 4.1 a stale item it cannot fix, so it has no consistent expected result.\n- **Minimal correction:**\n  - In task 4.2, or in the design's continuous-goal decision, state that `openspec/config.yaml` is a frozen planning-digest input this candidate cannot modify.\n  - Exempt its one-group summary from task 4.1's stale-guidance block.\n  - Name a separately planned follow-up change that aligns `config.yaml` with the integrated `AGENTS.md` selection.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T222635.424814Z/review.json",
+      "report_sha256": "51ea5ee2c7991467217defe2be6a30ebba57c1db3d2bab571dff3e018e927cd5",
+      "session_id": "ec7367b8-d735-4bd8-8dc0-813cdb51ac72",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 16,
+          "outputTokens": 11534,
+          "cacheReadInputTokens": 584849,
+          "cacheCreationInputTokens": 87394,
+          "webSearchRequests": 0,
+          "costUSD": 1.0468658,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 8536,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 87394,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T222635.424814Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "f222fa67d638acdc1397f7979e2ef8cd823963c23e49bf9c1b18219d8607ca63",
+        "design.md": "716032b2c20eff5d3b54a89788933e45d7234bda883bde35631fa670fd963248",
+        "tasks.md": "e2f24541eec2a5dc88f9dd381fb4eabd3e900b76ce8982162884ba1d2c1bf3b7",
+        "specs/autonomous-role-orchestration/spec.md": "c77c99ca416c3f142aa76f7b3ef5b855ca3c6b30a14560a772da2bf437a4b186",
+        "specs/openspec-integration/spec.md": "806dee9fffe898f2894937ed9a58278588142c3c9e87d68d9bf9a92b9a761a2c"
+      }
+    },
+    {
+      "input_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "f222fa67d638acdc1397f7979e2ef8cd823963c23e49bf9c1b18219d8607ca63",
+        "design.md": "716032b2c20eff5d3b54a89788933e45d7234bda883bde35631fa670fd963248",
+        "tasks.md": "e2f24541eec2a5dc88f9dd381fb4eabd3e900b76ce8982162884ba1d2c1bf3b7",
+        "specs/autonomous-role-orchestration/spec.md": "c77c99ca416c3f142aa76f7b3ef5b855ca3c6b30a14560a772da2bf437a4b186",
+        "specs/openspec-integration/spec.md": "806dee9fffe898f2894937ed9a58278588142c3c9e87d68d9bf9a92b9a761a2c"
+      },
+      "verdict": "**Low \u2014 the retired-route redirect points to the standalone Claude adapter even when that adapter isn't qualified.** Affected lines: `specs/autonomous-role-orchestration/spec.md:212-217`, `tasks.md:43-47`, `proposal.md:46-48`, `design.md:153-155`. These depend on the readiness gate at `spec.md:137-142`, `tasks.md:43-45` and `design.md:335-337`.\n\n- **What the text says:**\n  - *Retired Claude code-tab route* says a `code-tab-phase-roles` request stops and \"points to explicit standalone Claude adapter selection\".\n  - Task 3.4 always retires the route \"in favor of the standalone Claude adapter\".\n  - The readiness gate before retirement (`spec.md:139-140`, `tasks.md:43-45`, `design.md:335-337`) needs only *some* qualified adapter that can implement and run a fresh read-only review. It does not need Claude Code to qualify.\n- **Trigger:** In task 3.3, Claude Code fails qualification or is recorded unsupported, while another candidate such as Codex qualifies for both implementation and review.\n- **Impact:**\n  - Task 3.4 still retires code-tab and has to send operators to an adapter that *Missing or stale qualification* (`spec.md:132-135`) says must not be advertised, and whose dispatch stops.\n  - The retired-route migration docs required by *Configure and verify any supported client* (`spec.md:401`) would then advertise an unsupported host. Task 4.1 (`tasks.md:57`) must block completion on exactly that kind of claim.\n  - So in this case, tasks 3.4 and 4.1 have no consistent expected result. Either the candidate ships a migration path to an unsupported adapter, or group 4 can't complete.\n- **Minimal in-scope correction:**\n  - Make the redirect depend on Claude Code qualifying. In `spec.md:214-215`, change the THEN clause to: \"points to explicit standalone Claude adapter selection when that adapter is qualified; otherwise it records Claude Code unsupported and names only qualified adapters, without launching a fallback\".\n  - Mirror that condition in task 3.4 (`tasks.md:47`), `proposal.md:46-47` and `design.md:153-155`.\n  - Alternative: if the operator meant retirement to depend on Claude Code itself qualifying, add that to the gate at `tasks.md:43-45` and `design.md:335-337`. That is a client-topology change, so it needs an operator decision rather than an automatic correction.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T223054.462444Z/review.json",
+      "report_sha256": "8feb067a67e7e18bf092336b7e0be69e536d0ae0a1349194d43607d27f98760c",
+      "session_id": "4d41e9e6-ce68-4ef4-8829-84d39a4f521c",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 16,
+          "outputTokens": 13630,
+          "cacheReadInputTokens": 608623,
+          "cacheCreationInputTokens": 90699,
+          "webSearchRequests": 0,
+          "costUSD": 1.1199805999999999,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 11419,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 90699,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T223054.462444Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "2bfbbfd27341a4885de672d35a60256526a76648c4ade871e1713f8d2f732420",
+        "design.md": "4bb798edfcbef73b5303392bbee5640724cb0fefd36ee279ad4e468ed52b0ab4",
+        "tasks.md": "8605dde4feac5bdb1df2f130b473f8d4b45ea7a469915478ac5731239fcb42e6",
+        "specs/autonomous-role-orchestration/spec.md": "6e299a0a92afc4e4b9339ab9a929b2401a393ab9104991442a4216b25f50d7b8",
+        "specs/openspec-integration/spec.md": "806dee9fffe898f2894937ed9a58278588142c3c9e87d68d9bf9a92b9a761a2c"
+      }
+    },
+    {
+      "input_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "2bfbbfd27341a4885de672d35a60256526a76648c4ade871e1713f8d2f732420",
+        "design.md": "4bb798edfcbef73b5303392bbee5640724cb0fefd36ee279ad4e468ed52b0ab4",
+        "tasks.md": "8605dde4feac5bdb1df2f130b473f8d4b45ea7a469915478ac5731239fcb42e6",
+        "specs/autonomous-role-orchestration/spec.md": "6e299a0a92afc4e4b9339ab9a929b2401a393ab9104991442a4216b25f50d7b8",
+        "specs/openspec-integration/spec.md": "806dee9fffe898f2894937ed9a58278588142c3c9e87d68d9bf9a92b9a761a2c"
+      },
+      "verdict": "**Medium: the new contributor-contract guard has no defined rule for which files count as contributor contracts, so it could either stop almost every plan or be implemented arbitrarily.** Affected lines: `specs/openspec-integration/spec.md:85-88`, `tasks.md:58-60` and `design.md:56-58`, `design.md:87-88`.\n\n- **What the text says:** Besides any `AGENTS.md` or `CLAUDE.md`, the stop fires on \"a contributor-contract file named directly or transitively by the project's integrated contributor contract\". Task 4.2 must test that clause. The grant must record \"all declared contract paths\".\n- **Why it is undefined:**\n  - No delivery source defines how a contract designates a contributor-contract file. `openspec-delivery/SKILL.md:27`, `:172` and `openspec-next/SKILL.md:30` only say to \"read the contributor contract\".\n  - Read literally, \"named\" covers every path the contract mentions. Root `AGENTS.md:12` names README, the package manifest, `docs/claude-installation.md`, `docs/openspec-installation.md`, `docs/openspec-workflow.md` and `openspec/`. `AGENTS.md:27` names `references/naming.md`. Following those names transitively through the child indexes (`AGENTS.md:57-59`, `skills/AGENTS.md:35-36`) reaches almost the whole repository.\n- **Trigger:**\n  - Any plan in an adopting project that declares a change to a README or SDLC document.\n  - This plan's own tasks 4.1 and 4.2, which edit README and `docs/openspec-workflow.md`.\n- **Impact:** The guard applies to every adopting project, whatever policy it selects. So:\n  - **Broad reading:** almost every plan needs a separate pre-freeze grant. That contradicts the requirement's \"without repeated plumbing prompts\".\n  - **Narrow reading:** implementers pick an undocumented subset.\n  - **Testing:** the trigger tests in task 4.2 have no single expected result.\n  - **This change's grant:** the planned grant covers \"every declared `AGENTS.md` change\". Whether it must also list `docs/openspec-workflow.md` is undetermined.\n- **Minimal correction:**\n  - At `spec.md:86-87`, replace \"named directly or transitively by\" with \"that the integrated contributor contract explicitly designates as a contributor contract (directly, or through a designated contract's child-contract index)\". This keeps any `AGENTS.md`/`CLAUDE.md` at any path as the fixed trigger.\n  - Mirror that wording in task 4.2's trigger tests (`tasks.md:59-60`).\n  - Have task 4.2 test one negative case: an ordinary file the contract merely mentions, such as README, does not trigger the stop.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T223347.334609Z/review.json",
+      "report_sha256": "1aba9a1587b52ef0e9c41e45c511f8ffdb0dbbafe7c22da3e12d169e50c29baa",
+      "session_id": "7c040a8d-19a0-47a2-a288-c4cb96018309",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 24,
+          "outputTokens": 12757,
+          "cacheReadInputTokens": 1013448,
+          "cacheCreationInputTokens": 98534,
+          "webSearchRequests": 0,
+          "costUSD": 1.2461976,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 9733,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 98534,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T223347.334609Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "2bfbbfd27341a4885de672d35a60256526a76648c4ade871e1713f8d2f732420",
+        "design.md": "5ab2665b87c2a8cced2390a6bda612a9a57e6f68346a3cbc2071652bccfb5270",
+        "tasks.md": "0d44b79bcfbba1ff7dceb1e7a86c05182e3bde194bcbc8b33ae54a58f189fcad",
+        "specs/autonomous-role-orchestration/spec.md": "6e299a0a92afc4e4b9339ab9a929b2401a393ab9104991442a4216b25f50d7b8",
+        "specs/openspec-integration/spec.md": "54a490471bc4faf46b1941c3026e147d829d6d46af7749d4e144ce8f7bcfbe5a"
+      }
+    },
+    {
+      "input_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "2bfbbfd27341a4885de672d35a60256526a76648c4ade871e1713f8d2f732420",
+        "design.md": "5ab2665b87c2a8cced2390a6bda612a9a57e6f68346a3cbc2071652bccfb5270",
+        "tasks.md": "0d44b79bcfbba1ff7dceb1e7a86c05182e3bde194bcbc8b33ae54a58f189fcad",
+        "specs/autonomous-role-orchestration/spec.md": "6e299a0a92afc4e4b9339ab9a929b2401a393ab9104991442a4216b25f50d7b8",
+        "specs/openspec-integration/spec.md": "54a490471bc4faf46b1941c3026e147d829d6d46af7749d4e144ce8f7bcfbe5a"
+      },
+      "verdict": "**Medium: the existing Herdr pane-dispatch route is retired in the design, but no task, scenario or test actually retires or migrates it.**\n\nAffected lines:\n- `tasks.md:47`\n- `tasks.md:57`\n- `specs/autonomous-role-orchestration/spec.md:212-219`\n\nThese conflict with:\n- `design.md:127`\n- `design.md:152`\n- `design.md:209-211`\n- `proposal.md:42-45`\n\n- **What the plan says:** Existing Herdr-only dispatch \"is replaced, not retained as a launch dependency\" (`design.md:127`). Herdr-only launch \"is replaced by the selected terminal adapter\" (`design.md:211`). `HERDR_ENV` \"does not select or force a role transport\" (`design.md:152`).\n- **What the tasks cover:** Task 3.4 retires only `code-tab-phase-roles` and native-subagent role routing, and only those invocations are tested to \"stop without an implicit fallback\". Task 4.1 names only `claude-code-host.md`, `claude-code-roles.md` and `tests/openspec-routing.test.mjs` for retirement.\n- **What the spec covers:** It has a *Retired Claude code-tab route* scenario, but nothing equivalent for the Herdr pane route.\n- **What ships today:** The current route conflicts with the new requirements in four places:\n  - `skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md:38-45` makes the loop Herdr-only, gated by `$HERDR_ENV=1`.\n  - `references/herdr.md:12-54` dispatches to an existing pane the operator selected and claimed. The adapter does not launch that pane.\n  - `references/herdr.md:66` and `:81` deliver the packet as an argv element with `herdr agent prompt <pane-id> \"<text>\"`, and reset the same pane with `/new --yes`.\n  - `references/herdr.md:100-105` stops a worker by injecting `/stop`.\n- **Requirements it breaks:**\n  - *Launch payload transport* (`spec.md:144-150`) forbids argv packets.\n  - *Worker process ownership* (`spec.md:176-203`) requires an adapter-owned launch and forbids injecting a second packet on stop.\n  - *Standalone role execution* (`spec.md:21-24`) requires a separate native session/process.\n  - `tests/skills.test.mjs:78` still asserts the argv/`/new --yes` delivery.\n- **Trigger:** After this change is implemented, an operator runs the role loop with `HERDR_ENV=1` and an operator-selected Hermes pane.\n- **Impact:** The implementer has two choices, and both are wrong:\n  - Leave the route in place. A shipped dispatch path then violates the new transport and ownership requirements, and the docs still call the loop \"Herdr-only\".\n  - Remove it. That deletes a shipped route with no task, no retired-route result, no test update, and no replacement-readiness gate. The gate at `tasks.md:43-45` is tied to the retirements listed in 3.4, and this route isn't one of them.\n\n  Either way, tasks 3.4 and 4.1 have no defined expected result for this route, and the \"stale affected guidance\" block in 4.1 can't be checked consistently.\n- **Minimal in-scope correction:**\n  1. Extend *Retired Claude code-tab route* (`spec.md:212-219`), or add a sibling *Retired Herdr pane dispatch* scenario. Requesting operator-selected Herdr pane dispatch stops with a retired-route result and points only to qualified terminal adapters. `HERDR_ENV` selects no transport. Herdr stays available only as a qualified interaction route.\n  2. In task 3.4 (`tasks.md:47`), add retirement of operator-selected Herdr pane dispatch, after the replacement-readiness gate, with a test that it stops without fallback.\n  3. In task 4.1 (`tasks.md:57`), name `SKILL.md`'s Herdr-only precondition, `references/herdr.md`, `README.md:343` and `tests/skills.test.mjs` for migration.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T223642.111780Z/review.json",
+      "report_sha256": "4ef974f74212fb972ab19426ed5d07ab3282d3487ba25ca250a68724bb8efdf7",
+      "session_id": "ea2f9bb7-7e7a-4c36-8646-cf4fffd569e0",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 10,
+          "outputTokens": 13126,
+          "cacheReadInputTokens": 374024,
+          "cacheCreationInputTokens": 99418,
+          "webSearchRequests": 0,
+          "costUSD": 1.1327088,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 10468,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 99418,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T223642.111780Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "2bfbbfd27341a4885de672d35a60256526a76648c4ade871e1713f8d2f732420",
+        "design.md": "5ab2665b87c2a8cced2390a6bda612a9a57e6f68346a3cbc2071652bccfb5270",
+        "tasks.md": "c0175711381dd200cf449ff3b1f2fd0ff9784d8d97a914525bc00eec35efcad2",
+        "specs/autonomous-role-orchestration/spec.md": "05e9b6731e35d4c1b1c391e1331e17a886d766314f415634de7841ad7b4af9e0",
+        "specs/openspec-integration/spec.md": "54a490471bc4faf46b1941c3026e147d829d6d46af7749d4e144ce8f7bcfbe5a"
+      }
+    },
+    {
+      "input_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "2bfbbfd27341a4885de672d35a60256526a76648c4ade871e1713f8d2f732420",
+        "design.md": "5ab2665b87c2a8cced2390a6bda612a9a57e6f68346a3cbc2071652bccfb5270",
+        "tasks.md": "c0175711381dd200cf449ff3b1f2fd0ff9784d8d97a914525bc00eec35efcad2",
+        "specs/autonomous-role-orchestration/spec.md": "05e9b6731e35d4c1b1c391e1331e17a886d766314f415634de7841ad7b4af9e0",
+        "specs/openspec-integration/spec.md": "54a490471bc4faf46b1941c3026e147d829d6d46af7749d4e144ce8f7bcfbe5a"
+      },
+      "verdict": "No findings",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T223940.396190Z/review.json",
+      "report_sha256": "5a1f06ce262bc38be5946c9a62867f7efb0722ff9409c17059acd84a276a1d4e",
+      "session_id": "8cb063f4-76ca-49c6-a3f6-2d89f27270b2",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 12,
+          "outputTokens": 10025,
+          "cacheReadInputTokens": 498363,
+          "cacheCreationInputTokens": 105238,
+          "webSearchRequests": 0,
+          "costUSD": 1.1421246,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 8927,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 105238,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261114T223940.396190Z/post-review-hashes.json"
+    },
+    {
+      "input_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "2bfbbfd27341a4885de672d35a60256526a76648c4ade871e1713f8d2f732420",
+        "design.md": "5ab2665b87c2a8cced2390a6bda612a9a57e6f68346a3cbc2071652bccfb5270",
+        "tasks.md": "d44cd3efa2f87b994bec115fecb6be46b5e26a62093736d2e2c45c02ae66a432",
+        "specs/autonomous-role-orchestration/spec.md": "05e9b6731e35d4c1b1c391e1331e17a886d766314f415634de7841ad7b4af9e0",
+        "specs/openspec-integration/spec.md": "54a490471bc4faf46b1941c3026e147d829d6d46af7749d4e144ce8f7bcfbe5a"
+      },
+      "verdict": "**Medium: the plan never lists which contributor-contract files it will change, so the required pre-freeze grant has no defined path set to bind to.** Affected lines: `tasks.md:43`, `design.md:57-59`, `design.md:88-93`, `design.md:217`, with the rule at `specs/openspec-integration/spec.md:84-96`.\n\n- **What the plan requires:**\n  - The contributor-contract grant must \"cover every declared contract change \u2026 including nested `AGENTS.md` index updates in task 4.1\" (`design.md:57-59`).\n  - The grant must record \"all declared contract paths\" before freeze (`design.md:88-89`). Changed contract paths invalidate it (`design.md:93`, `spec.md:96`).\n  - Before freeze, only the planning artifacts can trigger this guard. The plan-commit diff contains only the config file and change-local files (`design.md:79-85`).\n- **What the compressed tasks file says:**\n  - Task 4.1 (`tasks.md:43`) no longer mentions `AGENTS.md` or index updates, so the reference at `design.md:59` points at nothing.\n  - No planning artifact names the contract files the implementation must change:\n    - Root `AGENTS.md:28` must change to select both policies (`design.md:217`). It currently says \"one approved local task group\".\n    - `skills/autonomous-ai-agents/AGENTS.md:31` and `:33` must change too. They require the \"Herdr-only\" role loop with `code-tab-phase-roles` as \"the only non-Herdr path\", and this change retires both routes. That file's ownership index (`:10-23`) also lists Herdr and code-tab references that the migration replaces.\n    - `skills/AGENTS.md` and `skills/software-development/AGENTS.md` may need index updates.\n- **Trigger:** The operator is asked for the pre-freeze contributor-contract grant, or task 4.1 reaches its \"all affected guidance is current\" check.\n- **Impact:** The grant's path set cannot be derived from the plan, so the operator would approve an unbounded contract change. During execution, any nested `AGENTS.md` edit has two bad outcomes:\n  - Treated as a changed contract path, it forces a stop, a new grant and a refreeze.\n  - Left out, it leaves a stale nested contract that requires Herdr-only dispatch, which contradicts the retired routes. Task 4.1 must then block on it.\n\n  Either way, task 4.1 and the grant binding have no consistent expected result.\n- **Minimal correction:**\n  1. In task 4.1, or in the contributor-contract paragraph at `design.md:56-59`, list the declared contract paths:\n     - root `AGENTS.md`, for the policy selection that applies only to changes frozen after this change is integrated;\n     - `skills/autonomous-ai-agents/AGENTS.md`, for the role-loop contracts and ownership index;\n     - any other `AGENTS.md` index that will change, such as `skills/AGENTS.md` or `skills/software-development/AGENTS.md`.\n  2. Change the \"in task 4.1\" reference at `design.md:59` to point to that list.\n  3. Add to task 4.1's acceptance that the changed contract paths match the paths the grant declared.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261115T063135.206285Z/review.json",
+      "report_sha256": "0305d97994d49b7a8f32c0d35eee824542018bc10d6ad4eb677b1880b42423b3",
+      "session_id": "9153e032-f1a0-46b9-8209-af81b33647e0",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 10,
+          "outputTokens": 8656,
+          "cacheReadInputTokens": 372664,
+          "cacheCreationInputTokens": 99930,
+          "webSearchRequests": 0,
+          "costUSD": 1.0471328,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 6444,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 99930,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261115T063135.206285Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "2bfbbfd27341a4885de672d35a60256526a76648c4ade871e1713f8d2f732420",
+        "design.md": "89159df6e58feca5bc2cc6b020cbe40c3a5afba5ea24f82937e9c5281e0774da",
+        "tasks.md": "04bc6bc05458e8b3ef54976604044c44a0ebba8ee534a12e4021eba41ebf2beb",
+        "specs/autonomous-role-orchestration/spec.md": "05e9b6731e35d4c1b1c391e1331e17a886d766314f415634de7841ad7b4af9e0",
+        "specs/openspec-integration/spec.md": "54a490471bc4faf46b1941c3026e147d829d6d46af7749d4e144ce8f7bcfbe5a"
+      }
+    },
+    {
+      "input_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "2bfbbfd27341a4885de672d35a60256526a76648c4ade871e1713f8d2f732420",
+        "design.md": "89159df6e58feca5bc2cc6b020cbe40c3a5afba5ea24f82937e9c5281e0774da",
+        "tasks.md": "04bc6bc05458e8b3ef54976604044c44a0ebba8ee534a12e4021eba41ebf2beb",
+        "specs/autonomous-role-orchestration/spec.md": "05e9b6731e35d4c1b1c391e1331e17a886d766314f415634de7841ad7b4af9e0",
+        "specs/openspec-integration/spec.md": "54a490471bc4faf46b1941c3026e147d829d6d46af7749d4e144ce8f7bcfbe5a"
+      },
+      "verdict": "No findings",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261115T063351.004141Z/review.json",
+      "report_sha256": "58061796fa5fe4a6df4af08dcdd021c82a234572d87de320bbc4cdb9a282a92f",
+      "session_id": "4024eeab-ab43-4c09-879d-5e9c10b0a1c7",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 16,
+          "outputTokens": 15235,
+          "cacheReadInputTokens": 678750,
+          "cacheCreationInputTokens": 101931,
+          "webSearchRequests": 0,
+          "costUSD": 1.255962,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 13489,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 101931,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261115T063351.004141Z/post-review-hashes.json"
+    },
+    {
+      "input_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "e80a75935196cf810057d70b2cd05df8e15e33aa35b26c317e71982fad4e3608",
+        "design.md": "7843765cd7428a8e92c3862e163718f70a56100471b175073f1f79759546e207",
+        "tasks.md": "4808db000949cb7ac8d7943a787582e2a4229869b36c492c3bbebe260935f3eb",
+        "specs/autonomous-role-orchestration/spec.md": "05e9b6731e35d4c1b1c391e1331e17a886d766314f415634de7841ad7b4af9e0",
+        "specs/openspec-integration/spec.md": "44815e5a8ea18ed44d171ceaf9ac32f39922188039176c34336d800a149619f2"
+      },
+      "verdict": "**Low: `specs/openspec-integration/spec.md:114` and `specs/openspec-integration/spec.md:141` disagree on who must follow *Minimum outcome task authoring*.**\n- **What the text says:**\n  - The requirement body applies to \"Projects adopting this workflow\". Every project that adopts the workflow SHALL author the fewest tasks.\n  - The *Reusable authoring instructions* scenario says the rule takes effect only \"when a project explicitly adopts this task-authoring policy\". It also says installation is not adoption.\n  - The proposal's *Modified Capabilities* summary for `openspec-integration` (`proposal.md:103-109`) doesn't mention this new requirement at all.\n- **Trigger:** A project adopted the OpenSpec workflow or invocation contract before this change, and has not opted into the new task-authoring rule. It then generates or reviews a plan after this change is integrated.\n- **Impact:**\n  - Task 2.1 (`tasks.md:26-29`) must test \"minimum-outcome task generation/review\", but has no single expected result for that project. The rule is either a default for all adopters or an explicit opt-in.\n  - Under a selected pre-execution-review policy, a planning reviewer could raise split findings that block freeze, even though the project never chose this policy. That puts a new obligation on existing adopters without saying so.\n- **Minimal correction:**\n  - Pick one scope and use it in both places. For example, change line 114 to \"Projects that explicitly adopt this task-authoring policy SHALL\u2026\" so it matches line 141. Or change line 141 to match the body, and state that adopting the workflow includes the rule.\n  - Add one clause about this requirement to `proposal.md:103-109`.\n\n**Low: the declared contributor-contract changes (`design.md:61-68`) leave out the task-authoring guidance that `design.md:122` and `specs/openspec-integration/spec.md:142-143` require in contributor guidance.**\n- **What the text says:**\n  - The design requires that \"Project `rules.tasks`, SDLC, and contributor guidance\" carry *Minimum outcome task authoring* into future task generation.\n  - In this repository, contributor guidance means the `AGENTS.md` contracts: root `AGENTS.md:16` and `:26-28`, and `skills/software-development/AGENTS.md:18-27`.\n  - The declared contract changes describe other work. Root `AGENTS.md` is to \"select both policies\". `skills/software-development/AGENTS.md` is to align \"delivery/next policy, review, grant, and continuation responsibilities\". Neither entry mentions adopting the task-authoring rule or owning task-authoring review.\n  - The spec grants approval per declared contract change (`spec.md:89-91`). Task 4.1 (`tasks.md:50-51`) checks only that the paths match.\n- **Trigger:** The operator is asked for the pre-freeze contributor-contract grant. Later, during task 4.1, the implementer adds the task-authoring adoption to a contract file.\n- **Impact:**\n  - The operator would approve a contract change that is described only as policy selection and alignment. A third adopted policy would then go in without being declared, and the path-only check in task 4.1 cannot catch it.\n  - If the implementer leaves the guidance out instead, the \"contributor guidance carries the rule\" check and task 4.1's \"all affected guidance is current\" check fail.\n- **Minimal correction:**\n  - In `design.md:61` (root `AGENTS.md`), or in the `skills/software-development/AGENTS.md` entry at `design.md:66-67`, add: \"adopt and assign ownership of *Minimum outcome task authoring* for generation and planning review.\"\n  - Have task 4.1 check that each contract edit matches its declared purpose, not only its path.\n\n**Low: `tasks.md:12-14` says this change applies *Minimum outcome task authoring*, but groups 1-3 (`tasks.md:16-43`) don't give the reason for each split that `specs/openspec-integration/spec.md:133-134` requires.**\n- **What the text says:**\n  - *Necessary outcome boundary* requires that the author \"states the material reason for the split\".\n  - `tasks.md` gives a reason only for the final checkpoint: it checks cross-outcome consistency (`tasks.md:13-14`).\n  - Groups 1 to 3 give no reason for being separate tasks. Group 1 is a reconstruction authority/identity gate. Group 2 is the core contract. Group 3 depends on that contract and can stop on its own at qualification.\n- **Trigger:** Planning review, including the post-config-edit re-review, or task 2.1's \"representative plans\" check applies the rule to this plan.\n- **Impact:** The change's own plan doesn't meet the authoring rule it says it applies. That weakens the plan as a representative example for the task 2.1 tests, and a reviewer can't tell whether the split is necessary or just fragmentation.\n- **Minimal correction:** Add one clause per group giving the reason for its boundary:\n  - group 1: an authority/identity gate before any source change;\n  - group 2: the core contract that adapters depend on;\n  - group 3: qualification-dependent work with its own replacement-readiness stop;\n  - group 4: the cross-outcome integration checkpoint.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261115T064115.593990Z/review.json",
+      "report_sha256": "39aae74255b4a5680b62ed704f17caa2f7d6943d163c41f309737f902837463e",
+      "session_id": "cc676a38-a24a-481f-8938-44f1dffe4687",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 16,
+          "outputTokens": 16515,
+          "cacheReadInputTokens": 735179,
+          "cacheCreationInputTokens": 112929,
+          "webSearchRequests": 0,
+          "costUSD": 1.3808317999999997,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 13053,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 112929,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261115T064115.593990Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "1954da247cf20bdaf5e697f188f5296efd5f4bb08736319da68a80911270a887",
+        "design.md": "c065565b0cc48e2f55da269746725f771cb35f025a9a693c26ec72b23c41bb6f",
+        "tasks.md": "3e1b7de25d0fc73d9576f255fbc178ebb85d5796d911118f9d7a63214f6ef07c",
+        "specs/autonomous-role-orchestration/spec.md": "05e9b6731e35d4c1b1c391e1331e17a886d766314f415634de7841ad7b4af9e0",
+        "specs/openspec-integration/spec.md": "f19c03527a6d6f3c523a7b6daabbfa6d4a542c517dc8e47c356957c037f74d63"
+      }
+    },
+    {
+      "input_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "1954da247cf20bdaf5e697f188f5296efd5f4bb08736319da68a80911270a887",
+        "design.md": "c065565b0cc48e2f55da269746725f771cb35f025a9a693c26ec72b23c41bb6f",
+        "tasks.md": "3e1b7de25d0fc73d9576f255fbc178ebb85d5796d911118f9d7a63214f6ef07c",
+        "specs/autonomous-role-orchestration/spec.md": "05e9b6731e35d4c1b1c391e1331e17a886d766314f415634de7841ad7b4af9e0",
+        "specs/openspec-integration/spec.md": "f19c03527a6d6f3c523a7b6daabbfa6d4a542c517dc8e47c356957c037f74d63"
+      },
+      "verdict": "**Low: `specs/autonomous-role-orchestration/spec.md:126-127` uses a term the plan never defines, \"unqualified subagents\".**\n- **What the text says:** Under *Qualification controls*, the probe must verify \"enforceable prohibition of worker-created multiplexers, unqualified subagents, and reviewer write escalation\". The word \"unqualified\" implies some subagents can be qualified and allowed.\n- **Where it conflicts:**\n  - No requirement in the package defines a qualified subagent or how one would be qualified. The earlier delegated-child eligibility concept was dropped when the operator chose to retire `code-tab-phase-roles`.\n  - The rest of the package bans subagents outright:\n    - `spec.md:24`, `spec.md:180`, `design.md:180-181` and `proposal.md:49` say no native subagent executes a role.\n    - `spec.md:205-206` stops an implementer that delegates its role to a subagent.\n    - `spec.md:229-233` invalidates a reviewer that creates any subagent.\n- **Trigger:** Task 3.1 writes a client's qualification probe and its acceptance test from this scenario.\n- **Impact:** The probe has no clear expected result:\n  - It might require blocking all subagents.\n  - It might let an implementer spawn helper subagents, since `spec.md:205` only forbids role delegation.\n  - It might accept some \"qualified\" subagent class that no requirement defines.\n\n  If a client is qualified under the loose reading, its reviewer can still create subagents, and only the runtime invalidation at `spec.md:229-233` catches it. The prohibition the probe is supposed to enforce before dispatch is never established.\n- **Minimal correction:** At `spec.md:127`, replace \"unqualified subagents\" with \"role delegation to subagents by implementers, any subagent creation by read-only reviewers\". This makes the qualification control match `spec.md:205-206` and `spec.md:229-231`.",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261115T064528.046614Z/review.json",
+      "report_sha256": "9c8ef2aa1b9ca20fc53548d2bacc39d024e34dc0d982e70c0e32d33ef4df32bd",
+      "session_id": "29a431ca-8063-4062-872a-5fc273b24da9",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 12,
+          "outputTokens": 13600,
+          "cacheReadInputTokens": 512155,
+          "cacheCreationInputTokens": 107042,
+          "webSearchRequests": 0,
+          "costUSD": 1.2308150000000002,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 11649,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 107042,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261115T064528.046614Z/post-review-hashes.json",
+      "disposition": "Applied in subsequent planning revision; retained report remains historical, not an acceptance verdict.",
+      "corrected_planning_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "1954da247cf20bdaf5e697f188f5296efd5f4bb08736319da68a80911270a887",
+        "design.md": "c065565b0cc48e2f55da269746725f771cb35f025a9a693c26ec72b23c41bb6f",
+        "tasks.md": "3e1b7de25d0fc73d9576f255fbc178ebb85d5796d911118f9d7a63214f6ef07c",
+        "specs/autonomous-role-orchestration/spec.md": "48b8395aadb165186e032ce35fa84f4c9ae0686d1cbb8899c9a8c93d0345f993",
+        "specs/openspec-integration/spec.md": "f19c03527a6d6f3c523a7b6daabbfa6d4a542c517dc8e47c356957c037f74d63"
+      }
+    },
+    {
+      "input_hashes": {
+        "openspec/config.yaml": "7495097e30175af913a776d0b6c85e039fe0a68cf291c90da5664919a94ff6f7",
+        ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "proposal.md": "1954da247cf20bdaf5e697f188f5296efd5f4bb08736319da68a80911270a887",
+        "design.md": "c065565b0cc48e2f55da269746725f771cb35f025a9a693c26ec72b23c41bb6f",
+        "tasks.md": "3e1b7de25d0fc73d9576f255fbc178ebb85d5796d911118f9d7a63214f6ef07c",
+        "specs/autonomous-role-orchestration/spec.md": "48b8395aadb165186e032ce35fa84f4c9ae0686d1cbb8899c9a8c93d0345f993",
+        "specs/openspec-integration/spec.md": "f19c03527a6d6f3c523a7b6daabbfa6d4a542c517dc8e47c356957c037f74d63"
+      },
+      "verdict": "No findings",
+      "report_reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261115T064810.796287Z/review.json",
+      "report_sha256": "9c8624ce53bfac6e28138f791f72f81e4db458caa7d0fc1514cbf23e97ba108e",
+      "session_id": "c5f75814-789f-44d4-9f14-d78050dd3239",
+      "model_usage": {
+        "claude-opus-5-5": {
+          "inputTokens": 18,
+          "outputTokens": 12168,
+          "cacheReadInputTokens": 886328,
+          "cacheCreationInputTokens": 115841,
+          "webSearchRequests": 0,
+          "costUSD": 1.3474256,
+          "contextWindow": 1000000,
+          "maxOutputTokens": 128000,
+          "thinkingTokens": 10556,
+          "cacheCreationEphemeral5mInputTokens": 0,
+          "cacheCreationEphemeral1hInputTokens": 115841,
+          "canonicalModel": "claude-opus-5-5",
+          "provider": "firstParty",
+          "costBasis": "list"
+        }
+      },
+      "automatic_cycle_status": "operator-authorized-planning-convergence",
+      "post_review_hashes": "/home/raphael/verification-records/ai-coding-agent-skills/profile-planning-convergence-20261115T064810.796287Z/post-review-hashes.json"
+    }
+  ],
+  "current_validation": "openspec validate profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99 --strict, npm run validate:openspec, git diff --check, and empty-diagnostic untracked planning-file whitespace checks all passed after the final planning revision.",
+  "cycle_count_status": "Historical cumulative count unavailable; not reset or inferred from the partial retained chain.",
+  "current_goal_authority": "Explicit operator-authorized planning finalization: one proposal issue, bounded config update, final review/evidence refresh, exact-base reconstruction, planning-only local commit, and plan-identity verification. No plan approval, implementation, profile change, publication, or external delivery authority.",
+  "retained_goal_review_count": 26,
+  "freeze_readiness": "READY FOR AUTHORIZED LOCAL PLANNING-ONLY FREEZE: the historical count remains unavailable and is not reset; the operator selected per-cycle authorization, used one routine correction/re-review cycle, and no further correction cycle is implied.",
+  "review_acceptance_scope": "Final exact-hash planning review only; it does not approve the plan or authorize implementation, profile changes, publication, integration, archive, or issue closure.",
+  "operator_architecture_decisions": {
+    "authority_source": "Current orchestrator conversation: explicit terminal-first clarification, option A agreement, and request to continue convergence with mandatory final operator documentation.",
+    "terminal_first": "Applies to every worker, including Hermes; Herdr is not a launch prerequisite.",
+    "legacy_code_tab": "Retire code-tab-phase-roles as a supported role-execution route in favor of standalone CLI role sessions; do not modify installed project/profile agent files.",
+    "interaction": "Automatically expose the same waiting session through its prequalified interaction route, without a separate chat notification or request to open it. Never approve, deny or bypass the native decision on the operator behalf.",
+    "single_client": "One qualified client may serve all roles in separate sessions, sequentially if needed; model selection is per role and does not require different clients or models unless project policy requires diversity.",
+    "final_documentation": "Require synchronized operator documentation for every qualified client, exact configuration surfaces/scopes/precedence and effective-role verification, same/mixed-client examples, and automatic interactive exposure.",
+    "execution_boundary": "Planning edits, validation, hashes and independent review only; no implementation, live profile/configuration change, publication or other external writes."
+  },
+  "final_review": {
+    "verdict": "No findings",
+    "reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-final-freeze-20261115T083400Z/final-review.json",
+    "sha256": "030a09feec6b8fa0352cc873e7859dd2c9dd3a337616b43d08d2172b8e5a6473",
+    "reviewer": "isolated delegate sa-0-f3a201c0 (kilo-auto/efficient)",
+    "literal_result": "No findings"
+  },
+  "pre_freeze_grants": {
+    "proposal_issue": "Created and read back as https://github.com/forgegod/ai-coding-agent-skills/issues/21; metadata binding matches the verified URL.",
+    "contributor_contract_scope": {
+      "paths": ["AGENTS.md", "skills/AGENTS.md", "skills/autonomous-ai-agents/AGENTS.md", "skills/software-development/AGENTS.md"],
+      "purpose": "Record the future implementation scope declared in the reviewed design without editing any contributor contract during plan finalization.",
+      "planning_hashes": "Matches this record's final planning_hashes."
+    },
+    "historical_count_disposition": "Historical cumulative correction count remains unavailable. The operator selected per-cycle authorization; this finalization used the separately authorized next one routine correction/re-review cycle and does not reset or infer the count."
+  },
+  "rejected_final_review_reports": [
+    {
+      "reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-final-freeze-20261115T083400Z/review-1-found-reset-sequencing.log",
+      "sha256": "9945dddec678238fc0f8175caf0cce779291b765b855ab33c2f639172bf39369",
+      "disposition": "Finding corrected; report retained unchanged."
+    },
+    {
+      "reference": "/home/raphael/verification-records/ai-coding-agent-skills/profile-final-freeze-20261115T083400Z/review-2-format-incomplete-no-findings.log",
+      "sha256": "85045af6c5d7abacf41bc843e12ff9ef1c1592e7b655376b943adb41a7bc66da",
+      "disposition": "Rejected only because its response included additional text after No findings; report retained unchanged."
+    }
+  ]
+}

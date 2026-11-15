@@ -1,0 +1,152 @@
+# Spec Delta
+
+## MODIFIED Requirements
+
+### Requirement: Short bounded delivery invocations
+Projects explicitly adopting the invocation contract SHALL let the agent perform
+workspace setup, bootstrap, verification, task updates and previewed autonomous
+local commits for one approved task group, or for consecutive eligible groups
+when continuous-goal continuation is selected below, without repeated plumbing prompts.
+Operator restrictions SHALL override defaults and remain effective on continuation.
+When the project selects the pre-execution-review policy, delivery SHALL
+require its retained independent pre-execution approach-review record before plan
+freeze and execution; delivery owns the freeze stop, while the orchestration
+package owns the review protocol.
+When the project’s contributor contract explicitly selects continuous-goal
+continuation, `/openspec-next` SHALL start that policy; otherwise it retains the
+single-group behavior below.
+Delivery owns the continuation contract and stops; the orchestration package owns
+process execution within that contract. If a selected policy's package is unavailable, delivery SHALL stop before
+freeze or execution.
+
+#### Scenario: Next approved local group
+- **WHEN** the operator sends `/openspec-next` in verified current-change context
+  and the project has not selected continuous-goal continuation
+- **THEN** the agent resolves actual tasks, approval, dependencies and interrupted work and advances one eligible unfinished group
+- **AND** it does not infer plan approval, perform remote writes or start another change
+
+#### Scenario: Selected continuous-goal policy
+- **WHEN** a project selected the continuous-goal policy and the operator sends
+  `/openspec-next` in verified current-change context without a narrower group restriction
+- **THEN** the orchestrator resolves and advances consecutive eligible groups,
+  including verification, task updates, and required independent reviews
+- **AND** it stops before a missing authority, failed gate, review finding needing
+  disposition, conflicting ownership, host block, remote write, next change, the
+  current group’s declared stop condition, a missing budget in both the group and
+  the project/global authority contract, a missing declared stop condition,
+  budget exhaustion, an unresolved native human-input wait after automatic
+  same-session exposure, or approved-plan/digest mismatch
+
+#### Scenario: Worker needs native human input
+- **WHEN** an authorized worker requests approval or other native human input
+- **THEN** the orchestration adapter automatically exposes the same waiting session
+  through its qualified interaction route without a separate operator chat notification
+- **AND** delivery suspends group advancement without answering the prompt,
+  replaying the task, or substituting another worker
+- **AND** native response, timeout, or exposure failure follows *Automatic operator
+  interaction exposure* in the orchestration contract within existing authority
+
+#### Scenario: Selected pre-execution review policy
+- **WHEN** a project selected the pre-execution-review policy and the plan
+  lacks a retained no-blocking-findings review record matching the complete planning
+  hash set
+- **THEN** delivery stops before freeze or execution
+- **AND** it does not treat a reviewer recommendation, draft review, or partial
+  hash record as plan approval
+
+#### Scenario: Policy selected after plan freeze
+- **WHEN** the contributor contract at the frozen plan commit's parent, an integrated
+  target-branch revision, does not select
+  continuous-goal continuation
+- **THEN** delivery retains single-group behavior for that change
+
+#### Scenario: Pre-execution review selected after plan freeze
+- **WHEN** the contributor contract at the frozen plan commit's parent, an integrated
+  target-branch revision, does not select
+  pre-execution review
+- **THEN** delivery retains its existing approval and is not blocked for lacking
+  a pre-execution review record
+
+#### Scenario: Legacy plan before integrity-guard adoption
+- **WHEN** retained evidence verifies that a plan was frozen before the project
+  adopted the delivery version containing the integrated-parent and
+  contributor-contract authority guards
+- **THEN** those two guards apply only at its next freeze or refreeze
+- **AND** they do not retroactively require a pre-freeze grant or invalidate that
+  plan's existing approval; other execution restrictions remain effective
+
+#### Scenario: Unintegrated plan parent
+- **WHEN** the prospective or frozen plan commit's parent is not a verified
+  integrated target-branch revision
+- **THEN** delivery stops before freeze or execution without deriving policy
+  selection from that unintegrated contract
+
+#### Scenario: Contributor-contract change
+- **WHEN** the planning artifacts declare, or the plan-commit diff includes, a change
+  to any `AGENTS.md` or `CLAUDE.md` at any path, or a file the integrated contributor
+  contract explicitly designates as a contributor contract, directly or through a
+  designated contract's child-contract index
+- **THEN** delivery stops before freeze or execution pending explicit operator approval
+- **AND** that approval is a separate pre-freeze authority grant for the contract
+  change, not the later execution approval of the frozen plan SHA/digest
+- **AND** the pre-freeze grant records the complete planning input hashes and declared
+  contract paths; retained freeze evidence binds it to the frozen planning digest
+  only after verifying exact input-hash and path identity
+- **AND** execution proceeds only with that matching retained grant binding;
+  refreeze or changed contract paths require a new grant
+- **AND** the changed file cannot select, disable, or alter policy for that same plan
+- **AND** merely mentioning an ordinary file, such as README, does not designate
+  it as a contributor contract or trigger this stop
+
+#### Scenario: Inspect or restricted execution
+- **WHEN** the operator requests inspect-only assessment or excludes commits
+- **THEN** inspect performs no mutations and a no-commit execution preserves its uncommitted boundary without claiming a clean candidate
+- **AND** ambiguous selection, missing approval or conflicting ownership blocks execution rather than creating replacement work
+
+#### Scenario: Explicit terminal delivery
+- **WHEN** the operator sends `/openspec-delivery finish <name>` under the adopted contract
+- **THEN** the agent resumes that candidate's protected publication, integrated verification, factual receipt/archive closure, acceptance-bound issue closure and clean-worktree retirement automatically
+- **AND** changed candidates require renewed gates/review, already merged implementation is not replayed, and branch deletion, bypass, release or another change remains unauthorized
+
+## ADDED Requirements
+
+### Requirement: Minimum outcome task authoring
+Projects adopting this workflow SHALL author the fewest goal-oriented tasks needed
+to deliver the complete agreed outcome without weakening scope, safety, acceptance
+evidence, or required authority/ownership boundaries. They SHALL split only when a
+necessary dependency, authority, ownership, safety, or independently verifiable
+delivery boundary requires it, not to prescribe implementation steps. There SHALL
+be no fixed task-count target.
+
+#### Scenario: One coherent outcome
+- **WHEN** one task can deliver and verify the complete bounded outcome within
+  the approved scope, budget, and stop conditions
+- **THEN** the author uses that one task rather than creating a procedural checklist
+- **AND** files, functions, commands, agent roles, and routine coding/test/docs steps
+  do not by themselves justify additional tracked tasks
+- **AND** the agent chooses and adapts its working approach without creating a
+  second mutable progress tracker
+
+#### Scenario: Necessary outcome boundary
+- **WHEN** combining work would obscure a required dependency gate, authority,
+  ownership, safety, or independently verifiable delivery boundary
+- **THEN** the author adds only the task boundaries needed to preserve it and
+  states the material reason for the split
+- **AND** fewer checkboxes never justify dropped requirements, weaker verification,
+  unbounded work, or bypassing approval or independent review
+- **AND** each outcome includes the tests and documentation it needs; a final
+  checkpoint covers cross-outcome integration, not deferred basic quality work
+
+#### Scenario: Reusable authoring instructions
+- **WHEN** a project authors or revises an unfrozen plan under its adopted workflow
+  version containing this rule
+- **THEN** its documented OpenSpec `rules.tasks`, SDLC, and contributor guidance
+  carry the rule into task generation and planning review
+- **AND** adopting that workflow version includes this authoring rule without a
+  separate per-change opt-in; already-approved frozen plans are not automatically
+  rewritten or refrozen
+- **AND** native checkbox syntax and dependency ordering are preserved without
+  patching upstream OpenSpec or treating installation as policy adoption
+- **AND** verification checks generated instructions and representative plans for
+  unnecessary fragmentation and harmful over-merging; strict CLI validation alone
+  is not claimed to prove semantic task minimality

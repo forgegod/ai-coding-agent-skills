@@ -9,10 +9,12 @@ context: |
   <slug>-<lowercase-ulid>, generated once by the agent, then reused verbatim.
   Authorized branches use change/<full-name>; existing names remain unchanged.
   This context reinforces policy; it is not a pre-creation CLI hook.
-  Follow root AGENTS.md for short delivery/next invocation scope: automatic local
-  workspace/bootstrap/previewed commits for one approved group; finish is the
-  separate named protected-publication/closure authority. Restrictions override
-  defaults; inspect is read-only. Prepare isolated proposal workspace before scaffolding.
+  Follow the integrated contributor contract for short delivery/next invocation
+  selection: single-group local workspace/bootstrap/previewed commits are the
+  default, and continuous-goal continuation applies only when that contract
+  explicitly selects it. Finish is the separate named protected-publication/closure
+  authority. Restrictions override defaults; inspect is read-only. Prepare an
+  isolated proposal workspace before scaffolding.
 rules:
   proposal:
     - State scope, non-goals, compatibility and operator authority explicitly.
@@ -21,6 +23,7 @@ rules:
     - State observable requirements with executable acceptance scenarios.
     - Current specs use identity-only frontmatter with capability, never change or github_issue. Delta specs have no frontmatter because OpenSpec 1.16.0 strict validation rejects it. Recheck metadata after sync/archive.
   tasks:
+    - Author the fewest goal-oriented tasks that deliver the complete agreed outcome without weakening scope, safety, verification, or necessary authority/ownership boundaries; split only for a necessary dependency, authority, ownership, safety, or independently verifiable delivery boundary, never to prescribe implementation steps or meet a task-count target.
     - Keep independently mergeable changes small; do not recreate a second task table.
     - Use metadata_version, artifact and exact change frontmatter; no status or progress properties.
     - Distinguish verified local implementation from unperformed publication/integration.

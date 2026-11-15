@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "kind": "planning-only-freeze-record",
+  "change": "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99",
+  "base": "ae6488e23414a07d12959bf22bcd283b84d9d8a3",
+  "branch": "change/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99",
+  "issue_url": "https://github.com/forgegod/ai-coding-agent-skills/issues/21",
+  "planning_hashes": {
+    "openspec/config.yaml": "5719878578ec6a96877ee711a20ff22cda46f92dfc41f96d41b313b9b5ddbd31",
+    ".openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+    "proposal.md": "1afecfab6023ac653224453b4daed21a1afbcafc9d94854b52687c6770998fa3",
+    "design.md": "a12040911b22b982cea162c9c07ffb75baabfd9b543457b34a065c7a733d83e0",
+    "tasks.md": "3e1b7de25d0fc73d9576f255fbc178ebb85d5796d911118f9d7a63214f6ef07c",
+    "specs/autonomous-role-orchestration/spec.md": "48b8395aadb165186e032ce35fa84f4c9ae0686d1cbb8899c9a8c93d0345f993",
+    "specs/openspec-integration/spec.md": "f19c03527a6d6f3c523a7b6daabbfa6d4a542c517dc8e47c356957c037f74d63"
+  },
+  "final_review": {
+    "verdict": "No findings",
+    "artifact": "/home/raphael/verification-records/ai-coding-agent-skills/profile-final-freeze-20261115T083400Z/final-review.json",
+    "sha256": "030a09feec6b8fa0352cc873e7859dd2c9dd3a337616b43d08d2172b8e5a6473"
+  },
+  "contributor_contract_grant": {
+    "paths": ["AGENTS.md", "skills/AGENTS.md", "skills/autonomous-ai-agents/AGENTS.md", "skills/software-development/AGENTS.md"],
+    "purpose": "Future implementation scope only; no contributor-contract file was edited in this planning-only freeze.",
+    "binding": "The final planning hashes above are the approved pre-freeze scope binding."
+  },
+  "historical_count_disposition": "Historical cumulative correction count remains unavailable and was not reconstructed, inferred, or reset. The operator selected per-cycle authorization and authorized the one routine correction/re-review cycle used here.",
+  "boundary": "This record does not contain its own hash, does not approve the plan, and does not authorize implementation, profile changes, publication, integration, archive, or issue closure."
+}
