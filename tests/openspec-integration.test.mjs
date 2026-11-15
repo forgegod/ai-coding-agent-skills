@@ -26,7 +26,7 @@ test("OpenSpec package documents explicit authority, writer separation and read-
   for (const pattern of [/candidate --repo/, /review --repo/, /receipt --repo/, /schemaVersion/, /planDigest/, /exitCode/, /does not authenticate/, /fences/, /append-only/]) assert.match(reference, pattern);
   for (const pattern of [/valid UTF-8/, /refs\/replace/, /grafts/, /fsmonitor/, /Every commit in `verified\.\.target`/, /--receipt-path/, /duplicate/i, /raw blob bytes/]) assert.match(reference, pattern);
   assert.doesNotMatch(skill, /adoption history|reviewer found|previously reported/i);
-  assert.match(skill, /version: 1\.0\.5/);
+  assert.match(skill, /version: 1\.1\.0/);
   assert.doesNotMatch(skill, /\/home\/|~\/.hermes/);
 });
 
@@ -62,6 +62,74 @@ function invoke(f, command = "candidate", extra = []) {
   const result = spawnSync(process.execPath, [guard, command, "--repo", f.repo, "--change", f.name ?? change, ...common, ...identity, ...extra], { encoding: "utf8", env: { ...env, ...f.env } });
   return { status: result.status, ...(result.stdout.trim() ? JSON.parse(result.stdout) : { error: result.stderr }) };
 }
+
+test("planning inventory exposes exact raw hashes separately from the normalized approved digest", async (t) => {
+  const f = await fixture(t);
+  const inventory = (head) => {
+    const result = spawnSync(process.execPath, [guard, "planning", "--repo", f.repo, "--change", change, "--head", head], { encoding: "utf8", env });
+    assert.equal(result.status, 0, result.stdout || result.stderr);
+    return JSON.parse(result.stdout);
+  };
+  const before = [git(f.repo, "rev-parse", "HEAD"), await readFile(path.join(f.repo, ".git/index")), git(f.repo, "status", "--porcelain")];
+  const plan = inventory(f.base);
+  const current = inventory(f.head);
+  assert.deepEqual(Object.keys(plan.inputs).sort(), ["openspec/config.yaml", `${changeRoot}/.openspec.yaml`, `${changeRoot}/proposal.md`, `${changeRoot}/tasks.md`, `${changeRoot}/specs/example/spec.md`].sort());
+  for (const [file, hash] of Object.entries(plan.inputs)) {
+    assert.equal(hash, createHash("sha256").update(execFileSync("git", ["-C", f.repo, "show", `${f.base}:${file}`], { env })).digest("hex"));
+  }
+  assert.equal(plan.planDigest, current.planDigest);
+  assert.notEqual(plan.inputs[`${changeRoot}/tasks.md`], current.inputs[`${changeRoot}/tasks.md`]);
+  assert.deepEqual([git(f.repo, "rev-parse", "HEAD"), await readFile(path.join(f.repo, ".git/index")), git(f.repo, "status", "--porcelain")], before);
+});
+
+test("draft inventory includes uncommitted planning files and every spec without writing Git or following symlinks", async (t) => {
+  const f = await fixture(t);
+  const draft = () => {
+    const result = spawnSync(process.execPath, [guard, "planning-worktree", "--repo", f.repo, "--change", change], { encoding: "utf8", env });
+    return { status: result.status, ...JSON.parse(result.stdout) };
+  };
+  await writeFile(path.join(f.repo, changeRoot, "design.md"), "# Draft design\n");
+  await writeFile(path.join(f.repo, changeRoot, "specs/example/acceptance.txt"), "Uncommitted acceptance\n");
+  await mkdir(path.join(f.repo, changeRoot, "evidence"));
+  await writeFile(path.join(f.repo, changeRoot, "evidence/approach-review.json"), "{}\n");
+  const before = [git(f.repo, "status", "--porcelain"), await readFile(path.join(f.repo, ".git/index")), git(f.repo, "rev-parse", "HEAD")];
+  const result = draft();
+  assert.equal(result.status, 0, result.error);
+  assert.equal(result.inputs[`${changeRoot}/design.md`], createHash("sha256").update("# Draft design\n").digest("hex"));
+  assert.equal(result.inputs[`${changeRoot}/specs/example/acceptance.txt`], createHash("sha256").update("Uncommitted acceptance\n").digest("hex"));
+  assert.equal(Object.hasOwn(result.inputs, `${changeRoot}/evidence/approach-review.json`), false);
+  assert.equal(Object.hasOwn(result, "planDigest"), false, "draft raw hashes are not a normalized approved digest");
+  assert.deepEqual([git(f.repo, "status", "--porcelain"), await readFile(path.join(f.repo, ".git/index")), git(f.repo, "rev-parse", "HEAD")], before);
+  await rm(path.join(f.repo, changeRoot, "design.md"));
+  await symlink(path.join(f.repo, "implementation.txt"), path.join(f.repo, changeRoot, "design.md"));
+  assert.equal(draft().status, 1);
+  assert.match(draft().error, /regular|symlink/);
+});
+
+test("policy context proves the plan parent belongs to the integrated target before selecting contracts", async (t) => {
+  const f = await fixture(t);
+  const invokeContext = (plan, target) => {
+    const result = spawnSync(process.execPath, [guard, "policy-context", "--repo", f.repo, "--change", change, "--plan", plan, "--target", target], { encoding: "utf8", env });
+    return { status: result.status, ...JSON.parse(result.stdout) };
+  };
+  const context = invokeContext(f.head, f.base);
+  assert.equal(context.status, 0, context.error);
+  assert.equal(context.parent, f.base);
+  assert.equal(context.target, f.base);
+  assert.equal(context.plan, f.head);
+  assert.equal(context.planDigest, invoke(f).planDigest);
+  assert.deepEqual(context.changedPaths, ["implementation.txt", `${changeRoot}/tasks.md`].sort());
+  await writeFile(path.join(f.repo, "AGENTS.md"), "New policy on an unintegrated branch\n");
+  const unintegrated = commit(f.repo, "Unintegrated contributor contract");
+  await writeFile(path.join(f.repo, changeRoot, "proposal.md"), "# Later plan\n");
+  const laterPlan = commit(f.repo, "Plan on unintegrated contract");
+  const refused = invokeContext(laterPlan, f.base);
+  assert.equal(refused.status, 1);
+  assert.match(refused.error, /ancestry|integrated/);
+  const integrated = invokeContext(laterPlan, unintegrated);
+  assert.equal(integrated.status, 0, integrated.error);
+  assert.equal(integrated.contractInputs["AGENTS.md"], createHash("sha256").update("New policy on an unintegrated branch\n").digest("hex"));
+});
 
 test("OpenSpec candidate binds committed planning and supports an independent clone without Git writes", async (t) => {
   const f = await fixture(t);

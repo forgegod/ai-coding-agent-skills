@@ -9,6 +9,12 @@ unexecuted templates, not permission to write or fabricated evidence.
 For lossless representation, provenance, completeness, and confidentiality of
 the output those checks cite, use [evidence-retention.md](evidence-retention.md).
 
+For `planning-worktree`, committed `planning`, and `policy-context` read-only
+commands, use [delivery-policy.md](delivery-policy.md). That mandatory procedure
+owns integrated-parent and separate contributor-grant checks before freeze and
+execution, with narrowly evidenced legacy handling. The existing candidate/review
+commands below validate committed evidence, not policy selection or grant authority.
+
 ## Inputs and trust
 
 Every Git child uses the shared [environment contract](git-environment.md): explicit

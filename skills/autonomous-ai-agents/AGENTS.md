@@ -10,6 +10,8 @@ Herdr pane-selection helper.
 | Path | Owns |
 | --- | --- |
 | `autonomous-implementation-review/SKILL.md` | Bounded implementation, review, and verification loop. |
+| `autonomous-implementation-review/references/portable-core.md` | Client-neutral outcome, approach-review, review-record continuity and candidate-review procedure. |
+| `autonomous-implementation-review/scripts/orchestration-core.mjs` | Pure packet and retained-observation checks; no launch, progress writes or authority authentication. |
 | `autonomous-implementation-review/scripts/herdr_panes.py` | Read-only overview and fail-closed validation of supplied operator selection against fresh pane JSON. |
 | `autonomous-implementation-review/scripts/herdr_lifecycle_watch.mjs` | Passive output-based Herdr lifecycle watcher, read-only inspection and arming gate; never sends pane input. |
 | `autonomous-implementation-review/scripts/herdr-pane-state.mjs` | Live-composer/footer parser and identity-bound executor observation. |
@@ -22,6 +24,8 @@ Herdr pane-selection helper.
 | `autonomous-implementation-review/templates/phase-reviewer.md` | Unarmed read-only reviewer template. The operator copies it into the target project after review. |
 
 ## Local Contracts
+
+- Portable core work follows `references/portable-core.md` without Hermes or Herdr. Delivery owns integrated-parent policy, contributor grants and continuation; adapters own terminal processes and same-session interaction. The host-specific contracts below remain legacy-only until replacement qualification/readiness; retaining them does not qualify a new route or permit fallback. Do not retire existing routes before an adapter qualifies for implementation and fresh read-only review.
 
 - The implementation and review phases use distinct, goal-named sessions; review is read-only.
 - Never infer autonomous commit authority or a pane selection from labels, focus, or agent identity.

@@ -21,6 +21,28 @@ Displaying them grants no Git or GitHub authority.
 
 ## Short operator commands
 
+For new and revised unfrozen plans, use
+[minimum-outcome task authoring](../skills/software-development/openspec-delivery/references/task-authoring.md).
+The fewest complete goal-oriented outcomes must still preserve scope, safety,
+verification and necessary dependency/authority/ownership boundaries. Each outcome
+includes its tests and documentation; no fixed task-count target applies. Carry
+the rule through OpenSpec `rules.tasks` and planning review; inspect generated
+instructions and reject both unnecessary fragmentation and harmful over-merging.
+Strict CLI validation does not prove semantic minimality. Existing approved plans
+remain unchanged; native `tasks.md` stays the sole mutable progress authority.
+
+Apply [delivery policy](../skills/software-development/openspec-delivery/references/delivery-policy.md)
+before freeze/execution: derive policy from the verified integrated plan parent,
+not a changed working-tree contributor contract. Require separate pre-freeze
+authority for declared/diffed contributor-contract changes. The examples below
+show default single-group behavior. If the parent's contributor contract selected
+continuous-goal, a bare next advances consecutive eligible groups until an explicit
+stop, budget or authority boundary; a narrower operator restriction wins. Selected
+pre-execution review requires the optional orchestration package's matching retained
+whole-plan review before freeze and execution. Neither policy applies retroactively.
+The core is available without Hermes/Herdr; new terminal execution requires
+separate adapter qualification. Legacy routes are not retired by core delivery.
+
 The agent owns the Git plumbing. This project explicitly selects the following
 invocation contract; other projects must adopt it in contributor instructions.
 Installing skills, displaying examples or approving a plan does not execute it.
@@ -755,8 +777,8 @@ Orchestration is optional. It requires the workflow plugin, explicit role and
 model configuration, and a supported host. Package installation does not create
 those roles.
 
-Current source: delivery 1.0.5 in `openspec-development` 1.0.6;
-`openspec-next` 0.1.1 and `autonomous-orchestration` 1.4.0 are unchanged.
+Current source: delivery 1.1.0 in `openspec-development` 1.1.0;
+`openspec-next` 0.2.0 and core skill 0.15.0 in `autonomous-orchestration` 1.5.0.
 Representation support adds no upstream workflow, runtime dependency or
 installation route. Package availability/byte checks do not establish account
 sync, host execution, native client discovery, Desktop acceptance or scanner approval.

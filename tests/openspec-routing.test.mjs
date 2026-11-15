@@ -73,7 +73,7 @@ test("capability-wireframes uses stable keys and change-owned proposals", async 
 
 test("autonomous-implementation-review bounds orchestration to one change and supported hosts", async () => {
   const source = await read(`${entry.orchestration}SKILL.md`);
-  assert.match(source, /^version: 0\.14\.0$/m);
+  assert.match(source, /^version: 0\.15\.0$/m);
   assert.match(source, /A planning-only request stops after proposal\/spec\/design\/tasks/);
   assert.match(source, /This automated role loop is Herdr-only/);
   assert.match(source, /openspec-delivery/);

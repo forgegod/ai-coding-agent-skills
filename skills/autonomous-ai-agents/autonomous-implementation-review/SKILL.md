@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.14.0
+version: 0.15.0
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -21,9 +21,19 @@ metadata:
 
 # Autonomous Implementation Review
 
-High-risk work needs external review. The unit is one authorized OpenSpec change
-and one named task group. This skill does not specify the change and does not
-write GitHub state.
+One authorized OpenSpec change, one named task group per worker; no GitHub writes.
+
+## Portable core
+
+For outcome packets, approach review and policy execution, follow
+[references/portable-core.md](references/portable-core.md) and
+`references/openspec.md`, without Hermes or Herdr. Dispatch requires a selected
+qualified terminal adapter. Core tests do not qualify clients. Replacement
+implementation/read-only review readiness must precede legacy retirement; no fallback.
+
+## Legacy host execution
+
+This retained recipe does not govern the portable core or qualify terminal routes.
 
 ## Preconditions and roles
 
@@ -50,13 +60,11 @@ write GitHub state.
 - For a source checkout, compare installed skill version once and report drift;
   source edits neither update installed skills nor authorize installation.
 
-## Goal and repository truth
+## Legacy goal and repository truth
 
-In a project adopting delivery's short-invocation policy, `/openspec-next` or
-`/openspec-delivery <name>` selects the approved group and automatically calls
-this configured role loop. The operator need not repeat its Git recipe. Local
-authority includes workspace creation/bootstrap, task updates and previewed
-autonomous commits, not push/PR/merge. Restrictions override defaults.
+Under adopted short-invocation policy, `/openspec-next` or `/openspec-delivery <name>`
+selects the approved group and configured loop. Local scope includes workspace/
+bootstrap, task updates and previewed commits, not push/PR/merge. Restrictions win.
 
 Optional persisted-goal launch (display alone grants no authority):
 
@@ -64,18 +72,17 @@ Optional persisted-goal launch (display alone grants no authority):
 /goal draft /openspec-delivery <name>
 ```
 
-`/goal draft` starts execution; the operator inspects `/goal show`. Resume from
-real state; use `session_search` only for missing evidence, not scratch plans.
+`/goal draft` starts execution; inspect `/goal show`. Resume from repository truth.
 
 Use `/goal`, not `/loop`. The operator controls pause/resume/clear and `/subgoal`.
 Compression is automatic; for earlier compression the operator runs `/goal pause`,
 `/compress here 2`, inspects `/context`, then `/goal resume`.
 Printed commands do not execute.
 
-Stop discovery once scope, authority, executor, ownership, bootstrap and gates
-resolve. Reuse valid evidence; batch independent lookups.
+Stop discovery once authority, ownership, bootstrap and gates resolve.
+Reuse valid evidence; batch independent lookups.
 
-## Procedure
+## Procedure (legacy host execution only)
 
 1. Confirm recovery and an isolated checkout through `openspec-delivery`.
    Do not start a second writer for the same change.
@@ -98,21 +105,18 @@ resolve. Reuse valid evidence; batch independent lookups.
 6. Reproduce findings; send confirmed fixes to a fresh implementer role in the same
    checkout with the original contract. Changed content requires renewed gates and
    review. Limit to two fix/review cycles; a third needs operator direction.
-7. The integration skill owns publication and completion evidence. Standalone commits
-   use project policy and `git-commit-message`. Neither agent identity nor green tests
-   grant writes. Push, pull requests and merge need separate authorization and
-   remote-ref readback. Without that authority, preserve and report the candidate.
+7. Delivery owns publication/completion; commits use `git-commit-message` under
+   project policy. Identity/tests grant no writes. Push/PR/merge need separate
+   authority and remote-ref readback; otherwise preserve/report the candidate.
 8. Continue only unfinished work in the named task group. Stop after that group or a
    real blocker; no next change without a new request.
 
 ## Executor turn-cap recovery
 
-`Iteration budget exhausted` means the role did not finish. The
-implementer/reviewer only returns factual state; it never self-continues or
-switches role. The orchestrator inspects report and workspace, then alone decides
-whether to stop or dispatch a fresh bounded, same-role packet for the exact
-unfinished action in the existing checkout. A cap is not completion or authority:
-split oversized packets, not raise caps.
+`Iteration budget exhausted` is incomplete. The worker returns facts; it
+never self-continues or switches role. The orchestrator alone decides whether to
+stop or dispatch a fresh bounded same-role packet for unfinished work in the
+existing checkout. A cap grants no authority: split packets, do not raise caps.
 
 ## Pitfalls and verification
 

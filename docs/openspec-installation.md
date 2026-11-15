@@ -27,15 +27,28 @@ This adds no upstream skill or runtime dependency. Package installation/validati
 does not establish native Git behavior; missing native macOS/Windows results remain
 hardening completion blockers, and WSL or case simulations do not replace them.
 
-Delivery 1.0.5 (in `openspec-development` 1.0.6) also includes
+Delivery 1.1.0 (in `openspec-development` 1.1.0) also includes
 `references/evidence-retention.md` and `scripts/evidence-retention.mjs`; keep both
 in complete companion copies and ZIPs. This is local lossless representation and
 claim-support checking, not a Git helper, gate runner, reviewer authenticator or
 approval/publication authority. It adds no upstream workflow, runtime dependency
-or installation route. `openspec-next` remains 0.1.1 and the separate optional
-`autonomous-orchestration` plugin remains 1.4.0. Installation, account sync and
+or installation route. `openspec-next` is 0.2.0 and the separate optional
+`autonomous-orchestration` plugin is 1.5.0 (core skill 0.15.0). Installation, account sync and
 host execution verification remain separate; package byte checks establish none
 of native client discovery, Desktop acceptance or scanner approval.
+
+Keep delivery's `references/delivery-policy.md`, `references/task-authoring.md`
+and `scripts/delivery-policy.mjs`, plus orchestration's `references/portable-core.md`
+and `scripts/orchestration-core.mjs`, in complete copies. Follow the
+[policy protocol](../skills/software-development/openspec-delivery/references/delivery-policy.md)
+for integrated-parent selection and grant/readiness checks. Single-group is the
+default. Explicitly selected pre-execution-review or continuous-goal policy
+requires the optional orchestration package; missing it blocks freeze/execution.
+Core checks run without Hermes/Herdr, but do not qualify any terminal client,
+retire legacy routes or change installed profiles. No new installation route or
+upstream workflow dependency is introduced; use the existing reviewed install,
+update/removal and collision/backup procedures. Policy adoption is a separate
+project decision and never retroactively rewrites frozen plans.
 
 ## Required upstream inventory
 

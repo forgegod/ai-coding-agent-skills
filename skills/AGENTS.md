@@ -8,7 +8,7 @@ Own optional, versioned agent playbooks that contributors can install and reuse 
 
 | Path | Owns |
 | --- | --- |
-| `autonomous-ai-agents/` | Optional implementation-and-review loop. |
+| `autonomous-ai-agents/` | Optional portable outcome/review core and separately qualified execution routes. |
 | `software-development/` | OpenSpec integration boundary, commit batches, and wireframes. |
 
 ## Local Contracts
@@ -16,6 +16,7 @@ Own optional, versioned agent playbooks that contributors can install and reuse 
 - A skill is an execution aid, not a source of product behaviour, progress, or architectural authority.
 - Durable product policy lives in the adopting project's DOX chain. OpenSpec artifacts own specification and task progress. These skills do not replace them.
 - Skills follow the Agent Skills `SKILL.md` format and remain safe to read without a Hermes installation.
+- `autonomous-ai-agents/autonomous-implementation-review/references/portable-core.md` owns client-neutral outcome and review procedures. Delivery owns policy/grant/continuation gates. Core checks do not qualify adapters or retire legacy routes; replacement readiness precedes retirement.
 - Do not add credentials, profile-local paths, or agent-private state to repository skills.
 - Installing a package does not select OpenSpec for a project, transfer another project's records, or grant Git or GitHub authority. GitHub issues and pull requests document and review; they are not the task list.
 - A skill installed in a shared agent profile must not remove or modify its installed package while operating on a target project.

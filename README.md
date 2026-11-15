@@ -35,6 +35,17 @@ GitHub issues and pull requests document and review. They are not the task list 
 
 Installing these packages does not select the workflow for another project, transfer that project's records, or grant Git or GitHub authority.
 
+The [delivery policy protocol](skills/software-development/openspec-delivery/references/delivery-policy.md)
+checks the integrated plan parent and separate contributor-contract grants before
+freeze/execution. Single-group continuation remains the default; pre-execution
+approach review and continuous-goal continuation require explicit selection at
+that parent and the optional orchestration package. Later policy edits do not
+widen frozen plans. Its [portable core](skills/autonomous-ai-agents/autonomous-implementation-review/references/portable-core.md)
+checks outcome/review evidence without Hermes or Herdr; it does not qualify a
+client or retire a legacy route. Terminal adapter qualification remains a separate
+prerequisite for new role dispatch. Minimum-outcome authoring accompanies workflow
+adoption for unfrozen plans, without rewriting already-approved plans.
+
 The delivery Git helpers share an explicit [child environment contract](skills/software-development/openspec-delivery/references/git-environment.md):
 only allowlisted runtime/configuration values reach Git, with global/system selectors
 preserved and topology overrides refused. Configuration remains trusted, not sandboxed.
@@ -696,9 +707,9 @@ no generated skill copies are committed. Its explicit skill lists separate the
 OpenSpec companion workflow from opt-in orchestration. Bump every affected plugin's version when
 its bundled content changes. See the [Claude release checks](docs/claude-installation.md#maintainer-verification).
 
-Current source versions are delivery 1.0.5 and its affected
-`openspec-development` plugin 1.0.6; `openspec-next` remains 0.1.1 and
-`autonomous-orchestration` remains 1.4.0. Complete well-known output, the delivery
+Current source versions are delivery 1.1.0 and its affected
+`openspec-development` plugin 1.1.0; `openspec-next` is 0.2.0 and
+`autonomous-orchestration` is 1.5.0 (core skill 0.15.0). Complete well-known output, the delivery
 skill ZIP, workflow plugin ZIP and isolated native copies must retain the lossless
 reference/helper pair byte-for-byte. Source assertions are not executed packaging
 proof or a claim of updated public downloads, native client discovery, Desktop

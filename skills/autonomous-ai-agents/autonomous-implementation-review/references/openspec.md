@@ -3,6 +3,12 @@
 Load this when the operator has authorized execution of one OpenSpec change.
 Selecting or approving a change grants nothing by itself.
 
+For agent-neutral packets and review, use [portable-core.md](portable-core.md).
+It follows delivery-owned policy selection and continuation, with one group per
+worker packet. The host-specific recipe below applies only to retained legacy
+routes until replacement readiness is proved; it does not qualify a terminal
+adapter. Do not infer a route from an environment marker or fall back silently.
+
 ## Unit and hosts
 
 - The unit is one authorized native OpenSpec change and one named task group from

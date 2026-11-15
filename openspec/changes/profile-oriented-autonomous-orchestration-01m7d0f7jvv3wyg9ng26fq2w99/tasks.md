@@ -26,7 +26,7 @@ Stop: missing authority, preservation, approval, or identity mismatch.
 
 ## 2. Implement the portable core and delivery policies
 
-- [ ] 2.1 Implement and test the agent-neutral orchestration core and `openspec-delivery`/`openspec-next` behavior defined by both delta specs.
+- [x] 2.1 Implement and test the agent-neutral orchestration core and `openspec-delivery`/`openspec-next` behavior defined by both delta specs.
 
 Acceptance: focused tests cover minimum-outcome task generation/review, the core,
 approach-review, review-record, grant,

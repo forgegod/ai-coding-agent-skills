@@ -159,15 +159,22 @@ files plus their generated plugin metadata, README, and license.
 
 Bump the affected plugin version in the catalog whenever its selected skills or
 support files change; skill versions alone do not update the enclosing plugin.
-The source catalog's `openspec-development` 1.0.6 includes `openspec-delivery`
-1.0.5 with its shared `scripts/git-environment.mjs` and
+The source catalog's `openspec-development` 1.1.0 includes `openspec-delivery`
+1.1.0 with its shared `scripts/git-environment.mjs` and
 `references/git-environment.md` for the Git guard/workspace helpers. Also preserve
 `references/evidence-retention.md` and `scripts/evidence-retention.mjs` in complete
 copies and skill/plugin ZIP exports: this separate local representation support
 preserves captured bytes/hashes and checks claim support, not gate execution,
 reviewer authentication, approval or publication authority. The optional
-`autonomous-orchestration` stays 1.4.0 and `openspec-next` stays 0.1.1. These
+`autonomous-orchestration` is 1.5.0 (core skill 0.15.0) and `openspec-next` is 0.2.0. These
 source versions do not assert that the public marketplace/downloads are updated.
+Preserve delivery's policy/task-authoring references and `delivery-policy.mjs`,
+and orchestration's `portable-core.md` and `orchestration-core.mjs`, in full copies.
+The [policy protocol](../skills/software-development/openspec-delivery/references/delivery-policy.md)
+adds no automatic plugin dependency: selected approach-review/continuous-goal
+policies need the separately installed orchestration package. Its client-neutral
+core is not Claude CLI qualification or Desktop execution evidence. Installation
+does not adopt policy, retire routes, or authorize changes to installed profiles.
 Tests reject omitted/duplicate packages, implicit orchestration or OpenSpec
 inclusion, unshared packages in multiple bundles, added active plugin components,
 unsafe paths, and symlinks, and verify archive bytes, repeatability, checksums,

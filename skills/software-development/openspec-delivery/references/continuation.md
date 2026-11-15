@@ -5,6 +5,14 @@ operator execution invocation. Installation or reading an example grants nothing
 Keep one orchestrator and one task-progress/Git writer; no second task table,
 profile-local progress file, scheduler, lease or automatic backlog dispatch.
 
+Before freeze or execution, follow [delivery-policy.md](delivery-policy.md).
+It owns integrated-parent policy selection, contributor-contract grants,
+pre-execution approach-review gating and the continuous-goal stop contract.
+Single-group is the default below. Where continuous-goal is selected at the
+frozen plan's integrated parent, repeat this procedure for consecutive eligible
+groups of the same change; stop on every policy boundary or narrower restriction.
+Installing the optional orchestration package does not select either policy.
+
 ## Select once
 
 Use the named change, an unambiguous short slug via `change-name.mjs resolve`, or
@@ -49,7 +57,7 @@ No mutable ownership/progress ledger is added to the common Git directory.
 | Closure merged, cleanup pending | Resume only authorized cleanup/issue closure; never recreate implementation or archive. |
 | Change fully closed and cleanup verified | Report complete; no next change. |
 
-One `next` runs one task group through its remaining local verification/review and
+By default, one `next` runs one task group through its remaining local verification/review and
 commits, not one shell command and not the whole backlog. A group is the native
 heading/task-number group in `tasks.md`, not an invented phase. Explicit `group N`
 is a scope restriction, not permission to skip unfinished dependencies. If grouping
