@@ -169,6 +169,15 @@ is selected and SHALL NOT proceed without a selected policy's required package.
 - **AND** material decisions, native human waits, identity failures and budget
   exhaustion remain stop boundaries under that contract
 
+#### Scenario: Worker handoff admission
+- **WHEN** a worker result is offered as evidence for group advancement
+- **THEN** delivery requires the orchestration core's *Artifact-first worker handoff*
+  validation and independently checks the group's gates and review obligations
+- **AND** worker completion, a summary, pane text or a result claiming success does
+  not itself update native tasks, approve a plan, waive review or authorize a new group
+- **AND** a missing or invalid handoff leaves progress incomplete; only the
+  orchestrator advances eligible work under the existing continuation contract
+
 ### Requirement: Minimum outcome task authoring
 Projects adopting this workflow SHALL author the fewest goal-oriented tasks needed
 to deliver the complete agreed outcome without weakening scope, safety, acceptance

@@ -159,6 +159,9 @@ for each distinct client variant.
 - **AND** it verifies a supported non-argv prompt route
 - **AND** it verifies terminal-first launch, effective role/model binding, and
   *Automatic operator interaction exposure* before dispatch
+- **AND** it verifies *Artifact-first worker handoff*, including native final-output
+  capture, adapter-only publication, atomic result visibility, safe evidence paths,
+  and rejection of incomplete, stale or mismatched results without pane parsing
 
 #### Scenario: Missing or stale qualification
 - **WHEN** a selected client version is outside its qualified range or its probe
@@ -203,6 +206,78 @@ before being retained.
 - **WHEN** Kilo modern and legacy configuration routes are evaluated
 - **THEN** each route has an independent probe and adapter decision
 - **AND** a pass for one route does not qualify the other
+
+### Requirement: Artifact-first worker handoff
+The orchestration core SHALL exchange immutable, identity-bound assignment and
+result artifacts with qualified adapters outside the checkout. It SHALL validate
+complete reports and evidence before accepting outcomes, not infer success from
+pane text, a summary, file existence or process exit. Adapters SHALL publish
+results atomically without granting workers extra write authority.
+
+#### Scenario: Bounded immutable assignment
+- **WHEN** the orchestrator dispatches an authorized role
+- **THEN** the adapter retains an immutable assignment with a unique attempt id,
+  role, native group/task/action, outcome, acceptance, authority, scope/non-goals,
+  workspace, applicable frozen SHA/digest/input hashes, budget and stop conditions
+- **AND** the launch uses the qualified prompt-file/stdin route under *Launch
+  payload transport*, not a second worker-owned goal or progress tracker
+- **AND** expected bindings and the request hash are retained independently of
+  worker-authored output; a changed request invalidates that attempt
+
+#### Scenario: Complete bound result
+- **WHEN** a qualified adapter observes the native end of a bounded attempt
+- **THEN** it retains the full report and original output/evidence and atomically
+  publishes a schema-versioned final result matching the assignment hash, attempt,
+  role, group/task/action, workspace, input bindings and verified runtime/session
+- **AND** it records execution status separately from a review verdict, finding
+  details, coverage limitations, evidence hashes and actual exit status or a
+  qualified native turn-end observation when the client process remains live
+- **AND** a completed review may contain findings; neither completion nor an exit
+  code of zero grants acceptance, plan approval or permission to advance
+
+#### Scenario: Adapter publication and read-only worker
+- **WHEN** a reviewer returns its native final output
+- **THEN** the adapter, not the reviewer, writes the result/report artifacts through
+  a qualified capture route and preserves the reviewer's read-only boundary
+- **AND** workers cannot overwrite the request, publisher-owned results or retained
+  captures; qualification must demonstrate the applicable enforcement
+- **AND** an unqualified route remains unsupported rather than granting broader
+  worker writes or silently falling back to pane scraping
+
+#### Scenario: Partial stale or malformed handoff
+- **WHEN** a result is missing, partial, malformed, from another attempt/session,
+  input-mismatched, unsupported-schema, truncated or missing required evidence
+- **THEN** the core preserves the observation and leaves the outcome incomplete
+- **AND** unsafe paths, symlinks and evidence references outside the assigned roots
+  are rejected without following them or executing artifact content
+- **AND** no final result is visible until its complete report and required captures
+  are finalized; a valid published result is immutable and never overwritten
+- **AND** empty findings, a summary or an artifact claiming success cannot substitute
+  for a complete matching review with no unaddressed coverage limitations
+
+#### Scenario: Live human-input wait
+- **WHEN** a worker requests native human input before its attempt has ended
+- **THEN** the adapter records a waiting lifecycle event and follows *Automatic
+  operator interaction exposure* without publishing a final success or verdict
+- **AND** the same attempt may continue only after the native decision within its
+  existing authority; the handoff artifacts never answer or bypass that decision
+
+#### Scenario: Capped stopped or failed attempt
+- **WHEN** a qualified attempt ends capped, stopped, blocked or failed
+- **THEN** the adapter retains that factual result without claiming completion
+  of the outcome or manufacturing a review verdict from missing output
+- **AND** any authorized fresh attempt has a new artifact directory and request
+  linked to its predecessor; action-level continuation and correction budgets
+  remain governed by their existing contracts and are not reset
+- **AND** result acceptance does not grant another launch, retry or cleanup
+
+#### Scenario: Terminal presentation is not protocol state
+- **WHEN** a terminal view contains old findings, wrapped output, a repaint or a
+  presentation-only read failure
+- **THEN** the core uses the matching artifacts and adapter-owned lifecycle/identity
+  evidence rather than inferring a verdict or new task state from the screen
+- **AND** Herdr remains optional for same-session interaction or diagnosis; real
+  identity, permission, input-integrity and native-decision failures still block
 
 ### Requirement: Worker process ownership
 The selected adapter SHALL own launch, identity readback, stop, and scratch cleanup
@@ -521,6 +596,9 @@ installation SHALL NOT imply workflow selection or execution authority.
   examples, sequential execution, fresh reviewer identity, and policy limitations
 - **AND** it explains automatic same-session exposure, native human decisions,
   Herdr's optional status, unavailable-route behavior, and retired-route migration
+- **AND** it explains assignment/result locations and bindings, complete reports,
+  adapter publication, lifecycle versus acceptance, evidence retention and safe
+  recovery from missing or invalid artifacts without assuming native CLI equivalence
 
 #### Scenario: Documentation acceptance
 - **WHEN** the implementation candidate is verified and independently reviewed

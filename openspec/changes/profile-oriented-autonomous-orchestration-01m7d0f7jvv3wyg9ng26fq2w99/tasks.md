@@ -43,6 +43,11 @@ Acceptance: focused tests cover minimum-outcome task generation/review, the core
 role ownership, orchestrator-owned correction loop, approach-review and review-record,
 and delivery-policy scenarios, including planning-input identity, single-writer
 ownership, legacy/default behavior, and operation without Hermes or Herdr.
+Core tests cover immutable request/result identity, schema validation, complete
+report/evidence hashes, atomic publication and missing/partial/stale/mismatched,
+truncated or unsafe artifact rejection. Execution completion, review verdict and
+delivery acceptance remain distinct; artifact content cannot grant authority or
+create another task tracker. Retained attempt evidence survives worker-scratch cleanup.
 Verify routine planning/source/validation corrections use the permitted writer
 without per-fix approval; material conflicts and exhausted budgets stop, while
 planning amendments require fresh review and exact-plan approval before execution.
@@ -71,6 +76,10 @@ Acceptance: every candidate has a qualification or unsupported record; at least
 one adapter supports implementation and fresh read-only review before any old
 route is retired. One-client sequential execution works without requiring distinct
 models. Compatible Hermes profile preparation ships only if Hermes qualifies.
+Each supported adapter proves prompt-file/stdin assignment delivery, native final
+output and lifecycle capture, adapter-only result publication, protected request
+and evidence files, persistent-client turn completion and live native-input waits.
+No reviewer write escalation or pane-scraping success fallback qualifies a route.
 Stop: no qualifying implementation/review adapter, an unsafe or unverifiable
 boundary, or an unresolved native human-input wait after automatic session exposure.
 A native decision resolved through the qualified same-session surface does not

@@ -53,6 +53,12 @@ outcome-oriented unit above fine-grained checklist steps.
   native terminal application under adapter-owned process/session supervision.
   Herdr is not a launch prerequisite; it is an optional qualified interaction
   surface. Do not use `delegate_task` or native subagents as role executors.
+- Use immutable file-based assignments and structured result handoffs as the
+  primary worker/core interface, independent of Herdr. Qualified adapters publish
+  complete reports, identity-bound results and lifecycle evidence outside the
+  checkout; the core verifies them rather than deriving verdicts from pane text.
+  Atomic completion, stale/partial-result rejection and same-session human input
+  preserve existing authority, review independence and native task ownership.
 - Replace the supported Claude `code-tab-phase-roles` subagent route with the
   standalone Claude CLI adapter only when qualified; otherwise record Claude Code
   unsupported and document only other qualified choices without automatic fallback.

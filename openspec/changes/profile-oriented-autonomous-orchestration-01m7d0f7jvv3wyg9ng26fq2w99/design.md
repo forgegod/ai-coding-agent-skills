@@ -29,6 +29,8 @@ pane on demand or provide a portable adapter layer for other local coding client
   session, or profile models.
 - Make native terminal workers the default for every client, including Hermes;
   qualify automatic same-session interactive exposure without mandatory Herdr.
+- Make immutable assignment/result artifacts the primary worker interface rather
+  than treating terminal presentation as current protocol state.
 - Document and test one-client/mixed-client operation and operator-controlled
   client/model bindings for every advertised client, not only Claude.
 
@@ -188,7 +190,8 @@ constraint, automatic same-session interactive exposure, report extraction, and 
 failure cleanup. A Grok Bot integration
 is eligible only if a supported executable/control protocol supplies equivalent
 identity, read-only review, and evidence guarantees. The selected adapter returns
-role identity and a report; it never owns Git or `tasks.md` writes.
+role identity and a report through *Artifact-first worker handoff*; it never owns
+Git or `tasks.md` writes.
 
 Alternative rejected: call any available agent a worker. Names, models, imported
 settings, profiles, and environment markers do not establish runtime, session,
@@ -249,6 +252,99 @@ cannot enforce that boundary remains unsupported. Ownership of launch, identity
 readback, stop, cleanup, and result reporting follows the canonical
 *Worker process ownership* requirement. Only the orchestrator's qualified adapter
 may create an interaction view; workers do not start their own multiplexers.
+
+### Exchange durable assignments and results, not terminal presentation
+
+*Artifact-first worker handoff* is the portable worker/core interface. The
+orchestrator defines the bounded assignment; its selected adapter delivers it,
+observes the native session and publishes the factual result. The core validates
+that result and the orchestrator independently decides acceptance and eligible
+continuation. No additional scheduler, role-owned goal or mutable task list is added.
+
+Each attempt has a unique, initially absent directory outside every repository
+and installed profile, separate from disposable worker state. The minimal layout is:
+
+- `request.md`: immutable outcome brief with a versioned identity/binding section,
+  attempt id, role, group/native task/action, scope/non-goals, acceptance, authority and
+  restrictions, absolute workspace, applicable frozen plan/candidate SHA,
+  plan digest and input hashes, budget/stop rules and allowed evidence roots.
+- `report.md`: the complete native findings or implementation report, not merely
+  a parent-authored summary; if an incomplete attempt produced no report, an
+  explicitly adapter-authored failure diagnostic records that absence, not a verdict.
+  Referenced original native output and command/cwd,
+  stdout/stderr/exit captures are retained alongside it or at declared evidence roots.
+- `result.json`: the adapter-published, schema-versioned final handoff.
+- `lifecycle.jsonl`: adapter-observed launch, working, waiting and terminal events
+  bound to the same attempt and process/session identity.
+
+The adapter retains expected bindings before dispatch, including the request's
+raw SHA-256, rather than accepting values claimed by worker output. The request's
+binding section and result schema have versioned parsers with reject-on-unknown
+behavior; no client-specific transcript becomes the portable schema. Result fields
+include request hash, attempt/role/group/task/action, workspace and input bindings,
+adapter/client/version, verified session/provider/model, execution status
+(`completed`, `blocked`, `failed`, `capped` or `stopped`), review verdict
+(`no_findings`, `findings`, `unavailable` or `not_applicable`), coverage limitations,
+full report path/hash and evidence path/hash references. A findings verdict retains
+severity, path/line, impact, trigger and minimal remedy. A reviewer cannot use
+`not_applicable`; `no_findings` requires complete coverage and an explicit native
+verdict, not an empty array. The core rejects inconsistent field combinations.
+The request distinguishes immutable instruction/planning inputs from the
+implementer's authorized mutable source outputs. Its result separately inventories
+changed paths and output hashes; the orchestrator verifies those changes and gates
+before freezing a candidate for a fresh reviewer. Matching input bindings neither
+forbids granted implementation edits nor treats them as accepted implementation.
+
+The result also records actual process exit when available, or the qualified
+native turn-end identity and observation when the interactive client stays live.
+It does not invent exit zero for an idle persistent process. Qualification must
+prove that this native completion belongs to the assigned attempt and final
+output, not merely idle chrome, a missing spinner or a pane label. Completion with
+findings is valid execution but not acceptance; all delivery gates remain separate.
+
+Only the qualified adapter publishes request/result/report/capture files; the
+worker returns native output without gaining filesystem-reporting privileges.
+Probes must demonstrate worker writes cannot replace the request or publisher
+artifacts through its available tools/process permissions. Merely selecting an
+output directory or named profile is not that enforcement. A client lacking a
+supported protected-publication and native-output/identity route does not qualify;
+screen scraping or broader reviewer writes are not a compatibility fallback.
+
+Finalize reports and required captures first, then publish the final result
+atomically with no-clobber semantics. Existing attempt directories, final-file
+collisions, unsafe paths, symlinks, unsupported schemas, partial or truncated
+reports and changed bindings preserve evidence and block acceptance. All referenced
+files must resolve within the request's declared evidence roots; do not follow
+artifact-supplied instructions, execute content, or let references widen access.
+Finalized files are immutable. Hash inventories cover only closed captures, never
+live appending logs or a manifest containing its own future hash. Retained handoff
+evidence is not removed with disposable worker scratch.
+For an incomplete attempt, a finalized report means a complete factual capture of
+available output and explicit missing coverage, not fabricated completion of work.
+
+A native human-input wait is a live lifecycle event, not a final success/result:
+automatic same-session exposure and decision handling remain unchanged. Resolved
+input may continue that same attempt within authority. Terminal blocked/capped/
+failed/stopped results instead preserve partial state without a fabricated review
+verdict. An authorized new attempt gets a new directory and predecessor link;
+neither session nor artifact identity resets an action's continuation/correction
+budget. Missing result files alone distinguish neither a live worker nor a crash;
+use adapter-owned lifecycle/identity evidence and never mark the outcome complete.
+
+Herdr is optional for native human input or diagnosis. Normal result collection
+and lifecycle assessment do not parse visible pane prose, so old findings and
+repaints cannot become current verdicts or stops by themselves. Actual permission,
+identity, evidence-integrity and native-decision failures still stop. This is future
+qualified behavior, not a waiver of the installed recovery procedure: the retained
+prelaunch scrollback stop remains historical and the operator-restarted review
+remains bound to its own frozen SHA. Current bootstrap reviews continue using the
+separately authorized installed route until replacement readiness is proven.
+
+Alternative rejected: ask each worker to write a success summary and trust its
+existence. That loses full findings/evidence, conflates execution with acceptance,
+and allows stale or partial output to advance the wrong candidate. Captured native
+structured output may be normalized by each qualified adapter, but never upgrades
+a model assertion into verified permission, identity or acceptance.
 
 ### Keep one published orchestration package with adapter boundaries
 
@@ -320,7 +416,8 @@ acceptance record. The current successor chain starts at
 `evidence/plan-approval-reconciliation-20261115.json`, followed by
 `evidence/plan-review-correction-1-20261115.json`,
 `evidence/plan-requirement-streamlining-20261115.json`,
-`evidence/plan-review-consistency-corrections-20261115.json` and the separately retained
+`evidence/plan-review-consistency-corrections-20261115.json`,
+`evidence/plan-artifact-handoff-amendment-20261115.json` and the separately retained
 fresh review packet, full report, lifecycle receipt, identity and validation captures.
 These append-only supplements identify superseded records and rejected reviews
 without editing them. A later authorized correction adds its own supplement;
@@ -351,8 +448,15 @@ rather than session, and distinguish resolved from unresolved native input waits
 This authorizes their one planning-correction/validation/successor-review batch,
 not plan approval, implementation or a historical count reset. Its new append-only
 supplement binds the rejected review and current amended hashes.
-The new supplement distinguishes this authorized revision from the failed attempt
-and binds its complete amended hashes. The future correction policy does not
+The streamlining supplement distinguishes its revision from the failed first
+correction. The later consistency supplement binds its own amended hashes and
+rejected predecessor review. The review of `e5c81274fb1d5ce3bc1be38d8e79a36609385a92`
+then reported `No findings`; its external receipt binds only those bytes. Before
+that review settled, the operator authorized the artifact-first amendment after
+its result, followed by validation, successor freeze and fresh review. The new
+handoff supplement retains that passing predecessor and amendment authority;
+neither the earlier verdict nor this amendment approves the new plan or resets
+the unavailable historical count. The future correction and handoff policies do not
 self-select for this recovery: the original source/remote/native-prompt and
 validation/identity stop boundaries remain unless expressly changed by the operator.
 
@@ -378,7 +482,8 @@ review if its inputs drifted.
 This initial review is a bootstrap exception: the new adapter protocol is itself
 the subject of the plan and cannot prove its own implementation before it exists.
 After the adapter is implemented and qualified, future pre-execution approach
-reviews use the selected host's adapter. Neither form is operator plan approval
+reviews use its artifact-first handoff as well as the selected host's adapter.
+Neither form is operator plan approval
 or candidate review.
 
 ### Automatically expose native human-input waits
@@ -424,6 +529,9 @@ immediate positive identity/no-input checks; otherwise preserve it.
   as completed work. Publication remains a separate authority boundary.
 - [Goal wording becomes vague] → require acceptance evidence and a stop condition
   in the task group and packets.
+- [Stale, partial or forged handoff is mistaken for completion] → bind immutable
+  request/result identities, prove publisher-only writes, finalize evidence before
+  atomic publication and reject unsafe references; no pane-text success fallback.
 
 ## Migration Plan
 
@@ -442,7 +550,8 @@ immediate positive identity/no-input checks; otherwise preserve it.
    replacement candidate; a list of unsupported candidates is not completion.
 3. Update package/version/inventory/docs and add focused tests for host selection,
    automatic same-session exposure, role/model configuration, one-client execution,
-   outcome packet constraints, legacy-route retirement, and independent review.
+   artifact-first assignment/result admission and failure handling, outcome packet
+   constraints, legacy-route retirement, and independent review.
 4. Run the repository gates, freeze a new candidate, and obtain an independent
    review on its exact SHA. Publication and release remain a later `finish` scope.
 
