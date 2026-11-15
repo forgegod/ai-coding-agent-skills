@@ -18,7 +18,7 @@ qualification and replacement-readiness gate; 4 independently verifies the integ
 
 ## 1. Verify the reconstruction boundary
 
-- [ ] 1.1 Verify the approved reconstruction/freeze evidence and preserve the old profile-preparation inputs without treating them as accepted implementation.
+- [x] 1.1 Verify the approved reconstruction/freeze evidence and preserve the old profile-preparation inputs without treating them as accepted implementation.
 
 Acceptance: the design's base, planning identity, grants, preserved commits, and
 input inventory verify; local `main` and installed state remain untouched.
