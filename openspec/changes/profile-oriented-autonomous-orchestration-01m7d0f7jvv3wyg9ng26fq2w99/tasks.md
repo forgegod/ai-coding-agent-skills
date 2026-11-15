@@ -25,7 +25,7 @@ the canonical correction and classification rules without weakening their gates.
 
 ## 1. Verify the reconstruction boundary
 
-- [ ] 1.1 Verify the reconstruction boundary and preserve the old profile-preparation inputs without treating them as accepted implementation.
+- [x] 1.1 Verify the reconstruction boundary and preserve the old profile-preparation inputs without treating them as accepted implementation.
 
 Acceptance: the design's pinned integrated policy base, preserved commits,
 historical evidence, successor parent chain, complete inventory and append-only

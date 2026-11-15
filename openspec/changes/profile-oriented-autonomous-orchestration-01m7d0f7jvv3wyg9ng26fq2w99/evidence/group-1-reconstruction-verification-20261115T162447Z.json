@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "kind": "group-1-reconstruction-boundary-verification",
+  "change": "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99",
+  "task": "1.1",
+  "verified_at": "2026-11-15T16:24:47Z",
+  "approved_plan": {
+    "commit": "480c443b43bf344a3bbd83ade5a28f1a274a7e1a",
+    "tree": "231de894450216ffbec5d2ed3ab2c71f7368b04f",
+    "digest": "b8aad918d69fd5eb190a1ac1e8dc662f319a2074060cfd71fa3d79bc2ab32aee",
+    "approval": "/home/raphael/verification-records/ai-coding-agent-skills/profile-plan-approval-20261115T161133437324Z/plan-approval.json",
+    "approval_sha256": "c255693843285d582b5179a254ce1eb8a9098e80687772665565b83a34b9b6cf"
+  },
+  "successor_chain": {
+    "integrated_policy_base": "ae6488e23414a07d12959bf22bcd283b84d9d8a3",
+    "preserved_candidate": "cc5f23a7f3892fb9e0e5eb858ca8b32e319ac566",
+    "successors": [
+      "d4b87045a72354519af69e0b9b6085c5b4bc5b83",
+      "84a6d8b9a5ee96df94ea66235dab4beea0c504b3",
+      "e5c81274fb1d5ce3bc1be38d8e79a36609385a92",
+      "480c443b43bf344a3bbd83ade5a28f1a274a7e1a"
+    ],
+    "assertion": "Every listed successor has exactly the preceding listed commit as parent. The retained policy base and preserved candidate are ancestors of the approved plan; neither is represented as an integrated target or accepted implementation."
+  },
+  "preservation": {
+    "source_outside_planning_package_unchanged_from_preserved_candidate": true,
+    "historical_evidence_byte_identical": {
+      "approach-review.json": "f3a8c618a08ce681194e3b7a30b9031bfbba0c5a",
+      "freeze-record.json": "234da7fd76915041aeb4cbf6e6a40cbe7ba5b905",
+      "group-1-reconstruction-verification.json": "556021d47ba8f8e41a3261bbdceb6c84f65dbd20",
+      "plan-approval.json": "0372566b19a400bc97afb5b46ad3e479f7e47f46"
+    },
+    "local_main_ref_observed": "850244e95f48c35e4485d8c7bb6de9290a233d6f",
+    "interpretation": "The initial reset/config-reapplication recipe remains historical only. The preserved profile-preparation input and inherited source are preserved audit inputs, not accepted implementation, candidate, gate, or review evidence. This verification did not reset, reapply configuration, alter local main, source, installed profiles, or remote state."
+  },
+  "current_acceptance_binding": {
+    "exact_plan_review": "/home/raphael/verification-records/ai-coding-agent-skills/profile-plan-artifact-handoff-review-20261115T155355298924Z/result.json",
+    "exact_plan_review_sha256": "b222c4149c3d964473d265f2d9d8018fe44a0602d071108cde2d22a1e423b454",
+    "identity_capture": "/home/raphael/verification-records/ai-coding-agent-skills/profile-plan-artifact-handoff-20261115T154521200808Z/frozen-identity-independent.json",
+    "identity_capture_sha256": "9894a216ae8dca06a7512f59fbbe405ddb57d5eec35581c680564f8a60d7fc66",
+    "review_verdict": "No findings",
+    "approval_is_current": true,
+    "approval_is_not_execution_or_implementation_acceptance": true
+  },
+  "planning_inventory": {
+    "all_approved_input_sha256_match": true,
+    "paths": [
+      "openspec/config.yaml",
+      "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/.openspec.yaml",
+      "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/proposal.md",
+      "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/design.md",
+      "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/tasks.md",
+      "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/specs/autonomous-role-orchestration/spec.md",
+      "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/specs/openspec-integration/spec.md"
+    ]
+  },
+  "capture": {
+    "root": "/home/raphael/verification-records/ai-coding-agent-skills/profile-group-1-reconstruction-prewrite-20261115T162447Z",
+    "topology": "topology.command.txt, topology.stdout.log, topology.stderr.log, topology.exit",
+    "hashes": "hashes.command.txt, hashes.stdout.log, hashes.stderr.log, hashes.exit",
+    "history": "history.command.txt, history.stdout.log, history.stderr.log, history.exit",
+    "preservation": "preservation.command.txt, preservation.stdout.log, preservation.stderr.log, preservation.exit",
+    "retained_records": "retained-records.command.txt, retained-records.stdout.log, retained-records.stderr.log, retained-records.exit"
+  },
+  "candidate_gates": {
+    "root": "/home/raphael/verification-records/ai-coding-agent-skills/profile-group-1-candidate-gates-20261115T162622Z",
+    "strict_validation": "strict.command.txt, strict.cwd.txt, strict.stdout.log, strict.stderr.log, strict.exit",
+    "metadata_validation": "metadata.command.txt, metadata.cwd.txt, metadata.stdout.log, metadata.stderr.log, metadata.exit",
+    "whitespace": "whitespace.command.txt, whitespace.cwd.txt, whitespace.stdout.log, whitespace.stderr.log, whitespace.exit",
+    "all_exit_zero": true
+  },
+  "boundary": {
+    "only_authorized_checkout_write_before_candidate_review": "This new append-only evidence record and task 1.1 progress are the only planned checkout writes.",
+    "future_group_2_or_source_implementation": false,
+    "fresh_independent_review_required_for_resulting_candidate": true
+  }
+}
