@@ -168,20 +168,22 @@ for each distinct client variant.
   evidence is missing, failed, or does not bind the selected launch interface
 - **THEN** dispatch stops and the client is not advertised as supported
 
-#### Scenario: Independent bootstrap adapter input
+#### Scenario: Bounded accepted-route bootstrap
 - **WHEN** source work must begin to implement candidate adapters before any
   candidate is qualified
-- **THEN** dispatch requires an independent, operator-supplied, already-qualified
-  terminal-adapter record bound to its exact client/version/launch interface and demonstrating
-  implementation and fresh read-only-review capability, non-argv transport,
-  artifact-first publisher isolation, lifecycle/identity capture, and same-session
-  human-input exposure
-- **AND** that adapter is an explicit source-work input, not a candidate, task
-  progress, or a substitute for separately qualifying each candidate
-- **AND** the legacy Herdr route is never that bootstrap adapter, and no candidate
-  self-qualifies through its own unqualified route
-- **AND** absent, stale, incomplete, or mismatched input stops source work with a
-  retained blocker without fallback or pane dispatch
+- **THEN** the already independently accepted group-2 implementation route MAY
+  perform only the initial task-3 source work and receive a fresh independent,
+  read-only review
+- **AND** that route is not a terminal adapter, is not advertised as supported,
+  does not establish candidate qualification, cannot be a fallback, and expires
+  once a supported adapter exists
+- **AND** each candidate adapter still independently demonstrates its exact
+  client/version/launch interface, implementation and fresh read-only-review
+  capability, non-argv transport, artifact-first publisher isolation,
+  lifecycle/identity capture, and same-session human-input exposure before support
+  or retirement of an old route
+- **AND** a failed or unverifiable candidate remains unsupported without extending
+  the bootstrap exception or automatically dispatching a pane
 
 #### Scenario: Replacement readiness before retirement
 - **WHEN** migration would retire an existing role route or freeze a replacement candidate

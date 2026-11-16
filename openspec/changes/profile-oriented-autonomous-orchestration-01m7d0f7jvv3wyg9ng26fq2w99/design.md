@@ -204,22 +204,27 @@ Alternative rejected: call any available agent a worker. Names, models, imported
 settings, profiles, and environment markers do not establish runtime, session,
 permissions, or independent-review identity.
 
-### Require an independent qualified-adapter input before adapter source work
+### Use one bounded accepted-route bootstrap exception
 
-Task 3.1 cannot qualify itself into authority to make its first source edit. Before
-any task-3 adapter source dispatch, the operator must supply an independent,
-already-qualified terminal-adapter record as an explicit input. It binds the exact
-client/version/launch interface and proves implementation plus fresh read-only-review
-capability, non-argv transport, artifact-first publisher isolation, lifecycle/identity
-capture, and the same-session human-input route required by this plan. The input is
-not a task-3 candidate, task progress, a substitute for qualifying every candidate,
-or execution authority beyond the bounded task-3 dispatch.
+Task 3.1 cannot require a candidate adapter to qualify itself before its first source
+edit. The already independently accepted group-2 implementation route is therefore
+the single bootstrap exception for initial task-3 adapter source work and its fresh
+independent review. It is bound to the existing group-2 acceptance evidence, not to a
+claim that it is a qualified terminal adapter.
 
-The legacy Herdr route is excluded from this bootstrap role. Task 3.1 uses the
-independent input only to implement and then separately qualify the candidate adapters
-under this plan; no candidate may self-qualify through its own unqualified launch
-route. An absent, stale, incomplete, or mismatched input stops task 3.1 with a
-retained blocker. There is no fallback, pane dispatch, or bootstrap exception.
+The bootstrap route may act only until one candidate adapter completes the full
+qualification contract in this plan. It cannot be advertised as supported, count as
+candidate qualification, replace a candidate's exact client/version/launch-interface
+probe, serve as a fallback, or be used after a supported adapter exists. The bootstrap
+route retains the current role separation: the implementation role makes the bounded
+source changes and a fresh independent reviewer remains read-only. It creates no
+automatic pane dispatch, no profile change, and no authority beyond task 3.1.
+
+Every candidate adapter must still separately prove implementation and fresh
+read-only-review capability, non-argv transport, artifact-first publisher isolation,
+lifecycle/identity capture, and the same-session human-input route before it is
+supported or any old route is retired. A failed or unverifiable candidate remains
+unsupported; it does not reactivate or extend the bootstrap exception.
 
 ### Run every worker as a native terminal application
 

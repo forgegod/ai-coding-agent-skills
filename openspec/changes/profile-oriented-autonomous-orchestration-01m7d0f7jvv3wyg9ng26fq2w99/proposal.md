@@ -100,11 +100,13 @@ outcome-oriented unit above fine-grained checklist steps.
   the repository OpenSpec configuration. The orchestrator assigns accepted corrections, revalidates the
   amended draft, and only then presents a specific plan SHA/digest for operator
   approval.
-- Before source work begins to implement candidate adapters, require the operator
-  to supply an independent, already-qualified terminal-adapter record. It is an
-  explicit prerequisite, not a candidate, task-progress claim, or substitute for
-  separately qualifying each candidate; an absent, stale, incomplete, or mismatched
-  record blocks the work without fallback or pane dispatch.
+- Permit one bounded bootstrap exception for the already independently accepted
+  group-2 implementation route to create the initial task-3 adapter source and
+  receive its fresh independent review. The route is not a terminal adapter, is
+  never advertised or treated as qualification evidence, and cannot be used as a
+  fallback or after a supported adapter exists. Every candidate adapter still needs
+  its own complete qualification before support, retirement of an old route, or any
+  later task dispatch.
 - For the explicitly authorized historical-successor recovery described in the
   design, a provisional local identity freeze precedes its exact-identity review;
   review acceptance and operator approval still follow that fresh review. The
