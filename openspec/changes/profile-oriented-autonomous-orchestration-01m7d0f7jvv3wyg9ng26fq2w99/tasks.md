@@ -67,6 +67,8 @@ changing a session id or relabeling the same action.
 Completion stays blocked by any unsatisfied contract or failed gate. In-scope
 repairs use the canonical correction loop; missing authority, non-convergence or
 another operator-disposition boundary stops for the operator.
+Stop: an unsatisfied contract, failed gate, missing authority, non-convergence, or
+another operator-disposition boundary.
 
 ## 3. Deliver qualified terminal workers
 
@@ -76,8 +78,8 @@ Acceptance: every candidate has a qualification or unsupported record; at least
 one adapter supports implementation and fresh read-only review before any old
 route is retired. One-client sequential execution works without requiring distinct
 models. Compatible Hermes profile preparation ships only if Hermes qualifies.
-Before any task-3 adapter source dispatch, an independent already-qualified terminal
-adapter record must be supplied as an explicit input. It binds the exact
+Before any task-3 adapter source dispatch, the operator must supply an independent
+already-qualified terminal-adapter record as an explicit input. It binds the exact
 client/version/launch interface and proves implementation plus fresh read-only-review
 capability, non-argv transport, artifact-first publisher isolation, lifecycle/identity
 capture, and same-session human-input exposure. It is neither a task-3 candidate nor
@@ -106,6 +108,7 @@ and `npm run build` pass after the final edit, and independent review passes for
 the exact candidate SHA. Verify the pre-freeze repository config is unchanged
 from the approved planning digest; never defer stale guidance to another change.
 Completion stays blocked by failed verification, stale guidance or blocking review;
-routine remedies use the canonical correction loop. Stop for an unresolved
-operator-disposition boundary or publication, integration, archive, release or
+routine remedies use the canonical correction loop.
+Stop: failed verification, stale guidance, blocking review, an unresolved
+operator-disposition boundary, or publication, integration, archive, release, or
 workspace retirement requiring separate authority.

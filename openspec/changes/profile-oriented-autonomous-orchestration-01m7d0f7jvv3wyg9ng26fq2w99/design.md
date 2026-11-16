@@ -63,11 +63,16 @@ The current recovery preserves candidate
 The first replacement freeze, `d4b87045a72354519af69e0b9b6085c5b4bc5b83`, has
 that candidate as its sole parent; an authorized planning-correction freeze has
 the preceding frozen plan as its sole parent. Neither parent is represented as
-an integrated target revision. Each successor diff contains only permitted
-planning edits and new append-only reconciliation evidence. Source and the four
-original historical evidence files remain byte-identical to the preserved candidate;
-an ancestry or digest guard pass does not certify their implementation, acceptance,
-or authority.
+an integrated target revision. The preservation invariant applies to each
+planning-successor range from parent
+`42a975d8da521de82972be1824546ccd45a3b27d` to its successor: that range contains
+only permitted planning edits and new append-only reconciliation evidence. The
+branch already contains task-1/task-2 source, test, documentation, and package
+history; retain it as historical branch state rather than asserting whole-branch
+source byte identity to `cc5f23a7f3892fb9e0e5eb858ca8b32e319ac566` or accepting it
+as completed work. The four original historical evidence files remain byte-identical
+to the preserved candidate; an ancestry or digest guard pass does not certify
+implementation, acceptance, or authority.
 Task 1.1 verifies these preservation and non-acceptance boundaries without
 another reset. No new name, branch, or worktree is created.
 
@@ -124,7 +129,9 @@ the newly approved contract, not count its presence as completed work.
 
 Alternative rejected: attach a plan after existing source and mark it complete.
 Preserving inherited source for audit is not accepting its execution order or
-implementation; no task is checked by this recovery.
+implementation. This planning-phase recovery correction does not change task
+progress; already-recorded task state remains unchanged unless a separately
+authorized evidence review establishes otherwise.
 
 ### Keep roles goal-oriented and OpenSpec-owned
 

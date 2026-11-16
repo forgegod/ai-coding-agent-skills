@@ -100,6 +100,11 @@ outcome-oriented unit above fine-grained checklist steps.
   the repository OpenSpec configuration. The orchestrator assigns accepted corrections, revalidates the
   amended draft, and only then presents a specific plan SHA/digest for operator
   approval.
+- Before source work begins to implement candidate adapters, require the operator
+  to supply an independent, already-qualified terminal-adapter record. It is an
+  explicit prerequisite, not a candidate, task-progress claim, or substitute for
+  separately qualifying each candidate; an absent, stale, incomplete, or mismatched
+  record blocks the work without fallback or pane dispatch.
 - For the explicitly authorized historical-successor recovery described in the
   design, a provisional local identity freeze precedes its exact-identity review;
   review acceptance and operator approval still follow that fresh review. The
