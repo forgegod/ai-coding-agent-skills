@@ -197,6 +197,23 @@ Alternative rejected: call any available agent a worker. Names, models, imported
 settings, profiles, and environment markers do not establish runtime, session,
 permissions, or independent-review identity.
 
+### Require an independent qualified-adapter input before adapter source work
+
+Task 3.1 cannot qualify itself into authority to make its first source edit. Before
+any task-3 adapter source dispatch, the operator must supply an independent,
+already-qualified terminal-adapter record as an explicit input. It binds the exact
+client/version/launch interface and proves implementation plus fresh read-only-review
+capability, non-argv transport, artifact-first publisher isolation, lifecycle/identity
+capture, and the same-session human-input route required by this plan. The input is
+not a task-3 candidate, task progress, a substitute for qualifying every candidate,
+or execution authority beyond the bounded task-3 dispatch.
+
+The legacy Herdr route is excluded from this bootstrap role. Task 3.1 uses the
+independent input only to implement and then separately qualify the candidate adapters
+under this plan; no candidate may self-qualify through its own unqualified launch
+route. An absent, stale, incomplete, or mismatched input stops task 3.1 with a
+retained blocker. There is no fallback, pane dispatch, or bootstrap exception.
+
 ### Run every worker as a native terminal application
 
 Every implementation/review worker, including Hermes, runs as an adapter-owned

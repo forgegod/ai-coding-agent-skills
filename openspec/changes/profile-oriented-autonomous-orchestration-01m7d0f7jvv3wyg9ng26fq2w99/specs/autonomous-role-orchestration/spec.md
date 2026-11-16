@@ -168,6 +168,21 @@ for each distinct client variant.
   evidence is missing, failed, or does not bind the selected launch interface
 - **THEN** dispatch stops and the client is not advertised as supported
 
+#### Scenario: Independent bootstrap adapter input
+- **WHEN** task 3.1 must make source changes to implement candidate adapters before
+  any candidate is qualified
+- **THEN** dispatch requires an independent, already-qualified terminal adapter
+  record bound to its exact client/version/launch interface and demonstrating
+  implementation and fresh read-only-review capability, non-argv transport,
+  artifact-first publisher isolation, lifecycle/identity capture, and same-session
+  human-input exposure
+- **AND** that adapter is an explicit task input, not a task-3 candidate, task
+  progress, or a substitute for separately qualifying each candidate
+- **AND** the legacy Herdr route is never that bootstrap adapter, and no candidate
+  self-qualifies through its own unqualified route
+- **AND** absent, stale, incomplete, or mismatched input stops task 3.1 with a
+  retained blocker without fallback or pane dispatch
+
 #### Scenario: Replacement readiness before retirement
 - **WHEN** migration would retire an existing role route or freeze a replacement candidate
 - **THEN** at least one qualified adapter must support both implementation and a

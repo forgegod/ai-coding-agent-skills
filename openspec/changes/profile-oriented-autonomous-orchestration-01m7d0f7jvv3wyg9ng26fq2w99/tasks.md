@@ -76,12 +76,21 @@ Acceptance: every candidate has a qualification or unsupported record; at least
 one adapter supports implementation and fresh read-only review before any old
 route is retired. One-client sequential execution works without requiring distinct
 models. Compatible Hermes profile preparation ships only if Hermes qualifies.
+Before any task-3 adapter source dispatch, an independent already-qualified terminal
+adapter record must be supplied as an explicit input. It binds the exact
+client/version/launch interface and proves implementation plus fresh read-only-review
+capability, non-argv transport, artifact-first publisher isolation, lifecycle/identity
+capture, and same-session human-input exposure. It is neither a task-3 candidate nor
+task progress and does not replace separate candidate qualification. The legacy Herdr
+route is excluded; no candidate self-qualifies through its own unqualified route.
 Each supported adapter proves prompt-file/stdin assignment delivery, native final
 output and lifecycle capture, adapter-only result publication, protected request
 and evidence files, persistent-client turn completion and live native-input waits.
 No reviewer write escalation or pane-scraping success fallback qualifies a route.
 Stop: no qualifying implementation/review adapter, an unsafe or unverifiable
-boundary, or an unresolved native human-input wait after automatic session exposure.
+boundary, an absent/stale/incomplete/mismatched independent bootstrap-adapter input,
+or an unresolved native human-input wait after automatic session exposure. There is no
+fallback or pane dispatch for the bootstrap input.
 A native decision resolved through the qualified same-session surface does not
 itself fail qualification or terminate the outcome; its result follows the contract.
 
