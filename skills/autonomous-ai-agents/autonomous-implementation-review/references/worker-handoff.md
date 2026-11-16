@@ -41,7 +41,11 @@ Its binding contains:
 - `schemaVersion: 1` and `identity`: `attempt`, `predecessor` (null initially),
   `role` (`implementer`, `reviewer`, `approach-reviewer`), full `change`, native
   numeric `group`, `task`, `action`, absolute `workspace`, `plan`, `planDigest`,
-  `candidate` and complete planning `inputs` (path to raw SHA-256).
+  `candidate`, complete planning `inputs` (path to raw SHA-256), and
+  `implementerSession`: the positively verified candidate implementer's session
+  for a reviewer, null for other roles. It is independent of the planning author.
+  Missing identity is refused, never inferred from authorSession or silently
+  filled into historical artifacts; a fresh attempt needs separate authority.
 - `action` equals the native task id; descriptive action labels are not allowance
   keys. A reviewer requires a candidate SHA; other roles use null. Ordinary draft
   approach review may use null plan/digest. Full planning inputs come from delivery's
@@ -49,7 +53,7 @@ Its binding contains:
 - `outcome`, nonempty `acceptance`, `scope`, `nonGoals`, `stop`, and finite positive
   `budget: { limit, unit }` resolved from the group/authority contract.
 - `authority`: `orchestrator`, identical `writer`, `authorSession` (the planning
-  author or candidate implementer for review independence), `approvalReference`,
+  author, not a substitute for implementerSession), `approvalReference`,
   `executionReference`. References describe existing role authority, never create it.
   An approach reviewer may use null approvalReference: review authority is not
   execution-plan approval, including for an authorized provisional successor.
@@ -77,8 +81,9 @@ identity), `requestSha256`, `runtime`, `status`, `verdict`, `nativeVerdict`,
 
 - Runtime fields: adapter, client, version, session, provider, model,
   configurationSource, configurationScope and boolean readOnly. They must equal
-  independent effective-setting readback. Review cannot use the author/implementer
-  or orchestrator session.
+  independent effective-setting readback. Publication and admission both refuse a
+  reviewer session matching identity.implementerSession, authority.authorSession
+  or the orchestrator. Read-only mode does not make an implementer session independent.
 - Status: completed, blocked, failed, capped or stopped. Verdict: no_findings,
   findings, unavailable or not_applicable. Completed implementation is not_applicable;
   incomplete attempts are unavailable with explicit coverage limitations, never
@@ -109,10 +114,17 @@ identity), `requestSha256`, `runtime`, `status`, `verdict`, `nativeVerdict`,
   64 MiB rather than returning truncated evidence.
 
 Finalize and sync all reports/captures first. Validate every required reference,
-size, SHA-256 and lifecycle identity, then write/sync a closed staging result and
-publish result.json with a same-directory atomic no-clobber hard link. The closed
-staging inode is retained, including on failure. Filesystems lacking that primitive
-fail rather than falling back to overwrite/rename. This is atomic visibility, not
+size, SHA-256 and lifecycle identity, then write the staging result, remove all
+write bits (mode 0400), sync and close its handle before atomic no-clobber hard-link
+publication of result.json. Remove the staging alias after successful linking;
+admission requires a read-only regular file with exactly one hard link. No writable
+handle or retained writable alias may survive publication. A collision preserves
+the existing result and the separate sealed staging file. Failed alias removal
+preserves sealed bytes but blocks admission; do not treat file existence as success.
+Filesystems lacking these primitives fail rather than falling back to overwrite/rename.
+Read-only mode does not constrain an administrator or trusted owner who deliberately
+changes permissions or replaces paths; qualified publisher isolation still must
+deny those actions to workers. This is atomic visibility, not
 a claim of power-loss durability on every filesystem. Never hash live append logs
 or create a manifest that includes its own future hash.
 

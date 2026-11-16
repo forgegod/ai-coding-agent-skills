@@ -202,6 +202,10 @@ exposure failure is retained, not retried through a different route. An executor
 turn cap returns factual partial state; only the orchestrator can authorize a
 fresh bounded same-role packet through delivery's `workerContinuationDecision`:
 once per group/native task, never a capped-session resume or a broader goal.
+Every cap handoff, including a retained legacy procedure, passes that fail-closed
+decision and any additional integrated approval gate before dispatch. Never split,
+relabel or change sessions to reset the allowance; a second cap on that native task
+stops. A missing qualified continuation route stops without fallback.
 No next group or next change is implied. Before admitting any terminal worker's
 report, use `readHandoff` under [worker-handoff.md](worker-handoff.md). Execution
 completion, review verdict and delivery acceptance are separate gates.

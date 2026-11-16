@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import * as api from "../skills/software-development/openspec-delivery/scripts/delivery-policy.mjs";
 const plan = "c".repeat(40), planDigest = "d".repeat(64);
 const boundary = () => ({ change: "fixture-change", group: "2", task: "2.1", action: "2.1", workspace: "/synthetic/worktree", plan, planDigest, role: "reviewer", outcome: "Verify feature", acceptance: ["Complete review"], scope: ["feature"], restrictions: ["read-only"], stop: "Identity drift", authorityReference: "retained:execution", budget: { limit: 8, unit: "cycles" } });
@@ -24,6 +25,29 @@ test("continuation is fail-closed on every observation and unchanged authority b
   for (const key of Object.keys(input.observed)) { const observed = { ...input.observed }; delete observed[key]; assert.equal(api.workerContinuationDecision({ ...input, observed }).action, "stop", key); }
   for (const key of ["plan", "planDigest", "scope", "restrictions", "stop", "outcome", "acceptance", "role", "workspace", "authorityReference"]) assert.equal(api.workerContinuationDecision({ ...input, after: { ...boundary(), [key]: "changed" } }).action, "stop", key);
   for (const override of [{ actor: "worker-1" }, { historyVerified: false }, { nextSession: "worker-1" }, { nativeTasks: [{ id: "2.1", group: "3", completed: false }] }, { nativeTasks: [{ id: "2.1", group: "2", completed: true }] }]) assert.equal(api.workerContinuationDecision({ ...input, ...override }).action, "stop");
+});
+
+test("splitting or renaming a capped action cannot manufacture a native task allowance", () => {
+  const input = request();
+  for (const task of ["2.1.a", "repair-2.1", "2.1/part-2"]) {
+    const renamed = { ...boundary(), task, action: task };
+    assert.equal(api.workerContinuationDecision({ ...input, before: renamed, after: renamed,
+      nativeTasks: [{ id: task, group: "2", completed: false }],
+      observed: { ...input.observed, unfinishedAction: task } }).action, "stop", task);
+  }
+  const first = api.workerContinuationDecision(input);
+  assert.equal(api.workerContinuationDecision({ ...input, history: [first.record], previousSession: "new-label", nextSession: "new-session",
+    observed: { ...input.observed, session: "new-label" } }).action, "stop");
+});
+
+test("every documented cap route uses the once-only decision and forbids bypasses", async () => {
+  for (const relative of ["skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md", "skills/autonomous-ai-agents/AGENTS.md"]) {
+    const source = await readFile(new URL(`../${relative}`, import.meta.url), "utf8");
+    assert.match(source, /workerContinuationDecision/, relative);
+    assert.match(source, /second cap.*stop|stop.*second cap/i, relative);
+    assert.match(source, /split.*relabel.*session/i, relative);
+    assert.doesNotMatch(source, /split packets, do not raise caps/, relative);
+  }
 });
 
 test("declared contract edits need independent alignment review, not a separate operator checkpoint", () => {

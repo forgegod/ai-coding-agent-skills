@@ -2,7 +2,7 @@
 // Callers must provide independently retained bindings and protected publisher roots.
 import { createHash, randomUUID } from "node:crypto";
 import { constants } from "node:fs";
-import { lstat, mkdir, open, link } from "node:fs/promises";
+import { lstat, mkdir, open, link, unlink } from "node:fs/promises";
 import path from "node:path";
 
 const need = (ok, message) => { if (!ok) throw new Error(message); };
@@ -57,7 +57,7 @@ function validateRequest(r) {
   keys(r, ["schemaVersion", "identity", "outcome", "acceptance", "scope", "nonGoals", "authority", "restrictions", "budget", "stop", "evidenceRoots", "requiredEvidence", "mutablePaths"], "request");
   need(r.schemaVersion === 1, "Unsupported request schema");
   const id = r.identity;
-  keys(id, ["attempt", "predecessor", "role", "change", "group", "task", "action", "workspace", "plan", "planDigest", "candidate", "inputs"], "identity");
+  keys(id, ["attempt", "predecessor", "role", "change", "group", "task", "action", "workspace", "plan", "planDigest", "candidate", "inputs", "implementerSession"], "identity");
   need([id.attempt, id.role, id.change, id.group, id.task, id.action].every(text), "Invalid literal identity types");
   need(/^[a-zA-Z0-9][a-zA-Z0-9_-]*$/.test(id.attempt) && (id.predecessor === null || (text(id.predecessor) && id.predecessor !== id.attempt)), "Invalid attempt identity");
   need(["implementer", "reviewer", "approach-reviewer"].includes(id.role), "Invalid role");
@@ -65,6 +65,7 @@ function validateRequest(r) {
   absolute(id.workspace);
   need((sha(id.plan) && digest(id.planDigest)) || (id.role === "approach-reviewer" && id.plan === null && id.planDigest === null), "Invalid plan identity");
   need(id.role === "reviewer" ? sha(id.candidate) : id.candidate === null, "Invalid candidate identity");
+  need(id.role === "reviewer" ? text(id.implementerSession) : id.implementerSession === null, "Missing or invalid explicit implementer session");
   inventory(id.inputs);
   const prefix = `openspec/changes/${id.change}/`;
   const required = ["openspec/config.yaml", ...[".openspec.yaml", "proposal.md", "tasks.md"].map((p) => prefix + p)];
@@ -86,22 +87,27 @@ function validateRequest(r) {
 }
 const requestBytes = (request) => Buffer.from(`# Worker request\n\n\`\`\`json\n${canonical(request)}\n\`\`\`\n`);
 const jsonBytes = (value) => Buffer.from(canonical(value) + "\n");
-async function readClosed(p, maxBytes = 64 * 1024 * 1024) {
+async function readClosed(p, maxBytes = 64 * 1024 * 1024, sealed = false) {
   await safePath(p);
   const handle = await open(p, constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0));
   try {
     const before = await handle.stat();
     need(before.isFile() && before.size <= maxBytes, "Unsafe or oversized artifact");
+    if (sealed) need((before.mode & 0o222) === 0 && before.nlink === 1, "Result is not sealed or still has a publication alias");
     const bytes = await handle.readFile();
     const after = await handle.stat();
     need(bytes.length === before.size && after.size === before.size && after.mtimeMs === before.mtimeMs && after.ctimeMs === before.ctimeMs, "Artifact changed during read");
     return bytes;
   } finally { await handle.close(); }
 }
-async function writeClosed(p, bytes) {
+async function writeClosed(p, bytes, sealed = false) {
   await safePath(p, true);
   const handle = await open(p, "wx", 0o600);
-  try { await handle.writeFile(bytes); await handle.sync(); } finally { await handle.close(); }
+  try {
+    await handle.writeFile(bytes);
+    if (sealed) await handle.chmod(0o400);
+    await handle.sync();
+  } finally { await handle.close(); }
 }
 export async function createAttempt({ directory, request, excludedRoots }) {
   request = structuredClone(request);
@@ -143,7 +149,8 @@ function validateResult(result, expected, runtime) {
   keys(runtime, ["adapter", "client", "version", "session", "provider", "model", "configurationSource", "configurationScope", "readOnly"], "runtime");
   need(Object.entries(runtime).every(([k, v]) => k === "readOnly" ? typeof v === "boolean" : text(v)) && same(runtime, result.runtime), "Runtime identity mismatch");
   need(runtime.session !== expected.request.authority.orchestrator && (result.identity.role === "implementer" || runtime.readOnly === true), "Invalid worker/read-only runtime");
-  if (result.identity.role !== "implementer") need(runtime.session !== expected.request.authority.authorSession, "Reviewer must be independent of the author/implementer session");
+  if (result.identity.role !== "implementer") need(runtime.session !== expected.request.authority.authorSession, "Reviewer must be independent of the planning author session");
+  if (result.identity.role === "reviewer") need(runtime.session !== expected.request.identity.implementerSession, "Reviewer must be independent of the candidate implementer session");
   need(["completed", "blocked", "failed", "capped", "stopped"].includes(result.status), "Invalid execution status");
   need(["no_findings", "findings", "unavailable", "not_applicable"].includes(result.verdict), "Invalid review verdict");
   need(list(result.coverageLimitations) && Array.isArray(result.findings), "Invalid coverage/findings");
@@ -219,17 +226,21 @@ export async function publishResult({ expected, runtime, result, files }) {
   await verifyFiles(result, expected);
   await checkExpected(expected);
   const temporary = path.join(expected.directory, `.result-${randomUUID()}.json`);
-  await writeClosed(temporary, jsonBytes(result));
+  await writeClosed(temporary, jsonBytes(result), true);
   // Same-directory hard-link publication is atomic and fails if result.json exists.
-  // Keep the closed staging inode as evidence, including on publication failure.
+  // Seal and close before linking: no writable handle/alias survives publication.
+  // A collision retains the sealed staging file without touching the existing result.
   await safePath(path.join(expected.directory, "result.json"), true);
   await link(temporary, path.join(expected.directory, "result.json"));
+  await unlink(temporary);
+  // Admission fails closed if alias removal failed or the result became writable.
+  await readClosed(path.join(expected.directory, "result.json"), undefined, true);
   return { published: true, deliveryAccepted: false };
 }
 export async function readHandoff({ expected, runtime }) {
   expected = structuredClone(expected); runtime = structuredClone(runtime);
   await checkExpected(expected);
-  const bytes = await readClosed(path.join(expected.directory, "result.json"));
+  const bytes = await readClosed(path.join(expected.directory, "result.json"), undefined, true);
   const result = JSON.parse(bytes.toString("utf8"));
   need(bytes.equals(jsonBytes(result)), "Noncanonical or duplicate result schema fields");
   validateResult(result, expected, runtime);

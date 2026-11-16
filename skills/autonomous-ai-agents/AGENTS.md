@@ -39,12 +39,15 @@ Herdr pane-selection helper.
 - The orchestrator dispatches code/prerequisite fixes to the executor, never edits worker code itself, and honors the operator's explicit launch authority and stop decisions.
 - Model selection is not delivery evidence: after `/model <key>`, follow it with `/status` and require a visible `Agent Running` card whose `Model:` names that key before arming. A missing card, mismatched route or rejected selection stops the role; the setup readback is not idle proof, and a running watcher still never injects a status request.
 - Keep external tool and model references as prerequisites, not bundled dependencies.
+- Every iteration-cap handoff must pass delivery's `workerContinuationDecision` before dispatch, including retained legacy procedures and their additional approval gates. Only one fresh bounded same-role continuation per group/native task is allowed; a second cap stops. Never split, relabel or change sessions to reset the allowance. Preserve the capped session and complete retained history; no result, goal restart or budget increase bypasses the decision.
 - Bound discovery and reuse valid evidence. Arm `herdr_lifecycle_watch.mjs` before delivery and leave the turn after dispatch. It reads `agent get` for identity and `agent read --source detection` for live activity, records one terminal outcome, and never sends input or starts another goal. An unreadable frame (a repaint caught in flight) is retried up to `--unknown-tolerance` consecutive samples and recorded with a bounded frame excerpt, because a single unpainted sample is not evidence of unfamiliar UI; ambiguous visible input still stops at once, and a streak past the tolerance stops, so an unrecognized pane is never watched forever. One `inconclusive` receipt may be resumed once with `--resume-from`, which inherits that receipt's terminal identity and working evidence; identity drift, a changed terminal, or a non-`inconclusive` prior outcome fails closed. Frozen status/counters are not activity proof; unknown output blocks injection. Output inspection only detects unsafe pane input; it cannot bind output to the active Hermes session. A turn-budget cap is an executor handoff, never self-directed continuation or a role switch; only the orchestrator decides a new packet. While Hermes issue #141194 is open, every role handoff requires explicit operator approval of the literal target pane; neither selection nor a watcher receipt permits another packet. Source changes do not authorize installed-profile updates.
 
 ## Verification
 
 Run `npm test` and `npm run build`. Confirm the generated package advertises
 `SKILL.md`, `references/claude-code-roles.md`, `references/herdr.md`,
+`references/environment-passthrough.md`, `references/portable-core.md`,
+`references/worker-handoff.md`, `scripts/orchestration-core.mjs`, `scripts/worker-handoff.mjs`,
 `references/lifecycle-watch.md`, `references/openspec.md`, `references/claude-code-host.md`, `scripts/herdr_panes.py`,
 `scripts/herdr_lifecycle_watch.mjs`, `scripts/herdr-pane-state.mjs`,
 `templates/phase-implementer.md`, and `templates/phase-reviewer.md`.

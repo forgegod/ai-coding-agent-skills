@@ -177,12 +177,17 @@ failed gate or advance a later group. Changed planning bytes pause execution unt
 fresh identity, whole-package review and explicit exact-plan approval. Missing
 authority, native waits, material conflicts or exhausted budgets remain stops.
 
-`workerContinuationDecision` is separate from group advancement. Supply actor and
+`workerContinuationDecision` is separate from group advancement. Every iteration-cap
+handoff must pass it; no route may bypass this decision.
+Group advancement with `observed.workerStatus: capped` stops and directs the caller
+here instead of treating the cap as accepted progress. Supply actor and
 orchestrator, equal `before`/`after` bounded assignments, nativeTasks observations,
 verified complete retained `history`, previousSession, nextSession and observed
 facts. Boundaries contain change/group/task/action, workspace, plan/digest, role,
 outcome, acceptance, scope, restrictions, stop, authorityReference and finite budget.
 Use the native task id itself as action: a label cannot mint another allowance.
+Read nativeTasks from the approved plan and current task progress; never split a
+capped action into invented task ids, relabel it or restart a session to reset the limit.
 
 Observed facts must bind status capped, fresh positive session identity readback,
 onTrack with progressReference against the unchanged acceptance, one unfinished

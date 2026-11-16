@@ -33,6 +33,28 @@ test("Claude instructions lead with native GUI installation and cite primary sou
   assert.match(guide, /No agents, hooks, MCP servers/);
 });
 
+test("current installation guidance matches package versions and preserves handoff support", async () => {
+  const root = new URL("../", import.meta.url);
+  const marketplace = JSON.parse(await readFile(new URL(".claude-plugin/marketplace.json", root), "utf8"));
+  const version = async (relative) => (await readFile(new URL(relative, root), "utf8")).match(/^version: (.+)$/m)[1];
+  const delivery = await version("skills/software-development/openspec-delivery/SKILL.md");
+  const next = await version("skills/software-development/openspec-next/SKILL.md");
+  const core = await version("skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md");
+  const plugin = (name) => marketplace.plugins.find((p) => p.name === name).version;
+  const escaped = (v) => v.replaceAll(".", "\\.");
+  for (const relative of ["README.md", "docs/claude-installation.md", "docs/openspec-installation.md", "docs/openspec-workflow.md"]) {
+    const source = await readFile(new URL(relative, root), "utf8");
+    for (const pattern of [
+      new RegExp(`delivery(?:\x60)?\\s+${escaped(delivery)}\\b`, "i"),
+      new RegExp(`\x60openspec-next\x60(?: is)?\\s+${escaped(next)}\\b`),
+      new RegExp(`core skill ${escaped(core)}\\b`),
+      new RegExp(`\x60openspec-development\x60(?: plugin)?\\s+${escaped(plugin("openspec-development"))}\\b`),
+      new RegExp(`\x60autonomous-orchestration\x60(?: plugin)?(?: is)?\\s+${escaped(plugin("autonomous-orchestration"))}\\b`),
+    ]) assert.match(source, pattern, relative);
+    for (const file of ["references/worker-handoff.md", "scripts/worker-handoff.mjs"]) assert.ok(source.includes(file), `${relative} omits ${file}`);
+  }
+});
+
 test("all launch examples carry the same bounded operator authorization", async () => {
   const files = [readme,
     fileURLToPath(new URL("../skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md", import.meta.url))];

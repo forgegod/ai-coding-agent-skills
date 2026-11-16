@@ -59,6 +59,9 @@ test("continuation advances eligible groups only within policy, persistent restr
   assert.equal(next.action, "advance");
   assert.equal(next.commits, true);
   assert.equal(next.remoteWrites, false);
+  const capped = api.continuationDecision({ ...request, observed: { ...request.observed, workerStatus: "capped" } });
+  assert.equal(capped.action, "stop");
+  assert.match(capped.reason, /workerContinuationDecision/);
   assert.equal(api.continuationDecision({ ...request, policy: { continuation: "single-group" } }).action, "stop");
   assert.equal(api.continuationDecision({ ...request, policy: { continuation: "single-group" }, observed: { ...request.observed, completedGroups: 0 } }).action, "advance");
   assert.equal(api.continuationDecision({ ...request, restrictions: { ...request.restrictions, noCommits: true } }).commits, false);

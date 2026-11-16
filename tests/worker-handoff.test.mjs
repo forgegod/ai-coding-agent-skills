@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, readFile, rm, writeFile, symlink, readdir } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, writeFile, symlink, readdir, chmod, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { createHash } from "node:crypto";
@@ -20,7 +20,7 @@ async function fixture(t, role = "implementer") {
   const inputs = Object.fromEntries(["openspec/config.yaml", ...[".openspec.yaml", "proposal.md", "tasks.md", "specs/a/spec.md"].map((p) => `openspec/changes/fixture-change/${p}`)].map((p) => [p, "a".repeat(64)]));
   const request = {
     schemaVersion: 1,
-    identity: { attempt: "attempt-1", predecessor: null, role, change: "fixture-change", group: "2", task: "2.1", action: "2.1", workspace, plan: "a".repeat(40), planDigest: "b".repeat(64), candidate: role === "reviewer" ? "c".repeat(40) : null, inputs },
+    identity: { attempt: "attempt-1", predecessor: null, role, change: "fixture-change", group: "2", task: "2.1", action: "2.1", workspace, plan: "a".repeat(40), planDigest: "b".repeat(64), candidate: role === "reviewer" ? "c".repeat(40) : null, inputs, implementerSession: role === "reviewer" ? "implementer-1" : null },
     outcome: "Deliver the bounded feature", acceptance: ["Focused tests pass"], scope: ["src/feature.mjs"], nonGoals: ["release"],
     authority: { orchestrator: "owner", writer: "owner", authorSession: "author", approvalReference: "retained:approval", executionReference: "retained:execution" },
     restrictions: ["no Git writes", "no tasks.md writes", "no profile writes", "no subagents", "no multiplexers", ...(role === "implementer" ? [] : ["read-only"])],
@@ -109,6 +109,41 @@ test("publication is invisible before atomic link and collisions preserve the ex
     await assert.rejects(core.publishResult({ expected, runtime: f.runtime, result: f.result, files: f.files }), /EEXIST/);
     assert.equal(atLink, true);
     assert.equal(await readFile(path.join(f.directory, "result.json"), "utf8"), "collision");
+    const staging = (await readdir(f.directory)).filter((p) => p.startsWith(".result-"));
+    assert.equal(staging.length, 1);
+    assert.equal((await stat(path.join(f.directory, staging[0]))).mode & 0o222, 0);
+  } finally { t.mock.restoreAll(); syncBuiltinESMExports(); }
+});
+
+test("published results have no writable staging alias and reject rewrite attempts", async (t) => {
+  const f = await fixture(t);
+  const expected = await prepare(f);
+  await core.publishResult({ expected, runtime: f.runtime, result: f.result, files: f.files });
+  await core.readHandoff({ expected, runtime: f.runtime });
+  const finalPath = path.join(f.directory, "result.json");
+  const original = await readFile(finalPath);
+  const aliases = (await readdir(f.directory)).filter((p) => p.startsWith(".result-"));
+  const rewritePath = aliases.length ? path.join(f.directory, aliases[0]) : finalPath;
+  const changed = original.toString().replace('"src/feature.mjs":"' + "d".repeat(64), '"src/feature.mjs":"' + "e".repeat(64));
+  await assert.rejects(writeFile(rewritePath, changed), /EACCES|EPERM/);
+  assert.deepEqual(await readFile(finalPath), original);
+  assert.equal((await stat(finalPath)).mode & 0o222, 0);
+  assert.equal((await stat(finalPath)).nlink, 1);
+  assert.deepEqual(aliases, []);
+  assert.equal((await core.readHandoff({ expected, runtime: f.runtime })).result.outputs["src/feature.mjs"], "d".repeat(64));
+});
+
+test("failed alias removal preserves sealed evidence but refuses admission", async (t) => {
+  const f = await fixture(t);
+  const expected = await prepare(f);
+  t.mock.method(fs, "unlink", async () => { throw new Error("synthetic unlink failure"); });
+  syncBuiltinESMExports();
+  try {
+    await assert.rejects(core.publishResult({ expected, runtime: f.runtime, result: f.result, files: f.files }), /unlink failure/);
+    await assert.rejects(core.readHandoff({ expected, runtime: f.runtime }), /publication alias/);
+    const alias = (await readdir(f.directory)).find((p) => p.startsWith(".result-"));
+    assert.ok(alias);
+    await assert.rejects(writeFile(path.join(f.directory, alias), "rewrite"), /EACCES|EPERM/);
   } finally { t.mock.restoreAll(); syncBuiltinESMExports(); }
 });
 
@@ -121,6 +156,32 @@ test("runtime reviewer independence, strict request schema and terminal identity
   replaceFile(f, "lifecycle.jsonl", JSON.stringify({ schemaVersion: 1, attempt: "attempt-1", session: "worker-1", event: "terminal", status: "completed", completion: { kind: "exit", code: 1, signal: null } }) + "\n");
   await assert.rejects(core.publishResult({ expected, runtime: f.runtime, result: f.result, files: f.files }), /terminal/);
   assert.ok(!(await readdir(f.directory)).includes("result.json"));
+});
+
+test("candidate reviewer admission requires an explicit distinct implementer session", async (t) => {
+  const f = await fixture(t, "reviewer");
+  for (const value of [undefined, null, ""]) {
+    const request = structuredClone(f.request);
+    if (value === undefined) delete request.identity.implementerSession;
+    else request.identity.implementerSession = value;
+    await assert.rejects(core.createAttempt({ directory: f.directory, request, excludedRoots: [f.workspace] }), /identity|implementer/);
+  }
+  // A planning author is not necessarily the candidate implementer.
+  f.request.identity.implementerSession = "implementer-1";
+  f.result.identity = structuredClone(f.request.identity);
+  const expected = await prepare(f);
+  const runtime = { ...f.runtime, session: "implementer-1" };
+  await assert.rejects(core.publishResult({ expected, runtime, result: { ...f.result, runtime }, files: f.files }), /independent.*implementer/i);
+  assert.ok(!(await readdir(f.directory)).includes("result.json"));
+  await core.publishResult({ expected, runtime: f.runtime, result: f.result, files: f.files });
+  assert.equal((await core.readHandoff({ expected, runtime: f.runtime })).executionCompleted, true);
+  // Simulate a hostile publisher bypass to exercise consumer-side admission too.
+  const finalPath = path.join(f.directory, "result.json");
+  const forged = (await readFile(finalPath, "utf8")).replace('"session":"worker-1"', '"session":"implementer-1"');
+  await chmod(finalPath, 0o600);
+  await writeFile(finalPath, forged);
+  await chmod(finalPath, 0o400);
+  await assert.rejects(core.readHandoff({ expected, runtime }), /independent.*implementer/i);
 });
 
 test("complete findings are valid execution, never delivery acceptance", async (t) => {
@@ -160,7 +221,9 @@ test("missing, partial, stale, unsafe and truncated handoffs remain incomplete",
   await writeFile(path.join(f.directory, "report.md"), "truncated");
   await assert.rejects(core.readHandoff({ expected, runtime: f.runtime }), /truncated/);
   await writeFile(path.join(f.directory, "report.md"), f.files["report.md"]);
-  await writeFile(path.join(f.directory, "result.json"), '{"schemaVersion":');
+  // Simulate hostile replacement, not an authorized publisher overwrite.
+  await rm(path.join(f.directory, "result.json"));
+  await writeFile(path.join(f.directory, "result.json"), '{"schemaVersion":', { mode: 0o400, flag: "wx" });
   await assert.rejects(core.readHandoff({ expected, runtime: f.runtime }), /JSON/);
 });
 

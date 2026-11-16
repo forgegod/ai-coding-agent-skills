@@ -1,7 +1,7 @@
 ---
 name: openspec-delivery
 description: Automate setup, execution and closeout of OpenSpec changes.
-version: 1.2.0
+version: 1.2.1
 author: Raphael (forgegod), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]

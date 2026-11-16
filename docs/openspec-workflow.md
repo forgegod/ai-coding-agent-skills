@@ -778,11 +778,18 @@ Orchestration is optional. It requires the workflow plugin, explicit role and
 model configuration, and a supported host. Package installation does not create
 those roles.
 
-Current source: delivery 1.1.0 in `openspec-development` 1.1.0;
-`openspec-next` 0.2.0 and core skill 0.15.0 in `autonomous-orchestration` 1.5.0.
+Current source: delivery 1.2.1 in `openspec-development` 1.2.1;
+`openspec-next` 0.3.0 and core skill 0.16.1 in `autonomous-orchestration` 1.6.1.
 Representation support adds no upstream workflow, runtime dependency or
 installation route. Package availability/byte checks do not establish account
 sync, host execution, native client discovery, Desktop acceptance or scanner approval.
+
+Complete copies and generated packages preserve delivery's policy/task-authoring
+references and `scripts/delivery-policy.mjs`, plus orchestration's
+`references/portable-core.md`, `scripts/orchestration-core.mjs`,
+`references/worker-handoff.md` and `scripts/worker-handoff.mjs`.
+The handoff pair is required portable support; it does not qualify a client or
+replace protected publication, independent review or delivery acceptance.
 
 ## Verification
 

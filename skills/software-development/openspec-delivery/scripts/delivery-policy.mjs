@@ -82,6 +82,7 @@ export function resolveDeliveryPolicy({ phase, context, selection, contractPaths
 export function continuationDecision({ policy, change, group, authority, restrictions, observed }) {
   const stop = (reason) => ({ action: "stop", reason, commits: false, remoteWrites: false });
   if (restrictions?.inspect === true) return { ...stop("Read-only inspection"), action: "inspect" };
+  if (observed?.workerStatus === "capped") return stop("Worker cap requires workerContinuationDecision; current group remains incomplete");
   if (!restrictions || restrictions.inspect !== false || typeof restrictions.noCommits !== "boolean" ||
       !(restrictions.group === null || text(restrictions.group))) return stop("Missing retained operator restrictions");
   if (!authority || authority.change !== change || !sha(authority.plan) || !digest(authority.planDigest) ||
@@ -126,7 +127,8 @@ export function workerContinuationDecision({ actor, orchestrator, before, after,
       !Number.isSafeInteger(before.budget?.limit) || before.budget.limit <= 0 || !text(before.budget.unit)) return stop("Missing identity or budget");
   // Use the native task id itself as the canonical unfinished-action key. Labels
   // and session IDs are not keys and can never mint another allowance.
-  if (before.action !== before.task || !Array.isArray(nativeTasks) ||
+  if (!/^\d+$/.test(before.group) || !new RegExp(`^${before.group}\\.\\d+$`).test(before.task) ||
+      before.action !== before.task || !Array.isArray(nativeTasks) ||
       nativeTasks.filter((t) => t.id === before.task).length !== 1 ||
       !nativeTasks.some((t) => t.id === before.task && t.group === before.group && t.completed === false)) return stop("No unique unfinished in-group native action");
   if (historyVerified !== true || !Array.isArray(history) || history.some((r) =>

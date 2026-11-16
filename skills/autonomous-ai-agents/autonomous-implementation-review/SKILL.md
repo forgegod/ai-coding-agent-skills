@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.16.0
+version: 0.16.1
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -64,8 +64,8 @@ This retained recipe does not govern the portable core or qualify terminal route
 ## Legacy goal and repository truth
 
 Under adopted short-invocation policy, `/openspec-next` or `/openspec-delivery <name>`
-selects the approved group and configured loop. Local scope includes workspace/
-bootstrap, task updates and previewed commits, not push/PR/merge. Restrictions win.
+selects one approved group. Local workspace/bootstrap, task updates and previewed
+commits exclude push/PR/merge; restrictions win.
 
 Optional persisted-goal launch (display alone grants no authority):
 
@@ -93,8 +93,9 @@ Reuse valid evidence; batch independent lookups.
    and budget; require focused tests, paths/results/risks and a report with links.
 3. On watcher `settled`, inspect the candidate and run relevant checks; lifecycle is
    not success. Under `lifecycle-watch.md`, one `inconclusive` receipt may be resumed
-   once with `--resume-from`; the role stays incomplete until it settles. Otherwise
-   non-`settled` stops. Reviewer/correction needs fresh approval; never inject
+   once with `--resume-from`; the role stays incomplete until it settles. Worker
+   caps use turn-cap recovery below; other non-`settled` outcomes stop.
+   Reviewer/correction needs fresh approval; never inject
    status/reset/goal. Dispatch failed prerequisites to a fresh implementer session;
    the orchestrator does not edit worker code.
 4. Freeze the clean committed candidate through the integration skill. Dispatch a
@@ -113,14 +114,16 @@ Reuse valid evidence; batch independent lookups.
 
 ## Executor turn-cap recovery
 
-`Iteration budget exhausted` is incomplete. The worker returns facts; it
-never self-continues or switches role. The orchestrator alone decides whether to
-stop or dispatch a fresh bounded same-role packet for unfinished work in the
-existing checkout. A cap grants no authority: split packets, do not raise caps.
+`Iteration budget exhausted` is incomplete. The worker stops; it never self-continues or
+switches role.
+The orchestrator alone decides through delivery's `workerContinuationDecision`
+before every cap handoff: once per native task in the existing checkout.
+Never split, relabel or change sessions to reset it; a second cap stops.
+Preserve identity, budget, review and native-input gates; follow
+`references/portable-core.md`. Legacy handoff approvals still apply.
 
 ## Pitfalls and verification
 
 - Conflicting checkout changes block; preserve them, never reset or choose a merge side.
-- This loop is done only with acceptance evidence, actual gates and frozen review.
-  Integration and documentation writes are separate authority. Separate verified
-  results, skips and blockers.
+- Require acceptance evidence, actual gates and frozen review. Report verified
+  results, skips and blockers separately; integration/documentation need separate authority.
