@@ -1,6 +1,6 @@
 # Delivery policy and planning identity
 
-Delivery owns policy selection, freeze stops, grants and continuation. The optional
+Delivery owns policy selection, freeze stops, contract alignment and continuation. The optional
 `autonomous-implementation-review` package owns approach-review protocol and worker
 execution through qualified adapters. No automatic package dependency is added.
 If either optional policy is selected and that package is unavailable, stop before
@@ -61,25 +61,27 @@ Import the pure functions in `scripts/delivery-policy.mjs` from Node 22+:
   explicit `{ parent, path }` edges from the integrated contract/child-contract
   index, not arbitrary prose mentions. Any AGENTS.md/CLAUDE.md at any path is a
   contract; custom paths count only through that explicit designation chain.
-- Before freeze, obtain a separate `grant` with `stage: pre-freeze`, full `change`,
-  the complete raw planning `inputs`, all resulting contract `paths`, and actual
-  operator `reference`. This grant is not later execution-plan approval.
-- `bindContractGrant({ change, inputs, paths, grant, plan, planDigest })`: after
-  freezing, compare exact input and path identity before retaining the binding
-  to the frozen SHA/digest. A failed comparison invalidates the freeze binding.
-- `verifyContractGrant` takes those same fields plus retained `binding` at execution.
-  Refreeze or changed contract paths require a new pre-freeze grant, even if a
-  previous grant was valid. Do not mint another binding from an old grant to hide
-  reuse; read retained prior bindings before requesting a new grant.
+- Compare those paths to the approved plan's `declaredContractPaths`. An undeclared
+  path stops for operator disposition. An in-scope declared edit is ordinary
+  implementation work, not a separate operator checkpoint or notification.
+- `contractAlignment({ declared, changed, head, review })` checks the exact-candidate
+  independent alignment review: head, paths, reviewerSession, implementerSession,
+  readOnly, goalAligned, materialConflict and retained reference. Uncertain alignment
+  or a material scope/authority/safety/external-write/dependency/evidence conflict stops.
+- `bindContractGrant` and `verifyContractGrant` remain read-only compatibility
+  helpers for retained older grant records, not a new mandatory approval step.
+  Existing frozen plans retain their integrated-parent authority and restrictions.
 
-The changed contributor contract cannot select, disable or alter policy for its
-own plan. Planning declarations trigger the stop even when the contract change is
-scheduled for implementation and absent from the plan commit's diff.
+Any working-tree or committed unintegrated contributor-contract edit is inert for
+its own change through integration. Authority, review, commit and continuation
+rules remain those of the integrated plan parent and approved frozen plan. New
+rules become effective only for later changes after integration, never because
+an independent reviewer found the edit goal-aligned.
 
 ## Policy selection and legacy plans
 
 `resolveDeliveryPolicy` consumes `phase: freeze | execute`, verified `context`,
-`selection`, `contractPaths`, grant/binding when required, and optional review and
+`selection`, `contractPaths`, `declaredContractPaths`, and optional review and
 legacy evidence. Context contains `change`, `parent`, integrated `target`, `inputs`
 and `ok: true` only after actual ancestry verification. For prospective freeze,
 `plan`/`planDigest` can be null; execution requires full literal frozen identities.
@@ -101,11 +103,11 @@ file or permission flags. Never infer them from the working-tree contract.
   groups of that same approved change within restrictions, budgets and stops.
   Delivery owns that decision; the core is not a scheduler or a second task list.
 - Verified legacy evidence that a frozen plan predates adoption of the integrated-
-  parent and contributor-grant guards exempts only those two guards until the next
+  parent integrity guard defers that guard until the next
   freeze/refreeze. Supply `legacy` with exact `plan`, `planDigest`, retained
   `reference`, `verified: true` and `predatesIntegrityGuards: true` only after
   evidence readback. Keep historical parent-policy selection, approval and all
-  other execution restrictions. Do not fabricate a grant or infer legacy status
+  other execution restrictions. Do not fabricate authority or infer legacy status
   from age, missing evidence or a failed new guard. Freeze has no legacy exemption.
 
 These helpers check structure and consistency of supplied observations; they do
@@ -130,6 +132,8 @@ is a pure decision check, not a launcher or durable progress ledger:
 - `group` has native `id`, declared `stop` and a positive finite `{ limit, unit }`
   budget, optionally inherited from `authority.budget`. Budget observations use
   that same unit and retained consumed history; no reset on resume.
+  When both budgets exist, `observed.authorityBudgetUsed` independently measures
+  the authority budget in its own unit; a larger group budget cannot mask exhaustion.
 - `authority` binds the same `change`, approved `plan`/`planDigest`, actual execution
   `reference` and separate `approvalReference`. `restrictions` retains `inspect`,
   `noCommits` and a selected `group` or null; other operator limits also still apply.
@@ -156,3 +160,42 @@ do not bypass the mandatory independent-review gate to advance. The decision's
 orchestrator updates proved task boxes and previews authorized commits. Every
 subsequent group repeats the gate, without a new plumbing prompt. `finish` remains
 separate named publication/closure authority; these policies never grant it.
+
+## Worker handoff, corrections and iteration caps
+
+For a selected terminal route, require orchestration's `readHandoff` and
+`references/worker-handoff.md` before using worker output as evidence. Completion
+with findings is valid execution, not acceptance. Missing/invalid handoff leaves
+the group incomplete. Recheck actual output paths/hashes, approved-plan/digest,
+gates and independent review; only the orchestrator updates tasks.
+
+Use orchestration's canonical `correctionDecision` and review-record continuity
+for routine in-scope failures/findings. Dispatch source/test/documentation repairs
+to the qualified implementer; planning amendments belong to the authorized
+orchestrator. Do not prompt merely to approve an already-granted repair, waive a
+failed gate or advance a later group. Changed planning bytes pause execution until
+fresh identity, whole-package review and explicit exact-plan approval. Missing
+authority, native waits, material conflicts or exhausted budgets remain stops.
+
+`workerContinuationDecision` is separate from group advancement. Supply actor and
+orchestrator, equal `before`/`after` bounded assignments, nativeTasks observations,
+verified complete retained `history`, previousSession, nextSession and observed
+facts. Boundaries contain change/group/task/action, workspace, plan/digest, role,
+outcome, acceptance, scope, restrictions, stop, authorityReference and finite budget.
+Use the native task id itself as action: a label cannot mint another allowance.
+
+Observed facts must bind status capped, fresh positive session identity readback,
+onTrack with progressReference against the unchanged acceptance, one unfinished
+in-group action, a fresh same-role session through the same qualifiedRoute, and
+positive groupBudgetRemaining and authorityBudgetRemaining. They explicitly deny
+nativePrompt, failedGate, drift, contradictory evidence and stopReached. A reviewer
+remains readOnly and never inherits the implementer's conversation. Any absent
+observation or unsupported route stops. This is not a self-continuation token.
+
+Retain the returned record before launch with both session ids. It consumes the
+one allowance per change/group/native task, independent of session, role or label.
+A second cap stops. Never inject into the capped session or resume a broader goal.
+A new artifact directory links its predecessor but does not reset this count.
+Budget exhaustion is a stop, not an iteration cap. Existing integrated handoff
+gates still constrain already-frozen changes; this source revision grants no new
+handoff authority to the change implementing it.

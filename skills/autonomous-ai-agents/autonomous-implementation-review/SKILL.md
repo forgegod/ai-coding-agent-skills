@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.15.0
+version: 0.16.0
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -25,11 +25,12 @@ One authorized OpenSpec change, one named task group per worker; no GitHub write
 
 ## Portable core
 
-For outcome packets, approach review and policy execution, follow
+For outcome packets and review, follow
 [references/portable-core.md](references/portable-core.md) and
-`references/openspec.md`, without Hermes or Herdr. Dispatch requires a selected
-qualified terminal adapter. Core tests do not qualify clients. Replacement
-implementation/read-only review readiness must precede legacy retirement; no fallback.
+`references/openspec.md`, without Hermes or Herdr. Use
+[references/worker-handoff.md](references/worker-handoff.md) for artifact-first
+handoffs. Dispatch requires a selected qualified adapter; core checks do not
+qualify clients. Replacement readiness precedes legacy retirement; no fallback.
 
 ## Legacy host execution
 
@@ -99,9 +100,8 @@ Reuse valid evidence; batch independent lookups.
 4. Freeze the clean committed candidate through the integration skill. Dispatch a
    fresh reviewer role through Herdr with base/digest, paths/diff, acceptance
    criteria, gate evidence and implementation report. Keep the candidate frozen.
-5. Require severity-ordered findings with `path:line`, impact, trigger and minimal
-   correction/reproduction, or `No findings`. Review correctness, regressions,
-   security/privacy, data loss/concurrency, contracts and test gaps, not refactors.
+5. Apply the candidate review criteria in `references/portable-core.md`; require
+   actionable findings or `No findings`.
 6. Reproduce findings; send confirmed fixes to a fresh implementer role in the same
    checkout with the original contract. Changed content requires renewed gates and
    review. Limit to two fix/review cycles; a third needs operator direction.

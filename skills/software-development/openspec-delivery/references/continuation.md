@@ -6,7 +6,7 @@ Keep one orchestrator and one task-progress/Git writer; no second task table,
 profile-local progress file, scheduler, lease or automatic backlog dispatch.
 
 Before freeze or execution, follow [delivery-policy.md](delivery-policy.md).
-It owns integrated-parent policy selection, contributor-contract grants,
+It owns integrated-parent policy selection, contributor-contract alignment,
 pre-execution approach-review gating and the continuous-goal stop contract.
 Single-group is the default below. Where continuous-goal is selected at the
 frozen plan's integrated parent, repeat this procedure for consecutive eligible
@@ -70,7 +70,9 @@ Earlier operator restrictions remain in effect. `no commits` means keep changes
 and report the uncommitted boundary; do not call a clean-candidate guard as if a
 commit existed. `inspect` means read-only. Approval of a plan is not the invocation
 that starts it. Scope/gate/dependency changes require renewed approval. A correction
-stays in the same change/group with at most two correction/review cycles.
+stays in the same change/group under the canonical orchestration correction loop:
+eight cumulative automatic cycles or the narrower inherited group/authority limit.
+Existing legacy two-cycle limits remain effective for their frozen changes.
 
 ## Local execution is automatic, not permissionless
 
@@ -92,7 +94,7 @@ a tick/evidence commit after review changes the SHA and requires renewed review.
 Per-group verdicts do not substitute for review of the final delivery candidate.
 Retain committed plan identity, candidate and review evidence; transient reports
 are not completion. Retain correction/review attempt identities and dispositions
-in change-owned evidence or verified review references; derive the two-cycle
+in change-owned evidence or verified review references; derive the effective
 budget from them on resume. Missing cycle evidence is a recovery blocker, never
 a reset to cycle zero. Do not ask to authorize every Git command already covered.
 
@@ -101,7 +103,8 @@ records. A successor disposition names the rejected candidate/review and the new
 candidate, carries the consumed correction/re-review cycles forward, and links
 fresh gates and review bound to that exact successor SHA. Retain the old bytes
 and hashes after a later pass; never overwrite or relabel rejection as acceptance.
-The two-cycle limit is inherited across successors and resumes. Missing attempt
+The effective limit (including a narrower inherited two-cycle limit) is retained
+across successors and resumes. Missing attempt
 or cycle evidence refuses continuation until a separately authorized recovery
 resolves it; a new filename or reviewer does not restart the budget. This is an
 orchestrator procedure, not a product budget validator or persistent ledger.

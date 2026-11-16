@@ -33,8 +33,9 @@ remain unchanged; native `tasks.md` stays the sole mutable progress authority.
 
 Apply [delivery policy](../skills/software-development/openspec-delivery/references/delivery-policy.md)
 before freeze/execution: derive policy from the verified integrated plan parent,
-not a changed working-tree contributor contract. Require separate pre-freeze
-authority for declared/diffed contributor-contract changes. The examples below
+not a changed working-tree contributor contract. Declared goal-aligned contract
+edits receive independent alignment review, not a separate operator checkpoint;
+unintegrated edits cannot change their own authority through integration. The examples below
 show default single-group behavior. If the parent's contributor contract selected
 continuous-goal, a bare next advances consecutive eligible groups until an explicit
 stop, budget or authority boundary; a narrower operator restriction wins. Selected

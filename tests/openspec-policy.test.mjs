@@ -30,9 +30,9 @@ test("delivery policy comes only from the integrated plan parent and preserves v
   assert.equal(api.resolveDeliveryPolicy({ ...request, selection: selected, orchestrationAvailable: true, reviewAcceptance }).continuation, "continuous-goal");
   const partial = { ...inputs }; delete partial["openspec/config.yaml"];
   assert.throws(() => api.resolveDeliveryPolicy({ ...request, selection: selected, orchestrationAvailable: true, reviewAcceptance: { ...reviewAcceptance, inputs: partial } }), /review/);
-  assert.throws(() => api.resolveDeliveryPolicy({ ...request, contractPaths: ["AGENTS.md"] }), /grant/);
+  assert.throws(() => api.resolveDeliveryPolicy({ ...request, contractPaths: ["AGENTS.md"] }), /declared/);
   const grant = { stage: "pre-freeze", change: "fixture-change", inputs, paths: ["AGENTS.md"], reference: "retained:contract-grant" };
-  assert.equal(api.resolveDeliveryPolicy({ ...request, phase: "freeze", context: { ...context(), plan: null, planDigest: null }, contractPaths: grant.paths, grant }).integrityGuards, true);
+  assert.equal(api.resolveDeliveryPolicy({ ...request, phase: "freeze", context: { ...context(), plan: null, planDigest: null }, contractPaths: grant.paths, declaredContractPaths: grant.paths }).integrityGuards, true);
   const legacy = { plan, planDigest, reference: "retained:pre-adoption-freeze", verified: true, predatesIntegrityGuards: true };
   const old = { ...request, legacy, context: { ...context(), ok: false }, contractPaths: ["AGENTS.md"] };
   assert.equal(api.resolveDeliveryPolicy(old).integrityGuards, false);
@@ -73,6 +73,10 @@ test("continuation advances eligible groups only within policy, persistent restr
   assert.equal(api.continuationDecision({ ...request, group: { ...request.group, budget: undefined } }).action, "stop");
   assert.equal(api.continuationDecision({ ...request, group: { ...request.group, budget: undefined }, authority: { ...request.authority, budget: request.group.budget } }).action, "advance");
   assert.equal(api.continuationDecision({ ...request, group: { ...request.group, stop: undefined } }).action, "stop");
+  const bounded = { ...request, authority: { ...request.authority, budget: { limit: 2, unit: "cycles" } } };
+  assert.equal(api.continuationDecision(bounded).action, "stop", "separate authority consumption cannot be omitted when a group has its own budget");
+  assert.equal(api.continuationDecision({ ...bounded, observed: { ...request.observed, authorityBudgetUsed: 2 } }).action, "stop");
+  assert.equal(api.continuationDecision({ ...bounded, observed: { ...request.observed, authorityBudgetUsed: 1 } }).action, "advance");
 });
 
 test("contributor grant binds all declared or changed contracts to exact pre-freeze inputs and freeze identity", async () => {

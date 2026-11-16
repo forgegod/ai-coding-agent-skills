@@ -81,9 +81,9 @@ test("lossless evidence guidance documents the fail-closed claim contract", asyn
   }
 });
 
-test("policy/textual procedure retains successor history and inherits the two-cycle limit", async () => {
+test("policy/textual procedure retains successor history and narrower inherited correction limits", async () => {
   const continuation = await read("skills/software-development/openspec-delivery/references/continuation.md");
-  for (const pattern of [/distinct rejected-candidate, rejected-review and successor-disposition/, /names the rejected candidate\/review and the new\s+candidate/, /carries the consumed correction\/re-review cycles forward/, /fresh gates and review bound to that exact successor SHA/, /Retain the old bytes\s+and hashes after a later pass/, /never overwrite or relabel rejection as acceptance/, /two-cycle limit is inherited across successors and resumes/, /Missing attempt\s+or cycle evidence refuses continuation until a separately authorized recovery/, /new filename or reviewer does not restart the budget/, /not a product budget validator or persistent ledger/]) assert.match(continuation, pattern);
+  for (const pattern of [/distinct rejected-candidate, rejected-review and successor-disposition/, /names the rejected candidate\/review and the new\s+candidate/, /carries the consumed correction\/re-review cycles forward/, /fresh gates and review bound to that exact successor SHA/, /Retain the old bytes\s+and hashes after a later pass/, /never overwrite or relabel rejection as acceptance/, /narrower inherited two-cycle limit.*retained\s+across successors and resumes/, /Missing attempt\s+or cycle evidence refuses continuation until a separately authorized recovery/, /new filename or reviewer does not restart the budget/, /not a product budget validator or persistent ledger/]) assert.match(continuation, pattern);
   // Synthetic procedure illustration only: no scheduler, ledger or runtime budget check.
   const first = { candidate: "synthetic-rejected-1", review: "synthetic-review-1", consumedCycles: 1 };
   const successor = { rejectedCandidate: first.candidate, rejectedReview: first.review, candidate: "synthetic-successor", consumedCycles: first.consumedCycles };
@@ -93,7 +93,7 @@ test("policy/textual procedure retains successor history and inherits the two-cy
   const missingCycle = { ...second, consumedCycles: undefined };
   assert.equal(missingCycle.consumedCycles, undefined);
   assert.match(continuation, /Missing cycle evidence is a recovery blocker, never\s+a reset to cycle zero/);
-  assert.match(continuation, /at most two correction\/review cycles/);
+  assert.match(continuation, /eight cumulative automatic cycles or the narrower inherited group\/authority limit/);
 });
 
 test("policy/textual closure procedure separates exact identities and orders gates, fresh review and publication", async () => {

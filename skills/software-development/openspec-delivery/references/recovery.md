@@ -12,7 +12,7 @@ without rewriting the original record.
 | --- | --- |
 | Dirty/unowned checkout, conflicting run or ambiguous operator | Stop and retain paths/refs; operator chooses ownership and safe next action. No reset, discard, silent unassignment or competing executor. |
 | Proposed plan changed after approval | Reapprove named changed scope/gates and digest before continuing. Preserve previous approval and evidence. |
-| Candidate changed after review | Run gates and independent review on the new exact candidate; do not relabel old review. At most two correction/review cycles before escalation. |
+| Candidate changed after review | Run gates and independent review on the new exact candidate; do not relabel old review. Use the canonical correction loop and retained cumulative count: eight automatic cycles or a narrower inherited group/authority limit (including legacy two-cycle limits). |
 | Push/comment/PR write timed out | Read the exact target and intended content back. Resume only from known state; do not replay a possibly successful write blindly. |
 | Open PR waiting on review or checks | Not a failure and not a second pull request. Resume under finish from the actual head and review state. |
 | Implementation already merged, no receipt | Verify actual merge and target, run missing integrated gates, then prepare the same change's truthful receipt/archive. Do not reapply implementation. |

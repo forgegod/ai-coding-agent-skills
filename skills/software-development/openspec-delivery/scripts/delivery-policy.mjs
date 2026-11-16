@@ -56,7 +56,7 @@ export function verifyContractGrant(request) {
   return true;
 }
 
-export function resolveDeliveryPolicy({ phase, context, selection, contractPaths, grant, binding, legacy, orchestrationAvailable, reviewAcceptance }) {
+export function resolveDeliveryPolicy({ phase, context, selection, contractPaths, declaredContractPaths, legacy, orchestrationAvailable, reviewAcceptance }) {
   requireThat(["freeze", "execute"].includes(phase), "Unknown delivery policy phase");
   requireThat(context && sha(context.parent) && sha(context.target), "Missing integrated parent identity");
   planningInputs(context.change, context.inputs);
@@ -68,9 +68,9 @@ export function resolveDeliveryPolicy({ phase, context, selection, contractPaths
     typeof selection.preExecutionReview === "boolean" && typeof selection.continuousGoal === "boolean", "Policy must come from the plan parent contributor contract");
   const paths = canonicalPaths(contractPaths);
   if (!exempt && paths.length) {
-    const request = { ...context, paths, grant, binding };
-    if (phase === "freeze") checkGrant(request);
-    else verifyContractGrant(request);
+    requireThat(Array.isArray(declaredContractPaths), "Missing declared contributor-contract path set");
+    const declared = canonicalPaths(declaredContractPaths);
+    requireThat(paths.every((p) => declared.includes(p)), "Undeclared contributor-contract edit requires operator disposition");
   }
   if (selection.preExecutionReview || selection.continuousGoal) requireThat(orchestrationAvailable === true, "Selected policy requires the orchestration package");
   if (selection.preExecutionReview) requireThat(reviewAcceptance?.action === "freeze-ready" && text(reviewAcceptance.reference) &&
@@ -95,8 +95,53 @@ export function continuationDecision({ policy, change, group, authority, restric
   if (!text(group.stop)) return stop("Missing declared stop condition");
   if (!budget || !Number.isSafeInteger(budget.limit) || budget.limit <= 0 || !text(budget.unit) ||
       !Number.isFinite(observed.budgetUsed) || observed.budgetUsed < 0 || observed.budgetUsed >= budget.limit) return stop("Missing or exhausted budget");
+  if (group.budget && authority.budget && (!Number.isSafeInteger(authority.budget.limit) || authority.budget.limit <= 0 || !text(authority.budget.unit) ||
+      !Number.isFinite(observed.authorityBudgetUsed) || observed.authorityBudgetUsed < 0 || observed.authorityBudgetUsed >= authority.budget.limit)) return stop("Missing or exhausted authority budget");
   if (!Number.isSafeInteger(observed.completedGroups) || observed.completedGroups < 0) return stop("Missing group completion evidence");
   if (!["single-group", "continuous-goal"].includes(policy?.continuation)) return stop("Missing selected continuation policy");
   if ((policy.continuation === "single-group" || restrictions.group !== null) && observed.completedGroups > 0) return stop("Authorized group completed");
   return { action: "advance", group: group.id, commits: !restrictions.noCommits, remoteWrites: false };
+}
+
+export function contractAlignment({ declared, changed, head, review }) {
+  const stop = { action: "operator-disposition", policyChanged: false };
+  const paths = canonicalPaths(changed);
+  if (!paths.every((p) => canonicalPaths(declared).includes(p)) || !sha(head) || review?.head !== head ||
+      !text(review.reference) || review.readOnly !== true || !text(review.reviewerSession) ||
+      !text(review.implementerSession) || review.reviewerSession === review.implementerSession ||
+      review.goalAligned !== true || review.materialConflict !== false ||
+      JSON.stringify(paths) !== JSON.stringify(canonicalPaths(review.paths))) return stop;
+  return { action: "aligned", policyChanged: false, reference: review.reference };
+}
+
+// Observations must come from retained history and fresh adapter identity readback.
+// This returns one record to retain BEFORE launch; it never launches or resumes.
+export function workerContinuationDecision({ actor, orchestrator, before, after, nativeTasks, history, historyVerified, previousSession, nextSession, observed }) {
+  const stop = (reason) => ({ action: "stop", reason, progressComplete: false });
+  if (!text(orchestrator) || actor !== orchestrator) return stop("Only the orchestrator may continue a worker");
+  if (!before || !after || !sameInputs(before, after)) return stop("Changed continuation boundary");
+  for (const field of ["change", "group", "task", "workspace", "outcome", "stop", "authorityReference"]) if (!text(before[field])) return stop("Incomplete bounded assignment");
+  if (!sha(before.plan) || !digest(before.planDigest) || !["implementer", "reviewer", "approach-reviewer"].includes(before.role) ||
+      ![before.acceptance, before.scope, before.restrictions].every((v) => Array.isArray(v) && v.length && v.every(text)) ||
+      !Number.isSafeInteger(before.budget?.limit) || before.budget.limit <= 0 || !text(before.budget.unit)) return stop("Missing identity or budget");
+  // Use the native task id itself as the canonical unfinished-action key. Labels
+  // and session IDs are not keys and can never mint another allowance.
+  if (before.action !== before.task || !Array.isArray(nativeTasks) ||
+      nativeTasks.filter((t) => t.id === before.task).length !== 1 ||
+      !nativeTasks.some((t) => t.id === before.task && t.group === before.group && t.completed === false)) return stop("No unique unfinished in-group native action");
+  if (historyVerified !== true || !Array.isArray(history) || history.some((r) =>
+    r?.schemaVersion !== 1 || ![r.change, r.group, r.task, r.previousSession, r.nextSession, r.progressReference].every(text))) return stop("Missing retained continuation history");
+  if (history.some((r) => r.change === before.change && r.group === before.group && r.task === before.task)) return stop("Native action continuation already consumed");
+  if (![previousSession, nextSession].every(text) || previousSession === nextSession ||
+      [previousSession, nextSession].includes(orchestrator) || history.some((r) => [r.previousSession, r.nextSession].includes(nextSession))) return stop("Continuation requires a fresh distinct session");
+  const required = { status: "capped", identityVerified: true, session: previousSession, onTrack: true, unfinishedAction: before.task,
+    freshSession: true, nativePrompt: false, failedGate: false, drift: false, contradictory: false, stopReached: false };
+  if (!observed || Object.entries(required).some(([key, value]) => observed[key] !== value) ||
+      !text(observed.progressReference) || JSON.stringify(observed.acceptance) !== JSON.stringify(before.acceptance) ||
+      !text(observed.qualifiedRoute) || observed.nextQualifiedRoute !== observed.qualifiedRoute ||
+      typeof observed.readOnly !== "boolean" || (before.role !== "implementer" && observed.readOnly !== true) ||
+      ![observed.groupBudgetRemaining, observed.authorityBudgetRemaining].every((v) => Number.isFinite(v) && v > 0)) return stop("Unproved progress, identity, route or stop boundary");
+  return { action: "continue-worker", progressComplete: false, record: structuredClone({ schemaVersion: 1,
+    change: before.change, group: before.group, task: before.task, action: before.task,
+    previousSession, nextSession, boundary: before, route: observed.qualifiedRoute, progressReference: observed.progressReference }) };
 }

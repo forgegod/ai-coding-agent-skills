@@ -1,5 +1,7 @@
-// Pure packet/evidence checks. No client, process, filesystem or progress writes.
+// Pure packet/evidence checks plus explicit adapter-only artifact I/O exports.
+// No client launch, process control, Git or task-progress writes.
 // Inputs are retained observations, not authenticated grants or a distributed lock.
+export { createAttempt, publishResult, readHandoff } from "./worker-handoff.mjs";
 const requireThat = (condition, message) => { if (!condition) throw new Error(message); };
 const text = (value) => typeof value === "string" && value.trim().length > 0;
 const list = (value) => Array.isArray(value) && value.length > 0 && value.every(text);
@@ -124,6 +126,40 @@ export function outcomePacket({ group, authority, workerSession }) {
     progressWriter: authority.orchestrator,
     forbidden: ["tasks", "git", "profiles", "remote", "subagents", "multiplexers"],
   });
+}
+
+export function correctionDecision(request) {
+  const { actor, orchestrator, kind, frozen, grant, qualifiedImplementer } = request;
+  const stop = { action: "operator-disposition", goal: request.goal, cumulativeCycles: request.cumulativeCycles,
+    executionAuthorized: false, finding: { ...structuredClone(request.finding), blocking: true } };
+  if (!text(orchestrator) || actor !== orchestrator || !["planning", "source", "test", "implementation-documentation"].includes(kind) ||
+      typeof frozen !== "boolean" || request.nativeInput !== false || request.identityVerified !== true ||
+      ![request.groupBudgetRemaining, request.authorityBudgetRemaining].every((n) => Number.isFinite(n) && n > 0) ||
+      !["write", "validate", "review"].every((p) => grant?.[p] === true)) return stop;
+  if (kind === "planning" && frozen && (grant.planningAmendment !== true || grant.successorFreeze !== true)) return stop;
+  if (kind !== "planning" && (!text(qualifiedImplementer) || qualifiedImplementer === orchestrator || grant.launch !== true)) return stop;
+  const decision = planningCorrection({ ...request, frozen: false });
+  if (decision.action === "operator-disposition") return stop;
+  return { ...decision, writer: kind === "planning" ? orchestrator : qualifiedImplementer,
+    action: decision.action === "retain-unfounded" ? decision.action : kind === "planning" ?
+      (frozen ? "amend-validate-freeze-review" : "apply-validate-review") : "dispatch-implementer",
+    requiresExactPlanApproval: kind === "planning", executionAuthorized: false };
+}
+
+export function acceptSuccessorReview({ change, identity, receipt, currentInputs, currentPackageHashes, chain, validation }) {
+  inventory(change, identity?.inputs);
+  requireThat(sha(identity.plan) && sha(identity.tree) && digest(identity.planDigest), "Missing successor identity");
+  const hashes = (v) => v && typeof v === "object" && !Array.isArray(v) && Object.keys(v).length > 0 && Object.values(v).every(digest);
+  requireThat(chain?.verified === true && chain.preservationVerified === true && text(chain.reference) && hashes(chain.superseded), "Missing verified append-only preservation chain");
+  requireThat(receipt && ["plan", "tree", "planDigest"].every((k) => receipt[k] === identity[k]) &&
+    sameInputs(receipt.inputs, identity.inputs) && sameInputs(currentInputs, identity.inputs), "Successor review identity/input drift");
+  requireThat(hashes(receipt.packageHashes) && sameInputs(receipt.packageHashes, currentPackageHashes), "Review package hash drift");
+  requireThat(text(receipt.model) && text(receipt.reference) && text(receipt.authorSession) && text(receipt.reviewerSession) &&
+    receipt.authorSession !== receipt.reviewerSession && receipt.readOnly === true && noBlockingFindings(receipt), "Missing independent successor verdict");
+  requireThat(validation?.plan === identity.plan && validation.exitCode === 0 && text(validation.reference) &&
+    sameInputs(validation.inputs, identity.inputs), "Missing retained successful successor validation");
+  return { action: "freeze-ready", inputs: structuredClone(identity.inputs), reference: receipt.reference,
+    plan: identity.plan, planDigest: identity.planDigest, planApproved: false, executionAuthorized: false };
 }
 
 export function candidateReviewPacket({ group, authority, implementerSession, reviewerSession, head, base, gates }) {

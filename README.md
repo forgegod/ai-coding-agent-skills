@@ -36,8 +36,9 @@ GitHub issues and pull requests document and review. They are not the task list 
 Installing these packages does not select the workflow for another project, transfer that project's records, or grant Git or GitHub authority.
 
 The [delivery policy protocol](skills/software-development/openspec-delivery/references/delivery-policy.md)
-checks the integrated plan parent and separate contributor-contract grants before
-freeze/execution. Single-group continuation remains the default; pre-execution
+checks the integrated plan parent and declared contributor-contract paths before
+freeze/execution; independent review determines goal alignment without a separate
+approval checkpoint for an in-scope edit. Single-group continuation remains the default; pre-execution
 approach review and continuous-goal continuation require explicit selection at
 that parent and the optional orchestration package. Later policy edits do not
 widen frozen plans. Its [portable core](skills/autonomous-ai-agents/autonomous-implementation-review/references/portable-core.md)
@@ -45,6 +46,13 @@ checks outcome/review evidence without Hermes or Herdr; it does not qualify a
 client or retire a legacy route. Terminal adapter qualification remains a separate
 prerequisite for new role dispatch. Minimum-outcome authoring accompanies workflow
 adoption for unfrozen plans, without rewriting already-approved plans.
+The [artifact-first handoff](skills/autonomous-ai-agents/autonomous-implementation-review/references/worker-handoff.md)
+binds immutable requests, complete native reports/captures and atomic adapter-only
+results. Execution completion never grants delivery acceptance. Routine corrections
+use the permitted writer and retained budget; one verified iteration-cap continuation
+is keyed to the native task, not a session or label. Unintegrated contract changes
+are inert for their own change through integration. This repository's future-policy
+selection becomes effective only for later plans after integration.
 
 The delivery Git helpers share an explicit [child environment contract](skills/software-development/openspec-delivery/references/git-environment.md):
 only allowlisted runtime/configuration values reach Git, with global/system selectors

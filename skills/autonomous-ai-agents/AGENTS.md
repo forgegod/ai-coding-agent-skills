@@ -12,6 +12,7 @@ Herdr pane-selection helper.
 | `autonomous-implementation-review/SKILL.md` | Bounded implementation, review, and verification loop. |
 | `autonomous-implementation-review/references/portable-core.md` | Client-neutral outcome, approach-review, review-record continuity and candidate-review procedure. |
 | `autonomous-implementation-review/scripts/orchestration-core.mjs` | Pure packet and retained-observation checks; no launch, progress writes or authority authentication. |
+| `autonomous-implementation-review/scripts/worker-handoff.mjs` and `references/worker-handoff.md` | Portable strict request/result schemas, adapter-only local publication and complete retained-artifact admission; no launch, cleanup or delivery acceptance. |
 | `autonomous-implementation-review/scripts/herdr_panes.py` | Read-only overview and fail-closed validation of supplied operator selection against fresh pane JSON. |
 | `autonomous-implementation-review/scripts/herdr_lifecycle_watch.mjs` | Passive output-based Herdr lifecycle watcher, read-only inspection and arming gate; never sends pane input. |
 | `autonomous-implementation-review/scripts/herdr-pane-state.mjs` | Live-composer/footer parser and identity-bound executor observation. |
@@ -25,7 +26,7 @@ Herdr pane-selection helper.
 
 ## Local Contracts
 
-- Portable core work follows `references/portable-core.md` without Hermes or Herdr. Delivery owns integrated-parent policy, contributor grants and continuation; adapters own terminal processes and same-session interaction. The host-specific contracts below remain legacy-only until replacement qualification/readiness; retaining them does not qualify a new route or permit fallback. Do not retire existing routes before an adapter qualifies for implementation and fresh read-only review.
+- Portable core work follows `references/portable-core.md` without Hermes or Herdr. Delivery owns integrated-parent policy, contributor-contract alignment and continuation; adapters own terminal processes and same-session interaction. Core artifact checks require independently retained request/runtime bindings and protected publisher roots; they never grant worker writes or qualification. The host-specific contracts below remain legacy-only until replacement qualification/readiness; retaining them does not qualify a new route or permit fallback. Do not retire existing routes before an adapter qualifies for implementation and fresh read-only review.
 
 - The implementation and review phases use distinct, goal-named sessions; review is read-only.
 - Never infer autonomous commit authority or a pane selection from labels, focus, or agent identity.

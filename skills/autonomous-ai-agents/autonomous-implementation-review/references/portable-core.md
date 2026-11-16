@@ -2,9 +2,10 @@
 
 Use this protocol for outcome packets, approach review and candidate review.
 It runs without Hermes or Herdr or any AI client installed. Node 22+ can import
-`scripts/orchestration-core.mjs`; its exports are pure checks and return detached
-packet/decision objects. They perform no launches, file writes, Git writes or
-network requests. The module does not authenticate authority, reviewer identity,
+`scripts/orchestration-core.mjs`; its packet/decision exports are pure checks.
+The explicit adapter-only artifact exports perform local I/O under
+[worker-handoff.md](worker-handoff.md); none launches workers, writes Git/tasks or
+makes network requests. The module does not authenticate authority, reviewer identity,
 report truth or adapter qualification. The orchestrator must read back retained
 observations before supplying them. A passing check is not permission to act.
 
@@ -122,12 +123,53 @@ reason instead of silently dropping it. Preserve the operator goal throughout.
 
 Stop for scope, client topology, authority, safety posture, dependencies, external
 state, security, host or accepted-contract decisions; unknown classes also stop.
-Post-freeze planning corrections require operator disposition, renewed freeze and
-explicit approval. Stop if a routine finding repeats unchanged after correction,
+Post-freeze planning corrections use `correctionDecision` below only with an
+existing amendment/validation/successor-freeze grant; otherwise stop for disposition.
+Changed bytes always require renewed identity, whole-package review and explicit
+exact-plan approval before execution. Stop if a routine finding repeats unchanged after correction,
 findings contradict, or eight automatic correction/review cycles do not converge.
 The count never resets on resume or a new record. With an unavailable count,
 `cycleAuthorization` must be verified and bind that finding ID, exact inputs and
 retained reference; record its consumption and never reuse it for another cycle.
+
+### One correction loop and permitted writer
+
+`correctionDecision` extends `planningCorrection` to planning, source, test and
+implementation-documentation remedies (including repairable validation failures).
+Supply the same finding/input/path/count fields plus `actor`, `orchestrator`,
+`kind`, `grant`, `qualifiedImplementer`, positive `groupBudgetRemaining` and
+`authorityBudgetRemaining`, `nativeInput: false` and `identityVerified: true`.
+The actor must be the orchestrator. The grant explicitly covers write, validate,
+review and, for implementation, launch; frozen planning additionally requires
+planningAmendment and successorFreeze. These are retained observations, not flags
+that manufacture permission. A missing qualified implementer is a blocker, never
+permission for the orchestrator to make source/test/documentation edits.
+
+Routine repairs need no per-fix approval within those grants. High severity alone
+does not stop a grounded fix restoring an existing safety requirement. Material
+scope, topology, authority, safety/security posture, dependencies, host, external
+state, accepted-contract changes and unexplained identity/evidence failures do stop.
+Retain each rejected finding/gate, remedy, before/amended hashes and new exact
+review in the existing review chain. Apply, validate and re-review counts once.
+Eight automatic cycles, repetition, contradiction or any narrower inherited budget
+stop; planning/source phase changes, refreezes and role sessions never reset it.
+An unavailable cumulative count retains the per-cycle authorization rule above.
+
+### Append-only historical successors
+
+An explicitly authorized historical-successor freeze establishes provisional
+identity only, not review acceptance or approval, and waives no adopted integrity
+guard. Preserve historical records and link their hashes through an append-only
+chain. `acceptSuccessorReview` takes change, identity (plan/tree/planDigest/inputs),
+receipt, currentInputs, currentPackageHashes, chain and validation. The receipt
+binds that exact identity, distinct authorSession/reviewerSession, effective model,
+readOnly, literal verdict/findings, reference and complete packageHashes. Chain
+observations require verified preservation, reference and superseded-record hashes;
+validation binds the plan/inputs, successful exitCode and retained reference.
+Re-enumerate/re-hash the complete inputs and review package after review. Missing,
+changed or partial identity blocks acceptance. This check returns freeze-ready,
+never plan approval, execution authority or a reset of reviewReadiness's cumulative
+count. Exact-SHA receipts stay outside the frozen checkout to avoid self-reference.
 
 ## Candidate review and return to delivery
 
@@ -138,11 +180,17 @@ authority, distinct `implementerSession` and `reviewerSession`, full `head` and
 Pass the candidate/diff, scope, plan digest and reports to a fresh read-only role.
 Freeze the candidate while reviewing; do not reuse the implementation conversation.
 
+For both portable and retained legacy candidate reviews, require severity-ordered
+`path:line` findings with impact, trigger and minimal correction/reproduction, or
+`No findings`. Review correctness, regressions, security/privacy, data
+loss/concurrency, contracts and test gaps, not refactors.
+
 `acceptCandidateReview({ packet, review, currentHead, currentPlanDigest })` checks
 the exact candidate/plan, independent read-only reviewer and resolved verdict.
 Retain actual gate and report evidence; structural acceptance cannot prove their
-truth. A changed candidate requires renewed gates and review. Candidate correction
-still has delivery's separate two-cycle limit, not the eight-cycle planning budget.
+truth. A changed candidate requires renewed gates and review. Candidate corrections
+use the same retained correction count and any narrower project/authority budget;
+the retained legacy host's two-cycle limit is not widened for already-frozen work.
 
 Return only verified results to delivery for progress and continuation decisions.
 The orchestrator dispatches code corrections; it does not edit worker code itself.
@@ -152,4 +200,8 @@ advancement; never answer, replay, substitute or change permissions. Native
 approval resumes only that session within existing authority. Denial/timeout or
 exposure failure is retained, not retried through a different route. An executor
 turn cap returns factual partial state; only the orchestrator can authorize a
-fresh bounded same-role packet. No next group or next change is implied.
+fresh bounded same-role packet through delivery's `workerContinuationDecision`:
+once per group/native task, never a capped-session resume or a broader goal.
+No next group or next change is implied. Before admitting any terminal worker's
+report, use `readHandoff` under [worker-handoff.md](worker-handoff.md). Execution
+completion, review verdict and delivery acceptance are separate gates.

@@ -1,7 +1,7 @@
 ---
 name: openspec-delivery
 description: Automate setup, execution and closeout of OpenSpec changes.
-version: 1.1.0
+version: 1.2.0
 author: Raphael (forgegod), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -78,12 +78,14 @@ remain separate from this local authority. Never infer approval from `next`.
 Before freeze or execution, apply
 [references/delivery-policy.md](references/delivery-policy.md): verify the
 integrated plan parent, derive policy only from its contributor contracts, and
-require the separate pre-freeze grant for declared/diffed contributor-contract
-changes. Retain exact planning hashes and grant-to-freeze identity. Verified
+check declared contributor-contract paths and independent goal alignment, without
+a separate approval checkpoint for in-scope edits. Retain exact planning identity. Verified
 pre-adoption legacy plans defer only those integrity guards until refreeze.
 Pre-execution review and continuous-goal continuation require explicit selection
 at that parent and the available orchestration package. Otherwise preserve
 single-group behavior and existing approval; later policy edits cannot widen it.
+Working-tree and committed unintegrated contract changes remain inert for their
+own change through integration, including authority, review, commits and continuation.
 
 ## Parallel specification and documentation
 
@@ -197,7 +199,7 @@ restrictions continue until explicitly lifted; a bare `next` never cancels them.
    Independent changes may run concurrently; dependent execution waits for accepted
    integrated prerequisite evidence. One implementation writer per change initially.
 5. Prepare native proposal/spec/design/tasks and obtain approval bound to an
-   immutable plan commit and digest. Before freezing, run the policy/grant checks
+   immutable plan commit and digest. Before freezing, run the policy/contract checks
    above and, when selected, retain an independent approach review of the complete
    planning hash set through orchestration's `references/portable-core.md`.
    Re-hash after review; acceptance is readiness, not plan approval. Only checkbox progress edits preserve that
@@ -207,12 +209,16 @@ restrictions continue until explicitly lifted; a bare `next` never cancels them.
    and resumes at its actual publication/integration/closure boundary. Retain actual
    gate output and report failed prerequisites. When the project's role loop is selected,
    load `autonomous-implementation-review` and its OpenSpec reference; unsupported
-   hosts stop rather than inventing model/session commands.
+   hosts stop rather than inventing model/session commands. For terminal workers,
+   validate the artifact-first handoff with orchestration's `readHandoff` before
+   using its report as evidence. Completion, review verdict and delivery acceptance
+   are distinct; neither worker output nor a missing result advances tasks.
 7. Freeze a clean committed candidate. Use `references/guard.md` for candidate
    and review checks. Independently review its exact full SHA, delta specs,
    implementation, executable evidence and current-behavior changes. Review is a
-   gate within this change, not a new change for every comment. Allow at most two
-   correction/re-review cycles; then stop for operator disposition. A changed
+   gate within this change, not a new change for every comment. Use orchestration's
+   canonical correction loop: eight cumulative automatic cycles or a narrower
+   inherited group/authority limit, never reset on refreeze or role change. A changed
    candidate invalidates review; confirmed defects are not silently waived.
 8. Before an authorized publication, load `references/integration.md`. Re-read the
    actual target and shared capability specs. Reconcile semantic overlap. Include

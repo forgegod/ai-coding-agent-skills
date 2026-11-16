@@ -1,7 +1,7 @@
 ---
 name: openspec-next
 description: Find and advance the next approved OpenSpec task group.
-version: 0.2.0
+version: 0.3.0
 author: Raphael (forgegod), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -44,6 +44,11 @@ parent did not select continuous-goal or pre-execution review. New integrity
 guards still apply unless retained legacy evidence defers them until refreeze.
 Selected policies require the available orchestration package and, for approach
 review, the matching complete frozen planning hashes. Never infer approval.
+Unintegrated contract edits are inert for their own change through integration.
+Use delivery's `workerContinuationDecision` only for one fresh bounded same-role
+session after a verified iteration cap, keyed to the existing group/native task.
+A changed session or action label never resets the allowance. Group/authority
+budget exhaustion, native waits, failed gates or a second cap stop instead.
 
 ## Procedure
 
@@ -77,7 +82,10 @@ review, the matching complete frozen planning hashes. Never infer approval.
    Do not bootstrap, create a checkout, stage, commit or dispatch a role.
 7. For normal execution, load `openspec-delivery` and its continuation/workspace
    recipes, pass the verified selection and constraints, and execute the remaining
-   local boundary without a second permission prompt. Stop after one task group
+   local boundary without a second permission prompt. Require artifact-first
+   handoff admission before trusting terminal worker evidence; actual gates and
+   independent review still decide acceptance. Routine fixes stay in this group
+   under orchestration's permitted-writer correction loop. Stop after one task group
    by default. With selected continuous-goal policy and no narrower restriction,
    repeat grounded selection for consecutive eligible groups of this change.
    Recheck every delivery-policy stop: authority, gates, review, ownership, host,

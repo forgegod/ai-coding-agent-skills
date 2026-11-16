@@ -22,11 +22,11 @@ test("OpenSpec package documents explicit authority, writer separation and read-
   const packageRoot = path.dirname(path.dirname(guard));
   const skill = await readFile(path.join(packageRoot, "SKILL.md"), "utf8");
   const reference = await readFile(path.join(packageRoot, "references/guard.md"), "utf8");
-  for (const pattern of [/explicitly selects/i, /never selects it/i, /operator-serialized/, /sole.*task.*writer/i, /at most two/, /planning-only/i, /not.*lock/i, /squash.*rebase/i, /post-merge/, /stock.*apply/i]) assert.match(skill, pattern);
+  for (const pattern of [/explicitly selects/i, /never selects it/i, /operator-serialized/, /sole.*task.*writer/i, /eight cumulative automatic cycles or a narrower/, /planning-only/i, /not.*lock/i, /squash.*rebase/i, /post-merge/, /stock.*apply/i]) assert.match(skill, pattern);
   for (const pattern of [/candidate --repo/, /review --repo/, /receipt --repo/, /schemaVersion/, /planDigest/, /exitCode/, /does not authenticate/, /fences/, /append-only/]) assert.match(reference, pattern);
   for (const pattern of [/valid UTF-8/, /refs\/replace/, /grafts/, /fsmonitor/, /Every commit in `verified\.\.target`/, /--receipt-path/, /duplicate/i, /raw blob bytes/]) assert.match(reference, pattern);
   assert.doesNotMatch(skill, /adoption history|reviewer found|previously reported/i);
-  assert.match(skill, /version: 1\.1\.0/);
+  assert.match(skill, /version: 1\.2\.0/);
   assert.doesNotMatch(skill, /\/home\/|~\/.hermes/);
 });
 
