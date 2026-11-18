@@ -3,7 +3,7 @@
   "kind": "group-1-replacement-preservation-proof",
   "change": "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99",
   "task": "1.1",
-  "observed_at": "2026-11-18T17:13:10Z",
+  "observed_at": "2026-11-18T17:46:19Z",
   "preserved_input": {
     "commit": "5f48fbe4826b739fe1f35be19de52543d101c7f5",
     "parent": "b1ba4d54b29d731a4d9d188435cb9d7051af338c",
@@ -28,7 +28,7 @@
     "interpretation": "This source retains the exact historical input named by the prior reconstruction evidence. It is read-only preservation evidence, not an implementation candidate, approval, gate, or execution route."
   },
   "external_capture": {
-    "root": "/home/raphael/verification-records/ai-coding-agent-skills/profile-group-1-replacement-preservation-proof-20261118T181000Z",
+    "root": "/home/raphael/verification-records/ai-coding-agent-skills/profile-group-1-replacement-preservation-proof-20261118T174619Z",
     "manifest": "SHA256SUMS",
     "owner_object_exit": 128,
     "source_commit_sha256": "afdd65f963842456dc5127e70aacc8cd055558c879802d2cc0794e0ff3e2ad2a"
