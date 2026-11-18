@@ -51,6 +51,11 @@ Operator restrictions SHALL override defaults and remain effective on continuati
 - **AND** the worker does not resume itself; an allowed continuation is one fresh
   bounded same-role session in the same checkout through the selected qualified
   adapter route and never resumes or injects into the capped session or a broader goal
+- **AND** before launch the adapter stops the exact capped process tree after
+  immediate positive identity readback and verifies termination, or proves it
+  cannot still write, retaining that quiescence proof in the continuation record
+- **AND** failed identity readback preserves the process and forbids continuation;
+  unverified quiescence blocks launch, and idle or cap output alone is not proof
 - **AND** a reviewer continuation remains read-only and never resumes an implementer
   conversation
 - **AND** a native prompt, failed gate, identity drift, contradictory evidence, a new
@@ -66,14 +71,15 @@ Operator restrictions SHALL override defaults and remain effective on continuati
 
 #### Scenario: Selected pre-execution review policy
 - **WHEN** a project selected the pre-execution-review policy and the plan
-  lacks a retained no-blocking-findings review record matching the complete planning
+  lacks a complete independent receipt with literal `Verdict: No findings` matching the complete planning
   hash set
 - **THEN** delivery stops before accepting an execution-plan freeze or execution
 - **AND** it does not treat a reviewer recommendation, draft review, or partial
   hash record as plan approval
 - **AND** a provisional historical-successor freeze follows *Review-record continuity*
   in the orchestration contract without acceptance, approval, execution authority
-  or a waiver of any adopted integrity guard
+  or a waiver of any adopted integrity guard beyond the explicitly named recovery
+  exception in *Unintegrated plan parent*
 
 #### Scenario: Policy selected after plan freeze
 - **WHEN** the contributor contract at the frozen plan commit's parent, an integrated
@@ -100,6 +106,12 @@ Operator restrictions SHALL override defaults and remain effective on continuati
   integrated target-branch revision
 - **THEN** delivery stops before freeze or execution without deriving policy
   selection from that unintegrated contract
+- **AND** only until `profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99`
+  integrates, its successor freezes and execution instead use integrated base
+  `ae6488e23414a07d12959bf22bcd283b84d9d8a3` plus explicit recovery, exact-plan
+  approval and execution grants; this stop does not apply to that named path
+- **AND** the exception applies to no later change, authorizes no reset and waives
+  no other integrity guard or review/approval/execution gate
 
 #### Scenario: Goal-aligned contributor-contract change
 - **WHEN** an implementation changes an `AGENTS.md`, `CLAUDE.md`, or a file the
@@ -117,6 +129,8 @@ Operator restrictions SHALL override defaults and remain effective on continuati
   committed, is inert for the current change through integration: its authority,
   review, commit, and continuation rules remain those of the integrated plan parent
   and approved frozen plan, and it becomes effective for later changes only after integration
+- **AND** the named recovery exception in *Unintegrated plan parent* uses its pinned
+  integrated base and explicit grants instead, never its unintegrated successor contract
 - **AND** uncertain alignment, a material scope or authority expansion, safety or
   security impact, an external write, dependency conflict, or contradictory evidence
   stops for operator disposition

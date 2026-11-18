@@ -28,7 +28,8 @@ pane on demand or provide a portable adapter layer for other local coding client
   supported only after qualification, without conflating their configuration,
   session, or profile models.
 - Make native terminal workers the default for every client, including Hermes;
-  qualify automatic same-session interactive exposure without mandatory Herdr.
+  qualify native same-session human input or a supported Herdr attachment/resume
+  fallback, without requiring Herdr proof for a client using the native route.
 - Make immutable assignment/result artifacts the primary worker interface rather
   than treating terminal presentation as current protocol state.
 - Document and test one-client/mixed-client operation and operator-controlled
@@ -102,8 +103,12 @@ operator recovery grants and any later exact-plan approval/execution grant.
 They do not come from the unintegrated successor parent or inherited child-contract
 edits at `cc5f23a`. Those edits remain inert for this change through integration.
 The delta's integrated-plan-parent rule is future behavior to implement, not an
-already-adopted rule that forces a reset of this recovery. This named recovery
-exception does not waive that rule for future plans. Candidate review determines
+already-adopted rule that forces a reset of this recovery. Until
+`profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99` integrates,
+its successor freezes and execution are governed by that integrated base plus
+explicit recovery, exact-plan approval and execution grants: an unintegrated
+successor parent does not stop this named path. This exception applies to no
+later change, authorizes no reset and waives no other integrity guard. Candidate review determines
 alignment of future contract changes, not their effectiveness for this change;
 they become effective for later changes only after integration.
 
@@ -129,9 +134,13 @@ the newly approved contract, not count its presence as completed work.
 
 Alternative rejected: attach a plan after existing source and mark it complete.
 Preserving inherited source for audit is not accepting its execution order or
-implementation. This planning-phase recovery correction does not change task
-progress; already-recorded task state remains unchanged unless a separately
-authorized evidence review establishes otherwise.
+implementation. This authorized planning correction reopens 1.1 and 2.1 for the
+current successor; their historical checkmarks remain provenance only. Before
+task-3 qualification or route retirement, task 1.1 must verify the new identity,
+review and approval binding, and task 2.1 must verify or rework inherited core
+source and pass its current tests and independent acceptance under separate
+execution authority. Planning validation alone completes neither task. This
+does not require reconstruction of historical group-2 route acceptance.
 
 ### Keep roles goal-oriented and OpenSpec-owned
 
@@ -204,31 +213,61 @@ Alternative rejected: call any available agent a worker. Names, models, imported
 settings, profiles, and environment markers do not establish runtime, session,
 permissions, or independent-review identity.
 
-### Use one bounded accepted-route bootstrap exception
+### Use one prospective, bounded native-CLI bootstrap exception
 
-Task 3.1 cannot require a candidate adapter to qualify itself before its first source
-edit. The already independently accepted group-2 implementation route is therefore
-the single bootstrap exception for initial task-3 adapter source work and its fresh
-independent review. It is bound to the existing group-2 acceptance evidence, not to a
-claim that it is a qualified terminal adapter.
+Task 3.1 cannot require the adapter it creates to exist before its first source edit.
+After fresh planning review, exact-plan approval and a separate task-3 execution
+grant, the orchestrator may use a separately bound native CLI process for initial
+adapter source work and a distinct fresh read-only reviewer. This prospective
+exception does not depend on reconstructing group-2 acceptance or reusing any
+historical pane/session. Historical acceptance records remain unchanged and do not
+prove current route readiness. Claude Code and Codex are operator-reported
+operational choices, not qualified adapters. Grok Build is a separate, unselected
+candidate, not an additional unspecified CLI choice; exact executable/version, supported
+launch interface, effective model and role permissions must be bound before use.
+No client is selected implicitly or substituted after a failure.
 
-The bootstrap route may act only until one candidate adapter completes the full
-qualification contract in this plan. It cannot be advertised as supported, count as
-candidate qualification, replace a candidate's exact client/version/launch-interface
-probe, serve as a fallback, or be used after a supported adapter exists. The bootstrap
-route retains the current role separation: the implementation role makes the bounded
-source changes and a fresh independent reviewer remains read-only. It creates no
-automatic pane dispatch, no profile change, and no authority beyond task 3.1.
+The sole exemption is from requiring a fully implemented, qualified product adapter
+before this initial work. An orchestrator-owned bootstrap supervisor takes the
+launch/capture/publisher responsibilities otherwise assigned to that adapter; it
+must be independent of the candidate code being developed. It is not an advertised
+adapter or candidate qualification evidence. Its exact implementation and finite
+attempt/time/stop limits must be identified in the later execution grant. Unknown
+or unverified required controls block launch; this planning decision supplies no
+runtime proof and authorizes no worker now.
 
-Every candidate adapter must still separately prove implementation and fresh
-read-only-review capability, non-argv transport, artifact-first publisher isolation,
-lifecycle/identity capture, and the same-session human-input route before it is
-supported or any old route is retired. A failed or unverifiable candidate remains
-unsupported; it does not reactivate or extend the bootstrap exception.
+The following floor is not waived:
+- Bind the immutable request and its SHA-256 before launch to the approved plan,
+  candidate/input hashes, workspace, role, explicit client/version/model, fresh
+  process/session identity, scope, permissions, budget and stops.
+- Use non-argv prompt transport and enforce implementer scope and reviewer read-only
+  permissions. The reviewer is never the implementer session or its conversation.
+- The supervisor, not either worker, owns protected capture and atomic publication
+  of the complete native report, result and lifecycle evidence, with absolute paths
+  and hashes outside repositories/profiles. Workers cannot rewrite published evidence.
+  Publisher and capture may be one supervisor; independent core verification and
+  independent review must not be replaced by that supervisor's success assertion.
+- Preserve all artifact-first validation rules, independently verify inputs, outputs,
+  report hashes and candidate gates, and require a fresh literal review verdict and
+  finding disposition. Completion, acceptance and operator approval stay distinct.
+- Stop on missing, stale, partial, mismatched or unverifiable identity/evidence,
+  unsafe permissions, failed gates, exhausted budgets or denied/timed-out approvals.
+  Do not fabricate historical facts or retry through another client to bypass a stop.
+
+Native CLI execution is the default. Use the qualified native same-session input
+route, or the bound Herdr fallback when native exposure cannot handle unavoidable
+operator involvement; it does not extend task authority or
+waive this floor. This is a view/interaction fallback, not a fallback to an unqualified
+worker. The orchestrator owns setup without per-pane approval or operator setup work.
+
+The exception expires once one adapter qualifies for implementation and fresh review;
+it cannot serve later tasks, advertise support, or retire an old route. Every candidate
+still independently proves its exact interface and complete terminal/interaction
+contract. A failed candidate stays unsupported and cannot extend the bootstrap budget.
 
 ### Run every worker as a native terminal application
 
-Every implementation/review worker, including Hermes, runs as an adapter-owned
+Except for the explicitly scoped bootstrap supervisor above, every implementation/review worker, including Hermes, runs as an adapter-owned
 native client process/session in the assigned dedicated worktree, with recorded
 identity and client-specific state. Herdr is not required for launch or ordinary
 progress. Presence of `HERDR_ENV` does not select or force a role transport.
@@ -240,8 +279,10 @@ Migration points to the standalone Claude adapter only when qualified; otherwise
 record Claude Code unsupported and name only qualified alternatives without dispatching one.
 
 The core records approved outcome authority; *Worker process ownership* defines
-adapter supervision. Herdr or a client-native UI may expose a worker only through
-its prequalified same-session interaction route, never by starting a second worker.
+adapter supervision. Native same-session input is sufficient without Herdr. When
+it cannot expose unavoidable input, the bound Herdr fallback is mandatory;
+its supported attachment/resume route must preserve the same logical worker session,
+never create a competing worker or replay its task.
 
 ### Bind clients and models per role, not per product installation
 
@@ -360,7 +401,9 @@ neither session nor artifact identity resets an action's continuation/correction
 budget. Missing result files alone distinguish neither a live worker nor a crash;
 use adapter-owned lifecycle/identity evidence and never mark the outcome complete.
 
-Herdr is optional for native human input or diagnosis. Normal result collection
+Herdr is unnecessary for autonomous progress or qualified native same-session input;
+it is mandatory only for the bound fallback when native exposure cannot handle
+unavoidable operator involvement. Normal result collection
 and lifecycle assessment do not parse visible pane prose, so old findings and
 repaints cannot become current verdicts or stops by themselves. Actual permission,
 identity, evidence-integrity and native-decision failures still stop. This is future
@@ -414,7 +457,13 @@ identity drift, contradictory evidence, a new stop boundary, a second exhaustion
 the same action, or an exhausted group/authority budget preserves state and stops
 delivery. The record keys the allowance to that stable group/task/action identity
 and binds both session ids as lineage; a fresh session id or relabeling does not
-reset it. The worker does not resume itself: an allowed continuation is one fresh, bounded
+reset it. Before launching a continuation, the adapter positively identifies the
+capped process tree immediately before stopping it and verifies termination, or
+proves the capped tree cannot still write. The continuation record retains that
+proof; idle chrome or turn-cap output is not quiescence. Failed identity readback
+preserves the process and forbids another writer; unverified quiescence also blocks
+launch. Preserve the capped session's evidence and scratch, not a competing writer.
+The worker does not resume itself: an allowed continuation is one fresh, bounded
 same-role packet only through its supported adapter route, or an unsupported
 continuation stop. It never resumes a broader delivery goal. A reviewer continuation
 remains read-only and never resumes an implementer conversation. Until this change
@@ -456,11 +505,15 @@ The new reconciliation supplements are committed outside the planning digest.
 The exact-SHA review receipt stays outside the frozen checkout so it cannot claim
 to contain its own future commit identity. It must bind the full planning hash
 set, SHA, tree and digest, fresh reviewer session/model, literal verdict, and
-finding dispositions. Only a matching no-findings review with successful retained
+finding dispositions. Only a matching review whose literal verdict is
+`Verdict: No findings`, with complete coverage, successful retained
 validation and unchanged post-review input/package hashes establishes current
 review acceptance; stale historical hashes cannot satisfy it. The acceptance
 binding is the successor chain plus that receipt, never a rewritten entry in the
 historical `approach-review.json`. Operator approval remains separate.
+Applied, unfounded or otherwise disposed findings retain their history but cannot
+satisfy this receipt: a later independent review must return `Verdict: No findings`
+for the current exact identity before review acceptance or presentation for approval.
 
 Missing or mismatched current-chain evidence invalidates acceptance. Recover the
 prior cumulative count from retained references when possible; never reconstruct
@@ -518,11 +571,23 @@ or candidate review.
 ### Automatically expose native human-input waits
 
 *Automatic operator interaction exposure* defines the boundary. Before dispatch,
-qualification proves an available same-session interactive route for that client
-and binds its view/session identity. Herdr is optional and is not assumed to adopt
-arbitrary running processes; supported native attachment or a prearranged terminal
-view may satisfy the contract. A print-only route that cannot preserve a human-input
-wait is insufficient for this unattended workflow.
+qualification proves either a native same-session human-input route or a supported
+Herdr attachment/resume route and binds its view/session identity. Herdr proof is
+required only for the Herdr fallback, not for a client qualified on its native route.
+Native CLI execution is the default. When unavoidable input cannot be exposed through
+the qualified native route, the prequalified, launch-bound Herdr fallback is mandatory;
+absence of both routes blocks launch, and a failed bound route does not permit an
+unqualified substitution. For that fallback, the
+orchestrator creates a fresh pane and starts the supported attachment/resume interface
+without separate pane-creation approval or requiring operator setup. This does not
+assume Herdr can adopt an arbitrary process. A native resume may change the process
+only after the previous process is confirmed stopped and the same logical session,
+pending decision and identity linkage are verified. No parallel worker, task replay,
+historical pane reuse or fresh replacement conversation is permitted. If no safe
+attachment/resume is supported, preserve state and report the blocker rather than
+claiming the fallback succeeded. Known unavoidable interaction may use the native
+surface, or start in a fresh Herdr pane directly when that is the bound route,
+under the same authorized role and evidence boundaries.
 
 When native approval, credentials, or other input is required, the adapter automatically
 exposes that waiting session without a separate chat notification or a request to
@@ -586,6 +651,6 @@ immediate positive identity/no-input checks; otherwise preserve it.
 
 ## Open Questions
 
-None. The client and optional interaction-surface probes decide support at implementation time;
+None. The client and conditional Herdr interaction-route probes decide support at implementation time;
 they do not change the required fail-closed behavior or permit undocumented
 fallback.

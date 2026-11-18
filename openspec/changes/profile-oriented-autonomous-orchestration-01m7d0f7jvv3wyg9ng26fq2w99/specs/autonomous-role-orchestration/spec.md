@@ -21,6 +21,9 @@ contracts to a concrete orchestrator and worker client.
 #### Scenario: Standalone role execution
 - **WHEN** an implementer or reviewer is dispatched
 - **THEN** its qualified adapter launches a separate native client session/process
+- **AND** only initial task-3 source work and its fresh read-only review may instead
+  use the independent orchestrator-owned supervisor under *Prospective bounded
+  native-CLI bootstrap*, with its non-waived floor, separate execution grant and expiry
 - **AND** neither Hermes `delegate_task` nor a client-native subagent executes that role
 
 ### Requirement: Outcome-oriented task groups
@@ -72,7 +75,7 @@ artifacts, create a candidate, or start implementation.
   read-only review binding the complete planning hash set
 
 #### Scenario: Ready approach review
-- **WHEN** the independent planning reviewer reports no blocking findings
+- **WHEN** the complete independent planning review returns literal `Verdict: No findings`
 - **THEN** the orchestrator may freeze the validated plan for a separate operator
   approval decision
 - **AND** for an authorized provisional successor already frozen, only the matching
@@ -159,6 +162,8 @@ for each distinct client variant.
 - **AND** it verifies a supported non-argv prompt route
 - **AND** it verifies terminal-first launch, effective role/model binding, and
   *Automatic operator interaction exposure* before dispatch
+- **AND** a qualified native same-session route needs no Herdr proof; only a
+  selected Herdr fallback must prove supported same-session attachment/resume
 - **AND** it verifies *Artifact-first worker handoff*, including native final-output
   capture, adapter-only publication, atomic result visibility, safe evidence paths,
   and rejection of incomplete, stale or mismatched results without pane parsing
@@ -168,22 +173,33 @@ for each distinct client variant.
   evidence is missing, failed, or does not bind the selected launch interface
 - **THEN** dispatch stops and the client is not advertised as supported
 
-#### Scenario: Bounded accepted-route bootstrap
+#### Scenario: Prospective bounded native-CLI bootstrap
 - **WHEN** source work must begin to implement candidate adapters before any
-  candidate is qualified
-- **THEN** the already independently accepted group-2 implementation route MAY
-  perform only the initial task-3 source work and receive a fresh independent,
-  read-only review
-- **AND** that route is not a terminal adapter, is not advertised as supported,
-  does not establish candidate qualification, cannot be a fallback, and expires
-  once a supported adapter exists
+  candidate is qualified, after fresh plan review, exact-plan approval and a separate
+  task-3 execution grant
+- **THEN** the design's prospective bootstrap supervisor MAY launch native CLI
+  workers for initial task-3 source work and a distinct fresh read-only review
+- **AND** this sole exception substitutes an orchestrator-owned supervisor independent
+  of candidate code for the not-yet-qualified product adapter; it does not reconstruct
+  group-2 acceptance, select historical sessions or treat reported CLI readiness as qualification
+- **AND** the design's non-waived floor applies: immutable request/input identity,
+  exact client/version/model and role permissions, fresh process/session bindings,
+  non-argv transport, protected supervisor-only publication of complete report/result/
+  lifecycle artifacts and hashes, independent core verification, fresh literal review
+  verdict, finite budgets and fail-closed stops
+- **AND** the later execution grant identifies the actual supervisor and selected
+  interfaces; missing or unverifiable controls block launch rather than allowing self-attestation
+- **AND** the exception is not advertised as supported, does not establish candidate
+  qualification, cannot serve later tasks, and expires once an adapter qualifies for
+  implementation and fresh review
 - **AND** each candidate adapter still independently demonstrates its exact
   client/version/launch interface, implementation and fresh read-only-review
   capability, non-argv transport, artifact-first publisher isolation,
   lifecycle/identity capture, and same-session human-input exposure before support
   or retirement of an old route
 - **AND** a failed or unverifiable candidate remains unsupported without extending
-  the bootstrap exception or automatically dispatching a pane
+  the bootstrap exception; only the bound operator-intervention route may create a
+  fresh Herdr pane, never to bypass failure or substitute another worker
 
 #### Scenario: Replacement readiness before retirement
 - **WHEN** migration would retire an existing role route or freeze a replacement candidate
@@ -293,7 +309,8 @@ results atomically without granting workers extra write authority.
   presentation-only read failure
 - **THEN** the core uses the matching artifacts and adapter-owned lifecycle/identity
   evidence rather than inferring a verdict or new task state from the screen
-- **AND** Herdr remains optional for same-session interaction or diagnosis; real
+- **AND** Herdr is required only as the bound fallback when qualified native
+  exposure cannot handle unavoidable operator involvement; real
   identity, permission, input-integrity and native-decision failures still block
 
 ### Requirement: Worker process ownership
@@ -304,7 +321,8 @@ worker-created multiplexers and native-subagent role executors.
 
 #### Scenario: Terminal-first worker
 - **WHEN** a worker is dispatched with or without Herdr present
-- **THEN** it runs as a qualified adapter-owned native client process/session
+- **THEN** it runs as a qualified adapter-owned native client process/session, or
+  under the design's explicitly bounded bootstrap supervisor for initial task-3 work
 - **AND** an interaction view does not become a second worker or a required launcher
 
 #### Scenario: Implementation role
@@ -329,6 +347,11 @@ worker-created multiplexers and native-subagent role executors.
 - **WHEN** the integration contract verifies a once-only worker iteration-cap
   continuation before any group/authority budget exhaustion, unexpected exit or stop decision
 - **THEN** the adapter preserves the identified worker session and reports the cap
+- **AND** before a fresh continuation it stops the exact capped process tree after
+  immediate positive identity readback and verifies termination, or proves that
+  tree cannot still write; the continuation record retains that proof, not idle chrome
+- **AND** failed identity readback preserves the process and forbids continuation;
+  unverified quiescence also blocks launch while session evidence and scratch remain preserved
 - **AND** only the orchestrator may send that contract's one fresh bounded same-role
   session through the qualified route in the same checkout, never into the capped
   session, and retains one continuation record per group and unfinished native task/action
@@ -442,12 +465,14 @@ before implementation starts or resumes under *Post-freeze planning finding*.
 ### Requirement: Review-record continuity
 The approach-review record or explicitly authorized append-only successor chain
 SHALL bind the complete planning hash set and review history. Review acceptance
-of a frozen plan binds only to the current chain's latest no-blocking-findings
-entry matching that complete planning set. Historical records SHALL NOT be
+of a frozen plan binds only to the current chain's latest complete independent
+receipt with literal `Verdict: No findings` matching that complete planning set.
+Disposed findings SHALL NOT substitute for that receipt. Historical records SHALL NOT be
 rewritten or treated as approval of successor bytes.
 
 #### Scenario: Matching acceptance
-- **WHEN** a no-blocking-findings review entry hashes to the frozen planning set
+- **WHEN** a complete independent receipt with literal `Verdict: No findings`
+  hashes to the frozen planning set
 - **THEN** review acceptance may bind to that entry in the current record/chain
 - **AND** operator approval of the exact frozen identity remains separate
 
@@ -460,9 +485,13 @@ rewritten or treated as approval of successor bytes.
   hashes, exact SHA, tree, digest, reviewer session/model and literal verdict
 - **AND** the operator may authorize a provisional identity freeze before that
   review, but it establishes no review acceptance, approval or execution authority
-- **AND** this exception does not waive any adopted integrated-parent or other
-  integrity guard; those guards still govern acceptance and execution
-- **AND** acceptance requires matching no-blocking findings, successful retained
+- **AND** only until `profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99`
+  integrates, its successor freezes and execution use integrated base
+  `ae6488e23414a07d12959bf22bcd283b84d9d8a3` plus explicit recovery, exact-plan
+  approval and execution grants; *Unintegrated plan parent* does not stop that path
+- **AND** that named exception applies to no later change, authorizes no reset and
+  waives no other integrity guard; unintegrated contracts remain inert for this change
+- **AND** acceptance requires literal `Verdict: No findings`, complete coverage, successful retained
   validation, and unchanged post-review input and review-package hashes
 - **AND** historical hash mismatches do not require historical edits and cannot
   satisfy current acceptance; a missing or mismatched successor receipt blocks it
@@ -500,7 +529,9 @@ SHALL retain that classification.
 #### Scenario: Unfounded routine finding
 - **WHEN** the orchestrator determines a routine finding is unsupported by current artifacts
 - **THEN** it records the finding, evidence, and reason as unfounded
-- **AND** the finding does not block freeze
+- **AND** that disposition alone does not permit execution-plan acceptance or
+  presentation for approval; a later independent receipt for the current identity
+  must return literal `Verdict: No findings`, as for applied or otherwise disposed findings
 - **AND** fresh independent review receives that disposition; disagreement does
   not become unilateral acceptance or bypass *Non-converging routine findings*
 
@@ -527,19 +558,42 @@ SHALL retain that classification.
 - **AND** missing amendment authority or a material conflict stops for operator disposition
 
 ### Requirement: Automatic operator interaction exposure
-Every worker adapter SHALL qualify an available same-session human-input route
-before launch. On a native input request it SHALL automatically expose that
-session through the bound route without a separate chat notification or asking
-the operator to open it. Herdr MAY provide the view but SHALL NOT be mandatory.
-Exposure SHALL NOT answer, approve, deny, or bypass the native decision.
+Every worker adapter SHALL qualify a native same-session input route or a Herdr
+attachment/resume fallback before launch. Native CLI execution SHALL be default;
+Herdr proof SHALL apply only to the fallback when native exposure cannot handle
+unavoidable input. The orchestrator SHALL own automatic same-session exposure;
+only the operator SHALL answer native decisions. Exposure SHALL NOT approve,
+deny or bypass them.
 
 #### Scenario: Prelaunch interaction readiness
 - **WHEN** a terminal-first worker is prepared for unattended execution
-- **THEN** its qualification verifies same-session identity, supported native
-  attachment or a prearranged terminal view, and delivery of native human decisions
+- **THEN** its qualification verifies same-session identity and native decision
+  delivery through either a native human-input surface or supported attachment/resume
+  in a fresh Herdr pane; a native-route pass does not require Herdr availability or proof
 - **AND** a route unable to preserve a human-input wait does not qualify
 - **AND** the authorized role launch binds the automatic view-exposure scope;
   no per-wait permission to open that qualified view is required
+- **AND** for the bound Herdr fallback the orchestrator creates a fresh pane and
+  starts its supported interface without per-pane approval or operator setup,
+  preserving the same logical worker session
+- **AND** absence of both routes blocks launch; failure does not permit an
+  unqualified route substitution
+
+#### Scenario: Known unavoidable operator involvement
+- **WHEN** the authorized role is known to require operator input before unattended progress
+- **THEN** the orchestrator uses its qualified native same-session surface, or
+  starts it directly in a fresh Herdr pane when that is the bound fallback, without
+  separate pane-creation approval or operator setup work
+- **AND** it preserves the authorized role, identity, evidence and permission boundaries
+
+#### Scenario: Native resume required for interaction
+- **WHEN** the selected client requires a supported resume rather than attachment
+  for its bound Herdr fallback
+- **THEN** the orchestrator verifies the previous process stopped before starting
+  the resume interface in a fresh Herdr pane and records old/new process identity
+- **AND** the same logical session and pending decision must be preserved and verified;
+  no concurrent worker, task replay, historical pane reuse or replacement conversation is allowed
+- **AND** inability to prove that continuity preserves state and blocks progress
 
 #### Scenario: Unexpected human-input wait
 - **WHEN** the worker requests native security approval, credentials, or other input
@@ -611,8 +665,10 @@ installation SHALL NOT imply workflow selection or execution authority.
   the operator's selection without silently modifying persistent global settings
 - **AND** it includes qualified one-client same/different-model and mixed-client
   examples, sequential execution, fresh reviewer identity, and policy limitations
-- **AND** it explains automatic same-session exposure, native human decisions,
-  Herdr's optional status, unavailable-route behavior, and retired-route migration
+- **AND** it explains native CLI default execution, automatic same-session exposure,
+  native-route qualification without Herdr and Herdr's mandatory role only as the
+  bound fallback when native exposure cannot handle unavoidable input, orchestrator-owned
+  fresh-pane setup, native human decisions, unavailable-route behavior and retired-route migration
 - **AND** it explains assignment/result locations and bindings, complete reports,
   adapter publication, lifecycle versus acceptance, evidence retention and safe
   recovery from missing or invalid artifacts without assuming native CLI equivalence

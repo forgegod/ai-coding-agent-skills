@@ -38,7 +38,10 @@ outcome-oriented unit above fine-grained checklist steps.
   bounded remaining action, unchanged goal/scope/authority, and no native prompt,
   failed gate, drift, or contradictory evidence. An allowed continuation is one
   fresh bounded same-role packet through the qualified adapter; it never uses a
-  bare chat `continue` or resumes a broader delivery goal.
+  bare chat `continue` or resumes a broader delivery goal. Before launching it,
+  the adapter must positively identify and stop the capped process tree with
+  verified termination, or prove it cannot still write. Failed identity readback
+  preserves the process and forbids continuation; retain the quiescence proof.
 - Select the pre-execution-review and continuous-goal policies for future changes
   through this repository’s updated `AGENTS.md`; neither retroactively widens
   authority for this change.
@@ -51,8 +54,13 @@ outcome-oriented unit above fine-grained checklist steps.
   profiles, models, or permission modes.
 - Launch every implementation/review worker, including Hermes, as a qualified
   native terminal application under adapter-owned process/session supervision.
-  Herdr is not a launch prerequisite; it is an optional qualified interaction
-  surface. Do not use `delegate_task` or native subagents as role executors.
+  The bounded initial task-3 bootstrap below substitutes its independent supervisor.
+  Herdr is not a launch prerequisite: prelaunch qualification accepts a verified
+  native same-session human-input route or a verified Herdr attachment/resume route.
+  Herdr is mandatory only as the bound fallback when unavoidable operator input
+  cannot be exposed through the qualified native route. The orchestrator creates the
+  fresh pane without per-pane approval or operator setup work, not a second worker.
+  Do not use `delegate_task` or native subagents as role executors.
 - Use immutable file-based assignments and structured result handoffs as the
   primary worker/core interface, independent of Herdr. Qualified adapters publish
   complete reports, identity-bound results and lifecycle evidence outside the
@@ -100,17 +108,26 @@ outcome-oriented unit above fine-grained checklist steps.
   the repository OpenSpec configuration. The orchestrator assigns accepted corrections, revalidates the
   amended draft, and only then presents a specific plan SHA/digest for operator
   approval.
-- Permit one bounded bootstrap exception for the already independently accepted
-  group-2 implementation route to create the initial task-3 adapter source and
-  receive its fresh independent review. The route is not a terminal adapter, is
-  never advertised or treated as qualification evidence, and cannot be used as a
-  fallback or after a supported adapter exists. Every candidate adapter still needs
-  its own complete qualification before support, retirement of an old route, or any
-  later task dispatch.
+- Permit the design's prospective bounded native-CLI bootstrap exception for initial
+  task-3 source work and fresh independent review, without reconstructing historical
+  group-2 acceptance or reusing old sessions. An independently bound orchestrator-owned
+  supervisor supplies launch/capture/publication; identity, immutable artifacts/hashes,
+  independent verification, fresh read-only review and fail-closed stops are not waived.
+  Claude Code and Codex readiness is operator-reported, not adapter qualification
+  or a role selection. Grok Build remains a separate, unselected candidate.
+  Native CLI execution is default; input uses the qualified native same-session route
+  or the bound Herdr fallback without delegating setup responsibility to the
+  operator. The exception expires at the first qualified implementation/review adapter;
+  separate candidate qualification, fresh plan approval and execution authority remain
+  mandatory before support, retirement, or later task dispatch.
 - For the explicitly authorized historical-successor recovery described in the
   design, a provisional local identity freeze precedes its exact-identity review;
   review acceptance and operator approval still follow that fresh review. The
   initial reset recipe and historical review/approval records are not replayed.
+  Until this named change integrates, its successor freezes and execution use the
+  integrated base `ae6488e23414a07d12959bf22bcd283b84d9d8a3` plus explicit recovery,
+  exact-plan approval and execution grants; an unintegrated successor parent does
+  not stop that path. This exception applies to no later change and permits no reset.
 - Qualify each client's unattended-to-interactive route before launch, including
   same-session identity, native decision delivery, safe view creation/attachment,
   and failure preservation. Never assume Herdr can adopt an arbitrary running process.
@@ -169,7 +186,10 @@ source, append-only reconciliation/review chain, validation and exact-identity
 review before explicit SHA/digest approval. No historical approval transfers to
 this replacement, and no task is completed merely by preserving source. Later
 implementation and exact-candidate review require their own authority. This
-proposal authorizes no reset, force push, cherry-pick, release, profile change,
+correction reopens 1.1 and 2.1: verify their current successor acceptances and
+verify or rework inherited task-2 source before task-3 qualification or route
+retirement. Historical checkmarks and evidence do not satisfy those gates.
+This proposal authorizes no reset, force push, cherry-pick, release, profile change,
 issue creation or publication.
 `github_issue` is the verified proposal-time documentation record. It does not
 approve the plan, authorize execution, or become a second task list.
