@@ -60,11 +60,14 @@ test("approach review binds the complete inventory and rejects drift without app
   const packet = api.approachPacket(request);
   assert.deepEqual(packet.inputs, inputs());
   for (const denied of ["edits", "shell", "git", "profiles", "persistence", "implementation", "subagents", "multiplexers"]) assert.ok(packet.forbidden.includes(denied));
-  const review = { inputs: inputs(), reviewerSession: "reviewer", readOnly: true, reference: "retained:review-1", verdict: "No findings", findings: [] };
+  const review = { inputs: inputs(), reviewerSession: "reviewer", readOnly: true, reference: "retained:review-1", verdict: "Verdict: No findings", findings: [], coverageLimitations: [] };
   const accepted = api.acceptApproachReview({ packet, review, currentInputs: inputs() });
   assert.equal(accepted.readyForFreeze, true);
   assert.equal(accepted.planApproved, false);
   assert.equal(accepted.executionAuthorized, false);
+  for (const override of [{ verdict: "No findings" }, { verdict: "No blocking findings" }, { coverageLimitations: undefined }, { coverageLimitations: ["Specs not reviewed"] }]) {
+    assert.throws(() => api.acceptApproachReview({ packet, review: { ...review, ...override }, currentInputs: inputs() }), /complete.*review/);
+  }
   const changed = { ...inputs(), "openspec/config.yaml": "d".repeat(64) };
   for (const currentInputs of [changed, { ...inputs(), "openspec/changes/fixture-change/specs/new/spec.md": "e".repeat(64) }]) assert.throws(() => api.acceptApproachReview({ packet, review, currentInputs }), /input|drift/);
   const partial = inputs();
@@ -83,11 +86,14 @@ test("approach review binds the complete inventory and rejects drift without app
 test("review-record continuity never resets an unavailable cumulative count or reuses stale acceptance", async () => {
   const api = await core();
   assert.equal(typeof api.reviewReadiness, "function", "review-record continuity exists");
-  const entry = { inputs: inputs(), verdict: "No findings", findings: [], reference: "retained:review", reviewerSession: "reviewer", authorSession: "author", readOnly: true, automaticCycle: false };
+  const entry = { inputs: inputs(), verdict: "Verdict: No findings", findings: [], coverageLimitations: [], reference: "retained:review", reviewerSession: "reviewer", authorSession: "author", readOnly: true, automaticCycle: false };
   const record = { schemaVersion: 1, change: "fixture-change", goal: "Deliver the requested outcome", cumulativeCycles: 3, countReference: "retained:count-chain", entries: [entry] };
   const request = { change: "fixture-change", inputs: inputs(), record, recordIntegrityVerified: true };
   assert.equal(api.reviewReadiness(request).action, "freeze-ready");
   assert.equal(api.reviewReadiness(request).cumulativeCycles, 3);
+  for (const override of [{ verdict: "No findings" }, { coverageLimitations: undefined }, { coverageLimitations: ["Partial review"] }]) {
+    assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [{ ...entry, ...override }] } }).action, "resolve-findings");
+  }
   for (const invalid of [undefined, "unreadable", { ...record, entries: [{ ...entry, inputs: { ...inputs(), "openspec/config.yaml": "d".repeat(64) } }] }]) {
     assert.equal(api.reviewReadiness({ ...request, record: invalid }).action, "operator-disposition");
     const recovered = api.reviewReadiness({ ...request, record: invalid, recovery: { cumulativeCycles: 5, reference: "retained:external-reports", verified: true } });
@@ -111,7 +117,9 @@ test("review readiness retains dispositions and permits a reviewed unavailable-c
   const entry = { inputs: inputs(), verdict: "No blocking findings", findings: [finding], reference: "retained:review", reviewerSession: "reviewer", authorSession: "author", readOnly: true, automaticCycle: false };
   const record = { schemaVersion: 1, change: "fixture-change", goal: "Preserved goal", cumulativeCycles: null, countDisposition: { mode: "per-cycle", reference: "retained:operator-decision" }, entries: [entry] };
   const request = { change: "fixture-change", inputs: inputs(), record, recordIntegrityVerified: true };
-  const result = api.reviewReadiness(request);
+  assert.equal(api.reviewReadiness(request).action, "resolve-findings", "disposition is not a fresh literal verdict");
+  const fresh = { ...entry, reference: "retained:fresh-review", verdict: "Verdict: No findings", findings: [], coverageLimitations: [] };
+  const result = api.reviewReadiness({ ...request, record: { ...record, entries: [entry, fresh] } });
   assert.equal(result.action, "freeze-ready");
   assert.equal(result.cumulativeCycles, null);
   assert.equal(result.requireCycleAuthorization, true);
@@ -124,11 +132,13 @@ test("a later empty verdict cannot erase an unresolved historical planning findi
   const api = await core();
   const finding = { id: "retained-finding", blocking: true, evidence: "design.md:12" };
   const common = { inputs: inputs(), reference: "retained:review", reviewerSession: "reviewer", authorSession: "author", readOnly: true, automaticCycle: false };
-  const record = { schemaVersion: 1, change: "fixture-change", goal: "Preserved goal", cumulativeCycles: 2, countReference: "retained:count", entries: [{ ...common, verdict: "Findings", findings: [finding] }, { ...common, reference: "retained:review-2", verdict: "No findings", findings: [] }] };
+  const record = { schemaVersion: 1, change: "fixture-change", goal: "Preserved goal", cumulativeCycles: 2, countReference: "retained:count", entries: [{ ...common, verdict: "Findings", findings: [finding] }, { ...common, reference: "retained:review-2", verdict: "Verdict: No findings", findings: [], coverageLimitations: [] }] };
   const request = { change: record.change, inputs: inputs(), record, recordIntegrityVerified: true };
   assert.equal(api.reviewReadiness(request).action, "resolve-findings");
   const resolved = structuredClone(record);
   resolved.entries[1] = { ...resolved.entries[1], verdict: "No blocking findings", findings: [{ ...finding, blocking: false, disposition: "applied", evidence: "retained:amended-hashes", reReviewReference: "retained:review-2" }] };
+  assert.equal(api.reviewReadiness({ ...request, record: resolved }).action, "resolve-findings");
+  resolved.entries.push({ ...common, reference: "retained:review-3", verdict: "Verdict: No findings", findings: [], coverageLimitations: [] });
   assert.equal(api.reviewReadiness({ ...request, record: resolved }).action, "freeze-ready");
   const missing = structuredClone(resolved); delete missing.entries[1].findings[0].reReviewReference;
   assert.equal(api.reviewReadiness({ ...request, record: missing }).action, "resolve-findings");
@@ -142,10 +152,14 @@ test("review records require retained automatic correction hashes and per-cycle 
   const request = { change: record.change, inputs: inputs(), record, recordIntegrityVerified: true };
   assert.equal(api.reviewReadiness(request).action, "operator-disposition");
   const corrected = { ...entry, correction: { finding, beforeInputs: inputs(), amendedInputs: inputs(), reReviewReference: entry.reference } };
-  assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [corrected] } }).action, "freeze-ready");
+  const fresh = { ...entry, automaticCycle: false, reference: "retained:fresh-review", verdict: "Verdict: No findings", findings: [], coverageLimitations: [] };
+  assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [corrected] } }).action, "resolve-findings");
+  assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [corrected, fresh] } }).action, "freeze-ready");
   const unknown = { ...record, cumulativeCycles: null, countDisposition: { mode: "per-cycle", reference: "retained:operator" }, entries: [corrected] };
   assert.equal(api.reviewReadiness({ ...request, record: unknown }).action, "operator-disposition");
   unknown.entries = [{ ...corrected, cycleAuthorization: { findingId: finding.id, inputs: inputs(), reference: "retained:cycle-1" } }];
+  assert.equal(api.reviewReadiness({ ...request, record: unknown }).action, "resolve-findings");
+  unknown.entries.push(fresh);
   assert.equal(api.reviewReadiness({ ...request, record: unknown }).action, "freeze-ready");
   assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [null] } }).action, "operator-disposition");
 });
@@ -173,6 +187,9 @@ test("routine planning correction preserves the goal and stops at disposition or
   assert.equal(unfounded.action, "retain-unfounded");
   assert.equal(unfounded.finding.blocking, false);
   assert.equal(unfounded.cumulativeCycles, 2);
+  for (const override of [{ repeated: true }, { contradictory: true }, { cumulativeCycles: 8 }]) {
+    assert.equal(api.planningCorrection({ ...request, ...override, finding: { ...finding, disposition: "unfounded", reason: "Disputed" } }).action, "operator-disposition");
+  }
 });
 
 test("candidate review requires a fresh read-only session and exact candidate and gate identities", async () => {
@@ -183,9 +200,12 @@ test("candidate review requires a fresh read-only session and exact candidate an
   const packet = api.candidateReviewPacket(request);
   assert.equal(packet.head, head);
   assert.ok(packet.forbidden.includes("edits"));
-  const review = { head, planDigest: authority().planDigest, reviewerSession: "reviewer", readOnly: true, reference: "retained:verdict", verdict: "No findings", findings: [] };
+  const review = { head, planDigest: authority().planDigest, reviewerSession: "reviewer", readOnly: true, reference: "retained:verdict", verdict: "Verdict: No findings", findings: [], coverageLimitations: [] };
   const acceptance = { packet, review, currentHead: head, currentPlanDigest: authority().planDigest };
   assert.equal(api.acceptCandidateReview(acceptance).accepted, true);
+  for (const override of [{ verdict: "No blocking findings" }, { coverageLimitations: undefined }, { coverageLimitations: ["Unreviewed outputs"] }]) {
+    assert.throws(() => api.acceptCandidateReview({ ...acceptance, review: { ...review, ...override } }), /complete.*review/);
+  }
   for (const reviewerSession of ["implementer", "owner-session", ""]) assert.throws(() => api.candidateReviewPacket({ ...request, reviewerSession }), /independent|distinct/);
   assert.throws(() => api.candidateReviewPacket({ ...request, gates: [{ ...request.gates[0], commit: "f".repeat(40) }] }), /gate/);
   assert.throws(() => api.candidateReviewPacket({ ...request, gates: [{ ...request.gates[0], exitCode: 1 }] }), /gate/);

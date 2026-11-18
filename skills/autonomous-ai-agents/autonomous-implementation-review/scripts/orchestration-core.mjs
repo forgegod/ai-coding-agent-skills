@@ -25,9 +25,10 @@ const resolvedFinding = (finding) => finding?.blocking === false && (
   (finding.disposition === "applied" && text(finding.evidence) && text(finding.reReviewReference)) ||
   (finding.disposition === "operator-disposed" && text(finding.operatorReference) && text(finding.reason))
 );
-const noBlockingFindings = (entry) => Array.isArray(entry.findings) &&
-  ((entry.verdict === "No findings" && entry.findings.length === 0) ||
-   (entry.verdict === "No blocking findings" && entry.findings.every(resolvedFinding)));
+// Dispositions preserve history; they are never a substitute for a fresh verdict.
+const completeNoFindings = (entry) => entry?.verdict === "Verdict: No findings" &&
+  Array.isArray(entry.findings) && entry.findings.length === 0 &&
+  Array.isArray(entry.coverageLimitations) && entry.coverageLimitations.length === 0;
 
 export function approachPacket({ change, workspace, inputs, authorSession, reviewerSession }) {
   inventory(change, inputs);
@@ -35,7 +36,7 @@ export function approachPacket({ change, workspace, inputs, authorSession, revie
   requireThat(text(authorSession) && text(reviewerSession) && authorSession !== reviewerSession, "Missing independent reviewer session");
   return structuredClone({ change, workspace, inputs, authorSession, reviewerSession,
     forbidden: ["edits", "shell", "git", "profiles", "persistence", "implementation", "subagents", "multiplexers"],
-    report: "Severity-ordered path:line findings with impact, trigger and minimal remedy, or No findings",
+    report: "Severity-ordered path:line findings with impact, trigger and minimal remedy, or literal Verdict: No findings; record coverage limitations",
   });
 }
 
@@ -46,7 +47,7 @@ export function acceptApproachReview({ packet, review, currentInputs }) {
   requireThat(review.readOnly === true, "Review must remain read-only");
   requireThat(text(review.reference), "Missing retained review reference");
   requireThat(sameInputs(packet.inputs, review.inputs) && sameInputs(packet.inputs, currentInputs), "Planning input drift or incomplete review inputs");
-  requireThat(noBlockingFindings(review), "Unresolved approach findings");
+  requireThat(completeNoFindings(review), "Missing complete literal no-findings approach review");
   return { readyForFreeze: true, planApproved: false, executionAuthorized: false, entry: structuredClone(review) };
 }
 
@@ -85,7 +86,7 @@ export function reviewReadiness({ change, inputs, record, recordIntegrityVerifie
     // Anonymous findings cannot be silently matched to a later disposition.
     findings.set(text(finding?.id) ? finding.id : Symbol(), finding);
   }
-  const ready = noBlockingFindings(latest) && [...findings.values()].every(resolvedFinding);
+  const ready = completeNoFindings(latest) && [...findings.values()].every(resolvedFinding);
   return { action: ready ? "freeze-ready" : "resolve-findings", cumulativeCycles: record.cumulativeCycles,
     requireCycleAuthorization: Boolean(perCycle), reference: latest.reference, inputs: structuredClone(inputs) };
 }
@@ -94,6 +95,8 @@ export function planningCorrection({ goal, frozen, finding, currentInputs, autho
   const result = { action: "operator-disposition", goal, cumulativeCycles, finding: { ...structuredClone(finding), blocking: true } };
   if (!text(goal) || frozen !== false || finding?.classification !== "routine" || !text(finding.id) ||
       !sameInputs(finding.inputs, currentInputs) || !text(finding.evidence)) return result;
+  if (repeated !== false || contradictory !== false ||
+      (cumulativeCycles !== null && (!Number.isSafeInteger(cumulativeCycles) || cumulativeCycles < 0 || cumulativeCycles >= 8))) return result;
   if (finding.disposition === "unfounded" && text(finding.reason)) {
     return { ...result, action: "retain-unfounded", finding: { ...result.finding, blocking: false } };
   }
@@ -155,7 +158,7 @@ export function acceptSuccessorReview({ change, identity, receipt, currentInputs
     sameInputs(receipt.inputs, identity.inputs) && sameInputs(currentInputs, identity.inputs), "Successor review identity/input drift");
   requireThat(hashes(receipt.packageHashes) && sameInputs(receipt.packageHashes, currentPackageHashes), "Review package hash drift");
   requireThat(text(receipt.model) && text(receipt.reference) && text(receipt.authorSession) && text(receipt.reviewerSession) &&
-    receipt.authorSession !== receipt.reviewerSession && receipt.readOnly === true && noBlockingFindings(receipt), "Missing independent successor verdict");
+    receipt.authorSession !== receipt.reviewerSession && receipt.readOnly === true && completeNoFindings(receipt), "Missing complete independent successor verdict");
   requireThat(validation?.plan === identity.plan && validation.exitCode === 0 && text(validation.reference) &&
     sameInputs(validation.inputs, identity.inputs), "Missing retained successful successor validation");
   return { action: "freeze-ready", inputs: structuredClone(identity.inputs), reference: receipt.reference,
@@ -176,6 +179,6 @@ export function acceptCandidateReview({ packet, review, currentHead, currentPlan
   requireThat(review?.reviewerSession === packet.reviewerSession && review.readOnly === true && text(review.reference), "Missing independent read-only review evidence");
   requireThat(currentHead === packet.head && review.head === packet.head && currentPlanDigest === packet.authority.planDigest &&
     review.planDigest === packet.authority.planDigest, "Candidate or plan changed after review");
-  requireThat(noBlockingFindings(review), "Unresolved candidate findings");
+  requireThat(completeNoFindings(review), "Missing complete literal no-findings candidate review");
   return { accepted: true, head: packet.head, planDigest: packet.authority.planDigest, reference: review.reference, publicationAuthorized: false };
 }

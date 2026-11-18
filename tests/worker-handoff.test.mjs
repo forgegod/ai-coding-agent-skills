@@ -28,11 +28,11 @@ async function fixture(t, role = "implementer") {
     requiredEvidence: ["native.txt", "lifecycle.jsonl"], mutablePaths: role === "implementer" ? ["src/feature.mjs"] : [],
   };
   const runtime = { adapter: "synthetic", client: "synthetic", version: "1", session: "worker-1", provider: "synthetic", model: "fixture", configurationSource: "test", configurationScope: "attempt", readOnly: role !== "implementer" };
-  const report = Buffer.from(role === "implementer" ? "Implemented feature; tests pass.\n" : "No findings\n");
+  const report = Buffer.from(role === "implementer" ? "Implemented feature; tests pass.\n" : "Verdict: No findings\n");
   const lifecycle = Buffer.from(JSON.stringify({ schemaVersion: 1, attempt: "attempt-1", session: "worker-1", event: "terminal", status: "completed", completion: { kind: "exit", code: 0, signal: null } }) + "\n");
   const files = { "report.md": report, "native.txt": report, "lifecycle.jsonl": lifecycle };
   const descriptor = (name) => ({ path: path.join(directory, name), sha256: hash(files[name]), bytes: files[name].length });
-  const result = { schemaVersion: 1, identity: structuredClone(request.identity), requestSha256: null, runtime, status: "completed", verdict: role === "implementer" ? "not_applicable" : "no_findings", nativeVerdict: role === "implementer" ? null : "No findings", findings: [], coverageLimitations: [], report: descriptor("report.md"), reportKind: "native", evidence: [descriptor("native.txt"), descriptor("lifecycle.jsonl")], outputs: role === "implementer" ? { "src/feature.mjs": "d".repeat(64) } : {}, completion: { kind: "exit", code: 0, signal: null }, nativeReport: descriptor("native.txt") };
+  const result = { schemaVersion: 1, identity: structuredClone(request.identity), requestSha256: null, runtime, status: "completed", verdict: role === "implementer" ? "not_applicable" : "no_findings", nativeVerdict: role === "implementer" ? null : "Verdict: No findings", findings: [], coverageLimitations: [], report: descriptor("report.md"), reportKind: "native", evidence: [descriptor("native.txt"), descriptor("lifecycle.jsonl")], outputs: role === "implementer" ? { "src/feature.mjs": "d".repeat(64) } : {}, completion: { kind: "exit", code: 0, signal: null }, nativeReport: descriptor("native.txt") };
   return { root, workspace, scratch, profile, directory, request, runtime, files, result };
 }
 async function prepare(f) {
@@ -48,6 +48,11 @@ test("portable adapter publication binds immutable request and complete retained
   assert.ok(Object.isFrozen(expected.request.identity));
   await core.publishResult({ expected, runtime: f.runtime, result: f.result, files: f.files });
   await rm(f.scratch, { recursive: true });
+  for (const name of ["request.md", "result.json", ...Object.keys(f.files)]) {
+    const file = path.join(f.directory, name);
+    assert.equal((await stat(file)).mode & 0o222, 0, name);
+    await assert.rejects(writeFile(file, "overwrite"), /EACCES|EPERM/);
+  }
   const admitted = await core.readHandoff({ expected, runtime: f.runtime });
   assert.equal(admitted.executionCompleted, true);
   assert.equal(admitted.deliveryAccepted, false);
@@ -68,6 +73,9 @@ function replaceFile(f, name, bytes) {
 test("review verdict and process completion must occur in the retained native observations", async (t) => {
   const f = await fixture(t, "reviewer");
   const expected = await prepare(f);
+  for (const override of [{ nativeVerdict: "No findings" }, { coverageLimitations: ["Incomplete coverage"] }, { coverageLimitations: undefined }]) {
+    await assert.rejects(core.publishResult({ expected, runtime: f.runtime, result: { ...f.result, ...override }, files: f.files }), /coverage|verdict/i);
+  }
   replaceFile(f, "report.md", "Review is still in progress\n");
   replaceFile(f, "native.txt", "Review is still in progress\n");
   await assert.rejects(core.publishResult({ expected, runtime: f.runtime, result: f.result, files: f.files }), /native verdict/);
@@ -131,6 +139,19 @@ test("published results have no writable staging alias and reject rewrite attemp
   assert.equal((await stat(finalPath)).nlink, 1);
   assert.deepEqual(aliases, []);
   assert.equal((await core.readHandoff({ expected, runtime: f.runtime })).result.outputs["src/feature.mjs"], "d".repeat(64));
+});
+
+test("admission refuses writable requests and captures even when all hashes still match", async (t) => {
+  const f = await fixture(t);
+  const expected = await prepare(f);
+  await core.publishResult({ expected, runtime: f.runtime, result: f.result, files: f.files });
+  for (const name of ["request.md", ...Object.keys(f.files)]) {
+    const file = path.join(f.directory, name);
+    await chmod(file, 0o600);
+    await assert.rejects(core.readHandoff({ expected, runtime: f.runtime }), /not sealed/);
+    await chmod(file, 0o400);
+  }
+  assert.equal((await core.readHandoff({ expected, runtime: f.runtime })).executionCompleted, true);
 });
 
 test("failed alias removal preserves sealed evidence but refuses admission", async (t) => {
@@ -218,9 +239,13 @@ test("missing, partial, stale, unsafe and truncated handoffs remain incomplete",
     assert.ok(!(await readdir(f.directory)).includes("result.json"));
   }
   await core.publishResult({ expected, runtime: f.runtime, result: f.result, files: f.files });
+  await chmod(path.join(f.directory, "report.md"), 0o600);
   await writeFile(path.join(f.directory, "report.md"), "truncated");
+  await chmod(path.join(f.directory, "report.md"), 0o400);
   await assert.rejects(core.readHandoff({ expected, runtime: f.runtime }), /truncated/);
+  await chmod(path.join(f.directory, "report.md"), 0o600);
   await writeFile(path.join(f.directory, "report.md"), f.files["report.md"]);
+  await chmod(path.join(f.directory, "report.md"), 0o400);
   // Simulate hostile replacement, not an authorized publisher overwrite.
   await rm(path.join(f.directory, "result.json"));
   await writeFile(path.join(f.directory, "result.json"), '{"schemaVersion":', { mode: 0o400, flag: "wx" });
@@ -231,9 +256,13 @@ test("changed requests, symlinks, evidence collisions and excluded roots are ref
   const f = await fixture(t);
   const expected = await prepare(f);
   const bytes = await readFile(path.join(f.directory, "request.md"));
+  await chmod(path.join(f.directory, "request.md"), 0o600);
   await writeFile(path.join(f.directory, "request.md"), Buffer.concat([bytes, Buffer.from("changed")]));
+  await chmod(path.join(f.directory, "request.md"), 0o400);
   await assert.rejects(core.publishResult({ expected, runtime: f.runtime, result: f.result, files: f.files }), /request identity/);
+  await chmod(path.join(f.directory, "request.md"), 0o600);
   await writeFile(path.join(f.directory, "request.md"), bytes);
+  await chmod(path.join(f.directory, "request.md"), 0o400);
   await symlink(path.join(f.root, "outside"), path.join(f.directory, "native.txt"));
   await assert.rejects(core.publishResult({ expected, runtime: f.runtime, result: f.result, files: f.files }), /symlink|exist/i);
   assert.ok(!(await readdir(f.directory)).includes("result.json"));

@@ -73,6 +73,10 @@ Its binding contains:
 flat attempt-local capture names to complete byte buffers. Required evidence may
 also be closed files already retained by that adapter in the declared roots.
 Inputs are snapshotted before asynchronous I/O. Existing files are never replaced.
+The request and all finalized reports/captures are sealed read-only (0400), synced
+and closed, not just result.json. Pre-retained evidence must already be sealed
+with one hard link; publication refuses writable files or aliases rather than
+changing externally supplied evidence. This is not worker isolation by itself.
 
 The exact result fields are `schemaVersion`, `identity` (the complete request
 identity), `requestSha256`, `runtime`, `status`, `verdict`, `nativeVerdict`,
@@ -88,7 +92,8 @@ identity), `requestSha256`, `runtime`, `status`, `verdict`, `nativeVerdict`,
   findings, unavailable or not_applicable. Completed implementation is not_applicable;
   incomplete attempts are unavailable with explicit coverage limitations, never
   manufactured review verdicts. Completed review requires an explicit native verdict;
-  no_findings requires `No findings`, empty findings and no coverage limitations.
+  no_findings requires literal `Verdict: No findings`, empty findings and no coverage
+  limitations. A findings verdict cannot carry that contradictory no-findings line.
 - Findings retain severity (critical/high/medium/low), repository-relative path,
   positive line, impact, trigger and remedy. Execution with findings is valid
   execution but not acceptance. The native verdict is an exact line of the complete
@@ -117,7 +122,8 @@ Finalize and sync all reports/captures first. Validate every required reference,
 size, SHA-256 and lifecycle identity, then write the staging result, remove all
 write bits (mode 0400), sync and close its handle before atomic no-clobber hard-link
 publication of result.json. Remove the staging alias after successful linking;
-admission requires a read-only regular file with exactly one hard link. No writable
+admission requires every retained artifact to be a read-only regular file with
+exactly one hard link. No writable
 handle or retained writable alias may survive publication. A collision preserves
 the existing result and the separate sealed staging file. Failed alias removal
 preserves sealed bytes but blocks admission; do not treat file existence as success.

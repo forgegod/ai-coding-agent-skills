@@ -43,9 +43,16 @@ test("historical successor acceptance binds exact identity, append-only chain an
   assert.equal(typeof core.acceptSuccessorReview, "function");
   const identity = { plan: "a".repeat(40), tree: "b".repeat(40), planDigest: "c".repeat(64), inputs };
   const packageHashes = { "review.json": "d".repeat(64), "report.md": "e".repeat(64) };
-  const receipt = { ...identity, reviewerSession: "reviewer", authorSession: "author", model: "fixture", readOnly: true, verdict: "No findings", findings: [], reference: "retained:fresh-review", packageHashes };
+  const receipt = { ...identity, reviewerSession: "reviewer", authorSession: "author", model: "fixture", readOnly: true, verdict: "Verdict: No findings", findings: [], coverageLimitations: [], reference: "retained:fresh-review", packageHashes };
   const input = { change: "fixture-change", identity, receipt, currentInputs: inputs, currentPackageHashes: packageHashes, chain: { verified: true, reference: "retained:append-only-chain", superseded: { "old-review.json": "f".repeat(64) }, preservationVerified: true }, validation: { plan: identity.plan, inputs, exitCode: 0, reference: "retained:validation" } };
   assert.equal(core.acceptSuccessorReview(input).action, "freeze-ready");
   assert.equal(core.acceptSuccessorReview(input).planApproved, false);
+  for (const disposition of ["applied", "unfounded", "operator-disposed"]) {
+    const finding = { blocking: false, disposition, evidence: "retained:remedy", reason: "Disposed", reReviewReference: "retained:review", operatorReference: "retained:operator" };
+    assert.throws(() => core.acceptSuccessorReview({ ...input, receipt: { ...receipt, verdict: "No blocking findings", findings: [finding] } }), /complete.*verdict/);
+  }
+  for (const override of [{ verdict: "No findings" }, { coverageLimitations: undefined }, { coverageLimitations: ["Config unread"] }]) {
+    assert.throws(() => core.acceptSuccessorReview({ ...input, receipt: { ...receipt, ...override } }), /complete.*verdict/);
+  }
   for (const override of [{ receipt: { ...receipt, plan: "f".repeat(40) } }, { receipt: { ...receipt, reviewerSession: "author" } }, { receipt: { ...receipt, model: "" } }, { currentPackageHashes: { ...packageHashes, "report.md": "f".repeat(64) } }, { validation: { ...input.validation, exitCode: 1 } }, { chain: { ...input.chain, preservationVerified: false } }, { currentInputs: { ...inputs, "openspec/config.yaml": "d".repeat(64) } }]) assert.throws(() => core.acceptSuccessorReview({ ...input, ...override }));
 });

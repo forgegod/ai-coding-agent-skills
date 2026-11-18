@@ -60,12 +60,14 @@ invokes this procedure. It does not authorize implementation or approve a plan.
    The fresh reviewer is read-only: no edits, shell execution, Git/profile/config
    writes, persistence, implementation, subagents or multiplexers. Require
    severity-ordered `path:line` findings with impact, trigger and minimal remedy,
-   or `No findings`. Review the whole approach including minimum-outcome task
+   or literal `Verdict: No findings`. Review the whole approach including minimum-outcome task
    generation, not only a last edit. A recommendation is not operator approval.
 3. Re-enumerate and re-hash the complete set after review. A review carries the
    same `inputs`, `reviewerSession`, `readOnly: true`, retained `reference`,
-   `verdict` and `findings`. `acceptApproachReview({ packet, review, currentInputs })`
-   refuses input drift, partial inventories, wrong sessions and unresolved findings.
+   `verdict`, `findings` and explicit `coverageLimitations`.
+   `acceptApproachReview({ packet, review, currentInputs })` requires literal
+   `Verdict: No findings`, empty findings and empty coverage limitations; it refuses
+   input drift, partial inventories, wrong sessions and unresolved findings.
    Ordinary draft drift preserves the goal and automatically repeats validation
    and full review subject to continuity below; do not create a task or narrow scope.
 4. Retain the review chain in change-owned `evidence/approach-review.json`, outside
@@ -80,7 +82,7 @@ invokes this procedure. It does not authorize implementation or approve a plan.
 checks a schemaVersion 1 record with `change`, unchanged operator `goal`,
 `cumulativeCycles`, retained `countReference`, and ordered `entries`. Each entry
 retains its full `inputs`, `authorSession`, `reviewerSession`, `readOnly`,
-`automaticCycle` boolean, `reference`, `verdict`, and `findings`. Re-read external
+`automaticCycle` boolean, `reference`, `verdict`, `findings` and `coverageLimitations`. Re-read external
 captures before asserting `recordIntegrityVerified`. A filename is not integrity.
 An automatic entry also retains `correction: { finding, beforeInputs,
 amendedInputs, reReviewReference }`: the finding binds the old hashes, the entry
@@ -96,9 +98,13 @@ accepted as this schema; normalize verified observations in external scratch.
   require `disposition: applied`, evidence and `reReviewReference`; unfounded
   findings require evidence and reason; operator dispositions require reason and
   `operatorReference`. A later empty verdict cannot erase a retained finding.
-- Freeze readiness needs the latest `No findings` or `No blocking findings` entry
-  matching the complete frozen inputs and resolved retained findings. This is
-  readiness only, never plan approval or execution authority.
+- Freeze readiness needs the latest complete independent receipt with literal
+  `Verdict: No findings`, empty findings and explicit empty coverage limitations,
+  matching the complete frozen inputs and resolved retained findings. Applied,
+  unfounded or operator-disposed findings (including `No blocking findings`) stay
+  in history but never substitute for that later fresh receipt. Do not rewrite a
+  historical report to produce the required literal. This is readiness only,
+  never plan approval or execution authority.
 - Missing, unreadable, mismatched or revised records invalidate acceptance.
   Recover the prior cumulative count from retained external reports. Supply a
   verified `recovery` with `cumulativeCycles` and `reference`; validate and review
@@ -163,7 +169,8 @@ guard. Preserve historical records and link their hashes through an append-only
 chain. `acceptSuccessorReview` takes change, identity (plan/tree/planDigest/inputs),
 receipt, currentInputs, currentPackageHashes, chain and validation. The receipt
 binds that exact identity, distinct authorSession/reviewerSession, effective model,
-readOnly, literal verdict/findings, reference and complete packageHashes. Chain
+readOnly, literal `Verdict: No findings`, empty findings and coverageLimitations,
+reference and complete packageHashes. Chain
 observations require verified preservation, reference and superseded-record hashes;
 validation binds the plan/inputs, successful exitCode and retained reference.
 Re-enumerate/re-hash the complete inputs and review package after review. Missing,
@@ -182,11 +189,12 @@ Freeze the candidate while reviewing; do not reuse the implementation conversati
 
 For both portable and retained legacy candidate reviews, require severity-ordered
 `path:line` findings with impact, trigger and minimal correction/reproduction, or
-`No findings`. Review correctness, regressions, security/privacy, data
+literal `Verdict: No findings`. Review correctness, regressions, security/privacy, data
 loss/concurrency, contracts and test gaps, not refactors.
 
 `acceptCandidateReview({ packet, review, currentHead, currentPlanDigest })` checks
-the exact candidate/plan, independent read-only reviewer and resolved verdict.
+the exact candidate/plan, independent read-only reviewer, literal no-findings verdict
+and explicit empty coverage limitations. A disposed finding is not that verdict.
 Retain actual gate and report evidence; structural acceptance cannot prove their
 truth. A changed candidate requires renewed gates and review. Candidate corrections
 use the same retained correction count and any narrower project/authority budget;
@@ -206,6 +214,12 @@ Every cap handoff, including a retained legacy procedure, passes that fail-close
 decision and any additional integrated approval gate before dispatch. Never split,
 relabel or change sessions to reset the allowance; a second cap on that native task
 stops. A missing qualified continuation route stops without fallback.
+Before a fresh continuation, the adapter must re-read the exact capped process-tree
+identity immediately before stopping it and verify termination, or prove the tree
+cannot still write. Retain that quiescence proof in the decision record under
+delivery's `references/delivery-policy.md`. Failed identity readback preserves the
+process and forbids continuation; idle UI or cap output alone is not quiescence.
+Preserve session evidence and worker scratch. The pure decision never stops a process.
 No next group or next change is implied. Before admitting any terminal worker's
 report, use `readHandoff` under [worker-handoff.md](worker-handoff.md). Execution
 completion, review verdict and delivery acceptance are separate gates.

@@ -126,14 +126,14 @@ export async function createAttempt({ directory, request, excludedRoots }) {
   await safePath(directory, true);
   await mkdir(directory, { mode: 0o700 }); // Deliberately non-recursive and no reuse.
   const bytes = requestBytes(request);
-  await writeClosed(path.join(directory, "request.md"), bytes);
+  await writeClosed(path.join(directory, "request.md"), bytes, true);
   return freeze({ directory, request, requestSha256: hash(bytes) });
 }
 async function checkExpected(expected) {
   validateRequest(expected.request);
   absolute(expected.directory);
   need(digest(expected.requestSha256) && expected.request.evidenceRoots.includes(expected.directory), "Invalid retained request binding");
-  const bytes = await readClosed(path.join(expected.directory, "request.md"));
+  const bytes = await readClosed(path.join(expected.directory, "request.md"), undefined, true);
   need(hash(bytes) === expected.requestSha256 && bytes.equals(requestBytes(expected.request)), "Changed or malformed request identity");
 }
 function descriptor(d, expected) {
@@ -160,7 +160,7 @@ function validateResult(result, expected, runtime) {
   }
   if (result.status !== "completed") need(result.verdict === "unavailable" && result.nativeVerdict === null && result.findings.length === 0 && result.coverageLimitations.length > 0, "Incomplete attempt cannot claim a verdict");
   else if (result.identity.role === "implementer") need(result.verdict === "not_applicable" && result.nativeVerdict === null && result.findings.length === 0, "Implementer cannot review itself");
-  else need((result.verdict === "no_findings" && result.nativeVerdict === "No findings" && result.findings.length === 0 && result.coverageLimitations.length === 0) || (result.verdict === "findings" && text(result.nativeVerdict) && result.findings.length > 0), "Missing complete explicit native review verdict");
+  else need((result.verdict === "no_findings" && result.nativeVerdict === "Verdict: No findings" && result.findings.length === 0 && result.coverageLimitations.length === 0) || (result.verdict === "findings" && text(result.nativeVerdict) && result.nativeVerdict !== "Verdict: No findings" && result.findings.length > 0), "Missing complete explicit native review verdict");
   descriptor(result.report, expected);
   need(result.report.path === path.join(expected.directory, "report.md") && result.report.bytes > 0, "Missing complete report");
   need(["native", "adapter-diagnostic"].includes(result.reportKind), "Invalid report kind");
@@ -184,7 +184,7 @@ function validateResult(result, expected, runtime) {
 }
 async function verifyFiles(result, expected) {
   for (const d of [result.report, ...result.evidence]) {
-    const bytes = await readClosed(d.path);
+    const bytes = await readClosed(d.path, undefined, true);
     need(bytes.length === d.bytes && hash(bytes) === d.sha256, "Missing, changed or truncated evidence");
   }
   if (result.nativeVerdict !== null) {
@@ -222,7 +222,7 @@ export async function publishResult({ expected, runtime, result, files }) {
     const d = descriptors.find((entry) => entry.path === p);
     need(d && hash(bytes) === d.sha256 && bytes.length === d.bytes, "Unexpected or truncated capture");
   }
-  for (const [name, bytes] of Object.entries(files)) await writeClosed(path.join(expected.directory, name), bytes);
+  for (const [name, bytes] of Object.entries(files)) await writeClosed(path.join(expected.directory, name), bytes, true);
   await verifyFiles(result, expected);
   await checkExpected(expected);
   const temporary = path.join(expected.directory, `.result-${randomUUID()}.json`);

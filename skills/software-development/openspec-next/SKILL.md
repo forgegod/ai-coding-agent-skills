@@ -49,6 +49,10 @@ Use delivery's `workerContinuationDecision` only for one fresh bounded same-role
 session after a verified iteration cap, keyed to the existing group/native task.
 A changed session or action label never resets the allowance. Group/authority
 budget exhaustion, native waits, failed gates or a second cap stop instead.
+Before any fresh continuation, require the adapter's retained exact-process-tree
+quiescence proof: immediate positive identity readback followed by verified
+termination, or proof it cannot still write. Failed readback preserves the process
+and forbids continuation; idle or cap output alone is insufficient.
 
 ## Procedure
 

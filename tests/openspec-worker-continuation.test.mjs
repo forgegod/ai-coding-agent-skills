@@ -4,7 +4,9 @@ import { readFile } from "node:fs/promises";
 import * as api from "../skills/software-development/openspec-delivery/scripts/delivery-policy.mjs";
 const plan = "c".repeat(40), planDigest = "d".repeat(64);
 const boundary = () => ({ change: "fixture-change", group: "2", task: "2.1", action: "2.1", workspace: "/synthetic/worktree", plan, planDigest, role: "reviewer", outcome: "Verify feature", acceptance: ["Complete review"], scope: ["feature"], restrictions: ["read-only"], stop: "Identity drift", authorityReference: "retained:execution", budget: { limit: 8, unit: "cycles" } });
-const request = () => ({ actor: "owner", orchestrator: "owner", before: boundary(), after: boundary(), nativeTasks: [{ id: "2.1", group: "2", completed: false }], history: [], historyVerified: true, previousSession: "worker-1", nextSession: "worker-2", observed: { status: "capped", identityVerified: true, session: "worker-1", onTrack: true, progressReference: "retained:acceptance-progress", acceptance: boundary().acceptance, unfinishedAction: "2.1", qualifiedRoute: "synthetic-v1", nextQualifiedRoute: "synthetic-v1", freshSession: true, readOnly: true, nativePrompt: false, failedGate: false, drift: false, contradictory: false, stopReached: false, groupBudgetRemaining: 1, authorityBudgetRemaining: 1 } });
+const processBinding = () => ({ session: "worker-1", pid: 123, startIdentity: "synthetic-start", treeIdentity: "retained:exact-tree" });
+const quiescence = () => ({ process: processBinding(), identityReadback: { process: processBinding(), verified: true, immediate: true, reference: "retained:pre-stop-readback" }, method: "terminated", terminationVerified: true, reference: "retained:tree-termination" });
+const request = () => ({ actor: "owner", orchestrator: "owner", before: boundary(), after: boundary(), nativeTasks: [{ id: "2.1", group: "2", completed: false }], history: [], historyVerified: true, previousSession: "worker-1", nextSession: "worker-2", cappedProcess: processBinding(), observed: { status: "capped", identityVerified: true, session: "worker-1", onTrack: true, progressReference: "retained:acceptance-progress", acceptance: boundary().acceptance, unfinishedAction: "2.1", qualifiedRoute: "synthetic-v1", nextQualifiedRoute: "synthetic-v1", freshSession: true, readOnly: true, nativePrompt: false, failedGate: false, drift: false, contradictory: false, stopReached: false, groupBudgetRemaining: 1, authorityBudgetRemaining: 1, quiescence: quiescence() } });
 
 test("iteration cap permits one fresh same-role continuation per native task, not per session or label", () => {
   assert.equal(typeof api.workerContinuationDecision, "function");
@@ -14,6 +16,9 @@ test("iteration cap permits one fresh same-role continuation per native task, no
   assert.equal(allowed.record.task, "2.1");
   assert.equal(allowed.record.previousSession, "worker-1");
   assert.equal(allowed.record.nextSession, "worker-2");
+  assert.deepEqual(allowed.record.quiescence, input.observed.quiescence);
+  input.observed.quiescence.reference = "changed-after-decision";
+  assert.equal(allowed.record.quiescence.reference, "retained:tree-termination");
   assert.equal(api.workerContinuationDecision({ ...input, history: [allowed.record], previousSession: "worker-2", nextSession: "worker-3", observed: { ...input.observed, session: "worker-2" } }).action, "stop");
   assert.equal(api.workerContinuationDecision({ ...input, history: [allowed.record], before: { ...boundary(), action: "renamed" }, after: { ...boundary(), action: "renamed" } }).action, "stop");
 });
@@ -25,6 +30,37 @@ test("continuation is fail-closed on every observation and unchanged authority b
   for (const key of Object.keys(input.observed)) { const observed = { ...input.observed }; delete observed[key]; assert.equal(api.workerContinuationDecision({ ...input, observed }).action, "stop", key); }
   for (const key of ["plan", "planDigest", "scope", "restrictions", "stop", "outcome", "acceptance", "role", "workspace", "authorityReference"]) assert.equal(api.workerContinuationDecision({ ...input, after: { ...boundary(), [key]: "changed" } }).action, "stop", key);
   for (const override of [{ actor: "worker-1" }, { historyVerified: false }, { nextSession: "worker-1" }, { nativeTasks: [{ id: "2.1", group: "3", completed: false }] }, { nativeTasks: [{ id: "2.1", group: "2", completed: true }] }]) assert.equal(api.workerContinuationDecision({ ...input, ...override }).action, "stop");
+});
+
+test("continuation requires immediate exact-tree identity and retained termination or non-writing proof", () => {
+  const input = request();
+  for (const proof of [undefined, {}, { ...quiescence(), method: "idle" }, { ...quiescence(), method: "capped" },
+    { ...quiescence(), terminationVerified: false }, { ...quiescence(), reference: "" },
+    { ...quiescence(), process: { ...processBinding(), pid: 456 } },
+    { ...quiescence(), identityReadback: { ...quiescence().identityReadback, verified: false } },
+    { ...quiescence(), identityReadback: { ...quiescence().identityReadback, immediate: false } },
+    { ...quiescence(), identityReadback: { ...quiescence().identityReadback, reference: "" } },
+    { ...quiescence(), identityReadback: { ...quiescence().identityReadback, process: { ...processBinding(), startIdentity: "reused-pid" } } },
+    { ...quiescence(), method: "non-writing", cannotWriteVerified: false }]) {
+    const result = api.workerContinuationDecision({ ...input, observed: { ...input.observed, quiescence: proof } });
+    assert.equal(result.action, "stop");
+    assert.equal(result.preserveProcess, true);
+  }
+  for (const key of Object.keys(input.cappedProcess)) {
+    const cappedProcess = { ...input.cappedProcess }; delete cappedProcess[key];
+    assert.equal(api.workerContinuationDecision({ ...input, cappedProcess }).action, "stop", key);
+  }
+  const proof = { ...quiescence(), method: "non-writing", cannotWriteVerified: true, reference: "retained:write-isolation" };
+  delete proof.terminationVerified;
+  const allowed = api.workerContinuationDecision({ ...input, observed: { ...input.observed, quiescence: proof } });
+  assert.equal(allowed.action, "continue-worker");
+  assert.deepEqual(allowed.record.quiescence, proof);
+  const nextProcess = { ...processBinding(), session: "worker-2", pid: 456, startIdentity: "new-start" };
+  const nextProof = { ...proof, process: nextProcess, identityReadback: { ...proof.identityReadback, process: nextProcess } };
+  const replay = api.workerContinuationDecision({ ...input, previousSession: "worker-2", nextSession: "worker-3", cappedProcess: nextProcess,
+    history: JSON.parse(JSON.stringify([allowed.record])), observed: { ...input.observed, session: "worker-2", quiescence: nextProof } });
+  assert.equal(replay.action, "stop", "valid new-session quiescence does not reset the action budget");
+  assert.match(replay.reason, /already consumed/);
 });
 
 test("splitting or renaming a capped action cannot manufacture a native task allowance", () => {
@@ -47,6 +83,10 @@ test("every documented cap route uses the once-only decision and forbids bypasse
     assert.match(source, /second cap.*stop|stop.*second cap/i, relative);
     assert.match(source, /split.*relabel.*session/i, relative);
     assert.doesNotMatch(source, /split packets, do not raise caps/, relative);
+  }
+  for (const relative of ["skills/software-development/openspec-delivery/references/delivery-policy.md", "skills/software-development/openspec-next/SKILL.md", "skills/autonomous-ai-agents/autonomous-implementation-review/references/portable-core.md"]) {
+    const source = await readFile(new URL(`../${relative}`, import.meta.url), "utf8");
+    for (const pattern of [/quiescence/, /immediate/i, /cannot still write/, /preserves the\s+process/, /idle/i]) assert.match(source, pattern, relative);
   }
 });
 

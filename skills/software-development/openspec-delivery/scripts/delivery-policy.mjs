@@ -56,15 +56,32 @@ export function verifyContractGrant(request) {
   return true;
 }
 
-export function resolveDeliveryPolicy({ phase, context, selection, contractPaths, declaredContractPaths, legacy, orchestrationAvailable, reviewAcceptance }) {
+export function resolveDeliveryPolicy({ phase, context, selection, contractPaths, declaredContractPaths, legacy, recovery, orchestrationAvailable, reviewAcceptance }) {
   requireThat(["freeze", "execute"].includes(phase), "Unknown delivery policy phase");
   requireThat(context && sha(context.parent) && sha(context.target), "Missing integrated parent identity");
   planningInputs(context.change, context.inputs);
   if (phase === "execute") requireThat(sha(context.plan) && digest(context.planDigest), "Missing frozen plan identity");
   const exempt = phase === "execute" && legacy?.verified === true && legacy.predatesIntegrityGuards === true &&
     legacy.plan === context.plan && legacy.planDigest === context.planDigest && text(legacy.reference);
-  requireThat(exempt || context.ok === true, "Plan parent is not a verified integrated target revision");
-  requireThat(selection?.revision === context.parent && text(selection.reference) &&
+  const recoveryChange = "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99";
+  const recoveryBase = "ae6488e23414a07d12959bf22bcd283b84d9d8a3";
+  let policyRevision = context.parent;
+  if (recovery !== undefined) {
+    // This named, expiring recovery is not a generic unintegrated-parent bypass.
+    // All values are independently retained observations, never inferred grants.
+    requireThat(!exempt && context.change === recoveryChange && recovery?.change === recoveryChange &&
+      recovery.policyBase === recoveryBase && recovery.integratedBaseVerified === true &&
+      recovery.changeIntegrated === false && recovery.identityVerified === true &&
+      recovery.preservationVerified === true && recovery.parent === context.parent &&
+      recovery.target === context.target && recovery.plan === context.plan &&
+      recovery.planDigest === context.planDigest && sameInputs(recovery.inputs, context.inputs) &&
+      text(recovery.reference) && text(recovery.recoveryReference) &&
+      (phase !== "execute" || (text(recovery.approvalReference) && text(recovery.executionReference))),
+    "Missing, mismatched or expired named recovery evidence/grants");
+    policyRevision = recoveryBase;
+  }
+  requireThat(exempt || recovery !== undefined || context.ok === true, "Plan parent is not a verified integrated target revision");
+  requireThat(selection?.revision === policyRevision && text(selection.reference) &&
     typeof selection.preExecutionReview === "boolean" && typeof selection.continuousGoal === "boolean", "Policy must come from the plan parent contributor contract");
   const paths = canonicalPaths(contractPaths);
   if (!exempt && paths.length) {
@@ -76,7 +93,7 @@ export function resolveDeliveryPolicy({ phase, context, selection, contractPaths
   if (selection.preExecutionReview) requireThat(reviewAcceptance?.action === "freeze-ready" && text(reviewAcceptance.reference) &&
     sameInputs(reviewAcceptance.inputs, context.inputs), "Missing matching complete approach-review acceptance");
   return { continuation: selection.continuousGoal ? "continuous-goal" : "single-group", requireApproachReview: selection.preExecutionReview,
-    integrityGuards: !exempt, policyRevision: context.parent, planApproved: false, executionAuthorized: false };
+    integrityGuards: !exempt, policyRevision, planApproved: false, executionAuthorized: false };
 }
 
 export function continuationDecision({ policy, change, group, authority, restrictions, observed }) {
@@ -117,8 +134,8 @@ export function contractAlignment({ declared, changed, head, review }) {
 
 // Observations must come from retained history and fresh adapter identity readback.
 // This returns one record to retain BEFORE launch; it never launches or resumes.
-export function workerContinuationDecision({ actor, orchestrator, before, after, nativeTasks, history, historyVerified, previousSession, nextSession, observed }) {
-  const stop = (reason) => ({ action: "stop", reason, progressComplete: false });
+export function workerContinuationDecision({ actor, orchestrator, before, after, nativeTasks, history, historyVerified, previousSession, nextSession, cappedProcess, observed }) {
+  const stop = (reason) => ({ action: "stop", reason, progressComplete: false, preserveProcess: true });
   if (!text(orchestrator) || actor !== orchestrator) return stop("Only the orchestrator may continue a worker");
   if (!before || !after || !sameInputs(before, after)) return stop("Changed continuation boundary");
   for (const field of ["change", "group", "task", "workspace", "outcome", "stop", "authorityReference"]) if (!text(before[field])) return stop("Incomplete bounded assignment");
@@ -143,7 +160,20 @@ export function workerContinuationDecision({ actor, orchestrator, before, after,
       !text(observed.qualifiedRoute) || observed.nextQualifiedRoute !== observed.qualifiedRoute ||
       typeof observed.readOnly !== "boolean" || (before.role !== "implementer" && observed.readOnly !== true) ||
       ![observed.groupBudgetRemaining, observed.authorityBudgetRemaining].every((v) => Number.isFinite(v) && v > 0)) return stop("Unproved progress, identity, route or stop boundary");
+  // The adapter retains the original process-tree binding independently. A PID,
+  // idle client or capped turn alone cannot establish that no writer remains.
+  const proof = observed.quiescence;
+  if (!cappedProcess || cappedProcess.session !== previousSession ||
+      !Number.isSafeInteger(cappedProcess.pid) || cappedProcess.pid <= 0 ||
+      !text(cappedProcess.startIdentity) || !text(cappedProcess.treeIdentity) ||
+      !proof || !sameInputs(proof.process, cappedProcess) ||
+      proof.identityReadback?.verified !== true || proof.identityReadback.immediate !== true ||
+      !text(proof.identityReadback.reference) || !sameInputs(proof.identityReadback.process, cappedProcess) ||
+      !text(proof.reference) ||
+      !((proof.method === "terminated" && proof.terminationVerified === true) ||
+        (proof.method === "non-writing" && proof.cannotWriteVerified === true))) return stop("Unverified capped process-tree quiescence; preserve process and evidence");
   return { action: "continue-worker", progressComplete: false, record: structuredClone({ schemaVersion: 1,
     change: before.change, group: before.group, task: before.task, action: before.task,
-    previousSession, nextSession, boundary: before, route: observed.qualifiedRoute, progressReference: observed.progressReference }) };
+    previousSession, nextSession, boundary: before, route: observed.qualifiedRoute, progressReference: observed.progressReference,
+    quiescence: proof }) };
 }

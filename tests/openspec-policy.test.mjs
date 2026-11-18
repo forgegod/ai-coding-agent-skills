@@ -41,6 +41,41 @@ test("delivery policy comes only from the integrated plan parent and preserves v
   assert.throws(() => api.resolveDeliveryPolicy({ ...old, legacy: { ...legacy, plan: "f".repeat(40) } }), /integrated/);
 });
 
+test("named successor recovery pins integrated policy without accepting its unintegrated parent or widening other changes", async () => {
+  const api = await policy();
+  const change = "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99";
+  const policyBase = "ae6488e23414a07d12959bf22bcd283b84d9d8a3";
+  const current = { ...context(), change, ok: false, inputs: Object.fromEntries(Object.entries(inputs).map(([p, h]) => [p.replace("fixture-change", change), h])) };
+  const recovery = { change, policyBase, parent: current.parent, target: current.target, plan, planDigest, inputs: current.inputs,
+    integratedBaseVerified: true, changeIntegrated: false, identityVerified: true, preservationVerified: true,
+    reference: "retained:recovery-verification", recoveryReference: "retained:operator-recovery", approvalReference: "retained:exact-plan-approval", executionReference: "retained:execution" };
+  const request = { phase: "execute", context: current, selection: { ...selection(), revision: policyBase }, contractPaths: [], recovery };
+  const result = api.resolveDeliveryPolicy(request);
+  assert.equal(result.policyRevision, policyBase);
+  assert.equal(result.continuation, "single-group");
+  assert.equal(result.integrityGuards, true);
+  assert.equal(result.executionAuthorized, false);
+  for (const key of Object.keys(recovery)) {
+    const incomplete = { ...recovery }; delete incomplete[key];
+    assert.throws(() => api.resolveDeliveryPolicy({ ...request, recovery: incomplete }), /recovery/, key);
+  }
+  for (const override of [{ changeIntegrated: true }, { integratedBaseVerified: false }, { identityVerified: false },
+    { preservationVerified: false }, { policyBase: current.parent }, { plan: "f".repeat(40) }, { planDigest: "f".repeat(64) },
+    { inputs: { ...current.inputs, "openspec/config.yaml": "f".repeat(64) } }]) {
+    assert.throws(() => api.resolveDeliveryPolicy({ ...request, recovery: { ...recovery, ...override } }), /recovery/);
+  }
+  assert.throws(() => api.resolveDeliveryPolicy({ ...request, recovery: undefined }), /integrated/);
+  assert.throws(() => api.resolveDeliveryPolicy({ ...request, recovery: null }), /recovery/);
+  assert.throws(() => api.resolveDeliveryPolicy({ ...request, legacy: { plan, planDigest, reference: "retained:legacy", verified: true, predatesIntegrityGuards: true } }), /recovery/, "recovery cannot stack a legacy guard exemption");
+  assert.throws(() => api.resolveDeliveryPolicy({ ...request, selection: selection() }), /parent/);
+  assert.throws(() => api.resolveDeliveryPolicy({ ...request, context: { ...context(), ok: false }, recovery: { ...recovery, change: "fixture-change", inputs } }), /recovery/);
+  assert.throws(() => api.resolveDeliveryPolicy({ ...request, contractPaths: ["AGENTS.md"], declaredContractPaths: [] }), /Undeclared/);
+  assert.throws(() => api.resolveDeliveryPolicy({ ...request, selection: { ...request.selection, preExecutionReview: true }, orchestrationAvailable: true }), /review/);
+  const draft = { ...current, plan: null, planDigest: null };
+  assert.equal(api.resolveDeliveryPolicy({ ...request, phase: "freeze", context: draft,
+    recovery: { ...recovery, plan: null, planDigest: null, approvalReference: undefined, executionReference: undefined } }).policyRevision, policyBase);
+});
+
 test("policy and grants reject structurally incomplete planning inventories even when supplied records agree", async () => {
   const api = await policy();
   const partial = { "openspec/config.yaml": "a".repeat(64) };

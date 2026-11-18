@@ -116,6 +116,32 @@ state, run reviews or enforce process permissions. A true boolean without retain
 readback is not evidence. The orchestrator owns the complete input inventory and
 semantic policy/path interpretation; the independent reviewer verifies both.
 
+### Named historical-successor exception
+
+Only until `profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99`
+integrates, its successor freezes/execution use pinned integrated policy base
+`ae6488e23414a07d12959bf22bcd283b84d9d8a3` plus explicit recovery, exact-plan approval
+and execution grants, not its unintegrated successor parent's contracts.
+This exception authorizes no reset, applies to no later change and waives no
+other identity, review, approval, execution or contributor-contract guard.
+
+For this path only, retain independent read-only verification of the sole parent,
+target, pinned base integration, preservation chain and complete planning identity.
+Use `planning` for frozen raw hashes/digest; do not falsify a `policy-context` pass
+or invoke its ordinary integrated-parent gate expecting it to authorize recovery.
+Supply that retained context to `resolveDeliveryPolicy` with `ok: false` and an
+explicit `recovery` observation binding `change`, `parent`, `target`, `plan`,
+`planDigest`, `inputs`, the exact `policyBase`, `integratedBaseVerified: true`,
+`changeIntegrated: false`, `identityVerified: true`, `preservationVerified: true`,
+`reference` and `recoveryReference`. Execute additionally requires separate
+`approvalReference` and `executionReference`; a prospective provisional freeze
+uses null plan/digest and still requires its explicit recovery/freeze grant.
+Selection must cite the pinned base revision. Independently verify the fresh
+successor review under orchestration's `acceptSuccessorReview` before approval
+or execution, regardless of the base's optional-policy selection. The helper
+does not authenticate these observations or turn the provisional freeze into
+review acceptance. Expired, missing or mismatched recovery evidence stops.
+
 ## Continuation and stop boundaries
 
 After each accepted group, resolve actual native tasks in document/dependency
@@ -182,7 +208,8 @@ handoff must pass it; no route may bypass this decision.
 Group advancement with `observed.workerStatus: capped` stops and directs the caller
 here instead of treating the cap as accepted progress. Supply actor and
 orchestrator, equal `before`/`after` bounded assignments, nativeTasks observations,
-verified complete retained `history`, previousSession, nextSession and observed
+verified complete retained `history`, previousSession, nextSession, `cappedProcess`
+and observed
 facts. Boundaries contain change/group/task/action, workspace, plan/digest, role,
 outcome, acceptance, scope, restrictions, stop, authorityReference and finite budget.
 Use the native task id itself as action: a label cannot mint another allowance.
@@ -197,7 +224,22 @@ nativePrompt, failedGate, drift, contradictory evidence and stopReached. A revie
 remains readOnly and never inherits the implementer's conversation. Any absent
 observation or unsupported route stops. This is not a self-continuation token.
 
-Retain the returned record before launch with both session ids. It consumes the
+Before launch require verified quiescence, not an idle screen or cap alone.
+`cappedProcess` is the independently retained exact tree binding: session, positive
+pid, startIdentity (rejects PID reuse) and treeIdentity (the retained tree inventory
+reference). `observed.quiescence` repeats that `process`, carries
+`identityReadback: { process, verified: true, immediate: true, reference }` and a
+retained proof `reference`. The adapter must positively read back identity
+immediately before stopping only that exact tree and verify termination
+(`method: terminated`, `terminationVerified: true`), or prove that exact tree
+cannot still write (`method: non-writing`, `cannotWriteVerified: true`).
+Retain the proof and all session evidence/scratch before any fresh worker launch.
+Failed identity readback preserves the process and forbids continuation; missing
+or unverified quiescence also blocks it. No helper signals or cleans a process;
+these are adapter observations, not a task-3 qualification or a self-attestation.
+
+Retain the returned record before launch with both session ids and the complete
+quiescence proof. It consumes the
 one allowance per change/group/native task, independent of session, role or label.
 A second cap stops. Never inject into the capped session or resume a broader goal.
 A new artifact directory links its predecessor but does not reset this count.
