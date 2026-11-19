@@ -15,7 +15,7 @@ versioned probe outcome for every candidate in the design:
 | Candidate | Status | Version range | Non-argv transport | Roles | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `hermes` | `qualified` (`supported: true`) | `>=0.23.0 <1.0.0` | `--query-file <path>` or `--query-file -` (`stdin`) | `implementer`, `reviewer`, `approach-reviewer` | Explicit `--profile` + `--in <workspace>`; enables [profile-preparation.md](profile-preparation.md). |
-| `claude-code` | `qualified` (`supported: true`) | `>=2.1.273 <3.0.0` | `--print` with `stdin` or prompt file | `implementer`, `reviewer`, `approach-reviewer` | Standalone CLI (`--session-id`, `--permission-mode`, `--tools`, `--disallowed-tools`); excludes `--bg` auto-respawn; retires `code-tab-phase-roles`. |
+| `claude-code` | `qualified` (`supported: true`) | `>=2.1.273 <3.0.0` | `--print` with `stdin` | `implementer`, `reviewer`, `approach-reviewer` | Standalone CLI (`--session-id`, `--permission-mode`, `--tools`, `--disallowed-tools`); excludes `--bg` auto-respawn; retires `code-tab-phase-roles`. |
 | `codex` | `qualified` (`supported: true`) | `>=0.167.0 <1.0.0` | `codex exec -` (`stdin`) | `implementer`, `reviewer`, `approach-reviewer` | `-C <workspace>`, `-s read-only` or `workspace-write`, `--json`, `-o`, `codex resume <id>`. |
 | `grok-build` | `qualified` (`supported: true`) | `>=1.0.89 <2.0.0` | `--prompt-file <path>` | `implementer`, `reviewer`, `approach-reviewer` | `--cwd <workspace>`, `-s <id>`, `--no-subagents`, `--no-leader`, `--permission-mode plan` or `default`, `--disallowed-tools`. |
 | `opencode` | `unsupported` (`supported: false`) | `null` | none | none | Uninstalled in probe environment; fail-closed. |

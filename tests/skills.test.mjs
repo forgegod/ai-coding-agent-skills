@@ -59,7 +59,8 @@ test("autonomous-implementation-review packages its selection helper", async () 
   assert.ok(transport.length < 6500, "transport reference must not accumulate duplicated procedures");
   assert.match(source, /references\/herdr\.md/);
   assert.match(source, /\/goal draft \/openspec-delivery <name>/);
-  assert.match(source, /automated role loop is Herdr-only/);
+  assert.match(source, /qualified terminal adapter/);
+  assert.match(source, /resolveLegacyRouteRequest/);
   assert.match(source, /Dispatch failed prerequisites to a fresh\s+implementer session/);
   assert.match(source, /orchestrator does not edit worker code/);
   assert.match(source, /openspec-delivery/);

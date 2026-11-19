@@ -44,62 +44,115 @@ export const DESIGN_CANDIDATES = Object.freeze([
   "hermes", "claude-code", "codex", "grok-build", "opencode", "kilo-modern", "kilo-legacy", "pi",
 ]);
 
+const PROBE_MANIFEST_SHA256 = "62c09733f74a1d0a47660a64b2fcfcd9765cf5e644f5fd42e931f2cd321b2d6e";
+const PROBE_SUMS_SHA256 = "0cf10b2cca356992ad3d7f3c777a697a70f4b3314c89b2d69ad8048b5353d547";
+
+const BASE_QUALIFIED_CONTROLS = Object.freeze({
+  prohibitMultiplexers: true,
+  prohibitImplementerSubagents: true,
+  prohibitReviewerSubagents: true,
+  prohibitReviewerWrites: true,
+  terminalFirstLaunch: true,
+  effectiveIdentityVerified: true,
+  artifactHandoffVerified: true,
+});
+
 export const CANDIDATE_RECORDS = Object.freeze({
   hermes: Object.freeze({
     client: "hermes", variant: "default", status: "qualified", supported: true,
-    versionRange: ">=0.23.0 <1.0.0", roles: Object.freeze(["implementer", "reviewer", "approach-reviewer"]),
+    observedVersion: "0.23.2", versionRange: ">=0.23.0 <1.0.0",
+    probeManifestSha256: PROBE_MANIFEST_SHA256, probeSumsSha256: PROBE_SUMS_SHA256,
+    evidenceFiles: Object.freeze(["hermes-version", "hermes-chat-help"]),
+    isolatedScratchRootVerified: true, credentialsMetadataOnly: true,
+    roles: Object.freeze(["implementer", "reviewer", "approach-reviewer"]),
     nonArgvTransport: Object.freeze(["query-file", "stdin"]), profilePreparationSupported: true,
     interactionRoutes: Object.freeze(["native-cli", "herdr-fallback"]),
+    controls: BASE_QUALIFIED_CONTROLS,
   }),
   "claude-code": Object.freeze({
     client: "claude-code", variant: "standalone-cli", status: "qualified", supported: true,
-    versionRange: ">=2.1.273 <3.0.0", roles: Object.freeze(["implementer", "reviewer", "approach-reviewer"]),
-    nonArgvTransport: Object.freeze(["stdin", "prompt-file"]), profilePreparationSupported: false,
+    observedVersion: "2.1.327", versionRange: ">=2.1.273 <3.0.0",
+    probeManifestSha256: PROBE_MANIFEST_SHA256, probeSumsSha256: PROBE_SUMS_SHA256,
+    evidenceFiles: Object.freeze(["claude-code-version", "claude-code-help"]),
+    isolatedScratchRootVerified: true, credentialsMetadataOnly: true,
+    roles: Object.freeze(["implementer", "reviewer", "approach-reviewer"]),
+    nonArgvTransport: Object.freeze(["stdin"]), profilePreparationSupported: false,
     interactionRoutes: Object.freeze(["native-cli", "herdr-fallback"]), retiresLegacyRoute: "code-tab-phase-roles",
+    controls: Object.freeze({ ...BASE_QUALIFIED_CONTROLS, excludesBackgroundAutoRespawn: true }),
   }),
   codex: Object.freeze({
     client: "codex", variant: "default", status: "qualified", supported: true,
-    versionRange: ">=0.167.0 <1.0.0", roles: Object.freeze(["implementer", "reviewer", "approach-reviewer"]),
+    observedVersion: "0.169.0", versionRange: ">=0.167.0 <1.0.0",
+    probeManifestSha256: PROBE_MANIFEST_SHA256, probeSumsSha256: PROBE_SUMS_SHA256,
+    evidenceFiles: Object.freeze(["codex-version", "codex-help", "codex-exec-help", "codex-resume-help"]),
+    isolatedScratchRootVerified: true, credentialsMetadataOnly: true,
+    roles: Object.freeze(["implementer", "reviewer", "approach-reviewer"]),
     nonArgvTransport: Object.freeze(["stdin"]), profilePreparationSupported: false,
     interactionRoutes: Object.freeze(["native-cli", "herdr-fallback"]),
+    controls: Object.freeze({ ...BASE_QUALIFIED_CONTROLS, preservesBuiltinProviderNamespace: true }),
   }),
   "grok-build": Object.freeze({
     client: "grok-build", variant: "default", status: "qualified", supported: true,
-    versionRange: ">=1.0.89 <2.0.0", roles: Object.freeze(["implementer", "reviewer", "approach-reviewer"]),
+    observedVersion: "1.0.89", versionRange: ">=1.0.89 <2.0.0",
+    probeManifestSha256: PROBE_MANIFEST_SHA256, probeSumsSha256: PROBE_SUMS_SHA256,
+    evidenceFiles: Object.freeze(["grok-build-version", "grok-build-help", "grok-build-agent-help"]),
+    isolatedScratchRootVerified: true, credentialsMetadataOnly: true,
+    roles: Object.freeze(["implementer", "reviewer", "approach-reviewer"]),
     nonArgvTransport: Object.freeze(["prompt-file"]), profilePreparationSupported: false,
     interactionRoutes: Object.freeze(["native-cli", "herdr-fallback"]),
+    controls: BASE_QUALIFIED_CONTROLS,
   }),
   opencode: Object.freeze({
     client: "opencode", variant: "default", status: "unsupported", supported: false,
-    versionRange: null, roles: Object.freeze([]), nonArgvTransport: Object.freeze([]),
+    observedVersion: null, versionRange: null, roles: Object.freeze([]), nonArgvTransport: Object.freeze([]),
     profilePreparationSupported: false, interactionRoutes: Object.freeze([]),
     reason: "Executable opencode is not installed in the verification environment",
   }),
   "kilo-modern": Object.freeze({
     client: "kilo-modern", variant: "modern", status: "unsupported", supported: false,
-    versionRange: null, roles: Object.freeze([]), nonArgvTransport: Object.freeze([]),
+    observedVersion: null, versionRange: null, roles: Object.freeze([]), nonArgvTransport: Object.freeze([]),
     profilePreparationSupported: false, interactionRoutes: Object.freeze([]),
     reason: "Independent modern variant (.kilo) is not installed in the verification environment",
   }),
   "kilo-legacy": Object.freeze({
     client: "kilo-legacy", variant: "legacy", status: "unsupported", supported: false,
-    versionRange: null, roles: Object.freeze([]), nonArgvTransport: Object.freeze([]),
+    observedVersion: null, versionRange: null, roles: Object.freeze([]), nonArgvTransport: Object.freeze([]),
     profilePreparationSupported: false, interactionRoutes: Object.freeze([]),
     reason: "Independent legacy variant (.kilocode) is not installed in the verification environment",
   }),
   pi: Object.freeze({
     client: "pi", variant: "default", status: "unsupported", supported: false,
-    versionRange: null, roles: Object.freeze([]), nonArgvTransport: Object.freeze([]),
+    observedVersion: null, versionRange: null, roles: Object.freeze([]), nonArgvTransport: Object.freeze([]),
     profilePreparationSupported: false, interactionRoutes: Object.freeze([]),
     reason: "Executable pi is not installed in the verification environment",
   }),
   "grok-bot": Object.freeze({
     client: "grok-bot", variant: "chat-only", status: "unsupported", supported: false,
-    versionRange: null, roles: Object.freeze([]), nonArgvTransport: Object.freeze([]),
+    observedVersion: null, versionRange: null, roles: Object.freeze([]), nonArgvTransport: Object.freeze([]),
     profilePreparationSupported: false, interactionRoutes: Object.freeze([]),
     reason: "Chat-only surface / imported settings lack a local CLI execution or session control protocol",
   }),
 });
+
+export function isRecordQualified(record, expectedClient = null) {
+  if (!record || typeof record !== "object") return false;
+  if (expectedClient !== null && record.client !== expectedClient) return false;
+  if (record.status !== "qualified" || record.supported !== true) return false;
+  if (!digest(record.probeManifestSha256) || !digest(record.probeSumsSha256)) return false;
+  if (!list(record.evidenceFiles) || record.isolatedScratchRootVerified !== true || record.credentialsMetadataOnly !== true) return false;
+  if (!versionInRange(record.observedVersion, record.versionRange)) return false;
+  if (!Array.isArray(record.roles) || !record.roles.includes("implementer") || !record.roles.includes("reviewer")) return false;
+  if (!list(record.nonArgvTransport) || !record.nonArgvTransport.every((r) => ["stdin", "prompt-file", "query-file"].includes(r))) return false;
+  if (record.client === "claude-code" && record.nonArgvTransport.includes("prompt-file")) return false;
+  if (!list(record.interactionRoutes) || !record.interactionRoutes.every((r) => ["native-cli", "herdr-fallback"].includes(r))) return false;
+  const c = record.controls;
+  if (!c || c.prohibitMultiplexers !== true || c.prohibitImplementerSubagents !== true ||
+      c.prohibitReviewerSubagents !== true || c.prohibitReviewerWrites !== true ||
+      c.terminalFirstLaunch !== true || c.effectiveIdentityVerified !== true ||
+      c.artifactHandoffVerified !== true) return false;
+  if (record.client === "claude-code" && c.excludesBackgroundAutoRespawn !== true) return false;
+  return true;
+}
 
 export function qualifyCandidateAdapter(probe) {
   const fail = (reason) => ({
@@ -116,7 +169,7 @@ export function qualifyCandidateAdapter(probe) {
   if (probe.firstPartyDocsVerified !== true || !text(probe.versionRange) || !versionInRange(probe.version, probe.versionRange)) {
     return fail("Missing first-party interface evidence or version outside qualified range");
   }
-  if (!text(probe.scratchStateRoot) || !path.isAbsolute(probe.scratchStateRoot) || probe.credentialsMetadataOnly !== true || probe.writesRealHome === true) {
+  if (!text(probe.scratchStateRoot) || !path.isAbsolute(probe.scratchStateRoot) || probe.credentialsMetadataOnly !== true || probe.writesRealHome !== false) {
     return fail("Probe must use an isolated scratch state root and metadata-only credential checks");
   }
   if (Array.isArray(probe.excludedRoots) && probe.excludedRoots.some((r) => text(r) && path.isAbsolute(r) && (within(r, probe.scratchStateRoot) || within(probe.scratchStateRoot, r)))) {
@@ -126,6 +179,7 @@ export function qualifyCandidateAdapter(probe) {
   if (!c || c.prohibitMultiplexers !== true || c.prohibitImplementerSubagents !== true ||
       c.prohibitReviewerSubagents !== true || c.prohibitReviewerWrites !== true ||
       !["stdin", "prompt-file", "query-file"].includes(c.nonArgvTransport) ||
+      (probe.client === "claude-code" && c.nonArgvTransport !== "stdin") ||
       c.terminalFirstLaunch !== true || c.effectiveIdentityVerified !== true ||
       c.nativeFinalOutputCapture !== true || c.adapterOnlyPublication !== true ||
       c.atomicResultVisibility !== true || c.safeEvidencePaths !== true ||
@@ -174,15 +228,14 @@ export function replacementReadiness({ records = CANDIDATE_RECORDS } = {}) {
     need(entry && entry.client === candidate && ["qualified", "unsupported"].includes(entry.status) &&
       typeof entry.supported === "boolean" && (entry.status === "qualified") === entry.supported,
     `Missing or inconsistent qualification record for ${candidate}`);
+    if (entry.status === "qualified") {
+      need(isRecordQualified(entry, candidate), `Qualified record for ${candidate} lacks verified probe hash, version or launch-interface binding`);
+    }
   }
   if (records["kilo-modern"]?.variant !== "modern" || records["kilo-legacy"]?.variant !== "legacy") {
     throw new Error("Kilo modern and legacy variants must retain separate records");
   }
-  const qualifiedAdapters = DESIGN_CANDIDATES.filter((name) => {
-    const r = records[name];
-    return r.status === "qualified" && r.supported === true &&
-      Array.isArray(r.roles) && r.roles.includes("implementer") && r.roles.includes("reviewer");
-  });
+  const qualifiedAdapters = DESIGN_CANDIDATES.filter((name) => isRecordQualified(records[name], name));
   const unsupportedCandidates = Object.keys(records).filter((name) => records[name]?.status === "unsupported");
   if (qualifiedAdapters.length === 0) {
     return {
@@ -197,12 +250,18 @@ export function replacementReadiness({ records = CANDIDATE_RECORDS } = {}) {
   };
 }
 
-export function bootstrapSupervisorDecision({ task, role, authority, supervisor, request, floor, qualifiedAdapters = [] }) {
+export function bootstrapSupervisorDecision({
+  task, role, authority, supervisor, request, floor,
+  records = CANDIDATE_RECORDS, qualifiedAdapters = null,
+}) {
+  const readiness = replacementReadiness({ records });
+  const activeQualified = Array.isArray(qualifiedAdapters) ? qualifiedAdapters : readiness.qualifiedAdapters;
+  const expired = readiness.ready || activeQualified.length > 0;
   const stop = (reason, extra = {}) => ({
-    allowed: false, action: "stop", expired: Array.isArray(qualifiedAdapters) && qualifiedAdapters.length > 0,
+    allowed: false, action: "stop", expired,
     advertisedAsSupported: false, establishesQualification: false, reason, ...extra,
   });
-  if (Array.isArray(qualifiedAdapters) && qualifiedAdapters.length > 0) {
+  if (expired) {
     return stop("Bootstrap exception expired once a qualified implementation/review adapter exists", { expired: true });
   }
   if (task !== "3.1" || !["implementer", "reviewer"].includes(role)) {
@@ -213,12 +272,12 @@ export function bootstrapSupervisorDecision({ task, role, authority, supervisor,
     return stop("Missing fresh plan review, exact-plan approval or separate task-3 execution grant");
   }
   if (!supervisor || !text(supervisor.id) || supervisor.independentOfCandidateCode !== true ||
-      supervisor.usesCandidateCode === true || supervisor.selfAttested === true ||
-      supervisor.reusesHistoricalGroup2Session === true ||
+      supervisor.usesCandidateCode !== false || supervisor.selfAttested !== false ||
+      supervisor.reusesHistoricalGroup2Session !== false ||
       !Number.isSafeInteger(supervisor.budget?.maxAttempts) || supervisor.budget.maxAttempts <= 0 ||
       !Number.isSafeInteger(supervisor.budget?.timeoutSeconds) || supervisor.budget.timeoutSeconds <= 0 ||
       !text(supervisor.budget?.stopCondition)) {
-    return stop("Supervisor must be independent of candidate code with finite attempt/time/stop limits and no historical session reuse");
+    return stop("Supervisor must be independent of candidate code with explicit false self-attestation/session-reuse flags and finite limits");
   }
   if (!request || !digest(request.requestSha256) || !text(request.workspace) || !path.isAbsolute(request.workspace) ||
       !text(request.client) || request.client === "grok-cli" || request.client === "grok-bot" ||
@@ -250,8 +309,10 @@ export const HERMES_PROFILE_PREPARATION_KEYS = Object.freeze({
   "display.busy_input_mode": "queue",
 });
 
-export function verifyHermesProfilePreparation({ hermesQualified, grantReference, profile, readbacks, livePaneSlashInjected = false }) {
-  need(hermesQualified === true, "Hermes profile preparation ships only when the Hermes adapter is qualified");
+export function verifyHermesProfilePreparation({
+  hermesQualified = true, records = CANDIDATE_RECORDS, grantReference, profile, readbacks, livePaneSlashInjected = false,
+}) {
+  need(hermesQualified === true && isRecordQualified(records?.hermes, "hermes"), "Hermes profile preparation ships only when the Hermes adapter record is qualified");
   need(text(grantReference) && text(profile), "Missing separate profile-preparation grant or profile name");
   need(livePaneSlashInjected === false, "Do not inject /busy, /model or /status during role pane setup");
   need(readbacks && typeof readbacks === "object", "Missing two-process config readbacks");
@@ -297,8 +358,8 @@ export function resolveRoleConfiguration({
     return stop("Incomplete role client/provider/model binding");
   }
   const record = records?.[selected.client];
-  if (!record || record.status !== "qualified" || record.supported !== true) {
-    return stop(`Selected client ${selected.client} is not a qualified adapter; no fallback permitted`);
+  if (!isRecordQualified(record, selected.client)) {
+    return stop(`Selected client ${selected.client} lacks a verified qualified adapter record; no fallback permitted`);
   }
   if (role !== "orchestrator" && (!Array.isArray(record.roles) || !record.roles.includes(role))) {
     return stop(`Client ${selected.client} is not qualified for role ${role}`);
@@ -316,9 +377,9 @@ export function resolveRoleConfiguration({
       selected.model === restrictions.implementerModel) {
     return stop("Project policy requires distinct implementer and reviewer models");
   }
-  if (!effectiveReadback || effectiveReadback.verified !== true || effectiveReadback.credentialsRead === true ||
-      effectiveReadback.aliasOnly === true || effectiveReadback.entitlementOnly === true ||
-      effectiveReadback.globalDefaultsModified === true ||
+  if (!effectiveReadback || effectiveReadback.verified !== true ||
+      effectiveReadback.credentialsRead !== false || effectiveReadback.aliasOnly !== false ||
+      effectiveReadback.entitlementOnly !== false || effectiveReadback.globalDefaultsModified !== false ||
       effectiveReadback.client !== selected.client || !versionInRange(effectiveReadback.version, record.versionRange) ||
       effectiveReadback.provider !== selected.provider || effectiveReadback.model !== selected.model ||
       effectiveReadback.session !== session) {
@@ -355,7 +416,7 @@ export function preparePromptTransport({
   failure = null, records = CANDIDATE_RECORDS,
 }) {
   const record = records?.[client];
-  need(record && record.status === "qualified" && record.supported === true, `Client ${client} is not qualified`);
+  need(isRecordQualified(record, client), `Client ${client} is not a verified qualified adapter`);
   need(versionInRange(version, record.versionRange), `Client ${client} version ${version} is outside ${record.versionRange}`);
   need(text(session) && ["implementer", "reviewer", "approach-reviewer"].includes(role), "Invalid role or session");
   absolute(workspace);
@@ -409,6 +470,11 @@ export function preparePromptTransport({
     argv = ["--prompt-file", promptFilePath, "--cwd", workspace, "-s", session, "--no-subagents", "--no-leader", "--output-format", "json", "--permission-mode", readOnly ? "plan" : "default", "--disallowed-tools", disallowed];
   }
   need(Array.isArray(argv) && !argv.includes(prompt), "Generated prompt must never be interpolated into argv");
+  if (route === "stdin") {
+    need(promptFilePath === null && bytes.length > 0, "stdin transport must carry non-empty stdinBytes without a promptFilePath");
+  } else {
+    need(text(promptFilePath) && argv.includes(promptFilePath), "File-based transport must bind promptFilePath in argv");
+  }
   return {
     action: "ready",
     client, version, role, session, route,
@@ -431,7 +497,7 @@ export function superviseWorkerLaunch({
   delegatedSubagent = false, multiplexerStarted = false, records = CANDIDATE_RECORDS,
 }) {
   const record = records?.[adapter];
-  need(record && record.status === "qualified" && record.supported === true, `Unqualified adapter ${adapter}`);
+  need(isRecordQualified(record, adapter), `Unqualified adapter ${adapter}`);
   need(["implementer", "reviewer", "approach-reviewer"].includes(role), "Invalid worker role");
   absolute(workspace);
   absolute(scratchRoot);
@@ -655,22 +721,47 @@ export function cleanupInteractionView({
   return { removed: true, preserved: false, viewId };
 }
 
+function parseNativeReviewFindings(lines) {
+  const parsed = [];
+  for (const line of lines) {
+    const m = line.match(/^(critical|high|medium|low)\s+([^\s:]+):(\d+)\s+([^;]+);\s*([^;]+);\s*(.+)$/i);
+    if (m) {
+      parsed.push({
+        severity: m[1].toLowerCase(),
+        path: m[2].trim(),
+        line: Number(m[3]),
+        impact: m[4].trim(),
+        trigger: m[5].trim(),
+        remedy: m[6].trim(),
+      });
+    }
+  }
+  return parsed;
+}
+
 export async function executeTerminalAdapterAttempt({
   directory, request, excludedRoots, runtime, scratchRoot,
-  command = process.execPath, args = [], promptText, transportRoute = "stdin",
-  completionKind = "exit", turnId = "turn-1", humanWait = null,
+  command = process.execPath, runnerPrefixArgs = [], args = null, promptText, transportRoute = null,
+  completionKind = "exit", turnId = "turn-1", humanWait = null, records = CANDIDATE_RECORDS,
 }) {
   const expected = await createAttempt({ directory, request, excludedRoots: [...excludedRoots, scratchRoot] });
   const captureDir = path.join(scratchRoot, "transport");
   await mkdir(captureDir, { recursive: true });
+  const effectivePrompt = promptText ?? `# Assignment ${request.identity.attempt}\n${request.outcome}\n`;
   const transport = preparePromptTransport({
     client: runtime.client, version: runtime.version, role: request.identity.role,
     session: runtime.session, workspace: request.identity.workspace,
-    prompt: promptText ?? `# Assignment ${request.identity.attempt}\n${request.outcome}\n`,
-    captureDir, preferredRoute: transportRoute,
+    prompt: effectivePrompt,
+    captureDir, preferredRoute: transportRoute, records,
   });
   need(transport.action === "ready", `Transport preparation failed: ${transport.reason ?? transport.status}`);
-  if (transport.promptFilePath) await writeFile(transport.promptFilePath, Buffer.from(promptText ?? `# Assignment ${request.identity.attempt}\n${request.outcome}\n`, "utf8"), { mode: 0o600 });
+  if (transport.promptFilePath) {
+    await writeFile(transport.promptFilePath, Buffer.from(effectivePrompt, "utf8"), { mode: 0o600 });
+  }
+  const spawnedArgs = args === null ? [...runnerPrefixArgs, ...transport.argv] : args;
+  need(Array.isArray(spawnedArgs) && !spawnedArgs.includes(effectivePrompt), "Spawned argv must never contain the prompt payload");
+  const tail = spawnedArgs.slice(spawnedArgs.length - transport.argv.length);
+  need(tail.length === transport.argv.length && tail.every((v, idx) => v === transport.argv[idx]), "Spawned argv must preserve transport.argv");
   const env = {
     PATH: process.env.PATH,
     HOME: scratchRoot,
@@ -678,7 +769,7 @@ export async function executeTerminalAdapterAttempt({
     WORKER_ATTEMPT_DIR: directory,
     WORKER_PROMPT_FILE: transport.promptFilePath ?? "",
   };
-  const proc = spawnSync(command, args, {
+  const proc = spawnSync(command, spawnedArgs, {
     cwd: request.identity.workspace,
     env,
     input: transport.stdinBytes ?? undefined,
@@ -689,31 +780,54 @@ export async function executeTerminalAdapterAttempt({
   const stderrBytes = Buffer.from(proc.stderr ?? []);
   const exitCode = proc.status ?? 1;
   const signal = proc.signal ?? null;
-  const nativeBytes = stdoutBytes.length > 0 ? stdoutBytes : Buffer.from("Adapter diagnostic: worker produced no native output.\n", "utf8");
-  const isCompleted = exitCode === 0 && signal === null && (!humanWait || humanWait.decision === "approved");
-  const status = !isCompleted ? (humanWait?.decision === "denied" ? "blocked" : "failed") : "completed";
-  const reportKind = isCompleted ? "native" : "adapter-diagnostic";
-  const reportBytes = isCompleted ? nativeBytes : Buffer.from(`Adapter diagnostic: incomplete attempt (${status}).\n`, "utf8");
-  const lines = nativeBytes.toString("utf8").split(/\r?\n/);
+  const exitBytes = Buffer.from(`${signal ?? exitCode}\n`, "utf8");
+  await Promise.all([
+    writeFile(transport.captures.stdoutPath, stdoutBytes, { mode: 0o600 }),
+    writeFile(transport.captures.stderrPath, stderrBytes, { mode: 0o600 }),
+    writeFile(transport.captures.exitPath, exitBytes, { mode: 0o600 }),
+  ]);
+
+  const hasNativeOutput = stdoutBytes.length > 0;
+  const lines = hasNativeOutput ? stdoutBytes.toString("utf8").split(/\r?\n/) : [];
+  const extractedFindings = request.identity.role === "implementer" ? [] : parseNativeReviewFindings(lines);
+  const hasNoFindingsLine = lines.includes("Verdict: No findings");
+  const explicitFindingsLine = lines.find((l) => l === "Verdict: findings" || l === "Findings") ?? null;
+
+  let reviewOutputValid = true;
   let verdict = "unavailable";
   let nativeVerdict = null;
-  if (isCompleted) {
+  let findings = [];
+  if (hasNativeOutput && exitCode === 0 && signal === null && (!humanWait || humanWait.decision === "approved")) {
     if (request.identity.role === "implementer") {
       verdict = "not_applicable";
-    } else if (lines.includes("Verdict: No findings")) {
+    } else if (hasNoFindingsLine && extractedFindings.length === 0) {
       verdict = "no_findings";
       nativeVerdict = "Verdict: No findings";
-    } else {
+    } else if (!hasNoFindingsLine && explicitFindingsLine !== null && extractedFindings.length > 0) {
       verdict = "findings";
-      nativeVerdict = lines.find((l) => l.trim().length > 0) ?? "Findings";
+      nativeVerdict = explicitFindingsLine;
+      findings = extractedFindings;
+    } else {
+      reviewOutputValid = false;
     }
+  } else {
+    reviewOutputValid = false;
   }
+
+  const isCompleted = hasNativeOutput && reviewOutputValid && exitCode === 0 && signal === null && (!humanWait || humanWait.decision === "approved");
+  const status = !isCompleted ? (humanWait?.decision === "denied" ? "blocked" : "failed") : "completed";
+  const reportKind = isCompleted ? "native" : "adapter-diagnostic";
+  const nativeBytes = hasNativeOutput ? stdoutBytes : Buffer.from("Adapter diagnostic: worker produced no native output.\n", "utf8");
+  const reportBytes = isCompleted ? stdoutBytes : Buffer.from(`Adapter diagnostic: incomplete attempt (${status}).\n`, "utf8");
+
   const files = {
     "report.md": reportBytes,
     "native.txt": nativeBytes,
+    "stderr.log": stderrBytes,
+    "exit.txt": exitBytes,
   };
   let completion;
-  if (completionKind === "turn-end") {
+  if (completionKind === "turn-end" && isCompleted) {
     const turnBytes = Buffer.from(JSON.stringify({
       event: "turn-end",
       attempt: request.identity.attempt,
@@ -724,7 +838,7 @@ export async function executeTerminalAdapterAttempt({
     files["turn.json"] = turnBytes;
     completion = { kind: "turn-end", turn: turnId, evidence: path.join(directory, "turn.json") };
   } else {
-    completion = { kind: "exit", code: signal ? null : exitCode, signal };
+    completion = { kind: "exit", code: signal ? null : (isCompleted ? 0 : (exitCode === 0 ? 1 : exitCode)), signal };
   }
   const lifecycleEvents = [
     { schemaVersion: 1, attempt: request.identity.attempt, session: runtime.session, event: "launch" },
@@ -755,8 +869,8 @@ export async function executeTerminalAdapterAttempt({
     status,
     verdict,
     nativeVerdict,
-    findings: verdict === "findings" ? [{ severity: "medium", path: "src/index.mjs", line: 1, impact: "Defect", trigger: "Input", remedy: "Fix" }] : [],
-    coverageLimitations: isCompleted ? [] : ["Attempt did not complete cleanly"],
+    findings,
+    coverageLimitations: isCompleted ? [] : ["Attempt did not complete with valid native output or verdict"],
     report: desc("report.md"),
     reportKind,
     nativeReport: reportKind === "native" ? desc("native.txt") : null,

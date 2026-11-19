@@ -69,7 +69,7 @@
       "observed_version": "2.1.327",
       "version_range": ">=2.1.273 <3.0.0",
       "roles": ["implementer", "reviewer", "approach-reviewer"],
-      "non_argv_transport": ["stdin", "prompt-file"],
+      "non_argv_transport": ["stdin"],
       "isolated_scratch_root_verified": true,
       "credentials_metadata_only": true,
       "profile_preparation_supported": false,

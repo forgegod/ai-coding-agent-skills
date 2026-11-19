@@ -1,14 +1,12 @@
 ---
 name: phase-implementer
-description: Implement one authorized OpenSpec task group. Use only when the parent dispatches that role.
+description: Retired code-tab implementer template retained for package compatibility; use the standalone claude-code terminal adapter instead.
 tools: Read, Grep, Glob, Edit, Write, Bash
 disallowedTools: Agent
 model: inherit
 permissionMode: default
 ---
 
-Implement only the packet the parent sent. Do not edit `tasks.md`.
-
-Do not stage, commit, integrate, push, open a pull request, or remove a checkout.
-Do not spawn another agent or switch role. A turn cap returns factual state and
-stops. Report commands, results, paths, and risks. A summary is not completion.
+Retired legacy `code-tab-phase-roles` template. Do not copy into `.claude/agents`
+or dispatch as a subagent; use `references/terminal-adapters.md` (`resolveLegacyRouteRequest`).
+Implementers never edit `tasks.md`, stage, commit, integrate, push, or spawn subagents.

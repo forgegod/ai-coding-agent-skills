@@ -75,7 +75,9 @@ test("autonomous-implementation-review bounds orchestration to one change and su
   const source = await read(`${entry.orchestration}SKILL.md`);
   assert.match(source, /^version: 0\.17\.0$/m);
   assert.match(source, /A planning-only request stops after proposal\/spec\/design\/tasks/);
-  assert.match(source, /This automated role loop is Herdr-only/);
+  assert.match(source, /qualified terminal adapter/);
+  assert.match(source, /resolveLegacyRouteRequest/);
+  assert.match(source, /retired-route/);
   assert.match(source, /openspec-delivery/);
   assert.match(source, /\/goal draft \/openspec-delivery <name>/);
   assert.equal([...source.matchAll(/^\s*\/goal draft \/openspec-delivery .+$/gm)].length, 1);
@@ -85,12 +87,15 @@ test("autonomous-implementation-review bounds orchestration to one change and su
   for (const expected of [
     /one authorized native OpenSpec change/,
     /task group/,
-    /\$HERDR_ENV=1/,
+    /terminal-adapters\.md/,
+    /resolveLegacyRouteRequest/,
+    /retired-route/,
     /code-tab-phase-roles/,
     /defines no new host/,
     /openspec-delivery/,
     /sole Git and `tasks\.md` writer/,
     /checkbox writes are mediated/i,
+    /requireDistinctModels/,
     /stops after the named task group/,
   ]) assert.match(reference, expected);
   assert.doesNotMatch(reference, /~(?:[A-Za-z0-9._-]+)?\/\.hermes|\/home\//);

@@ -34,11 +34,15 @@ qualified adapter; replacement readiness precedes retirement; no fallback.
 
 ## Legacy host execution
 
-This retained recipe does not govern the portable core or qualify routes.
+`replacementReadiness` is satisfied. `resolveLegacyRouteRequest` stops
+`code-tab-phase-roles` and `herdr-pane-dispatch` with `status: "retired-route"`,
+without fallback or `.claude/agents` edits. `HERDR_ENV` selects no role transport;
+[references/herdr.md](references/herdr.md) and `references/lifecycle-watch.md`
+govern only the Herdr interaction fallback.
 
 ## Preconditions and roles
 
-- Read the contributor contract, the selected `openspec/changes/<name>/` artifacts,
+- Read the contributor contract, `openspec/changes/<name>/` artifacts,
   code/tests, branch/status, gates and authority. Load `references/openspec.md`
   before dispatch. A planning-only request stops after proposal/spec/design/tasks;
   do not dispatch implementation.
@@ -46,27 +50,22 @@ This retained recipe does not govern the portable core or qualify routes.
   Git and `tasks.md` writer through `openspec-delivery`. The executor
   must not edit `tasks.md`, stage, commit, integrate, or retire checkouts.
   Reviewers are read-only.
-- This automated role loop is Herdr-only. Require `$HERDR_ENV=1` and load
-  [references/herdr.md](references/herdr.md) before pane control.
-  Use an explicitly selected different Herdr pane; this pane remains the orchestrator.
-  Issue #141194 blocks handoff proof. Until closed, only operator approval of pane
-  authorizes next packet.
-  No implicit consent or `delegate_task` fallback.
-  Outside Herdr, stop unless the operator sent `code-tab-phase-roles`; then load
-  `references/claude-code-roles.md`. Do not mix that token with Herdr.
-- Model keys are session selectors, not executables. A rejected key blocks;
-  never shell-execute it or edit global config.
-- Isolate writers and mutable services; use finite budgets. No secrets, destructive
-  tasks or unresolved choices; browser access must be scoped.
+- Dispatch roles via an explicitly selected qualified terminal adapter
+  (`hermes`, `claude-code`, `codex`, `grok-build`) in `references/terminal-adapters.md`.
+  One client may run all roles sequentially in fresh sessions without distinct
+  models unless `requireDistinctModels: true`. No implicit consent, `delegate_task`,
+  subagent, or multiplexer fallback. `code-tab-phase-roles` (`references/claude-code-roles.md`)
+  and Herdr pane dispatch stop at `resolveLegacyRouteRequest` (`retired-route`).
+- Model keys are session selectors, not executables; never shell-execute them or edit global config.
+- Isolate writers/services; use finite budgets; no secrets or destructive tasks.
 - Compare installed skill version to source once; source edits do not update profiles.
 
-## Legacy goal and repository truth
+## Goal and repository truth
 
-Under adopted short-invocation policy, `/openspec-next` or `/openspec-delivery <name>`
-selects one approved group. Local workspace/bootstrap, task updates and previewed
-commits exclude push/PR/merge; restrictions win.
+Under short-invocation policy, `/openspec-next` or `/openspec-delivery <name>`
+selects one approved group. Local setup/commits exclude push/PR/merge; restrictions win.
 
-Optional persisted-goal launch (display alone grants no authority):
+Optional persisted-goal launch (display grants no authority):
 
 ```text
 /goal draft /openspec-delivery <name>
@@ -75,40 +74,40 @@ Optional persisted-goal launch (display alone grants no authority):
 `/goal draft` starts execution; inspect `/goal show`. Resume from repository truth.
 
 Use `/goal`, not `/loop`. The operator controls pause/resume/clear and `/subgoal`.
-Compression is automatic; for earlier compression the operator runs `/goal pause`,
-`/compress here 2`, inspects `/context`, then `/goal resume`.
-Printed commands do not execute.
+For earlier compression the operator runs `/goal pause`, `/compress here 2`,
+`/context`, then `/goal resume`. Printed commands do not execute.
 
 Stop discovery once authority, ownership, bootstrap and gates resolve.
 Reuse valid evidence; batch independent lookups.
 
-## Procedure (legacy host execution only)
+## Procedure
 
 1. Confirm recovery and an isolated checkout through `openspec-delivery`.
    Do not start a second writer for the same change.
-2. Through the Herdr recipe, start a fresh outcome-named implementer session with
-   accepted `/busy queue`, configured model and a visible `Agent Running` readback.
-   Send outcome, scope/non-goals, workspace/base, paths, links, gates, constraints
-   and budget; require focused tests, paths/results/risks and a report with links.
-3. On watcher `settled`, inspect the candidate and run relevant checks; lifecycle is
-   not success. Under `lifecycle-watch.md`, one `inconclusive` receipt may be resumed
-   once with `--resume-from`; the role stays incomplete until it settles. Worker
-   caps use turn-cap recovery below; other non-`settled` outcomes stop.
-   Reviewer/correction needs fresh approval; never inject
-   status/reset/goal. Dispatch failed prerequisites to a fresh implementer session;
+2. Via `references/terminal-adapters.md` (`references/profile-preparation.md` for
+   `hermes`), bind role config (`resolveRoleConfiguration`), prepare non-argv
+   transport (`preparePromptTransport`), and launch a fresh implementer session
+   (`superviseWorkerLaunch`, `createAttempt`) with outcome, scope/non-goals,
+   workspace/base, paths, gates and budget; require focused tests and a report.
+3. Admit worker output via `readHandoff` (`references/worker-handoff.md`).
+   On human-input waits, `exposeOperatorInteraction` exposes the same session
+   natively or via a fresh Herdr fallback pane (`references/herdr.md`,
+   `references/lifecycle-watch.md`, `--resume-from` once on `inconclusive`). Worker
+   caps use turn-cap recovery below; other incomplete outcomes stop.
+   Dispatch failed prerequisites to a fresh implementer session;
    the orchestrator does not edit worker code.
 4. Freeze the clean committed candidate via `openspec-delivery`. Dispatch a
-   fresh reviewer role via Herdr with base/digest, paths/diff, acceptance,
-   gate evidence and implementation report. Keep the candidate frozen.
-5. Apply the candidate review criteria in `references/portable-core.md`; require
+   fresh read-only reviewer via the selected qualified terminal adapter with
+   base/digest, paths/diff, acceptance, gate evidence and implementation report.
+5. Apply candidate review criteria in `references/portable-core.md`; require
    actionable findings or literal `Verdict: No findings` with empty findings and
    empty coverage limitations.
-6. Reproduce findings; send confirmed fixes to a fresh implementer role in the same
+6. Reproduce findings; send confirmed fixes to a fresh implementer role in the
    checkout with the original contract. Changed content needs renewed gates and
    review. Limit to two fix/review cycles; a third needs operator direction.
-7. Delivery owns publication/completion; commits use `git-commit-message` under
-   project policy. Identity/tests grant no writes. Push/PR/merge need separate
-   authority and remote-ref readback; otherwise preserve/report the candidate.
+7. Delivery owns publication/completion; commits use `git-commit-message`.
+   Identity/tests grant no writes. Push/PR/merge need separate authority and
+   remote-ref readback; otherwise preserve/report the candidate.
 8. Continue only unfinished work in the named task group. Stop after that group or
    a real blocker; no next change without a new request.
 

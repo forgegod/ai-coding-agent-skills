@@ -179,6 +179,18 @@ test("replacementReadiness stops for operator disposition if no candidate qualif
 });
 
 test("bootstrapSupervisorDecision admits only initial task 3.1 with an independent supervisor and expires once an adapter qualifies", () => {
+  const allUnsupported = Object.fromEntries(
+    core.DESIGN_CANDIDATES.map((c) => [
+      c,
+      {
+        client: c,
+        variant: c === "kilo-modern" ? "modern" : c === "kilo-legacy" ? "legacy" : "default",
+        status: "unsupported",
+        supported: false,
+        roles: [],
+      },
+    ]),
+  );
   const base = {
     task: "3.1",
     role: "implementer",
@@ -216,8 +228,13 @@ test("bootstrapSupervisorDecision admits only initial task 3.1 with an independe
       freshLiteralVerdictRequired: true,
       interactionRoute: "native-cli",
     },
-    qualifiedAdapters: [],
+    records: allUnsupported,
   };
+
+  // Expires by default when called against CANDIDATE_RECORDS (even without qualifiedAdapters)
+  const defaultExpired = core.bootstrapSupervisorDecision({ ...base, records: undefined });
+  assert.equal(defaultExpired.allowed, false);
+  assert.equal(defaultExpired.expired, true);
 
   const admitted = core.bootstrapSupervisorDecision(base);
   assert.equal(admitted.allowed, true);
@@ -230,7 +247,7 @@ test("bootstrapSupervisorDecision admits only initial task 3.1 with an independe
   assert.equal(expired.allowed, false);
   assert.equal(expired.expired, true);
 
-  // Refuses other tasks, candidate-code self-attestation, historical session reuse, and missing floor controls
+  // Refuses other tasks, candidate-code self-attestation, omitted boolean flags, historical session reuse, and missing floor controls
   for (const override of [
     { task: "2.1" },
     { task: "4.1" },
@@ -238,8 +255,11 @@ test("bootstrapSupervisorDecision admits only initial task 3.1 with an independe
     { authority: { ...base.authority, task3ExecutionReference: "" } },
     { supervisor: { ...base.supervisor, independentOfCandidateCode: false } },
     { supervisor: { ...base.supervisor, usesCandidateCode: true } },
+    { supervisor: { ...base.supervisor, usesCandidateCode: undefined } },
     { supervisor: { ...base.supervisor, selfAttested: true } },
+    { supervisor: { ...base.supervisor, selfAttested: undefined } },
     { supervisor: { ...base.supervisor, reusesHistoricalGroup2Session: true } },
+    { supervisor: { ...base.supervisor, reusesHistoricalGroup2Session: undefined } },
     { request: { ...base.request, client: "grok-cli" } },
     { request: { ...base.request, client: "grok-bot" } },
     { role: "reviewer", request: { ...base.request, implementerSession: "bootstrap-impl-1", session: "bootstrap-impl-1" } },
@@ -339,6 +359,41 @@ test("resolveRoleConfiguration enforces precedence, one-client sequential sessio
     }).action,
     "stop",
   );
+
+  // Omitting credentialsRead, aliasOnly, entitlementOnly, or globalDefaultsModified fails closed
+  for (const omittedKey of ["credentialsRead", "aliasOnly", "entitlementOnly", "globalDefaultsModified"]) {
+    const partialReadback = readback();
+    delete partialReadback[omittedKey];
+    assert.equal(
+      core.resolveRoleConfiguration({
+        role: "implementer",
+        orchestratorSession: "orch-1",
+        session: "worker-session-1",
+        projectDefault: { client: "codex", provider: "openai", model: "gpt-5.4" },
+        effectiveReadback: partialReadback,
+      }).action,
+      "stop",
+      omittedKey,
+    );
+  }
+
+  // Unbound status flag without probe hash/version/interface bindings is rejected
+  const unboundRecords = {
+    ...core.CANDIDATE_RECORDS,
+    codex: { client: "codex", status: "qualified", supported: true, roles: ["implementer", "reviewer"] },
+  };
+  assert.equal(
+    core.resolveRoleConfiguration({
+      role: "implementer",
+      orchestratorSession: "orch-1",
+      session: "worker-session-1",
+      projectDefault: { client: "codex", provider: "openai", model: "gpt-5.4" },
+      records: unboundRecords,
+      effectiveReadback: readback(),
+    }).action,
+    "stop",
+  );
+  assert.throws(() => core.replacementReadiness({ records: unboundRecords }), /probe hash|version|binding/);
 });
 
 test("verifyHermesProfilePreparation ships only when Hermes qualifies and two-process readbacks match", () => {
@@ -362,6 +417,15 @@ test("verifyHermesProfilePreparation ships only when Hermes qualifies and two-pr
   assert.throws(() =>
     core.verifyHermesProfilePreparation({
       hermesQualified: false,
+      grantReference: "retained:profile-prep-grant",
+      profile: "hermes-dev-review",
+      readbacks,
+    }),
+  );
+  assert.throws(() =>
+    core.verifyHermesProfilePreparation({
+      hermesQualified: true,
+      records: { ...core.CANDIDATE_RECORDS, hermes: { ...core.CANDIDATE_RECORDS.hermes, status: "unsupported", supported: false } },
       grantReference: "retained:profile-prep-grant",
       profile: "hermes-dev-review",
       readbacks,
@@ -399,7 +463,25 @@ test("preparePromptTransport uses non-argv routes for all four qualified clients
     assert.equal(t.route, expectedRoute);
     assert.equal(t.exceededSafeArgv, true);
     assert.ok(!t.argv.includes(prompt), `${client} leaked prompt into argv`);
+    if (expectedRoute === "stdin") {
+      assert.equal(t.promptFilePath, null);
+      assert.ok(Buffer.isBuffer(t.stdinBytes) && t.stdinBytes.length === prompt.length);
+    } else {
+      assert.ok(t.argv.includes(t.promptFilePath));
+    }
   }
+  assert.throws(() =>
+    core.preparePromptTransport({
+      client: "claude-code",
+      version: "2.1.327",
+      role: "reviewer",
+      session: "rev-1",
+      workspace: "/synthetic/worktree",
+      prompt,
+      captureDir: "/tmp/transport-captures",
+      preferredRoute: "prompt-file",
+    }),
+  );
 
   const oversized = core.preparePromptTransport({
     client: "claude-code",
@@ -606,7 +688,7 @@ test("executeTerminalAdapterAttempt proves non-argv delivery, protected request/
     budget: { limit: 2, unit: "cycles" },
     stop: "Stop on failed gate",
     evidenceRoots: [path.join(root, "attempt-1")],
-    requiredEvidence: ["native.txt", "lifecycle.jsonl", "turn.json"],
+    requiredEvidence: ["native.txt", "stderr.log", "exit.txt", "lifecycle.jsonl", "turn.json"],
     mutablePaths: [],
   };
   const runtime = {
@@ -634,8 +716,24 @@ test("executeTerminalAdapterAttempt proves non-argv delivery, protected request/
       'if (!blockedWrite) process.exit(2);',
       'const prompt = readFileSync(process.env.WORKER_PROMPT_FILE, "utf8");',
       'if (!prompt.includes("Assignment attempt-review-1")) process.exit(3);',
+      'process.stderr.write("worker-stderr-trace\\n");',
       'process.stdout.write("Reviewed candidate.\\nVerdict: No findings\\n");',
     ].join("\n"),
+  );
+
+  // Rejects custom args that omit transport.argv
+  await assert.rejects(
+    core.executeTerminalAdapterAttempt({
+      directory: path.join(root, "attempt-bad-argv"),
+      request: { ...request, evidenceRoots: [path.join(root, "attempt-bad-argv")] },
+      excludedRoots: [workspace, profile],
+      runtime,
+      scratchRoot,
+      command: process.execPath,
+      args: [workerScript],
+      transportRoute: "prompt-file",
+    }),
+    /transport\.argv/,
   );
 
   const run = await core.executeTerminalAdapterAttempt({
@@ -645,7 +743,7 @@ test("executeTerminalAdapterAttempt proves non-argv delivery, protected request/
     runtime,
     scratchRoot,
     command: process.execPath,
-    args: [workerScript],
+    runnerPrefixArgs: [workerScript],
     transportRoute: "prompt-file",
     completionKind: "turn-end",
     turnId: "turn-42",
@@ -661,9 +759,35 @@ test("executeTerminalAdapterAttempt proves non-argv delivery, protected request/
   assert.equal(run.admitted.result.verdict, "no_findings");
   assert.equal(run.admitted.result.nativeVerdict, "Verdict: No findings");
   assert.equal(run.admitted.result.completion.kind, "turn-end");
-  for (const f of ["request.md", "report.md", "native.txt", "lifecycle.jsonl", "turn.json", "result.json"]) {
+  assert.equal(await readFile(run.transport.captures.stderrPath, "utf8"), "worker-stderr-trace\n");
+  assert.equal(await readFile(run.transport.captures.exitPath, "utf8"), "0\n");
+  for (const f of ["request.md", "report.md", "native.txt", "stderr.log", "exit.txt", "lifecycle.jsonl", "turn.json", "result.json"]) {
     const st = await stat(path.join(root, "attempt-1", f));
     assert.equal(st.mode & 0o222, 0, `${f} must be sealed 0400`);
     await chmod(path.join(root, "attempt-1", f), 0o400);
   }
+
+  // Empty or non-verdict reviewer stdout never fabricates a completed native review or phantom finding
+  const emptyScript = path.join(scratchRoot, "empty-worker.mjs");
+  await writeFile(emptyScript, "process.exit(0);\n");
+  const emptyRun = await core.executeTerminalAdapterAttempt({
+    directory: path.join(root, "attempt-empty"),
+    request: {
+      ...request,
+      identity: { ...request.identity, attempt: "attempt-empty" },
+      evidenceRoots: [path.join(root, "attempt-empty")],
+      requiredEvidence: ["native.txt", "stderr.log", "exit.txt", "lifecycle.jsonl"],
+    },
+    excludedRoots: [workspace, profile],
+    runtime,
+    scratchRoot,
+    command: process.execPath,
+    runnerPrefixArgs: [emptyScript],
+    transportRoute: "prompt-file",
+  });
+  assert.equal(emptyRun.admitted.executionCompleted, false);
+  assert.equal(emptyRun.admitted.result.status, "failed");
+  assert.equal(emptyRun.admitted.result.verdict, "unavailable");
+  assert.equal(emptyRun.admitted.result.reportKind, "adapter-diagnostic");
+  assert.deepEqual(emptyRun.admitted.result.findings, []);
 });

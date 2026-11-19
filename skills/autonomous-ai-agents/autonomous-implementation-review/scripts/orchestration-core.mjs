@@ -1,6 +1,6 @@
-// Pure packet/evidence checks plus explicit adapter-only artifact I/O exports.
-// No client launch, process control, Git or task-progress writes.
-// Inputs are retained observations, not authenticated grants or a distributed lock.
+// Pure packet/evidence checks plus re-exported adapter handoff/supervision helpers.
+// Pure core functions do no client launch or process control; adapter execution lives in terminal-adapters.mjs.
+// No Git or task-progress writes; inputs are retained observations, not authenticated grants.
 export { createAttempt, publishResult, readHandoff } from "./worker-handoff.mjs";
 export {
   CANDIDATE_RECORDS,
@@ -11,6 +11,7 @@ export {
   executeTerminalAdapterAttempt,
   exposeOperatorInteraction,
   handleWorkerStopOrViolation,
+  isRecordQualified,
   preparePromptTransport,
   qualifyCandidateAdapter,
   replacementReadiness,

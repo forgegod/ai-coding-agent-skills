@@ -19,14 +19,18 @@ adapter. Do not infer a route from an environment marker or fall back silently.
 
 - The unit is one authorized native OpenSpec change and one named task group from
   its `tasks.md`. Never a second change, an unapproved task, or a whole backlog.
-- Reuse only the hosts already supported by `SKILL.md`: Herdr (`$HERDR_ENV=1`,
-  see `references/herdr.md`) or the operator-sent `code-tab-phase-roles` command
-  (see `references/claude-code-roles.md` and `references/claude-code-host.md`).
+- Use only the qualified terminal adapters in [terminal-adapters.md](terminal-adapters.md)
+  (`hermes`, `claude-code`, `codex`, `grok-build`). Legacy requests for operator-selected
+  Herdr pane dispatch (`$HERDR_ENV=1`, see `references/herdr.md`) or the
+  `code-tab-phase-roles` command (see `references/claude-code-roles.md` and
+  `references/claude-code-host.md`) stop at `resolveLegacyRouteRequest` with
+  `status: "retired-route"` and name only qualified adapters without launching a
+  fallback or modifying `.claude/agents`.
   This reference defines no new host, CLI launcher, wrapper script or apply driver.
-  A missing or unclear host is a blocker.
-- The Herdr launch template in `SKILL.md` is the only `/goal draft` example.
-  Print the Code-tab command only from `references/claude-code-host.md`, and only
-  when that host is selected. Do not print both.
+  A missing, unqualified or unclear adapter is a blocker.
+- The `/goal draft` launch template in `SKILL.md` is the only persisted-goal
+  example. Do not dispatch `code-tab-phase-roles` (`references/claude-code-host.md`
+  retains it only to document the retired-route redirect).
 
 ## Roles and writes
 
@@ -38,8 +42,10 @@ adapter. Do not infer a route from an environment marker or fall back silently.
   frozen commit reviewed by the independent reviewer. A later checkbox commit
   changes the SHA and requires renewed candidate review.
 - Review binds the immutable candidate commit and the approved plan content
-  digest. The reviewer is a different session and a different model from the
-  implementer. A changed head, changed planning content or changed gate evidence
+  digest. The reviewer is a fresh read-only session distinct from the implementer
+  and orchestrator; one qualified client and the same model may be used
+  sequentially unless project policy sets `requireDistinctModels: true`.
+  A changed head, changed planning content or changed gate evidence
   invalidates review. Per-group verdicts never substitute for review of the final
   delivery SHA. Correct confirmed in-scope findings in the same unit and
   stop at two correction/review cycles before operator escalation.
