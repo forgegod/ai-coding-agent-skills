@@ -82,11 +82,14 @@ export function reviewReadiness({ change, inputs, record, recordIntegrityVerifie
     return { action: "operator-disposition", cumulativeCycles: null, reason: "Review acceptance invalid; recover cumulative count from retained external reports or retain an operator disposition" };
   }
   const findings = new Map();
-  for (const entry of record.entries) for (const finding of entry.findings) {
-    // Anonymous findings cannot be silently matched to a later disposition.
-    findings.set(text(finding?.id) ? finding.id : Symbol(), finding);
+  for (const entry of record.entries) {
+    if (entry.correction?.finding) findings.set(entry.correction.finding.id, entry.correction.finding);
+    for (const finding of entry.findings) {
+      // Anonymous findings cannot be silently matched to a later disposition.
+      findings.set(text(finding?.id) ? finding.id : Symbol(), finding);
+    }
   }
-  const ready = completeNoFindings(latest) && [...findings.values()].every(resolvedFinding);
+  const ready = latest.automaticCycle === false && completeNoFindings(latest) && [...findings.values()].every(resolvedFinding);
   return { action: ready ? "freeze-ready" : "resolve-findings", cumulativeCycles: record.cumulativeCycles,
     requireCycleAuthorization: Boolean(perCycle), reference: latest.reference, inputs: structuredClone(inputs) };
 }

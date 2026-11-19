@@ -38,6 +38,7 @@ test("portable protocol is connected to delivery and next without retiring unqua
   assert.match(orchestration, /references\/portable-core\.md/);
   assert.match(orchestration, /without Hermes or Herdr/);
   assert.match(orchestration, /Legacy host execution/);
+  assert.match(orchestration, /literal `Verdict: No findings` with empty findings and\s+empty coverage limitations/);
   const coreReference = await read("skills/autonomous-ai-agents/autonomous-implementation-review/references/portable-core.md");
   for (const term of ["outcomePacket", "approachPacket", "acceptApproachReview", "reviewReadiness", "planningCorrection", "candidateReviewPacket", "acceptCandidateReview", "approach-review.json", "eight", "per-cycle", "first plan freeze", "same-session", "qualified", "does not authenticate"]) assert.ok(coreReference.includes(term), term);
   const delivery = await read("skills/software-development/openspec-delivery/SKILL.md");
@@ -152,8 +153,14 @@ test("review records require retained automatic correction hashes and per-cycle 
   const request = { change: record.change, inputs: inputs(), record, recordIntegrityVerified: true };
   assert.equal(api.reviewReadiness(request).action, "operator-disposition");
   const corrected = { ...entry, correction: { finding, beforeInputs: inputs(), amendedInputs: inputs(), reReviewReference: entry.reference } };
+  const automaticNoFindings = { ...corrected, verdict: "Verdict: No findings", findings: [], coverageLimitations: [] };
+  const automaticResolvedOnlyInCorrection = { ...automaticNoFindings, correction: { ...corrected.correction, finding: { ...finding, blocking: false, disposition: "applied", reReviewReference: entry.reference } } };
   const fresh = { ...entry, automaticCycle: false, reference: "retained:fresh-review", verdict: "Verdict: No findings", findings: [], coverageLimitations: [] };
   assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [corrected] } }).action, "resolve-findings");
+  assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [automaticNoFindings] } }).action, "resolve-findings");
+  assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [automaticNoFindings, fresh] } }).action, "resolve-findings");
+  assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [automaticResolvedOnlyInCorrection] } }).action, "resolve-findings");
+  assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [automaticResolvedOnlyInCorrection, fresh] } }).action, "freeze-ready");
   assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [corrected, fresh] } }).action, "freeze-ready");
   const unknown = { ...record, cumulativeCycles: null, countDisposition: { mode: "per-cycle", reference: "retained:operator" }, entries: [corrected] };
   assert.equal(api.reviewReadiness({ ...request, record: unknown }).action, "operator-disposition");

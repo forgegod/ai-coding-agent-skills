@@ -98,25 +98,26 @@ Reuse valid evidence; batch independent lookups.
    Reviewer/correction needs fresh approval; never inject
    status/reset/goal. Dispatch failed prerequisites to a fresh implementer session;
    the orchestrator does not edit worker code.
-4. Freeze the clean committed candidate through the integration skill. Dispatch a
-   fresh reviewer role through Herdr with base/digest, paths/diff, acceptance
-   criteria, gate evidence and implementation report. Keep the candidate frozen.
+4. Freeze the clean committed candidate via `openspec-delivery`. Dispatch a
+   fresh reviewer role via Herdr with base/digest, paths/diff, acceptance,
+   gate evidence and implementation report. Keep the candidate frozen.
 5. Apply the candidate review criteria in `references/portable-core.md`; require
-   actionable findings or `No findings`.
+   actionable findings or literal `Verdict: No findings` with empty findings and
+   empty coverage limitations.
 6. Reproduce findings; send confirmed fixes to a fresh implementer role in the same
-   checkout with the original contract. Changed content requires renewed gates and
+   checkout with the original contract. Changed content needs renewed gates and
    review. Limit to two fix/review cycles; a third needs operator direction.
 7. Delivery owns publication/completion; commits use `git-commit-message` under
    project policy. Identity/tests grant no writes. Push/PR/merge need separate
    authority and remote-ref readback; otherwise preserve/report the candidate.
-8. Continue only unfinished work in the named task group. Stop after that group or a
-   real blocker; no next change without a new request.
+8. Continue only unfinished work in the named task group. Stop after that group or
+   a real blocker; no next change without a new request.
 
 ## Executor turn-cap recovery
 
 `Iteration budget exhausted` is incomplete. The worker stops; it never self-continues or
 switches role.
-The orchestrator alone decides through delivery's `workerContinuationDecision`
+The orchestrator alone decides via delivery's `workerContinuationDecision`
 before every cap handoff: once per native task in the existing checkout.
 Never split, relabel or change sessions to reset it; a second cap stops.
 Preserve identity, budget, review and native-input gates; follow
@@ -124,6 +125,6 @@ Preserve identity, budget, review and native-input gates; follow
 
 ## Pitfalls and verification
 
-- Conflicting checkout changes block; preserve them, never reset or choose a merge side.
+- Conflicting checkout changes block; preserve them, never reset or pick a side.
 - Require acceptance evidence, actual gates and frozen review. Report verified
-  results, skips and blockers separately; integration/documentation need separate authority.
+  results, skips and blockers separately; integration/docs need separate authority.
