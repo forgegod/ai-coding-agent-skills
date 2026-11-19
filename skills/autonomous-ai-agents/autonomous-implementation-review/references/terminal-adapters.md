@@ -16,7 +16,7 @@ versioned probe outcome for every candidate in the design:
 | --- | --- | --- | --- | --- | --- |
 | `hermes` | `qualified` (`supported: true`) | `>=0.23.0 <1.0.0` | `--query-file <path>` or `--query-file -` (`stdin`) | `implementer`, `reviewer`, `approach-reviewer` | Explicit `--profile` + `--in <workspace>`; enables [profile-preparation.md](profile-preparation.md). |
 | `claude-code` | `qualified` (`supported: true`) | `>=2.1.273 <3.0.0` | `--print` with `stdin` | `implementer`, `reviewer`, `approach-reviewer` | Standalone CLI (`--session-id`, `--permission-mode`, `--tools`, `--disallowed-tools`); excludes `--bg` auto-respawn; retires `code-tab-phase-roles`. |
-| `codex` | `qualified` (`supported: true`) | `>=0.167.0 <1.0.0` | `codex exec -` (`stdin`) | `implementer`, `reviewer`, `approach-reviewer` | `-C <workspace>`, `-s read-only` or `workspace-write`, `--json`, `-o`, `codex resume <id>`. |
+| `codex` | `qualified` (`supported: true`) | `>=0.167.0 <1.0.0` | `codex exec -` (`stdin`) | `implementer`, `reviewer`, `approach-reviewer` | `-C <workspace>`, `-s read-only` or `workspace-write`, `--json`, `-o <captureDir>/last-message.txt`. |
 | `grok-build` | `qualified` (`supported: true`) | `>=1.0.89 <2.0.0` | `--prompt-file <path>` | `implementer`, `reviewer`, `approach-reviewer` | `--cwd <workspace>`, `-s <id>`, `--no-subagents`, `--no-leader`, `--permission-mode plan` or `default`, `--disallowed-tools`. |
 | `opencode` | `unsupported` (`supported: false`) | `null` | none | none | Uninstalled in probe environment; fail-closed. |
 | `kilo-modern` | `unsupported` (`supported: false`) | `null` | none | none | `.kilo` modern route evaluated independently of `kilo-legacy`; uninstalled. |
@@ -65,7 +65,7 @@ model, or permission fallback.
 | --- | --- | --- |
 | `hermes` | `>=0.23.0 <1.0.0` (`0.23.2`) | Launch argv `--profile <verified-profile> chat --query-file <-\|prompt.md> --oneshot --format stream-json --pass-session-id --in <workspace> -t <file\|file,terminal>` (`cliMode: "chat --oneshot"`); profile keys `model.default`, `model.provider`, `display.busy_input_mode = queue` in `<hermes-home>/profiles/<verified-profile>/` ([profile-preparation.md](profile-preparation.md)); declarative skill frontmatter keys `autonomous_ai_agents.implementer` and `autonomous_ai_agents.reviewer`; scratch isolation via `HOME=<scratchRoot>` and `TMPDIR=<scratchRoot>`. |
 | `claude-code` | `>=2.1.273 <3.0.0` (`2.1.327`) | Launch argv `--print --output-format json --session-id <session> --permission-mode <plan\|manual> --tools <Read,Glob,Grep\|Read,Edit,Write,Glob,Grep,Bash> --disallowed-tools <...>` with `stdin` (`plan` for read-only reviewers, `manual` for implementers); scratch isolation via `HOME=<scratchRoot>` and `TMPDIR=<scratchRoot>`; model/provider selection is verified via caller-supplied `effectiveReadback` in `resolveRoleConfiguration` rather than injected into `preparePromptTransport` argv. |
-| `codex` | `>=0.167.0 <1.0.0` (`0.169.0`) | Launch argv `exec - -C <workspace> -s <read-only\|workspace-write> --json -o <captureDir>/last-message.txt` with `stdin` (and `codex resume <session-id>` for `herdr-fallback`); scratch isolation via `HOME=<scratchRoot>` and `TMPDIR=<scratchRoot>`; model/provider selection is verified via caller-supplied `effectiveReadback` in `resolveRoleConfiguration` rather than injected into `preparePromptTransport` argv. |
+| `codex` | `>=0.167.0 <1.0.0` (`0.169.0`) | Launch argv `exec - -C <workspace> -s <read-only\|workspace-write> --json -o <captureDir>/last-message.txt` with `stdin`; scratch isolation via `HOME=<scratchRoot>` and `TMPDIR=<scratchRoot>`; model/provider selection is verified via caller-supplied `effectiveReadback` in `resolveRoleConfiguration` rather than injected into `preparePromptTransport` argv. |
 | `grok-build` | `>=1.0.89 <2.0.0` (`1.0.89`) | Launch argv `--prompt-file <captureDir>/prompt.md --cwd <workspace> -s <session> --no-subagents --no-leader --output-format json --permission-mode <plan\|default> --disallowed-tools <...>` (`plan` for read-only reviewers, `default` for implementers); scratch isolation via `HOME=<scratchRoot>` and `TMPDIR=<scratchRoot>`; model/provider selection is verified via caller-supplied `effectiveReadback` in `resolveRoleConfiguration` rather than injected into `preparePromptTransport` argv. |
 
 - **Scope, effective verification, and model availability:** Configuration is
@@ -275,12 +275,15 @@ input (`approval`, `credentials`, `clarify`, `input`):
   acceptance.
 - **Evidence retention and safe recovery:** Handoff artifacts under the attempt
   directory survive `scratchRoot` cleanup. Missing, partial, truncated,
-  writable, symlinked, or hash-mismatched artifacts fail closed in `readHandoff`
-  (`status: "incomplete"`), preserving the sealed attempt directory as evidence.
-  Recovery never overwrites an existing attempt or assumes cross-client CLI flag
-  or session equivalence: the orchestrator dispatches a new attempt directory
-  linked via `predecessor` (`predecessorAttemptId`) within the existing
-  continuation and correction budgets.
+  writable, symlinked, or hash-mismatched artifacts throw in `readHandoff` and
+  are not admitted (valid result statuses are only `completed`, `blocked`,
+  `failed`, `capped`, and `stopped`, and `readHandoff` returns
+  `{ executionCompleted, deliveryAccepted: false, planApproved: false, result }`
+  on success), preserving the `0700` attempt directory and any sealed `0400`
+  files inside it as evidence. Recovery never overwrites an existing attempt or
+  assumes cross-client CLI flag or session equivalence: the orchestrator
+  dispatches a new attempt directory linked via `predecessor`
+  (`predecessorAttemptId`) within the existing continuation and correction budgets.
 
 ## Legacy route retirement
 
