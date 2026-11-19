@@ -146,7 +146,9 @@ test("autonomous goal documentation distinguishes orchestration from polling", a
   assert.match(source, /### Run the autonomous implementation-review goal/);
   assert.match(source, /\/goal draft \/openspec-delivery <name>/);
   assert.match(source, /push\/PR\/merge are not/);
-  assert.match(source, /supports Herdr only/);
+  assert.match(source, /qualified terminal adapter/);
+  assert.match(source, /resolveLegacyRouteRequest/);
+  assert.match(source, /retired-route/);
   assert.match(source, /operator sends `\/goal pause`/i);
   assert.match(source, /docs\/openspec-workflow\.md/);
   assert.doesNotMatch(withoutRetirementManifest, /phased-plan-/);
@@ -155,7 +157,7 @@ test("autonomous goal documentation distinguishes orchestration from polling", a
   assert.match(source, /Scratch logs, patches, and agent reports are temporary evidence only/);
   assert.match(source, /#### Fresh-session busy-input protection/);
   assert.match(source, /#### Stop an execution deliberately/);
-  assert.match(source, /\/busy queue/);
+  assert.match(source, /display\.busy_input_mode queue/);
   assert.match(source, /\/stop` is not an immediate foreground-turn/);
   assert.match(source, /Operator commands, not an agent response/);
   assert.match(source, /Do not use `\/loop` for implementation and review/);

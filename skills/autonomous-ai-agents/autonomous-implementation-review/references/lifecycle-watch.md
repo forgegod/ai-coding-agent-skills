@@ -20,9 +20,7 @@ node <this-skill-dir>/scripts/herdr_lifecycle_watch.mjs --wait-armed --receipt <
 
 Require exit 0 and JSON `outcome` `armed`. The baseline is visibly `idle`, with literal pane, workspace, and terminal IDs and `source: pane-output`. Any other result blocks delivery: stop that background process with `process_manage`, and do not dispatch or start another watcher.
 
-3. Send the role packet once, without `--wait`, then end the turn. Do not poll, run `herdr agent wait`, or inject input. The watcher never runs `agent prompt`, `/new`, `/busy`, `/goal`, or a status question.
-The setup `/status` readback belongs to herdr.md step 4, before arming; while this
-watcher runs it stays forbidden.
+3. For a retained Herdr observation, never poll, run `herdr agent wait`, or inject input. The watcher never runs `agent prompt`, `/new`, `/busy`, `/model`, `/goal`, or `/status`. Qualified terminal adapters prepare Hermes profiles offline via `references/profile-preparation.md` rather than live pane slash setup; while this watcher runs, pane input stays forbidden.
 
 4. On the exit notification, read the receipt once with `read_file`. The last JSON object is the verdict; earlier `unreadable` lines are samples and can precede `settled`. If the watcher ended `inconclusive`, the role may still be running. Run one fresh `--inspect` and compare its literal pane, workspace, and terminal IDs with the receipt's `final` identity. A verdict that followed `unreadable` events means frames could not be parsed, not that the pane looked unfamiliar: the recorded excerpt shows what was on screen. Only when all three match and the status is `working` may you resume:
 

@@ -188,8 +188,9 @@ flowchart TB
 
 The diagram is not a promise of unattended execution: required human PR approvals,
 host/tool permission controls and the configured role protocol still apply. In
-particular, the current Herdr protocol requires explicit reviewer/executor pane
-handoff approval. Routine Git commands are automated; these decisions are not.
+particular, role execution requires a qualified terminal adapter (with Herdr
+used only as a prequalified same-session human-input fallback). Routine Git
+commands are automated; these decisions are not.
 Operator restrictions such as `no commits` or `keep the worktree` override the
 automatic actions shown. An ordinary `next` never supplies finish authority.
 

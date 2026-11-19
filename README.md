@@ -359,9 +359,14 @@ Use `autonomous-implementation-review` from the orchestrator session, not an
 executor pane. It coordinates implementation and review for one authorized
 OpenSpec task group. It does not replace OpenSpec artifacts or create a second
 progress tracker.
-This automated role loop currently supports Herdr only (`HERDR_ENV=1`, selected
-Hermes executor, verified model keys). Outside Herdr, stop unless the operator
-sent `code-tab-phase-roles`. Do not invent a fallback transport.
+Role execution uses an explicitly selected qualified terminal adapter
+(`hermes`, `claude-code`, `codex`, `grok-build`) under
+`skills/autonomous-ai-agents/autonomous-implementation-review/references/terminal-adapters.md`.
+Legacy requests for operator-selected Herdr pane dispatch (`herdr-pane-dispatch`)
+or `code-tab-phase-roles` stop at `resolveLegacyRouteRequest` with
+`status: "retired-route"`, without fallback or `.claude/agents` edits (`HERDR_ENV`
+does not select a role transport; Herdr remains available as the prequalified
+same-session human-input fallback).
 
 For a project that explicitly adopts the short-invocation policy, the operator
 sends `/openspec-next` to advance the current approved group, or
@@ -387,11 +392,13 @@ dispatching. Use `/goal show` to inspect the drafted contract. Pause or clear it
 if it materially misstates the change.
 
 The operator decides when and where to send the goal. After submission,
-`autonomous-implementation-review` keeps that session as orchestrator and asks
-for an explicitly selected different Herdr pane for implementer/reviewer roles.
-It owns that role handoff, including fresh-session queue/model setup, visible
-idle/input checks and passive executor monitoring. It never resets or runs a
-worker in the orchestrator pane. A displayed goal grants no execution authority.
+`autonomous-implementation-review` keeps that session as orchestrator and
+launches fresh implementer and read-only reviewer sessions through the selected
+qualified terminal adapter (`hermes`, `claude-code`, `codex`, `grok-build`),
+publishing sealed attempt handoffs (`worker-handoff.mjs`) and exposing any
+native human-input wait on the same session (`exposeOperatorInteraction`,
+native CLI or fresh Herdr fallback pane). It never resets or runs a worker in
+the orchestrator session. A displayed goal grants no execution authority.
 
 Publication, a pull request, and merge need separate authorization. The
 [SDLC](docs/openspec-workflow.md) owns that boundary. A pull request documents
@@ -415,11 +422,12 @@ artifact, use only its documented repository-tracked location.
 
 #### Fresh-session busy-input protection
 
-When the orchestrator starts a fresh executor session, it sends `/new --yes
-<goal-name>`, verifies visible idle through output inspection, then sends `/busy queue` before
-the model or role task. Queue mode keeps any later operator message as the next
-turn instead of redirecting the executor's active work. This is an orchestrator
-action; the operator does not need to send it separately during a normal run.
+When the `hermes` terminal adapter is used, Hermes role profiles are prepared
+offline via `references/profile-preparation.md` (`hermes --profile <name> config set display.busy_input_mode queue`
+and `verifyHermesProfilePreparation` two-process readbacks) rather than injecting
+live `/new`, `/busy queue`, `/model`, or `/status` commands into a pane. Queue
+mode keeps any later operator message as the next turn instead of redirecting
+active work.
 
 #### Stop an execution deliberately
 
@@ -538,13 +546,14 @@ loaded skill path and content rather than relying only on the model's claim.
 
 Reference: [Claude Code skills](https://code.claude.com/docs/en/skills).
 
-That copy installs skills only. It does not install Code-tab subagents and does
-not receive Hermes scanner approval for them. Role templates are
+That copy installs skills only. With `replacementReadiness` verified, the legacy
+`code-tab-phase-roles` subagent route is retired (`resolveLegacyRouteRequest`
+stops with `status: "retired-route"` and redirects to the standalone `claude-code`
+terminal adapter in `references/terminal-adapters.md`). The files
 `templates/phase-implementer.md` and `templates/phase-reviewer.md` in
-`autonomous-implementation-review`. Copy them into the target project's `.claude/agents/` only
-after review, and refuse an existing file. Set distinct non-`inherit` `model`
-values and keep the parent session in Manual mode before use. Absence of Herdr
-does not select this path.
+`autonomous-implementation-review` are retired legacy templates retained for
+package compatibility: do not copy them into `.claude/agents/` or dispatch
+subagents for role execution.
 
 ### Codex
 

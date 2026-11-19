@@ -103,11 +103,16 @@ changing installation routes.
 | Cowork | Skills in its task environment | Check actual workspace access, tools, and permissions. This repository's Claude Code role protocol is not automatically a Cowork role protocol. |
 | Claude Code, including Desktop's Code tab | Coding-agent skill loading | A project checkout, Git, Node 22+ for the packaged guards, project-specific tooling, and explicit execution authority. |
 
-The orchestration path additionally requires separately reviewed project subagents
-and model/permission configuration. Follow the [Claude Code host reference](../skills/autonomous-ai-agents/autonomous-implementation-review/references/claude-code-host.md)
-and [role protocol](../skills/autonomous-ai-agents/autonomous-implementation-review/references/claude-code-roles.md).
-Installing a plugin neither creates those project files nor authorizes commits,
-checkout creation, publication, or unattended execution.
+The orchestration path uses an explicitly selected qualified terminal adapter
+(`claude-code`, `hermes`, `codex`, `grok-build`) in
+[terminal-adapters.md](../skills/autonomous-ai-agents/autonomous-implementation-review/references/terminal-adapters.md).
+The legacy `code-tab-phase-roles` subagent route documented in the
+[Claude Code host reference](../skills/autonomous-ai-agents/autonomous-implementation-review/references/claude-code-host.md)
+and [role protocol](../skills/autonomous-ai-agents/autonomous-implementation-review/references/claude-code-roles.md)
+is retired (`resolveLegacyRouteRequest` stops with `status: "retired-route"`,
+without copying `.claude/agents` templates). Installing a plugin neither
+configures an adapter nor authorizes commits, checkout creation, publication, or
+unattended execution.
 
 Anthropic documents account skills and plugins syncing into Claude Code v2.1.273+
 when signed in with the same Claude account. API-key and cloud-provider sign-ins

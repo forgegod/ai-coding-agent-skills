@@ -447,11 +447,15 @@ obsolete copies and registrations, preserve local edits/backups, and obtain
 operator approval for migration or removal. A running shared-profile skill must
 not modify or remove its own installed package.
 
-Optional orchestration still needs a supported host and separately configured
-roles/models/permissions: [Herdr](../skills/autonomous-ai-agents/autonomous-implementation-review/references/herdr.md)
-or the explicitly selected [Claude Code role protocol](../skills/autonomous-ai-agents/autonomous-implementation-review/references/claude-code-roles.md).
-Installing either upstream or companion skills does not create those roles or
-select a different orchestration host.
+Optional orchestration still needs a qualified terminal adapter and separately
+configured role/model/permission bindings:
+[terminal-adapters.md](../skills/autonomous-ai-agents/autonomous-implementation-review/references/terminal-adapters.md)
+(`hermes`, `claude-code`, `codex`, `grok-build`), with
+[Herdr](../skills/autonomous-ai-agents/autonomous-implementation-review/references/herdr.md)
+serving only as the prequalified same-session human-input fallback and the legacy
+[Claude Code role protocol](../skills/autonomous-ai-agents/autonomous-implementation-review/references/claude-code-roles.md)
+retired via `resolveLegacyRouteRequest`. Installing either upstream or companion
+skills does not configure those adapters or authorize execution.
 
 ## Keep prerequisites and instructions in the same change
 

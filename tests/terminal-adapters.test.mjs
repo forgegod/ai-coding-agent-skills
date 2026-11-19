@@ -456,6 +456,7 @@ test("preparePromptTransport uses non-argv routes for all four qualified clients
       role: "reviewer",
       session: "rev-1",
       workspace: "/synthetic/worktree",
+      profile: client === "hermes" ? "hermes-dev-review" : null,
       prompt,
       captureDir: "/tmp/transport-captures",
     });
@@ -463,6 +464,11 @@ test("preparePromptTransport uses non-argv routes for all four qualified clients
     assert.equal(t.route, expectedRoute);
     assert.equal(t.exceededSafeArgv, true);
     assert.ok(!t.argv.includes(prompt), `${client} leaked prompt into argv`);
+    if (client === "hermes") {
+      assert.equal(t.profile, "hermes-dev-review");
+      assert.equal(t.argv[0], "--profile");
+      assert.equal(t.argv[1], "hermes-dev-review");
+    }
     if (expectedRoute === "stdin") {
       assert.equal(t.promptFilePath, null);
       assert.ok(Buffer.isBuffer(t.stdinBytes) && t.stdinBytes.length === prompt.length);
@@ -470,6 +476,19 @@ test("preparePromptTransport uses non-argv routes for all four qualified clients
       assert.ok(t.argv.includes(t.promptFilePath));
     }
   }
+  assert.throws(
+    () =>
+      core.preparePromptTransport({
+        client: "hermes",
+        version: "0.23.2",
+        role: "reviewer",
+        session: "rev-1",
+        workspace: "/synthetic/worktree",
+        prompt,
+        captureDir: "/tmp/transport-captures",
+      }),
+    /verified profile/,
+  );
   assert.throws(() =>
     core.preparePromptTransport({
       client: "claude-code",

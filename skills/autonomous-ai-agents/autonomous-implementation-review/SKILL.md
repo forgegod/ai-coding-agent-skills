@@ -104,7 +104,7 @@ Reuse valid evidence; batch independent lookups.
    empty coverage limitations.
 6. Reproduce findings; send confirmed fixes to a fresh implementer role in the
    checkout with the original contract. Changed content needs renewed gates and
-   review. Limit to two fix/review cycles; a third needs operator direction.
+   review. Limit to eight fix/review cycles (two for already-frozen legacy work).
 7. Delivery owns publication/completion; commits use `git-commit-message`.
    Identity/tests grant no writes. Push/PR/merge need separate authority and
    remote-ref readback; otherwise preserve/report the candidate.

@@ -412,13 +412,16 @@ export function resolveRoleConfiguration({
 
 export function preparePromptTransport({
   client, version, role, session, workspace, prompt, captureDir,
-  preferredRoute = null, safeArgvBytes = 4096, maxPayloadBytes = 8 * 1024 * 1024,
+  profile = null, preferredRoute = null, safeArgvBytes = 4096, maxPayloadBytes = 8 * 1024 * 1024,
   failure = null, records = CANDIDATE_RECORDS,
 }) {
   const record = records?.[client];
   need(isRecordQualified(record, client), `Client ${client} is not a verified qualified adapter`);
   need(versionInRange(version, record.versionRange), `Client ${client} version ${version} is outside ${record.versionRange}`);
   need(text(session) && ["implementer", "reviewer", "approach-reviewer"].includes(role), "Invalid role or session");
+  if (client === "hermes") {
+    need(text(profile), "Hermes transport requires an explicit verified profile");
+  }
   absolute(workspace);
   absolute(captureDir);
   need(!within(workspace, captureDir) && !within(captureDir, workspace), "Transport captures must stay outside the repository");
@@ -457,7 +460,7 @@ export function preparePromptTransport({
   const readOnly = role !== "implementer";
   let argv;
   if (client === "hermes") {
-    argv = ["chat", "--query-file", route === "stdin" ? "-" : promptFilePath, "--oneshot", "--format", "stream-json", "--pass-session-id", "--in", workspace, "-t", readOnly ? "file" : "file,terminal"];
+    argv = ["--profile", profile, "chat", "--query-file", route === "stdin" ? "-" : promptFilePath, "--oneshot", "--format", "stream-json", "--pass-session-id", "--in", workspace, "-t", readOnly ? "file" : "file,terminal"];
   } else if (client === "claude-code") {
     const disallowed = readOnly
       ? "Edit,Write,Bash,Task,Agent,NotebookEdit"
@@ -477,7 +480,9 @@ export function preparePromptTransport({
   }
   return {
     action: "ready",
-    client, version, role, session, route,
+    client, version, role, session,
+    profile: client === "hermes" ? profile : null,
+    route,
     exceededSafeArgv: bytes.length > safeArgvBytes,
     promptBytes: bytes.length,
     promptSha256,
@@ -751,10 +756,14 @@ export async function executeTerminalAdapterAttempt({
   const transport = preparePromptTransport({
     client: runtime.client, version: runtime.version, role: request.identity.role,
     session: runtime.session, workspace: request.identity.workspace,
+    profile: runtime.profile ?? null,
     prompt: effectivePrompt,
     captureDir, preferredRoute: transportRoute, records,
   });
   need(transport.action === "ready", `Transport preparation failed: ${transport.reason ?? transport.status}`);
+  if (runtime.client === "hermes") {
+    need(transport.argv[0] === "--profile" && transport.argv[1] === runtime.profile, "Hermes launch must bind --profile <verified-profile> in argv");
+  }
   if (transport.promptFilePath) {
     await writeFile(transport.promptFilePath, Buffer.from(effectivePrompt, "utf8"), { mode: 0o600 });
   }

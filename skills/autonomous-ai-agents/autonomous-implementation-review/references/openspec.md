@@ -48,7 +48,8 @@ adapter. Do not infer a route from an environment marker or fall back silently.
   A changed head, changed planning content or changed gate evidence
   invalidates review. Per-group verdicts never substitute for review of the final
   delivery SHA. Correct confirmed in-scope findings in the same unit and
-  stop at two correction/review cycles before operator escalation.
+  stop at eight correction/review cycles (two only for already-frozen legacy-host
+  work) before operator escalation.
 - A pull request must not be merged, and its branch must not be deleted, until
   this independent verdict exists for that SHA and findings are dispositioned.
   The verdict is not a GitHub approval and not risk acceptance. This loop does
