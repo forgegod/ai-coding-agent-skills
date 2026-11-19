@@ -224,3 +224,82 @@ test("change naming is automatic project policy, not a second identity or instal
     assert.doesNotMatch(source, /Do not generate a ULID\.|Do not add a ULID\./, relative);
   }
 });
+
+test("operator configuration documentation covers every advertised client and exercises documented configuration examples with synthetic state", async () => {
+  const root = new URL("../", import.meta.url);
+  const { CANDIDATE_RECORDS, resolveRoleConfiguration } = await import(new URL("skills/autonomous-ai-agents/autonomous-implementation-review/scripts/terminal-adapters.mjs", root));
+  const adaptersDoc = await readFile(new URL("skills/autonomous-ai-agents/autonomous-implementation-review/references/terminal-adapters.md", root), "utf8");
+  const readmeSource = await readFile(new URL("README.md", root), "utf8");
+
+  for (const [client, record] of Object.entries(CANDIDATE_RECORDS)) {
+    assert.ok(adaptersDoc.includes(`\`${client}\``), `terminal-adapters.md must list candidate ${client}`);
+    assert.ok(readmeSource.includes(`\`${client}\``), `README.md must list candidate ${client}`);
+    if (record.supported) {
+      assert.ok(adaptersDoc.includes(`\`${record.versionRange}\``), `terminal-adapters.md must document versionRange for ${client}`);
+      assert.ok(readmeSource.includes(record.versionRange), `README.md must document versionRange for ${client}`);
+    } else {
+      assert.match(adaptersDoc, new RegExp(`\\\`${client}\\\`\\s*\\|\\s*\\\`unsupported\\\`\\s*\\(\\\`supported: false\\\`\\)`));
+    }
+  }
+
+  for (const requiredPattern of [
+    /--profile <verified-profile>/,
+    /model\.default/,
+    /model\.provider/,
+    /display\.busy_input_mode = queue/,
+    /autonomous_ai_agents\.implementer/,
+    /autonomous_ai_agents\.reviewer/,
+    /--permission-mode/,
+    /codex exec -/,
+    /--prompt-file/,
+    /per-run-override/,
+    /project-default/,
+    /client-default/,
+    /Changing or removing an operator selection/i,
+    /native-cli/,
+    /herdr-fallback/,
+    /request\.json/,
+    /report\.md/,
+    /result\.json/,
+    /lifecycle\.jsonl/,
+    /predecessorAttemptId/,
+    /retired-route/,
+  ]) {
+    assert.match(adaptersDoc, requiredPattern);
+  }
+
+  const jsonBlocks = [...adaptersDoc.matchAll(/```json\n([\s\S]*?)\n```/g)].map((m) => JSON.parse(m[1]));
+  assert.equal(jsonBlocks.length, 3, "expect three executable role configuration examples in terminal-adapters.md");
+  const byExample = Object.fromEntries(jsonBlocks.map((b) => [b.example, b]));
+  for (const name of ["one-client-same-model", "one-client-different-model", "mixed-client"]) {
+    assert.ok(byExample[name], `missing example ${name}`);
+    const resolved = resolveRoleConfiguration(byExample[name]);
+    assert.equal(resolved.action, "bound", name);
+    assert.equal(resolved.role, byExample[name].role, name);
+    assert.equal(resolved.client, byExample[name].effectiveReadback.client, name);
+    assert.equal(resolved.model, byExample[name].effectiveReadback.model, name);
+    assert.equal(resolved.session, byExample[name].effectiveReadback.session, name);
+    assert.equal(resolved.configurationScope, "launch-scoped", name);
+    assert.equal(resolved.fallbackUsed, false, name);
+  }
+
+  // Verify changing and removing an operator selection without mutating global defaults
+  const baseExample = byExample["one-client-same-model"];
+  const overridden = resolveRoleConfiguration({
+    ...baseExample,
+    perRunOverride: { client: "claude-code", provider: "anthropic", model: "claude-opus-4-6" },
+    restrictions: { ...baseExample.restrictions, allowedModels: ["claude-sonnet-4-6", "claude-opus-4-6"] },
+    effectiveReadback: { ...baseExample.effectiveReadback, model: "claude-opus-4-6" },
+  });
+  assert.equal(overridden.action, "bound");
+  assert.equal(overridden.configurationSource, "per-run-override");
+  assert.equal(overridden.model, "claude-opus-4-6");
+
+  const removedOverride = resolveRoleConfiguration({
+    ...baseExample,
+    perRunOverride: null,
+  });
+  assert.equal(removedOverride.action, "bound");
+  assert.equal(removedOverride.configurationSource, "project-default");
+  assert.equal(removedOverride.model, "claude-sonnet-4-6");
+});

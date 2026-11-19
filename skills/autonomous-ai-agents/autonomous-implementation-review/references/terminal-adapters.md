@@ -59,20 +59,151 @@ Project restrictions and operator limits (`allowedClients`, `allowedModels`,
 contradictory, or unavailable bindings stop without host, client, profile,
 model, or permission fallback.
 
+### Supported client keys, flags, presets, and profile paths
+
+| Advertised client | Supported versions (probed) | Role / client / provider / model selectors & profile paths |
+| --- | --- | --- |
+| `hermes` | `>=0.23.0 <1.0.0` (`0.23.2`) | Launch flag `--profile <verified-profile>` (`<hermes-home>/profiles/<verified-profile>/` or isolated scratch `--hermes-home`); profile keys `model.default`, `model.provider`, `display.busy_input_mode = queue`; declarative skill frontmatter keys `autonomous_ai_agents.implementer` and `autonomous_ai_agents.reviewer`. |
+| `claude-code` | `>=2.1.273 <3.0.0` (`2.1.327`) | Launch flags `--model <model>`, `--session-id <uuid>`, `--permission-mode <acceptEdits\|plan>`, `--tools` / `--disallowed-tools`, `--setting-sources user,project,local`, or isolated `CLAUDE_CONFIG_DIR`. |
+| `codex` | `>=0.167.0 <1.0.0` (`0.169.0`) | Launch flags `codex exec -`, `-m <model>`, `-C <workspace>`, `-s <workspace-write\|read-only>`, `-c model_provider=<provider>`, `codex resume <session-id>`, or isolated `CODEX_HOME`. |
+| `grok-build` | `>=1.0.89 <2.0.0` (`1.0.89`) | Launch flags `-m <model>`, `--cwd <workspace>`, `-s <session-id>`, `--permission-mode <default\|plan>`, `--no-subagents`, `--no-leader`, `--disallowed-tools`, `--prompt-file <path>`, or isolated `GROK_BUILD_HOME`. |
+
+- **Scope, effective verification, and model availability:** Configuration is
+  launch-scoped or isolated to a named Hermes role profile / scratch config
+  root. `resolveRoleConfiguration` requires positive `effectiveReadback` of
+  `client`, `version`, `provider`, `model`, and `session` without reading secret
+  credentials (`credentialsRead: false`) or modifying live global defaults
+  (`globalDefaultsModified: false`). When `availableModels` or `aliasMap` is
+  supplied, model availability and alias resolution are verified against the
+  resolved model ID; a requested alias or account entitlement alone never counts
+  as effective-model proof.
+- **Changing or removing an operator selection:** To change a role selection for
+  a run, supply a new `perRunOverride` (`client`, `provider`, `model`, or
+  `profile` for Hermes). To remove a selection, omit or clear `perRunOverride`
+  (reverting to `projectDefault` or `clientDefault`) or retire the disposable
+  role profile/scratch config directory—never by silently mutating persistent
+  global user settings.
 - **One-client sequential or mixed-client execution:** One qualified client may
   serve `orchestrator`, `implementer`, and `reviewer` sequentially in distinct
   fresh sessions (`implementerSession !== orchestratorSession`,
   `reviewerSession !== implementerSession`). Different models are optional
   unless project policy sets `requireDistinctModels: true`.
-- **Effective identity verification:** Requires positive readback of effective
-  `client`, `version`, `provider`, `model`, and `session` without reading secret
-  credentials (`credentialsRead: false`), modifying live global defaults
-  (`globalDefaultsModified: false`), or treating an unverified alias or account
-  entitlement as model proof.
 - **Hermes vs. external CLIs:** Hermes skill frontmatter is declarative input
   only; concrete `--profile` and CLI mode are bound at launch. External CLIs
   (`claude-code`, `codex`, `grok-build`) bind via their own flags and isolated
   config/state paths and never claim or inherit a Hermes profile.
+
+### Qualified role configuration examples
+
+One-client same-model sequential configuration (`requireDistinctModels: false`):
+
+```json
+{
+  "example": "one-client-same-model",
+  "role": "reviewer",
+  "orchestratorSession": "claude-orch-1",
+  "implementerSession": "claude-impl-1",
+  "session": "claude-rev-1",
+  "projectDefault": {
+    "client": "claude-code",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-6"
+  },
+  "restrictions": {
+    "allowedClients": ["claude-code"],
+    "allowedProviders": ["anthropic"],
+    "allowedModels": ["claude-sonnet-4-6"],
+    "requireDistinctModels": false,
+    "implementerModel": "claude-sonnet-4-6"
+  },
+  "effectiveReadback": {
+    "verified": true,
+    "client": "claude-code",
+    "version": "2.1.327",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-6",
+    "session": "claude-rev-1",
+    "credentialsRead": false,
+    "aliasOnly": false,
+    "entitlementOnly": false,
+    "globalDefaultsModified": false
+  }
+}
+```
+
+One-client different-model sequential configuration (`requireDistinctModels: true`):
+
+```json
+{
+  "example": "one-client-different-model",
+  "role": "reviewer",
+  "orchestratorSession": "hermes-orch-1",
+  "implementerSession": "hermes-impl-1",
+  "session": "hermes-rev-1",
+  "perRunOverride": {
+    "client": "hermes",
+    "provider": "xai",
+    "model": "grok-4.7",
+    "profile": "hermes-dev-review",
+    "cliMode": "chat --cli"
+  },
+  "restrictions": {
+    "allowedClients": ["hermes"],
+    "allowedProviders": ["xai", "google"],
+    "allowedModels": ["gemini-4-argon", "grok-4.7"],
+    "requireDistinctModels": true,
+    "implementerModel": "gemini-4-argon"
+  },
+  "effectiveReadback": {
+    "verified": true,
+    "client": "hermes",
+    "version": "0.23.2",
+    "provider": "xai",
+    "model": "grok-4.7",
+    "session": "hermes-rev-1",
+    "credentialsRead": false,
+    "aliasOnly": false,
+    "entitlementOnly": false,
+    "globalDefaultsModified": false
+  }
+}
+```
+
+Mixed-client configuration (`codex` implementer + `grok-build` fresh read-only reviewer):
+
+```json
+{
+  "example": "mixed-client",
+  "role": "reviewer",
+  "orchestratorSession": "orch-1",
+  "implementerSession": "codex-impl-1",
+  "session": "grok-rev-1",
+  "perRunOverride": {
+    "client": "grok-build",
+    "provider": "xai",
+    "model": "grok-code-fast-1"
+  },
+  "restrictions": {
+    "allowedClients": ["codex", "grok-build"],
+    "allowedProviders": ["openai", "xai"],
+    "allowedModels": ["gpt-5.4", "grok-code-fast-1"],
+    "requireDistinctModels": true,
+    "implementerModel": "gpt-5.4"
+  },
+  "effectiveReadback": {
+    "verified": true,
+    "client": "grok-build",
+    "version": "1.0.89",
+    "provider": "xai",
+    "model": "grok-code-fast-1",
+    "session": "grok-rev-1",
+    "credentialsRead": false,
+    "aliasOnly": false,
+    "entitlementOnly": false,
+    "globalDefaultsModified": false
+  }
+}
+```
 
 ## Non-argv payload transport and supervision
 
@@ -115,6 +246,35 @@ input (`approval`, `credentials`, `clarify`, `input`):
 - `cleanupInteractionView` removes an unused adapter-created view only after
   immediate positive verification of adapter ownership, non-orchestrator
   identity, no active worker, and no operator input; otherwise it preserves the view.
+
+## Artifact-first assignments, publication, and recovery
+
+`executeTerminalAdapterAttempt` integrates with `scripts/worker-handoff.mjs`
+([worker-handoff.md](worker-handoff.md)):
+
+- **Locations and bindings:** Each attempt writes outside the repository
+  checkout under `<artifactRoot>/attempts/<attemptId>/`: immutable
+  `request.json` (`0444`), complete `report.md`, `output.raw`,
+  `lifecycle.jsonl`, and atomic `result.json` (plus `<scratchRoot>/transport-<attemptId>/`
+  for `stdout.log`, `stderr.log`, and `exit.json`). `result.json` binds
+  `requestSha256`, `attemptId`, `role`, `group`, `task`, `action`, `workspace`,
+  `runtime` (`client`, `model`, `session`), `reportSha256`, and `evidence`
+  hashes within declared `evidenceRoots`.
+- **Adapter-only publication vs. delivery acceptance:** The adapter—never the
+  read-only reviewer—publishes `report.md` and `result.json` atomically and
+  seals files `0444` and the attempt directory `0555` without writable staging
+  aliases. Process exit `0` or `status: "completed"` is lifecycle observation
+  only, never delivery acceptance, plan approval, or `tasks.md` progress. A
+  completed review with findings triggers the orchestrator-owned correction
+  loop; literal `Verdict: No findings` with empty findings and empty coverage
+  limitations is required for candidate review acceptance.
+- **Evidence retention and safe recovery:** Handoff artifacts under
+  `<artifactRoot>` survive `scratchRoot` cleanup. Missing, partial, truncated,
+  writable, symlinked, or hash-mismatched artifacts fail closed in `readHandoff`
+  (`status: "incomplete"`), preserving the attempt directory as evidence.
+  Recovery never overwrites an existing attempt or assumes cross-client CLI flag
+  or session equivalence: the orchestrator dispatches a new `<attemptId>` linked
+  via `predecessorAttemptId` within the existing continuation and correction budgets.
 
 ## Legacy route retirement
 

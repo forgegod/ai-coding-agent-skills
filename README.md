@@ -400,6 +400,15 @@ native human-input wait on the same session (`exposeOperatorInteraction`,
 native CLI or fresh Herdr fallback pane). It never resets or runs a worker in
 the orchestrator session. A displayed goal grants no execution authority.
 
+#### Configure and verify qualified terminal adapters
+
+See [`references/terminal-adapters.md`](skills/autonomous-ai-agents/autonomous-implementation-review/references/terminal-adapters.md)
+for the complete adapter inventory and executable JSON examples:
+
+- **Supported clients and selectors:** `hermes` (`>=0.23.0 <1.0.0`, `--profile <verified-profile>`, profile keys `model.default`, `model.provider`, `display.busy_input_mode = queue`, declarative frontmatter `autonomous_ai_agents.implementer` / `autonomous_ai_agents.reviewer`), `claude-code` (`>=2.1.273 <3.0.0`, `--print` with `stdin`, `--model`, `--session-id`, `--permission-mode`, `--tools` / `--disallowed-tools`), `codex` (`>=0.167.0 <1.0.0`, `codex exec -` with `stdin`, `-m`, `-C`, `-s`, `-c model_provider=<provider>`), and `grok-build` (`>=1.0.89 <2.0.0`, `--prompt-file`, `-m`, `--cwd`, `-s`, `--permission-mode`, `--no-subagents`, `--no-leader`, `--disallowed-tools`). `opencode`, `kilo-modern`, `kilo-legacy`, `pi`, and chat-only `grok-bot` remain explicit unsupported candidates.
+- **Precedence, effective verification, and changing/removing selections:** `resolveRoleConfiguration` applies `per-run-override` > `project-default` > `client-default` within project policy (`allowedClients`, `allowedProviders`, `allowedModels`, `requireDistinctModels`), checks `availableModels`/alias resolution and positive `effectiveReadback` (`credentialsRead: false`, `globalDefaultsModified: false`), and supports one-client sequential (same or different model) or mixed-client execution in distinct fresh sessions. Change a selection with a new `perRunOverride`; remove it by clearing `perRunOverride` or retiring the disposable role profile/scratch config root without modifying persistent global settings.
+- **Native CLI default, interaction exposure, and artifact handoffs:** Native CLI execution is default (`native-cli` qualification requires no Herdr); Herdr is mandatory only as the bound `herdr-fallback` when unavoidable operator input cannot use native exposure (orchestrator-created fresh pane without per-pane approval or setup, verified prior-process termination before resume, and state preservation on unavailable routes). Adapters write immutable `<artifactRoot>/attempts/<attemptId>/request.json`, `report.md`, `output.raw`, `lifecycle.jsonl`, and atomic `result.json` (`0444`/`0555`) outside the checkout; lifecycle completion never implies delivery acceptance, and invalid or incomplete artifacts fail closed in `readHandoff` and recover only via a new `predecessorAttemptId`-linked attempt directory.
+
 Publication, a pull request, and merge need separate authorization. The
 [SDLC](docs/openspec-workflow.md) owns that boundary. A pull request documents
 review of the frozen candidate. It is not the task list.

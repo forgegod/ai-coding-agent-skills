@@ -123,7 +123,7 @@ itself fail qualification or terminate the outcome; its result follows the contr
 
 ## 4. Document, package, and verify the candidate
 
-- [ ] 4.1 Verify cross-outcome documentation/routing/test consistency, synchronize final versions and package inventories, run the required gates, and obtain independent review of the exact frozen local candidate.
+- [x] 4.1 Verify cross-outcome documentation/routing/test consistency, synchronize final versions and package inventories, run the required gates, and obtain independent review of the exact frozen local candidate.
 
 Acceptance: *Operator configuration documentation* covers every advertised client
 and all affected guidance is current; contract edits are independently confirmed to
