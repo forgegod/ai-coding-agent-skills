@@ -63,20 +63,21 @@ model, or permission fallback.
 
 | Advertised client | Supported versions (probed) | Role / client / provider / model selectors & profile paths |
 | --- | --- | --- |
-| `hermes` | `>=0.23.0 <1.0.0` (`0.23.2`) | Launch flag `--profile <verified-profile>` (`<hermes-home>/profiles/<verified-profile>/` or isolated scratch `--hermes-home`); profile keys `model.default`, `model.provider`, `display.busy_input_mode = queue`; declarative skill frontmatter keys `autonomous_ai_agents.implementer` and `autonomous_ai_agents.reviewer`. |
-| `claude-code` | `>=2.1.273 <3.0.0` (`2.1.327`) | Launch flags `--model <model>`, `--session-id <uuid>`, `--permission-mode <acceptEdits\|plan>`, `--tools` / `--disallowed-tools`, `--setting-sources user,project,local`, or isolated `CLAUDE_CONFIG_DIR`. |
-| `codex` | `>=0.167.0 <1.0.0` (`0.169.0`) | Launch flags `codex exec -`, `-m <model>`, `-C <workspace>`, `-s <workspace-write\|read-only>`, `-c model_provider=<provider>`, `codex resume <session-id>`, or isolated `CODEX_HOME`. |
-| `grok-build` | `>=1.0.89 <2.0.0` (`1.0.89`) | Launch flags `-m <model>`, `--cwd <workspace>`, `-s <session-id>`, `--permission-mode <default\|plan>`, `--no-subagents`, `--no-leader`, `--disallowed-tools`, `--prompt-file <path>`, or isolated `GROK_BUILD_HOME`. |
+| `hermes` | `>=0.23.0 <1.0.0` (`0.23.2`) | Launch argv `--profile <verified-profile> chat --query-file <-\|prompt.md> --oneshot --format stream-json --pass-session-id --in <workspace> -t <file\|file,terminal>` (`cliMode: "chat --oneshot"`); profile keys `model.default`, `model.provider`, `display.busy_input_mode = queue` in `<hermes-home>/profiles/<verified-profile>/` ([profile-preparation.md](profile-preparation.md)); declarative skill frontmatter keys `autonomous_ai_agents.implementer` and `autonomous_ai_agents.reviewer`; scratch isolation via `HOME=<scratchRoot>` and `TMPDIR=<scratchRoot>`. |
+| `claude-code` | `>=2.1.273 <3.0.0` (`2.1.327`) | Launch argv `--print --output-format json --session-id <session> --permission-mode <plan\|manual> --tools <Read,Glob,Grep\|Read,Edit,Write,Glob,Grep,Bash> --disallowed-tools <...>` with `stdin` (`plan` for read-only reviewers, `manual` for implementers); scratch isolation via `HOME=<scratchRoot>` and `TMPDIR=<scratchRoot>`; model/provider selection is verified via caller-supplied `effectiveReadback` in `resolveRoleConfiguration` rather than injected into `preparePromptTransport` argv. |
+| `codex` | `>=0.167.0 <1.0.0` (`0.169.0`) | Launch argv `exec - -C <workspace> -s <read-only\|workspace-write> --json -o <captureDir>/last-message.txt` with `stdin` (and `codex resume <session-id>` for `herdr-fallback`); scratch isolation via `HOME=<scratchRoot>` and `TMPDIR=<scratchRoot>`; model/provider selection is verified via caller-supplied `effectiveReadback` in `resolveRoleConfiguration` rather than injected into `preparePromptTransport` argv. |
+| `grok-build` | `>=1.0.89 <2.0.0` (`1.0.89`) | Launch argv `--prompt-file <captureDir>/prompt.md --cwd <workspace> -s <session> --no-subagents --no-leader --output-format json --permission-mode <plan\|default> --disallowed-tools <...>` (`plan` for read-only reviewers, `default` for implementers); scratch isolation via `HOME=<scratchRoot>` and `TMPDIR=<scratchRoot>`; model/provider selection is verified via caller-supplied `effectiveReadback` in `resolveRoleConfiguration` rather than injected into `preparePromptTransport` argv. |
 
 - **Scope, effective verification, and model availability:** Configuration is
-  launch-scoped or isolated to a named Hermes role profile / scratch config
-  root. `resolveRoleConfiguration` requires positive `effectiveReadback` of
-  `client`, `version`, `provider`, `model`, and `session` without reading secret
-  credentials (`credentialsRead: false`) or modifying live global defaults
-  (`globalDefaultsModified: false`). When `availableModels` or `aliasMap` is
-  supplied, model availability and alias resolution are verified against the
-  resolved model ID; a requested alias or account entitlement alone never counts
-  as effective-model proof.
+  launch-scoped or isolated to a named Hermes role profile / scratch
+  `HOME`/`TMPDIR` root. `resolveRoleConfiguration` requires positive
+  `effectiveReadback` of `client`, `version`, `provider`, `model`, and `session`
+  without reading secret credentials (`credentialsRead: false`), modifying live
+  global defaults (`globalDefaultsModified: false`), or accepting an unverified
+  alias or account entitlement (`aliasOnly: false`, `entitlementOnly: false`) as
+  effective-model proof. External-client model/provider selection is verified
+  through caller-supplied `effectiveReadback` rather than injected into
+  `preparePromptTransport` argv.
 - **Changing or removing an operator selection:** To change a role selection for
   a run, supply a new `perRunOverride` (`client`, `provider`, `model`, or
   `profile` for Hermes). To remove a selection, omit or clear `perRunOverride`
@@ -145,7 +146,7 @@ One-client different-model sequential configuration (`requireDistinctModels: tru
     "provider": "xai",
     "model": "grok-4.7",
     "profile": "hermes-dev-review",
-    "cliMode": "chat --cli"
+    "cliMode": "chat --oneshot"
   },
   "restrictions": {
     "allowedClients": ["hermes"],
@@ -253,28 +254,33 @@ input (`approval`, `credentials`, `clarify`, `input`):
 ([worker-handoff.md](worker-handoff.md)):
 
 - **Locations and bindings:** Each attempt writes outside the repository
-  checkout under `<artifactRoot>/attempts/<attemptId>/`: immutable
-  `request.json` (`0444`), complete `report.md`, `output.raw`,
-  `lifecycle.jsonl`, and atomic `result.json` (plus `<scratchRoot>/transport-<attemptId>/`
-  for `stdout.log`, `stderr.log`, and `exit.json`). `result.json` binds
-  `requestSha256`, `attemptId`, `role`, `group`, `task`, `action`, `workspace`,
-  `runtime` (`client`, `model`, `session`), `reportSha256`, and `evidence`
-  hashes within declared `evidenceRoots`.
+  checkout in a unique attempt directory (`0700`): `createAttempt` writes
+  sealed `request.md` (`0400`), and `executeTerminalAdapterAttempt` publishes
+  `report.md`, `native.txt`, `stderr.log`, `exit.txt`, `lifecycle.jsonl` (plus
+  `turn.json` for `completionKind === "turn-end"`), and atomic `result.json`
+  (each sealed `0400`), with transport scratch `stdout.log`, `stderr.log`, and
+  `exit.txt` under `<scratchRoot>/transport/` (`0600`). `result.json` binds
+  `requestSha256`, `identity` (`attempt`, `predecessor`, `role`, `group`,
+  `task`, `action`, `workspace`), `runtime` (`client`, `version`, `provider`,
+  `model`, `session`), `report`, `nativeReport`, and `evidence` descriptors
+  within declared `evidenceRoots`.
 - **Adapter-only publication vs. delivery acceptance:** The adapter—never the
   read-only reviewer—publishes `report.md` and `result.json` atomically and
-  seals files `0444` and the attempt directory `0555` without writable staging
-  aliases. Process exit `0` or `status: "completed"` is lifecycle observation
-  only, never delivery acceptance, plan approval, or `tasks.md` progress. A
-  completed review with findings triggers the orchestrator-owned correction
-  loop; literal `Verdict: No findings` with empty findings and empty coverage
-  limitations is required for candidate review acceptance.
-- **Evidence retention and safe recovery:** Handoff artifacts under
-  `<artifactRoot>` survive `scratchRoot` cleanup. Missing, partial, truncated,
+  seals every artifact `0400` inside the `0700` attempt directory without
+  writable staging aliases. Process exit `0` or `status: "completed"` is
+  lifecycle observation only, never delivery acceptance, plan approval, or
+  `tasks.md` progress. A completed review with findings triggers the
+  orchestrator-owned correction loop; literal `Verdict: No findings` with empty
+  findings and empty coverage limitations is required for candidate review
+  acceptance.
+- **Evidence retention and safe recovery:** Handoff artifacts under the attempt
+  directory survive `scratchRoot` cleanup. Missing, partial, truncated,
   writable, symlinked, or hash-mismatched artifacts fail closed in `readHandoff`
-  (`status: "incomplete"`), preserving the attempt directory as evidence.
+  (`status: "incomplete"`), preserving the sealed attempt directory as evidence.
   Recovery never overwrites an existing attempt or assumes cross-client CLI flag
-  or session equivalence: the orchestrator dispatches a new `<attemptId>` linked
-  via `predecessorAttemptId` within the existing continuation and correction budgets.
+  or session equivalence: the orchestrator dispatches a new attempt directory
+  linked via `predecessor` (`predecessorAttemptId`) within the existing
+  continuation and correction budgets.
 
 ## Legacy route retirement
 

@@ -244,28 +244,57 @@ test("operator configuration documentation covers every advertised client and ex
 
   for (const requiredPattern of [
     /--profile <verified-profile>/,
+    /chat --oneshot/,
     /model\.default/,
     /model\.provider/,
     /display\.busy_input_mode = queue/,
     /autonomous_ai_agents\.implementer/,
     /autonomous_ai_agents\.reviewer/,
-    /--permission-mode/,
-    /codex exec -/,
-    /--prompt-file/,
+    /--permission-mode <plan\\\|manual>/,
+    /exec - -C <workspace>/,
+    /--prompt-file <captureDir>\/prompt\.md/,
+    /HOME=<scratchRoot>/,
+    /TMPDIR=<scratchRoot>/,
     /per-run-override/,
     /project-default/,
     /client-default/,
     /Changing or removing an operator selection/i,
     /native-cli/,
     /herdr-fallback/,
-    /request\.json/,
+    /request\.md/,
+    /0400/,
+    /0700/,
     /report\.md/,
+    /native\.txt/,
+    /stderr\.log/,
+    /exit\.txt/,
+    /<scratchRoot>\/transport\//,
     /result\.json/,
     /lifecycle\.jsonl/,
-    /predecessorAttemptId/,
+    /predecessor/,
     /retired-route/,
   ]) {
     assert.match(adaptersDoc, requiredPattern);
+  }
+  const readmeAdaptersSection = readmeSource.split("#### Configure and verify qualified terminal adapters\n")[1]?.split("\n#### ")[0] ?? "";
+  assert.ok(readmeAdaptersSection.length > 0, "README must contain Configure and verify qualified terminal adapters section");
+  for (const forbiddenPattern of [
+    /request\.json/,
+    /output\.raw/,
+    /exit\.json/,
+    /transport-<attemptId>/,
+    /0444/,
+    /0555/,
+    /acceptEdits/,
+    /--setting-sources/,
+    /--hermes-home/,
+    /CLAUDE_CONFIG_DIR/,
+    /CODEX_HOME/,
+    /GROK_BUILD_HOME/,
+    /chat --cli/,
+  ]) {
+    assert.doesNotMatch(adaptersDoc, forbiddenPattern);
+    assert.doesNotMatch(readmeAdaptersSection, forbiddenPattern);
   }
 
   const jsonBlocks = [...adaptersDoc.matchAll(/```json\n([\s\S]*?)\n```/g)].map((m) => JSON.parse(m[1]));
