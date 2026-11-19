@@ -85,7 +85,7 @@ another operator-disposition boundary.
 
 ## 3. Deliver qualified terminal workers
 
-- [ ] 3.1 Qualify every candidate in the design, implement only supported adapters, and test role/model configuration, worker supervision, prompt transport, automatic same-session interaction, and legacy-route migration against the orchestration spec.
+- [x] 3.1 Qualify every candidate in the design, implement only supported adapters, and test role/model configuration, worker supervision, prompt transport, automatic same-session interaction, and legacy-route migration against the orchestration spec.
 
 Precondition: current successor acceptances for 1.1 and 2.1 are verified; do not
 skip inherited-core verification/rework because an older plan marked it complete.
