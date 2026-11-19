@@ -291,6 +291,7 @@ test("operator configuration documentation covers every advertised client and ex
   }
   const readmeAdaptersSection = readmeSource.split("#### Configure and verify qualified terminal adapters\n")[1]?.split("\n#### ")[0] ?? "";
   assert.ok(readmeAdaptersSection.length > 0, "README must contain Configure and verify qualified terminal adapters section");
+  assert.match(readmeAdaptersSection, /throw in `readHandoff` \(not admitted; preserving the `0700` attempt directory and any sealed `0400` files inside it as evidence\)/);
   for (const forbiddenPattern of [
     /request\.json/,
     /output\.raw/,
