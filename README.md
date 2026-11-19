@@ -433,10 +433,11 @@ active work.
 
 Stopping is an explicit operator decision. The operator sends `/goal pause` in
 the orchestrator session; the orchestrator does not dispatch another packet.
-After the executor settles, the orchestrator prompts it with `/stop` to stop Hermes background processes and
-then verifies the pane state. `/stop` is not an immediate foreground-turn
-interrupt; with `/busy queue` it is queued until the current role turn finishes.
-Do not use `ctrl+c` as an undocumented substitute.
+To stop a running terminal worker, the adapter terminates the exact owned
+process tree only after immediate identity readback (`handleWorkerStopOrViolation`),
+never by injecting `/stop` into an executor pane or scraping live pane state.
+In an interactive Hermes session, `/stop` is not an immediate foreground-turn
+interrupt. Do not use `ctrl+c` as an undocumented substitute.
 
 Do not use `/loop` for implementation and review: it replays a fixed prompt on
 a cadence and lacks `/goal`'s outcome, verification, constraint, boundary, and
