@@ -51,7 +51,7 @@ test("current installation guidance matches package versions and preserves hando
       new RegExp(`\x60openspec-development\x60(?: plugin)?\\s+${escaped(plugin("openspec-development"))}\\b`),
       new RegExp(`\x60autonomous-orchestration\x60(?: plugin)?(?: is)?\\s+${escaped(plugin("autonomous-orchestration"))}\\b`),
     ]) assert.match(source, pattern, relative);
-    for (const file of ["references/worker-handoff.md", "scripts/worker-handoff.mjs"]) assert.ok(source.includes(file), `${relative} omits ${file}`);
+    for (const file of ["references/worker-handoff.md", "scripts/worker-handoff.mjs", "references/terminal-adapters.md", "scripts/terminal-adapters.mjs", "references/profile-preparation.md"]) assert.ok(source.includes(file), `${relative} omits ${file}`);
   }
 });
 

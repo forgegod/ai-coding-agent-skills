@@ -166,11 +166,13 @@ The source catalog's `openspec-development` 1.2.1 includes `openspec-delivery`
 copies and skill/plugin ZIP exports: this separate local representation support
 preserves captured bytes/hashes and checks claim support, not gate execution,
 reviewer authentication, approval or publication authority. The optional
-`autonomous-orchestration` is 1.6.1 (core skill 0.16.1) and `openspec-next` is 0.3.0. These
+`autonomous-orchestration` is 1.7.0 (core skill 0.17.0) and `openspec-next` is 0.3.0. These
 source versions do not assert that the public marketplace/downloads are updated.
 Preserve delivery's policy/task-authoring references and `delivery-policy.mjs`,
 and orchestration's `references/portable-core.md`, `scripts/orchestration-core.mjs`,
-`references/worker-handoff.md` and `scripts/worker-handoff.mjs`, in full copies and
+`references/worker-handoff.md`, `scripts/worker-handoff.mjs`,
+`references/terminal-adapters.md`, `scripts/terminal-adapters.mjs` and
+`references/profile-preparation.md`, in full copies and
 generated skill/plugin packages. The handoff pair is required portable support,
 not disposable worker scratch or evidence of adapter qualification.
 The [policy protocol](../skills/software-development/openspec-delivery/references/delivery-policy.md)

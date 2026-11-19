@@ -33,14 +33,15 @@ in complete companion copies and ZIPs. This is local lossless representation and
 claim-support checking, not a Git helper, gate runner, reviewer authenticator or
 approval/publication authority. It adds no upstream workflow, runtime dependency
 or installation route. `openspec-next` is 0.3.0 and the separate optional
-`autonomous-orchestration` plugin is 1.6.1 (core skill 0.16.1). Installation, account sync and
+`autonomous-orchestration` plugin is 1.7.0 (core skill 0.17.0). Installation, account sync and
 host execution verification remain separate; package byte checks establish none
 of native client discovery, Desktop acceptance or scanner approval.
 
 Keep delivery's `references/delivery-policy.md`, `references/task-authoring.md`
 and `scripts/delivery-policy.mjs`, plus orchestration's `references/portable-core.md`
-and `scripts/orchestration-core.mjs`, plus its required `references/worker-handoff.md`
-and `scripts/worker-handoff.mjs`, in complete copies and generated skill/plugin
+and `scripts/orchestration-core.mjs`, plus its required `references/worker-handoff.md`,
+`scripts/worker-handoff.mjs`, `references/terminal-adapters.md`,
+`scripts/terminal-adapters.mjs` and `references/profile-preparation.md`, in complete copies and generated skill/plugin
 packages. Handoff support is not disposable worker scratch. Follow the
 [policy protocol](../skills/software-development/openspec-delivery/references/delivery-policy.md)
 for integrated-parent selection and contract-alignment/readiness checks. Single-group is the

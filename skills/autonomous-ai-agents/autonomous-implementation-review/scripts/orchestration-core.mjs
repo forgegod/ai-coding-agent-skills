@@ -2,6 +2,24 @@
 // No client launch, process control, Git or task-progress writes.
 // Inputs are retained observations, not authenticated grants or a distributed lock.
 export { createAttempt, publishResult, readHandoff } from "./worker-handoff.mjs";
+export {
+  CANDIDATE_RECORDS,
+  DESIGN_CANDIDATES,
+  HERMES_PROFILE_PREPARATION_KEYS,
+  bootstrapSupervisorDecision,
+  cleanupInteractionView,
+  executeTerminalAdapterAttempt,
+  exposeOperatorInteraction,
+  handleWorkerStopOrViolation,
+  preparePromptTransport,
+  qualifyCandidateAdapter,
+  replacementReadiness,
+  resolveLegacyRouteRequest,
+  resolveRoleConfiguration,
+  superviseWorkerLaunch,
+  verifyHermesProfilePreparation,
+  versionInRange,
+} from "./terminal-adapters.mjs";
 const requireThat = (condition, message) => { if (!condition) throw new Error(message); };
 const text = (value) => typeof value === "string" && value.trim().length > 0;
 const list = (value) => Array.isArray(value) && value.length > 0 && value.every(text);

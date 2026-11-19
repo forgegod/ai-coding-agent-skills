@@ -1,0 +1,212 @@
+{
+  "schema_version": 1,
+  "kind": "group-3-candidate-qualification-record",
+  "change": "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99",
+  "task": "3.1",
+  "external_capture": {
+    "root": "/home/raphael/verification-records/ai-coding-agent-skills/task31-qualification-20261119T165000Z",
+    "manifest": "qualification-manifest.json",
+    "manifest_sha256": "62c09733f74a1d0a47660a64b2fcfcd9765cf5e644f5fd42e931f2cd321b2d6e",
+    "sha256sums": "SHA256SUMS",
+    "sha256sums_sha256": "0cf10b2cca356992ad3d7f3c777a697a70f4b3314c89b2d69ad8048b5353d547",
+    "retained_predecessor_captures": [
+      "/home/raphael/verification-records/ai-coding-agent-skills/task31-qualification-20261119T164500Z",
+      "/home/raphael/verification-records/ai-coding-agent-skills/task31-qualification-20261119T164800Z"
+    ],
+    "preserved_historical_codex_records": [
+      "/home/raphael/verification-records/ai-coding-agent-skills/q-3c39d0ccc1aa",
+      "/home/raphael/verification-records/ai-coding-agent-skills/q-d8112470aee2"
+    ]
+  },
+  "replacement_readiness": {
+    "ready": true,
+    "qualified_adapters": [
+      "hermes",
+      "claude-code",
+      "codex",
+      "grok-build"
+    ],
+    "unsupported_candidates": [
+      "opencode",
+      "kilo-modern",
+      "kilo-legacy",
+      "pi",
+      "grok-bot"
+    ],
+    "retire_legacy_routes": true,
+    "ship_hermes_profile_preparation": true,
+    "bootstrap_exception_expired": true
+  },
+  "candidates": {
+    "hermes": {
+      "client": "hermes",
+      "variant": "default",
+      "status": "qualified",
+      "supported": true,
+      "observed_version": "0.23.2",
+      "version_range": ">=0.23.0 <1.0.0",
+      "roles": ["implementer", "reviewer", "approach-reviewer"],
+      "non_argv_transport": ["query-file", "stdin"],
+      "isolated_scratch_root_verified": true,
+      "credentials_metadata_only": true,
+      "profile_preparation_supported": true,
+      "interaction_routes": ["native-cli", "herdr-fallback"],
+      "controls": {
+        "prohibit_multiplexers": true,
+        "prohibit_implementer_subagents": true,
+        "prohibit_reviewer_subagents": true,
+        "prohibit_reviewer_writes": true,
+        "terminal_first_launch": true,
+        "effective_identity_verified": true,
+        "artifact_handoff_verified": true
+      }
+    },
+    "claude-code": {
+      "client": "claude-code",
+      "variant": "standalone-cli",
+      "status": "qualified",
+      "supported": true,
+      "observed_version": "2.1.327",
+      "version_range": ">=2.1.273 <3.0.0",
+      "roles": ["implementer", "reviewer", "approach-reviewer"],
+      "non_argv_transport": ["stdin", "prompt-file"],
+      "isolated_scratch_root_verified": true,
+      "credentials_metadata_only": true,
+      "profile_preparation_supported": false,
+      "interaction_routes": ["native-cli", "herdr-fallback"],
+      "retires_legacy_route": "code-tab-phase-roles",
+      "controls": {
+        "prohibit_multiplexers": true,
+        "prohibit_implementer_subagents": true,
+        "prohibit_reviewer_subagents": true,
+        "prohibit_reviewer_writes": true,
+        "terminal_first_launch": true,
+        "effective_identity_verified": true,
+        "artifact_handoff_verified": true,
+        "excludes_background_auto_respawn": true
+      }
+    },
+    "codex": {
+      "client": "codex",
+      "variant": "default",
+      "status": "qualified",
+      "supported": true,
+      "observed_version": "0.169.0",
+      "version_range": ">=0.167.0 <1.0.0",
+      "roles": ["implementer", "reviewer", "approach-reviewer"],
+      "non_argv_transport": ["stdin"],
+      "isolated_scratch_root_verified": true,
+      "credentials_metadata_only": true,
+      "profile_preparation_supported": false,
+      "interaction_routes": ["native-cli", "herdr-fallback"],
+      "controls": {
+        "prohibit_multiplexers": true,
+        "prohibit_implementer_subagents": true,
+        "prohibit_reviewer_subagents": true,
+        "prohibit_reviewer_writes": true,
+        "terminal_first_launch": true,
+        "effective_identity_verified": true,
+        "artifact_handoff_verified": true,
+        "preserves_builtin_provider_namespace": true
+      }
+    },
+    "grok-build": {
+      "client": "grok-build",
+      "variant": "default",
+      "status": "qualified",
+      "supported": true,
+      "observed_version": "1.0.89",
+      "version_range": ">=1.0.89 <2.0.0",
+      "roles": ["implementer", "reviewer", "approach-reviewer"],
+      "non_argv_transport": ["prompt-file"],
+      "isolated_scratch_root_verified": true,
+      "credentials_metadata_only": true,
+      "profile_preparation_supported": false,
+      "interaction_routes": ["native-cli", "herdr-fallback"],
+      "controls": {
+        "prohibit_multiplexers": true,
+        "prohibit_implementer_subagents": true,
+        "prohibit_reviewer_subagents": true,
+        "prohibit_reviewer_writes": true,
+        "terminal_first_launch": true,
+        "effective_identity_verified": true,
+        "artifact_handoff_verified": true
+      }
+    },
+    "opencode": {
+      "client": "opencode",
+      "variant": "default",
+      "status": "unsupported",
+      "supported": false,
+      "observed_version": null,
+      "version_range": null,
+      "roles": [],
+      "non_argv_transport": [],
+      "isolated_scratch_root_verified": true,
+      "credentials_metadata_only": true,
+      "profile_preparation_supported": false,
+      "interaction_routes": [],
+      "reason": "Executable opencode is not installed in the verification environment; fail-closed per Missing or stale qualification."
+    },
+    "kilo-modern": {
+      "client": "kilo-modern",
+      "variant": "modern",
+      "status": "unsupported",
+      "supported": false,
+      "observed_version": null,
+      "version_range": null,
+      "roles": [],
+      "non_argv_transport": [],
+      "isolated_scratch_root_verified": true,
+      "credentials_metadata_only": true,
+      "profile_preparation_supported": false,
+      "interaction_routes": [],
+      "reason": "Executable kilo (.kilo modern configuration route) is not installed in the verification environment; evaluated independently of kilo-legacy."
+    },
+    "kilo-legacy": {
+      "client": "kilo-legacy",
+      "variant": "legacy",
+      "status": "unsupported",
+      "supported": false,
+      "observed_version": null,
+      "version_range": null,
+      "roles": [],
+      "non_argv_transport": [],
+      "isolated_scratch_root_verified": true,
+      "credentials_metadata_only": true,
+      "profile_preparation_supported": false,
+      "interaction_routes": [],
+      "reason": "Executable kilocode (.kilocode legacy configuration route) is not installed in the verification environment; evaluated independently of kilo-modern."
+    },
+    "pi": {
+      "client": "pi",
+      "variant": "default",
+      "status": "unsupported",
+      "supported": false,
+      "observed_version": null,
+      "version_range": null,
+      "roles": [],
+      "non_argv_transport": [],
+      "isolated_scratch_root_verified": true,
+      "credentials_metadata_only": true,
+      "profile_preparation_supported": false,
+      "interaction_routes": [],
+      "reason": "Executable pi (.pi/agent) is not installed in the verification environment; fail-closed per Missing or stale qualification."
+    },
+    "grok-bot": {
+      "client": "grok-bot",
+      "variant": "chat-only",
+      "status": "unsupported",
+      "supported": false,
+      "observed_version": null,
+      "version_range": null,
+      "roles": [],
+      "non_argv_transport": [],
+      "isolated_scratch_root_verified": true,
+      "credentials_metadata_only": true,
+      "profile_preparation_supported": false,
+      "interaction_routes": [],
+      "reason": "Chat-only surface / imported settings without a tested local CLI execution or role/session control protocol."
+    }
+  }
+}

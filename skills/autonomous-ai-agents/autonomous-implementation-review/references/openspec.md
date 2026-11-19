@@ -3,9 +3,15 @@
 Load this when the operator has authorized execution of one OpenSpec change.
 Selecting or approving a change grants nothing by itself.
 
-For agent-neutral packets and review, use [portable-core.md](portable-core.md).
+For agent-neutral packets and review, use [portable-core.md](portable-core.md),
+[terminal-adapters.md](terminal-adapters.md), and
+[profile-preparation.md](profile-preparation.md).
 It follows delivery-owned policy selection and continuation, with one group per
-worker packet. The host-specific recipe below applies only to retained legacy
+worker packet. Once `replacementReadiness` is verified, `resolveLegacyRouteRequest`
+stops `code-tab-phase-roles` and operator-selected `herdr-pane-dispatch` with
+`status: "retired-route"`, redirecting only to qualified terminal adapters
+(`hermes`, `claude-code`, `codex`, `grok-build`) without modifying `.claude/agents`
+or launching a fallback. The host-specific recipe below applies only to retained legacy
 routes until replacement readiness is proved; it does not qualify a terminal
 adapter. Do not infer a route from an environment marker or fall back silently.
 

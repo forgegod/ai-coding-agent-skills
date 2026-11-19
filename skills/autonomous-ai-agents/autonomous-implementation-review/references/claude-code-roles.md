@@ -1,5 +1,11 @@
 # Code-tab role loop
 
+Retired once `replacementReadiness` is proved: `resolveLegacyRouteRequest` stops
+`code-tab-phase-roles` with `status: "retired-route"`, points to the standalone
+`claude-code` terminal adapter in [terminal-adapters.md](terminal-adapters.md)
+only when qualified (otherwise recording Claude Code unsupported and naming
+qualified adapters), and never modifies installed `.claude/agents` files.
+
 Load only when the operator sent the `code-tab-phase-roles` command and
 `$HERDR_ENV` is not `1`. If Herdr is active, stop. Do not mix hosts. This is not
 `delegate_task` and not a pane transport.

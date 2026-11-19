@@ -1,5 +1,11 @@
 # Claude Code host
 
+Retired once `replacementReadiness` is proved: `resolveLegacyRouteRequest`
+redirects `code-tab-phase-roles` to the standalone `claude-code` terminal
+adapter in [terminal-adapters.md](terminal-adapters.md) when qualified (or
+records it unsupported and lists only qualified adapters), without modifying
+installed `.claude/agents` files.
+
 Load only when the operator sent `code-tab-phase-roles` and Herdr is not active.
 This is not a Herdr transport and does not authorize execution. Displaying the
 command does not send it.

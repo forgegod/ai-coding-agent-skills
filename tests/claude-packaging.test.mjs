@@ -17,7 +17,7 @@ const expectedBundles = {
     skills: ["openspec-delivery", "openspec-next", "git-commit-message", "capability-wireframes"],
   },
   "autonomous-orchestration": {
-    version: "1.6.1",
+    version: "1.7.0",
     skills: ["autonomous-implementation-review"],
   },
 };

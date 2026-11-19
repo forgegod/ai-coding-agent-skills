@@ -13,6 +13,7 @@ Herdr pane-selection helper.
 | `autonomous-implementation-review/references/portable-core.md` | Client-neutral outcome, approach-review, review-record continuity and candidate-review procedure. |
 | `autonomous-implementation-review/scripts/orchestration-core.mjs` | Pure packet and retained-observation checks; no launch, progress writes or authority authentication. |
 | `autonomous-implementation-review/scripts/worker-handoff.mjs` and `references/worker-handoff.md` | Portable strict request/result schemas, adapter-only local publication and complete retained-artifact admission; no launch, cleanup or delivery acceptance. |
+| `autonomous-implementation-review/scripts/terminal-adapters.mjs`, `references/terminal-adapters.md` and `references/profile-preparation.md` | Candidate qualification records, terminal worker adapters (`hermes`, `claude-code`, `codex`, `grok-build`), role/model bindings, non-argv transport, process supervision, same-session interaction exposure, bootstrap-exception expiry, Hermes profile preparation and legacy-route retirement. |
 | `autonomous-implementation-review/scripts/herdr_panes.py` | Read-only overview and fail-closed validation of supplied operator selection against fresh pane JSON. |
 | `autonomous-implementation-review/scripts/herdr_lifecycle_watch.mjs` | Passive output-based Herdr lifecycle watcher, read-only inspection and arming gate; never sends pane input. |
 | `autonomous-implementation-review/scripts/herdr-pane-state.mjs` | Live-composer/footer parser and identity-bound executor observation. |
@@ -47,7 +48,9 @@ Herdr pane-selection helper.
 Run `npm test` and `npm run build`. Confirm the generated package advertises
 `SKILL.md`, `references/claude-code-roles.md`, `references/herdr.md`,
 `references/environment-passthrough.md`, `references/portable-core.md`,
-`references/worker-handoff.md`, `scripts/orchestration-core.mjs`, `scripts/worker-handoff.mjs`,
+`references/profile-preparation.md`, `references/terminal-adapters.md`,
+`references/worker-handoff.md`, `scripts/orchestration-core.mjs`,
+`scripts/terminal-adapters.mjs`, `scripts/worker-handoff.mjs`,
 `references/lifecycle-watch.md`, `references/openspec.md`, `references/claude-code-host.md`, `scripts/herdr_panes.py`,
 `scripts/herdr_lifecycle_watch.mjs`, `scripts/herdr-pane-state.mjs`,
 `templates/phase-implementer.md`, and `templates/phase-reviewer.md`.

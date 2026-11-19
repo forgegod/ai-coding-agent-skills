@@ -717,7 +717,7 @@ its bundled content changes. See the [Claude release checks](docs/claude-install
 
 Current source versions are delivery 1.2.1 and its affected
 `openspec-development` plugin 1.2.1; `openspec-next` is 0.3.0 and
-`autonomous-orchestration` is 1.6.1 (core skill 0.16.1). Complete well-known output, the delivery
+`autonomous-orchestration` is 1.7.0 (core skill 0.17.0). Complete well-known output, the delivery
 skill ZIP, workflow plugin ZIP and isolated native copies must retain the lossless
 reference/helper pair byte-for-byte. Source assertions are not executed packaging
 proof or a claim of updated public downloads, native client discovery, Desktop
@@ -725,8 +725,9 @@ acceptance or scanner approval. No upstream prerequisite or installation route i
 added by this representation facility.
 
 Preserve orchestration's complete `references/portable-core.md`,
-`scripts/orchestration-core.mjs`, `references/worker-handoff.md` and
-`scripts/worker-handoff.mjs` in well-known output, skill/plugin ZIPs and native
+`scripts/orchestration-core.mjs`, `references/worker-handoff.md`,
+`scripts/worker-handoff.mjs`, `references/terminal-adapters.md`,
+`scripts/terminal-adapters.mjs` and `references/profile-preparation.md` in well-known output, skill/plugin ZIPs and native
 copies. The artifact publisher/reader is part of the portable core, not optional
 adapter scratch or a qualification result. Keep delivery's `references/delivery-policy.md`,
 `references/task-authoring.md` and `scripts/delivery-policy.mjs` as well.

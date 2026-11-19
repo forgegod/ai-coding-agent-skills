@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.16.1
+version: 0.17.0
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -25,16 +25,16 @@ One authorized OpenSpec change, one named task group per worker; no GitHub write
 
 ## Portable core
 
-For outcome packets and review, follow
-[references/portable-core.md](references/portable-core.md) and
+Follow [references/portable-core.md](references/portable-core.md),
+[references/terminal-adapters.md](references/terminal-adapters.md),
+[references/profile-preparation.md](references/profile-preparation.md) and
 `references/openspec.md`, without Hermes or Herdr. Use
-[references/worker-handoff.md](references/worker-handoff.md) for artifact-first
-handoffs. Dispatch requires a selected qualified adapter; core checks do not
-qualify clients. Replacement readiness precedes legacy retirement; no fallback.
+[references/worker-handoff.md](references/worker-handoff.md). Dispatch uses a
+qualified adapter; replacement readiness precedes retirement; no fallback.
 
 ## Legacy host execution
 
-This retained recipe does not govern the portable core or qualify terminal routes.
+This retained recipe does not govern the portable core or qualify routes.
 
 ## Preconditions and roles
 
@@ -58,8 +58,7 @@ This retained recipe does not govern the portable core or qualify terminal route
   never shell-execute it or edit global config.
 - Isolate writers and mutable services; use finite budgets. No secrets, destructive
   tasks or unresolved choices; browser access must be scoped.
-- For a source checkout, compare installed skill version once and report drift;
-  source edits neither update installed skills nor authorize installation.
+- Compare installed skill version to source once; source edits do not update profiles.
 
 ## Legacy goal and repository truth
 

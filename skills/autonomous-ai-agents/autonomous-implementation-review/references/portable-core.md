@@ -4,9 +4,11 @@ Use this protocol for outcome packets, approach review and candidate review.
 It runs without Hermes or Herdr or any AI client installed. Node 22+ can import
 `scripts/orchestration-core.mjs`; its packet/decision exports are pure checks.
 The explicit adapter-only artifact exports perform local I/O under
-[worker-handoff.md](worker-handoff.md); none launches workers, writes Git/tasks or
+[worker-handoff.md](worker-handoff.md) and qualified adapter checks under
+[terminal-adapters.md](terminal-adapters.md) (with Hermes profile preparation in
+[profile-preparation.md](profile-preparation.md)); none writes Git/tasks or
 makes network requests. The module does not authenticate authority, reviewer identity,
-report truth or adapter qualification. The orchestrator must read back retained
+report truth or live external state. The orchestrator must read back retained
 observations before supplying them. A passing check is not permission to act.
 
 Delivery owns policy selection, freeze stops and continuation. Read delivery's
