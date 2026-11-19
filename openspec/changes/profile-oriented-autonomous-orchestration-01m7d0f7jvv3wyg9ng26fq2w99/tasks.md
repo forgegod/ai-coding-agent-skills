@@ -39,7 +39,7 @@ Verify the newly reviewed and approved identity before task 2 or task 3 proceeds
 
 ## 2. Implement the portable core and delivery policies
 
-- [ ] 2.1 Implement and test the agent-neutral orchestration core and `openspec-delivery`/`openspec-next` behavior defined by both delta specs.
+- [x] 2.1 Implement and test the agent-neutral orchestration core and `openspec-delivery`/`openspec-next` behavior defined by both delta specs.
 
 Reopened for this successor: verify or rework inherited task-2 source against the
 newly approved contract under separate execution authority, with current gates
