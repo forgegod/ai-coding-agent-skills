@@ -156,11 +156,14 @@ test("review records require retained automatic correction hashes and per-cycle 
   const automaticNoFindings = { ...corrected, verdict: "Verdict: No findings", findings: [], coverageLimitations: [] };
   const automaticResolvedOnlyInCorrection = { ...automaticNoFindings, correction: { ...corrected.correction, finding: { ...finding, blocking: false, disposition: "applied", reReviewReference: entry.reference } } };
   const fresh = { ...entry, automaticCycle: false, reference: "retained:fresh-review", verdict: "Verdict: No findings", findings: [], coverageLimitations: [] };
+  const anonymousUnresolved = { ...fresh, reference: "retained:anon-1", verdict: "Findings", correction: { finding: { blocking: true, evidence: "design.md:8" } } };
+  const anonymousResolved = { ...fresh, reference: "retained:anon-2", verdict: "No blocking findings", correction: { finding: { blocking: false, disposition: "unfounded", evidence: "design.md:8", reason: "Not an issue" } } };
   assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [corrected] } }).action, "resolve-findings");
   assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [automaticNoFindings] } }).action, "resolve-findings");
   assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [automaticNoFindings, fresh] } }).action, "resolve-findings");
   assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [automaticResolvedOnlyInCorrection] } }).action, "resolve-findings");
   assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [automaticResolvedOnlyInCorrection, fresh] } }).action, "freeze-ready");
+  assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [anonymousUnresolved, anonymousResolved, fresh] } }).action, "resolve-findings");
   assert.equal(api.reviewReadiness({ ...request, record: { ...record, entries: [corrected, fresh] } }).action, "freeze-ready");
   const unknown = { ...record, cumulativeCycles: null, countDisposition: { mode: "per-cycle", reference: "retained:operator" }, entries: [corrected] };
   assert.equal(api.reviewReadiness({ ...request, record: unknown }).action, "operator-disposition");

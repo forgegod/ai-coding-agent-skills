@@ -83,8 +83,7 @@ export function reviewReadiness({ change, inputs, record, recordIntegrityVerifie
   }
   const findings = new Map();
   for (const entry of record.entries) {
-    if (entry.correction?.finding) findings.set(entry.correction.finding.id, entry.correction.finding);
-    for (const finding of entry.findings) {
+    for (const finding of [...(entry.correction?.finding ? [entry.correction.finding] : []), ...entry.findings]) {
       // Anonymous findings cannot be silently matched to a later disposition.
       findings.set(text(finding?.id) ? finding.id : Symbol(), finding);
     }
