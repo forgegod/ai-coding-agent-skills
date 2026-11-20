@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "change": "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99",
+  "issueUrl": "https://github.com/forgegod/ai-coding-agent-skills/issues/21",
+  "integrationReference": "https://github.com/forgegod/ai-coding-agent-skills/pull/23",
+  "priorImplementationPrReference": "https://github.com/forgegod/ai-coding-agent-skills/pull/22",
+  "candidateHead": "4d625da62862a617ed4d860c1670f82079fc7173",
+  "integratedCommit": "36076f5be86eed9c1529d7c9d16baf88802648db",
+  "mergedAt": "2026-11-20T08:23:17Z",
+  "claimSupport": "supported",
+  "applicableCheckIds": [
+    "verify:136153563986",
+    "verify:136153407421"
+  ],
+  "checksRepresentation": {
+    "schemaVersion": 1,
+    "kind": "lossless-evidence-representation",
+    "encoding": "utf8",
+    "content": "{\n  \"head\": \"4d625da62862a617ed4d860c1670f82079fc7173\",\n  \"checks\": [\n    {\n      \"id\": \"verify:136153563986\",\n      \"name\": \"verify\",\n      \"checkRunId\": 136153563986,\n      \"appId\": 15368,\n      \"status\": \"completed\",\n      \"conclusion\": \"success\",\n      \"startedAt\": \"2026-11-20T07:36:47Z\",\n      \"completedAt\": \"2026-11-20T07:37:19Z\"\n    },\n    {\n      \"id\": \"verify:136153407421\",\n      \"name\": \"verify\",\n      \"checkRunId\": 136153407421,\n      \"appId\": 15368,\n      \"status\": \"completed\",\n      \"conclusion\": \"success\",\n      \"startedAt\": \"2026-11-20T07:36:24Z\",\n      \"completedAt\": \"2026-11-20T07:36:57Z\"\n    }\n  ]\n}\n",
+    "storedArtifactSha256": "039687860f8760f266a8e0e3b3639bd62badb32b82f60489330f625bb41707b5",
+    "decodedOriginalSha256": "039687860f8760f266a8e0e3b3639bd62badb32b82f60489330f625bb41707b5",
+    "provenance": {
+      "source": "/home/raphael/verification-records/ai-coding-agent-skills/finish-pr23-and-closure-20261120T082309Z/02-pre-merge-check-runs/stdout.log",
+      "command": [
+        "gh",
+        "api",
+        "--paginate",
+        "repos/forgegod/ai-coding-agent-skills/commits/4d625da62862a617ed4d860c1670f82079fc7173/check-runs?per_page=100"
+      ],
+      "environmentScope": "orchestrator hermes-dev GitHub CLI native store",
+      "exitStatus": 0,
+      "observedAt": "2026-11-20T08:23:10Z",
+      "revision": "4d625da62862a617ed4d860c1670f82079fc7173",
+      "scope": "PR #23 pre-merge check-runs",
+      "pagination": "complete",
+      "readbackType": "original-response"
+    },
+    "labels": {
+      "representation": "original-response",
+      "completeness": "complete",
+      "confidentiality": "publishable"
+    },
+    "wrapperSha256": "b68dad3b1feb90369484e7f9e8a777eadd5eefba2b07bde0f546733859136179"
+  },
+  "pr22": {
+    "integrationReference": "https://github.com/forgegod/ai-coding-agent-skills/pull/22",
+    "candidateHead": "3fd2ba9716af5baf6c7c3244825305200fac29b9",
+    "integratedCommit": "c2e97f15c3bb09df6cd8fd3a53482a4ed005a10b",
+    "mergedAt": "2026-11-20T06:50:58Z",
+    "claimSupport": "supported",
+    "applicableCheckIds": [
+      "verify:136128480833",
+      "verify:136127900952"
+    ],
+    "checksRepresentation": {
+      "schemaVersion": 1,
+      "kind": "lossless-evidence-representation",
+      "encoding": "utf8",
+      "content": "{\n  \"head\": \"3fd2ba9716af5baf6c7c3244825305200fac29b9\",\n  \"checks\": [\n    {\n      \"id\": \"verify:136128480833\",\n      \"name\": \"verify\",\n      \"checkRunId\": 136128480833,\n      \"appId\": 15368,\n      \"status\": \"completed\",\n      \"conclusion\": \"success\",\n      \"startedAt\": \"2026-11-20T06:32:30Z\",\n      \"completedAt\": \"2026-11-20T06:33:00Z\"\n    },\n    {\n      \"id\": \"verify:136127900952\",\n      \"name\": \"verify\",\n      \"checkRunId\": 136127900952,\n      \"appId\": 15368,\n      \"status\": \"completed\",\n      \"conclusion\": \"success\",\n      \"startedAt\": \"2026-11-20T06:30:59Z\",\n      \"completedAt\": \"2026-11-20T06:31:31Z\"\n    }\n  ]\n}\n",
+      "storedArtifactSha256": "91c012ba4edadefad9791461883006e4b1fe38018833f9d60100ced25bd23629",
+      "decodedOriginalSha256": "91c012ba4edadefad9791461883006e4b1fe38018833f9d60100ced25bd23629",
+      "provenance": {
+        "source": "/home/raphael/verification-records/ai-coding-agent-skills/finish-merge-and-integrated-gates-20261120T065029Z/02-pre-merge-check-runs/stdout.log",
+        "command": [
+          "gh",
+          "api",
+          "--paginate",
+          "repos/forgegod/ai-coding-agent-skills/commits/3fd2ba9716af5baf6c7c3244825305200fac29b9/check-runs?per_page=100"
+        ],
+        "environmentScope": "orchestrator hermes-dev GitHub CLI native store",
+        "exitStatus": 0,
+        "observedAt": "2026-11-20T06:50:31Z",
+        "revision": "3fd2ba9716af5baf6c7c3244825305200fac29b9",
+        "scope": "PR #22 pre-merge check-runs",
+        "pagination": "complete",
+        "readbackType": "original-response"
+      },
+      "labels": {
+        "representation": "original-response",
+        "completeness": "complete",
+        "confidentiality": "publishable"
+      },
+      "wrapperSha256": "59f10e39bbe25af38c2f4fc74adbc6fb062683b5e4471e29a858b115411b32a5"
+    }
+  },
+  "artifacts": [
+    {
+      "file": "implementation-premerge-check-runs.json",
+      "source": "/home/raphael/verification-records/ai-coding-agent-skills/finish-pr23-and-closure-20261120T082309Z/02-pre-merge-check-runs/stdout.log",
+      "representation": "original-byte copy",
+      "sha256": "5237e06abe025380bbc18c8f3f706fc00d372a43497cff15935a0dcd02f5c110",
+      "confidentiality": "publishable",
+      "completeness": "complete",
+      "capture": {
+        "argv": [
+          "gh",
+          "api",
+          "--paginate",
+          "repos/forgegod/ai-coding-agent-skills/commits/4d625da62862a617ed4d860c1670f82079fc7173/check-runs?per_page=100"
+        ],
+        "cwd": "/home/raphael/src/ai-coding-agent-skills--profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99-bootstrap-identity-owner",
+        "exit": 0,
+        "stdoutSha256": "5237e06abe025380bbc18c8f3f706fc00d372a43497cff15935a0dcd02f5c110",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "file": "implementation-premerge-threads.json",
+      "source": "/home/raphael/verification-records/ai-coding-agent-skills/finish-pr23-and-closure-20261120T082309Z/08-pre-merge-review-threads/stdout.log",
+      "representation": "original-byte copy",
+      "sha256": "bf7c62a2069eb116c3046df7a9e10d1c9a81a9cf934389606d9a457e6d82d27a",
+      "confidentiality": "publishable",
+      "completeness": "complete",
+      "capture": {
+        "argv": [
+          "gh",
+          "api",
+          "graphql",
+          "--paginate",
+          "pullRequest(number: 23) reviewThreads(first: 100)"
+        ],
+        "cwd": "/home/raphael/src/ai-coding-agent-skills--profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99-bootstrap-identity-owner",
+        "exit": 0,
+        "stdoutSha256": "bf7c62a2069eb116c3046df7a9e10d1c9a81a9cf934389606d9a457e6d82d27a",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "file": "implementation-merge-response.json",
+      "source": "/home/raphael/verification-records/ai-coding-agent-skills/finish-pr23-and-closure-20261120T082309Z/11-post-merge-pr-view/stdout.log",
+      "representation": "original-byte copy",
+      "sha256": "6df32d0ee98b0d51bc3ff85408d3635b5632bd3bcf0d4f6c702d04a67fbc9d72",
+      "confidentiality": "publishable",
+      "completeness": "complete",
+      "capture": {
+        "argv": [
+          "gh",
+          "pr",
+          "view",
+          "23",
+          "--repo",
+          "forgegod/ai-coding-agent-skills",
+          "--json",
+          "number,url,state,mergedAt,mergeCommit,headRefOid,baseRefName,headRefName"
+        ],
+        "cwd": "/home/raphael/src/ai-coding-agent-skills--profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99-bootstrap-identity-owner",
+        "exit": 0,
+        "stdoutSha256": "6df32d0ee98b0d51bc3ff85408d3635b5632bd3bcf0d4f6c702d04a67fbc9d72",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "file": "implementation-pr22-premerge-check-runs.json",
+      "source": "/home/raphael/verification-records/ai-coding-agent-skills/finish-merge-and-integrated-gates-20261120T065029Z/02-pre-merge-check-runs/stdout.log",
+      "representation": "original-byte copy",
+      "sha256": "2028acf522aac25b0908a701bd35ba5fba423f0bb1db66fc81a6981aa03ad5df",
+      "confidentiality": "publishable",
+      "completeness": "complete",
+      "capture": {
+        "argv": [
+          "gh",
+          "api",
+          "--paginate",
+          "repos/forgegod/ai-coding-agent-skills/commits/3fd2ba9716af5baf6c7c3244825305200fac29b9/check-runs?per_page=100"
+        ],
+        "cwd": "/home/raphael/src/ai-coding-agent-skills--profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99-bootstrap-identity-owner",
+        "exit": 0,
+        "stdoutSha256": "2028acf522aac25b0908a701bd35ba5fba423f0bb1db66fc81a6981aa03ad5df",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "file": "implementation-pr22-premerge-threads.json",
+      "source": "/home/raphael/verification-records/ai-coding-agent-skills/finish-merge-and-integrated-gates-20261120T065029Z/08-pre-merge-review-threads/stdout.log",
+      "representation": "original-byte copy",
+      "sha256": "2b0895359eaf1a22991bede884f1c8d3415bda489ebbccecf1c55a6f6e877d09",
+      "confidentiality": "publishable",
+      "completeness": "complete",
+      "capture": {
+        "argv": [
+          "gh",
+          "api",
+          "graphql",
+          "--paginate",
+          "pullRequest(number: 22) reviewThreads(first: 100)"
+        ],
+        "cwd": "/home/raphael/src/ai-coding-agent-skills--profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99-bootstrap-identity-owner",
+        "exit": 0,
+        "stdoutSha256": "2b0895359eaf1a22991bede884f1c8d3415bda489ebbccecf1c55a6f6e877d09",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "file": "implementation-pr22-merge-response.json",
+      "source": "/home/raphael/verification-records/ai-coding-agent-skills/finish-merge-and-integrated-gates-20261120T065029Z/11-post-merge-pr-view/stdout.log",
+      "representation": "original-byte copy",
+      "sha256": "297348684e72284e6c29ad96a7787c28f699bb9505422e997dd242c68467364b",
+      "confidentiality": "publishable",
+      "completeness": "complete",
+      "capture": {
+        "argv": [
+          "gh",
+          "pr",
+          "view",
+          "22",
+          "--repo",
+          "forgegod/ai-coding-agent-skills",
+          "--json",
+          "number,url,state,mergedAt,mergeCommit,headRefOid,baseRefName,headRefName"
+        ],
+        "cwd": "/home/raphael/src/ai-coding-agent-skills--profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99-bootstrap-identity-owner",
+        "exit": 0,
+        "stdoutSha256": "297348684e72284e6c29ad96a7787c28f699bb9505422e997dd242c68467364b",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ]
+}
