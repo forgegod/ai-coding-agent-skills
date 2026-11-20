@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "kind": "operator-plan-approval",
+  "recorded_at": "2026-11-15T07:59:44Z",
+  "change": "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99",
+  "operator_decision": "Approved this exact plan and authorized normal /openspec-next execution of group 1 only.",
+  "plan": "21ea24c1f521f0d102002c7e387ffa43d3a615f9",
+  "base": "ae6488e23414a07d12959bf22bcd283b84d9d8a3",
+  "tree": "d3176318c2b50a3b19c90146dd65ce5f4e3724ae",
+  "plan_digest": "144d92d0d893e84c12ee593e1f6d1debaad845db73d2217182b8e409179b5197",
+  "scope": "Local execution of native task group 1 only. This approval does not authorize profile changes, remote writes, publication, pull requests, merge, archive, issue closure, or any later task group."
+}

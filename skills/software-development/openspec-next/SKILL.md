@@ -1,7 +1,7 @@
 ---
 name: openspec-next
 description: Find and advance the next approved OpenSpec task group.
-version: 0.1.1
+version: 0.3.0
 author: Raphael (forgegod), Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -13,8 +13,9 @@ metadata:
 
 # OpenSpec Next
 
-Resolve the real unfinished boundary of one change and advance one approved local
-task group. The operator need not remember its full name, worktree or Git recipe.
+Resolve the real unfinished boundary of one change and advance an approved local
+task group, or consecutive eligible groups under selected continuous-goal policy.
+The operator need not remember its full name, worktree or Git recipe.
 This is repository-grounded selection and recovery, not a scheduler or another
 specification/task authority. OpenSpec owns native artifacts and `tasks.md`.
 
@@ -35,6 +36,23 @@ defaults and persist across a bare `next`. Do not push, open PRs, merge, close a
 issue, remove a worktree or start another change under this invocation alone.
 An existing explicitly authorized finish operation can be resumed, but do not
 convert a local-only request into finish authority.
+
+Apply delivery's `references/delivery-policy.md` before execution: derive policy
+from the verified integrated parent of the frozen plan, not a changed local
+contract. Default single-group behavior and existing approval remain when that
+parent did not select continuous-goal or pre-execution review. New integrity
+guards still apply unless retained legacy evidence defers them until refreeze.
+Selected policies require the available orchestration package and, for approach
+review, the matching complete frozen planning hashes. Never infer approval.
+Unintegrated contract edits are inert for their own change through integration.
+Use delivery's `workerContinuationDecision` only for one fresh bounded same-role
+session after a verified iteration cap, keyed to the existing group/native task.
+A changed session or action label never resets the allowance. Group/authority
+budget exhaustion, native waits, failed gates or a second cap stop instead.
+Before any fresh continuation, require the adapter's retained exact-process-tree
+quiescence proof: immediate positive identity readback followed by verified
+termination, or proof it cannot still write. Failed readback preserves the process
+and forbids continuation; idle or cap output alone is insufficient.
 
 ## Procedure
 
@@ -68,8 +86,15 @@ convert a local-only request into finish authority.
    Do not bootstrap, create a checkout, stage, commit or dispatch a role.
 7. For normal execution, load `openspec-delivery` and its continuation/workspace
    recipes, pass the verified selection and constraints, and execute the remaining
-   local boundary without a second permission prompt. Stop after one task group,
-   or a real approval/review/authority blocker. If a pull request is open and
+   local boundary without a second permission prompt. Require artifact-first
+   handoff admission before trusting terminal worker evidence; actual gates and
+   independent review still decide acceptance. Routine fixes stay in this group
+   under orchestration's permitted-writer correction loop. Stop after one task group
+   by default. With selected continuous-goal policy and no narrower restriction,
+   repeat grounded selection for consecutive eligible groups of this change.
+   Recheck every delivery-policy stop: authority, gates, review, ownership, host,
+   native human-input wait, plan/digest identity, declared stop and finite inherited
+   or group budget. No remote write or next change. If a pull request is open and
    only waiting, report it and do not merge. If already merged, do not replay
    implementation; request `finish` only when that authority is absent. Fully
    complete means report completion with no next change.

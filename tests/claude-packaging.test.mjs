@@ -13,11 +13,11 @@ const marketplacePath = path.join(root, ".claude-plugin/marketplace.json");
 
 const expectedBundles = {
   "openspec-development": {
-    version: "1.0.6",
+    version: "1.2.1",
     skills: ["openspec-delivery", "openspec-next", "git-commit-message", "capability-wireframes"],
   },
   "autonomous-orchestration": {
-    version: "1.4.0",
+    version: "1.7.0",
     skills: ["autonomous-implementation-review"],
   },
 };

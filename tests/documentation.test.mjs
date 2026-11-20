@@ -33,6 +33,28 @@ test("Claude instructions lead with native GUI installation and cite primary sou
   assert.match(guide, /No agents, hooks, MCP servers/);
 });
 
+test("current installation guidance matches package versions and preserves handoff support", async () => {
+  const root = new URL("../", import.meta.url);
+  const marketplace = JSON.parse(await readFile(new URL(".claude-plugin/marketplace.json", root), "utf8"));
+  const version = async (relative) => (await readFile(new URL(relative, root), "utf8")).match(/^version: (.+)$/m)[1];
+  const delivery = await version("skills/software-development/openspec-delivery/SKILL.md");
+  const next = await version("skills/software-development/openspec-next/SKILL.md");
+  const core = await version("skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md");
+  const plugin = (name) => marketplace.plugins.find((p) => p.name === name).version;
+  const escaped = (v) => v.replaceAll(".", "\\.");
+  for (const relative of ["README.md", "docs/claude-installation.md", "docs/openspec-installation.md", "docs/openspec-workflow.md"]) {
+    const source = await readFile(new URL(relative, root), "utf8");
+    for (const pattern of [
+      new RegExp(`delivery(?:\x60)?\\s+${escaped(delivery)}\\b`, "i"),
+      new RegExp(`\x60openspec-next\x60(?: is)?\\s+${escaped(next)}\\b`),
+      new RegExp(`core skill ${escaped(core)}\\b`),
+      new RegExp(`\x60openspec-development\x60(?: plugin)?\\s+${escaped(plugin("openspec-development"))}\\b`),
+      new RegExp(`\x60autonomous-orchestration\x60(?: plugin)?(?: is)?\\s+${escaped(plugin("autonomous-orchestration"))}\\b`),
+    ]) assert.match(source, pattern, relative);
+    for (const file of ["references/worker-handoff.md", "scripts/worker-handoff.mjs", "references/terminal-adapters.md", "scripts/terminal-adapters.mjs", "references/profile-preparation.md"]) assert.ok(source.includes(file), `${relative} omits ${file}`);
+  }
+});
+
 test("all launch examples carry the same bounded operator authorization", async () => {
   const files = [readme,
     fileURLToPath(new URL("../skills/autonomous-ai-agents/autonomous-implementation-review/SKILL.md", import.meta.url))];
@@ -124,7 +146,9 @@ test("autonomous goal documentation distinguishes orchestration from polling", a
   assert.match(source, /### Run the autonomous implementation-review goal/);
   assert.match(source, /\/goal draft \/openspec-delivery <name>/);
   assert.match(source, /push\/PR\/merge are not/);
-  assert.match(source, /supports Herdr only/);
+  assert.match(source, /qualified terminal adapter/);
+  assert.match(source, /resolveLegacyRouteRequest/);
+  assert.match(source, /retired-route/);
   assert.match(source, /operator sends `\/goal pause`/i);
   assert.match(source, /docs\/openspec-workflow\.md/);
   assert.doesNotMatch(withoutRetirementManifest, /phased-plan-/);
@@ -133,7 +157,7 @@ test("autonomous goal documentation distinguishes orchestration from polling", a
   assert.match(source, /Scratch logs, patches, and agent reports are temporary evidence only/);
   assert.match(source, /#### Fresh-session busy-input protection/);
   assert.match(source, /#### Stop an execution deliberately/);
-  assert.match(source, /\/busy queue/);
+  assert.match(source, /display\.busy_input_mode queue/);
   assert.match(source, /\/stop` is not an immediate foreground-turn/);
   assert.match(source, /Operator commands, not an agent response/);
   assert.match(source, /Do not use `\/loop` for implementation and review/);
@@ -199,4 +223,129 @@ test("change naming is automatic project policy, not a second identity or instal
     const source = await readFile(new URL(relative, root), "utf8");
     assert.doesNotMatch(source, /Do not generate a ULID\.|Do not add a ULID\./, relative);
   }
+});
+
+test("operator configuration documentation covers every advertised client and exercises documented configuration examples with synthetic state", async () => {
+  const root = new URL("../", import.meta.url);
+  const { CANDIDATE_RECORDS, resolveRoleConfiguration, preparePromptTransport } = await import(new URL("skills/autonomous-ai-agents/autonomous-implementation-review/scripts/terminal-adapters.mjs", root));
+  const adaptersDoc = await readFile(new URL("skills/autonomous-ai-agents/autonomous-implementation-review/references/terminal-adapters.md", root), "utf8");
+  const readmeSource = await readFile(new URL("README.md", root), "utf8");
+
+  for (const [client, record] of Object.entries(CANDIDATE_RECORDS)) {
+    assert.ok(adaptersDoc.includes(`\`${client}\``), `terminal-adapters.md must list candidate ${client}`);
+    assert.ok(readmeSource.includes(`\`${client}\``), `README.md must list candidate ${client}`);
+    if (record.supported) {
+      assert.ok(adaptersDoc.includes(`\`${record.versionRange}\``), `terminal-adapters.md must document versionRange for ${client}`);
+      assert.ok(readmeSource.includes(record.versionRange), `README.md must document versionRange for ${client}`);
+    } else {
+      assert.match(adaptersDoc, new RegExp(`\\\`${client}\\\`\\s*\\|\\s*\\\`unsupported\\\`\\s*\\(\\\`supported: false\\\`\\)`));
+    }
+  }
+
+  const codexTransport = preparePromptTransport({
+    client: "codex",
+    version: "0.169.0",
+    role: "reviewer",
+    session: "codex-rev-1",
+    workspace: "/synthetic/workspace",
+    prompt: "# Synthetic prompt\n",
+    captureDir: "/synthetic/capture",
+  });
+  assert.deepEqual(codexTransport.argv, ["exec", "-", "-C", "/synthetic/workspace", "-s", "read-only", "--json", "-o", "/synthetic/capture/last-message.txt"]);
+  assert.match(adaptersDoc, /exec - -C <workspace> -s <read-only\\\|workspace-write> --json -o <captureDir>\/last-message\.txt/);
+
+  for (const requiredPattern of [
+    /--profile <verified-profile>/,
+    /chat --oneshot/,
+    /model\.default/,
+    /model\.provider/,
+    /display\.busy_input_mode = queue/,
+    /autonomous_ai_agents\.implementer/,
+    /autonomous_ai_agents\.reviewer/,
+    /--permission-mode <plan\\\|manual>/,
+    /exec - -C <workspace>/,
+    /--prompt-file <captureDir>\/prompt\.md/,
+    /HOME=<scratchRoot>/,
+    /TMPDIR=<scratchRoot>/,
+    /per-run-override/,
+    /project-default/,
+    /client-default/,
+    /Changing or removing an operator selection/i,
+    /native-cli/,
+    /herdr-fallback/,
+    /request\.md/,
+    /0400/,
+    /0700/,
+    /report\.md/,
+    /native\.txt/,
+    /stderr\.log/,
+    /exit\.txt/,
+    /<scratchRoot>\/transport\//,
+    /result\.json/,
+    /lifecycle\.jsonl/,
+    /throw in `readHandoff` and\s+are not admitted/,
+    /predecessor/,
+    /retired-route/,
+  ]) {
+    assert.match(adaptersDoc, requiredPattern);
+  }
+  const readmeAdaptersSection = readmeSource.split("#### Configure and verify qualified terminal adapters\n")[1]?.split("\n#### ")[0] ?? "";
+  assert.ok(readmeAdaptersSection.length > 0, "README must contain Configure and verify qualified terminal adapters section");
+  assert.match(readmeAdaptersSection, /throw in `readHandoff` \(not admitted; preserving the `0700` attempt directory and any sealed `0400` files inside it as evidence\)/);
+  for (const forbiddenPattern of [
+    /request\.json/,
+    /output\.raw/,
+    /exit\.json/,
+    /transport-<attemptId>/,
+    /0444/,
+    /0555/,
+    /acceptEdits/,
+    /--setting-sources/,
+    /--hermes-home/,
+    /CLAUDE_CONFIG_DIR/,
+    /CODEX_HOME/,
+    /GROK_BUILD_HOME/,
+    /chat --cli/,
+    /codex resume/,
+    /status:\s*"incomplete"/,
+    /sealed attempt directory/i,
+  ]) {
+    assert.doesNotMatch(adaptersDoc, forbiddenPattern);
+    assert.doesNotMatch(readmeAdaptersSection, forbiddenPattern);
+  }
+
+  const jsonBlocks = [...adaptersDoc.matchAll(/```json\n([\s\S]*?)\n```/g)].map((m) => JSON.parse(m[1]));
+  assert.equal(jsonBlocks.length, 3, "expect three executable role configuration examples in terminal-adapters.md");
+  const byExample = Object.fromEntries(jsonBlocks.map((b) => [b.example, b]));
+  for (const name of ["one-client-same-model", "one-client-different-model", "mixed-client"]) {
+    assert.ok(byExample[name], `missing example ${name}`);
+    const resolved = resolveRoleConfiguration(byExample[name]);
+    assert.equal(resolved.action, "bound", name);
+    assert.equal(resolved.role, byExample[name].role, name);
+    assert.equal(resolved.client, byExample[name].effectiveReadback.client, name);
+    assert.equal(resolved.model, byExample[name].effectiveReadback.model, name);
+    assert.equal(resolved.session, byExample[name].effectiveReadback.session, name);
+    assert.equal(resolved.configurationScope, "launch-scoped", name);
+    assert.equal(resolved.fallbackUsed, false, name);
+  }
+
+  // Verify changing and removing an operator selection without mutating global defaults
+  const baseExample = byExample["one-client-same-model"];
+  const overridden = resolveRoleConfiguration({
+    ...baseExample,
+    perRunOverride: { client: "claude-code", provider: "anthropic", model: "claude-opus-4-6" },
+    restrictions: { ...baseExample.restrictions, allowedModels: ["claude-sonnet-4-6", "claude-opus-4-6"] },
+    effectiveReadback: { ...baseExample.effectiveReadback, model: "claude-opus-4-6" },
+  });
+  assert.equal(overridden.action, "bound");
+  assert.equal(overridden.configurationSource, "per-run-override");
+  assert.equal(overridden.model, "claude-opus-4-6");
+
+  const removedOverride = resolveRoleConfiguration({
+    ...baseExample,
+    perRunOverride: null,
+  });
+  assert.equal(removedOverride.action, "bound");
+  assert.equal(removedOverride.configurationSource, "project-default");
+  assert.equal(removedOverride.model, "claude-sonnet-4-6");
 });

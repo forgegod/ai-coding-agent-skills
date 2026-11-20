@@ -1,33 +1,22 @@
-# Claude Code host
+# Claude Code host (retired `code-tab-phase-roles` route)
 
-Load only when the operator sent `code-tab-phase-roles` and Herdr is not active.
-This is not a Herdr transport and does not authorize execution. Displaying the
-command does not send it.
+With `replacementReadiness` verified, `code-tab-phase-roles` is retired:
+`resolveLegacyRouteRequest({ route: "code-tab-phase-roles" })` stops with
+`status: "retired-route"` and redirects to the standalone `claude-code` terminal
+adapter in [terminal-adapters.md](terminal-adapters.md) only when `claude-code`
+is qualified (otherwise recording `claudeCodeSupported: false` and naming only
+qualified adapters), without launching a fallback or modifying installed
+`.claude/agents` files.
 
-## Armed files
+## Retired subagent templates
 
-Both files must exist in the target project, not in another home:
+The legacy files `templates/phase-implementer.md` and `templates/phase-reviewer.md`
+remain in the package inventory solely so existing distributions and migration
+audits stay deterministic. Do not copy them into `.claude/agents/`, edit
+installed `.claude/agents/phase-implementer.md` or
+`.claude/agents/phase-reviewer.md`, or dispatch subagents for role execution.
 
-- `.claude/agents/phase-implementer.md`
-- `.claude/agents/phase-reviewer.md`
+## Legacy command token
 
-Read each `model` value. Armed means both are set, neither is `inherit`, and they
-differ. Missing, equal, or `inherit` is an unbound host: no launch command.
-Do not copy templates, search `~/.claude`, or edit the files.
-
-Templates live next to this file at `templates/phase-implementer.md` and
-`templates/phase-reviewer.md`. The operator copies them into the target project
-after review and refuses an existing destination. The parent session must stay
-in Manual permission mode. Accept-edits, auto, and bypass ignore a subagent
-`permissionMode`, so those parent modes are not armed.
-
-## Command
-
-For a project explicitly adopting the short-invocation policy, print this command exactly.
-Its local authority comes from that project contract; it does not grant remote
-writes or bypass the armed-role requirements. Do not dispatch it. Do not also print the Herdr
-`/goal draft` command.
-
-```text
-/openspec-delivery <name> code-tab-phase-roles
-```
+If an operator sends `/openspec-delivery <name> code-tab-phase-roles`, do not
+dispatch subagents; return the `resolveLegacyRouteRequest` retired-route stop.

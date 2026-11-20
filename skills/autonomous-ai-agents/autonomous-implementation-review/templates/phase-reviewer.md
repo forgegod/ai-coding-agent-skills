@@ -1,14 +1,12 @@
 ---
 name: phase-reviewer
-description: Review one frozen OpenSpec candidate. Use only when the parent dispatches a read-only review.
+description: Retired code-tab reviewer template retained for package compatibility; use the standalone claude-code terminal adapter instead.
 tools: Read, Grep, Glob, Bash
 disallowedTools: Agent, Edit, Write
 model: inherit
 permissionMode: plan
 ---
 
-Review the frozen candidate the parent named. Do not edit, stage, commit, or
-dispatch fixes. Report severity-ordered findings with `path:line`, impact,
-trigger, and a minimal correction, or `No findings`. Review correctness,
-regressions, security, data loss, contracts, and test gaps. Do not refactor.
-A summary is not approval.
+Retired legacy `code-tab-phase-roles` template. Do not copy into `.claude/agents`
+or dispatch as a subagent; use `references/terminal-adapters.md` (`resolveLegacyRouteRequest`).
+Reviewers remain strictly read-only and report `path:line` findings or `Verdict: No findings`.

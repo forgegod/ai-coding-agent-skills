@@ -21,6 +21,29 @@ Displaying them grants no Git or GitHub authority.
 
 ## Short operator commands
 
+For new and revised unfrozen plans, use
+[minimum-outcome task authoring](../skills/software-development/openspec-delivery/references/task-authoring.md).
+The fewest complete goal-oriented outcomes must still preserve scope, safety,
+verification and necessary dependency/authority/ownership boundaries. Each outcome
+includes its tests and documentation; no fixed task-count target applies. Carry
+the rule through OpenSpec `rules.tasks` and planning review; inspect generated
+instructions and reject both unnecessary fragmentation and harmful over-merging.
+Strict CLI validation does not prove semantic minimality. Existing approved plans
+remain unchanged; native `tasks.md` stays the sole mutable progress authority.
+
+Apply [delivery policy](../skills/software-development/openspec-delivery/references/delivery-policy.md)
+before freeze/execution: derive policy from the verified integrated plan parent,
+not a changed working-tree contributor contract. Declared goal-aligned contract
+edits receive independent alignment review, not a separate operator checkpoint;
+unintegrated edits cannot change their own authority through integration. The examples below
+show default single-group behavior. If the parent's contributor contract selected
+continuous-goal, a bare next advances consecutive eligible groups until an explicit
+stop, budget or authority boundary; a narrower operator restriction wins. Selected
+pre-execution review requires the optional orchestration package's matching retained
+whole-plan review before freeze and execution. Neither policy applies retroactively.
+The core is available without Hermes/Herdr; new terminal execution requires
+separate adapter qualification. Legacy routes are not retired by core delivery.
+
 The agent owns the Git plumbing. This project explicitly selects the following
 invocation contract; other projects must adopt it in contributor instructions.
 Installing skills, displaying examples or approving a plan does not execute it.
@@ -165,8 +188,9 @@ flowchart TB
 
 The diagram is not a promise of unattended execution: required human PR approvals,
 host/tool permission controls and the configured role protocol still apply. In
-particular, the current Herdr protocol requires explicit reviewer/executor pane
-handoff approval. Routine Git commands are automated; these decisions are not.
+particular, role execution requires a qualified terminal adapter (with Herdr
+used only as a prequalified same-session human-input fallback). Routine Git
+commands are automated; these decisions are not.
 Operator restrictions such as `no commits` or `keep the worktree` override the
 automatic actions shown. An ordinary `next` never supplies finish authority.
 
@@ -755,11 +779,20 @@ Orchestration is optional. It requires the workflow plugin, explicit role and
 model configuration, and a supported host. Package installation does not create
 those roles.
 
-Current source: delivery 1.0.5 in `openspec-development` 1.0.6;
-`openspec-next` 0.1.1 and `autonomous-orchestration` 1.4.0 are unchanged.
+Current source: delivery 1.2.1 in `openspec-development` 1.2.1;
+`openspec-next` 0.3.0 and core skill 0.17.0 in `autonomous-orchestration` 1.7.0.
 Representation support adds no upstream workflow, runtime dependency or
 installation route. Package availability/byte checks do not establish account
 sync, host execution, native client discovery, Desktop acceptance or scanner approval.
+
+Complete copies and generated packages preserve delivery's policy/task-authoring
+references and `scripts/delivery-policy.mjs`, plus orchestration's
+`references/portable-core.md`, `scripts/orchestration-core.mjs`,
+`references/worker-handoff.md`, `scripts/worker-handoff.mjs`,
+`references/terminal-adapters.md`, `scripts/terminal-adapters.mjs` and
+`references/profile-preparation.md`.
+The handoff pair is required portable support; it does not qualify a client or
+replace protected publication, independent review or delivery acceptance.
 
 ## Verification
 

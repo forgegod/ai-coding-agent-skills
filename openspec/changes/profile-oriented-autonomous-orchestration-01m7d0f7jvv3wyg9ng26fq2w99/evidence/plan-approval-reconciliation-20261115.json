@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "kind": "append-only-plan-approval-reconciliation",
+  "change": "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99",
+  "recorded_at": "2026-11-15T14:15:05.526619+00:00",
+  "authority": "Current operator reconciliation-only goal; one local planning freeze, exact identity capture, and fresh read-only review in w1B:pR on hermes-dev-review. No plan approval or implementation authority.",
+  "predecessor_candidate": {
+    "commit": "cc5f23a7f3892fb9e0e5eb858ca8b32e319ac566",
+    "tree": "5eeb48ca54a2153b089dc55b0e57947230fcad4d",
+    "preservation": "Retain the object and its ancestry unchanged; successor commit adds planning/reconciliation only. Existing source at this candidate is not accepted by this reconciliation."
+  },
+  "supersession": {
+    "scope": "Current-plan authority only. All historical approvals, reviews, freezes, reconstruction and rejected reports remain historical provenance byte-for-byte. No predecessor grants execution for the replacement bytes.",
+    "records": {
+      "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/approach-review.json": "e97b89c562eeeb86c56f3216da7a93ef9f024207c31b4b845cfe3f646d460f74",
+      "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/freeze-record.json": "3b149663dd64dfbc79159024f427f0b0f18ae5737b3a17eda7075181ab7a145b",
+      "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/group-1-reconstruction-verification.json": "ac9a410e846eb43d1cf4e58fe5cd492780e66f27149f0c3239105c1d567eed33",
+      "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/plan-approval.json": "de293df646169ec2dab5b1dd0e026d415b60b6ef67572bdd58081f3aca969065"
+    },
+    "historical_plan": "21ea24c1f521f0d102002c7e387ffa43d3a615f9",
+    "historical_digest": "144d92d0d893e84c12ee593e1f6d1debaad845db73d2217182b8e409179b5197"
+  },
+  "findings": {
+    "H1": {
+      "observation": "Five current planning-input hashes differ from the retained freeze/final-review hash set; config and .openspec.yaml still match.",
+      "resolution": "Freeze the explicitly captured current bytes as a new identity and obtain a new exact-identity review. Historical review does not cover them.",
+      "current_planning_sha256": {
+        "openspec/config.yaml": "5719878578ec6a96877ee711a20ff22cda46f92dfc41f96d41b313b9b5ddbd31",
+        "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/.openspec.yaml": "2e91af4681be83038a92e715cfb64d8067b4c8399c2b25074da27a778869f3aa",
+        "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/proposal.md": "329c3108158f1e93ae51296ed86ccd60847f0f662455aa73b6efbed01d67df50",
+        "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/design.md": "bcac47885ad7e0340f14ea840c083b350bf0410679e19c635e00e14576330710",
+        "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/tasks.md": "6a30daa951a9bd43f4535cf54945d07e866730f01bf391a99d1729dac5c2ac8e",
+        "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/specs/autonomous-role-orchestration/spec.md": "541c8688ac68aa4d4ff0c57ad6d5b466de515df4398639a41611e8ba3951dc4c",
+        "openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/specs/openspec-integration/spec.md": "ce68659f526f8721dc973f118cf9782e56a79c3ebcc1d1ca2143d8c418de2999"
+      }
+    },
+    "H2": {
+      "observation": "plan-approval.json records 2026-11-15T07:59:44Z. The retained review transcript records 08:29:52 through 08:32:13 without an explicit timezone, and observes the old 850244e branch tip. Git records the plan commit at 08:37:58 +0100. These retained clocks/provenance do not establish a trustworthy approval-after-review sequence; timezone assumptions must not manufacture one.",
+      "resolution": "Do not correct timestamps or assert a reconstructed chronology. New explicit operator approval must follow fresh frozen-identity review. None is recorded here."
+    },
+    "H3": {
+      "observation": "The retained review shows the pre-reset working tree at 850244e with config modified and change-local files untracked; it is not proof of a post-reset/config-reapplication independent review.",
+      "resolution": "Do not fabricate missing historical re-review. The replacement review must inspect the actual new frozen SHA, full planning input inventory and digest after this new freeze."
+    }
+  },
+  "bounded_recovery_override": {
+    "scope": "This specific operator-authorized replacement workflow only; not a shipped policy change.",
+    "sequence": "Preserve cc5f23a and history; validate current planning; append a local planning-only successor to cc5f23a; reproduce identity in place; fresh w1B:pR review; stop before operator approval.",
+    "historical_design_procedure": "The reset/reconstruction procedure in design.md describes the initial reconstruction, not permission or a requirement to reset again during this recovery. No reset, second workspace, config reapplication or implementation is authorized here. The new plan parent is cc5f23a, not a newly claimed integrated target revision.",
+    "future_policy": "Unimplemented delta-spec rules and contributor-contract proposals do not govern this recovery or grant current execution authority.",
+    "review_record": "The predecessor approach-review.json remains immutable historical provenance. This new reconciliation record and separately retained exact-SHA reviewer receipt form the replacement chain; do not overwrite that historical filename.",
+    "count": "Historical cumulative correction count remains unavailable; no invented zero, reset or accepted-risk claim. This grant permits fresh routine planning correction/re-review only within its scope; at most two correction/review cycles under the loaded workflow, otherwise stop.",
+    "task_state": "All current task boxes are unchecked before this recovery. Preserve that planning state; no task execution or progress certification is performed."
+  },
+  "pending": [
+    "Required validations",
+    "Local plan-freeze SHA/tree and reproducible guard digest/inventory",
+    "Fresh independent read-only reviewer receipt bound to that frozen identity",
+    "Explicit operator exact-plan approval; NOT GRANTED"
+  ],
+  "prohibitions": [
+    "No historical edits/deletions",
+    "No source implementation or task execution",
+    "No remote writes, issues, PR, merge or archive",
+    "No profile or installed-skill mutation",
+    "No automatic approval"
+  ]
+}

@@ -103,11 +103,16 @@ changing installation routes.
 | Cowork | Skills in its task environment | Check actual workspace access, tools, and permissions. This repository's Claude Code role protocol is not automatically a Cowork role protocol. |
 | Claude Code, including Desktop's Code tab | Coding-agent skill loading | A project checkout, Git, Node 22+ for the packaged guards, project-specific tooling, and explicit execution authority. |
 
-The orchestration path additionally requires separately reviewed project subagents
-and model/permission configuration. Follow the [Claude Code host reference](../skills/autonomous-ai-agents/autonomous-implementation-review/references/claude-code-host.md)
-and [role protocol](../skills/autonomous-ai-agents/autonomous-implementation-review/references/claude-code-roles.md).
-Installing a plugin neither creates those project files nor authorizes commits,
-checkout creation, publication, or unattended execution.
+The orchestration path uses an explicitly selected qualified terminal adapter
+(`claude-code`, `hermes`, `codex`, `grok-build`) in
+[terminal-adapters.md](../skills/autonomous-ai-agents/autonomous-implementation-review/references/terminal-adapters.md).
+The legacy `code-tab-phase-roles` subagent route documented in the
+[Claude Code host reference](../skills/autonomous-ai-agents/autonomous-implementation-review/references/claude-code-host.md)
+and [role protocol](../skills/autonomous-ai-agents/autonomous-implementation-review/references/claude-code-roles.md)
+is retired (`resolveLegacyRouteRequest` stops with `status: "retired-route"`,
+without copying `.claude/agents` templates). Installing a plugin neither
+configures an adapter nor authorizes commits, checkout creation, publication, or
+unattended execution.
 
 Anthropic documents account skills and plugins syncing into Claude Code v2.1.273+
 when signed in with the same Claude account. API-key and cloud-provider sign-ins
@@ -159,15 +164,27 @@ files plus their generated plugin metadata, README, and license.
 
 Bump the affected plugin version in the catalog whenever its selected skills or
 support files change; skill versions alone do not update the enclosing plugin.
-The source catalog's `openspec-development` 1.0.6 includes `openspec-delivery`
-1.0.5 with its shared `scripts/git-environment.mjs` and
+The source catalog's `openspec-development` 1.2.1 includes `openspec-delivery`
+1.2.1 with its shared `scripts/git-environment.mjs` and
 `references/git-environment.md` for the Git guard/workspace helpers. Also preserve
 `references/evidence-retention.md` and `scripts/evidence-retention.mjs` in complete
 copies and skill/plugin ZIP exports: this separate local representation support
 preserves captured bytes/hashes and checks claim support, not gate execution,
 reviewer authentication, approval or publication authority. The optional
-`autonomous-orchestration` stays 1.4.0 and `openspec-next` stays 0.1.1. These
+`autonomous-orchestration` is 1.7.0 (core skill 0.17.0) and `openspec-next` is 0.3.0. These
 source versions do not assert that the public marketplace/downloads are updated.
+Preserve delivery's policy/task-authoring references and `delivery-policy.mjs`,
+and orchestration's `references/portable-core.md`, `scripts/orchestration-core.mjs`,
+`references/worker-handoff.md`, `scripts/worker-handoff.mjs`,
+`references/terminal-adapters.md`, `scripts/terminal-adapters.mjs` and
+`references/profile-preparation.md`, in full copies and
+generated skill/plugin packages. The handoff pair is required portable support,
+not disposable worker scratch or evidence of adapter qualification.
+The [policy protocol](../skills/software-development/openspec-delivery/references/delivery-policy.md)
+adds no automatic plugin dependency: selected approach-review/continuous-goal
+policies need the separately installed orchestration package. Its client-neutral
+core is not Claude CLI qualification or Desktop execution evidence. Installation
+does not adopt policy, retire routes, or authorize changes to installed profiles.
 Tests reject omitted/duplicate packages, implicit orchestration or OpenSpec
 inclusion, unshared packages in multiple bundles, added active plugin components,
 unsafe paths, and symlinks, and verify archive bytes, repeatability, checksums,

@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "kind": "group-1-replacement-preservation-capture-transcript",
+  "change": "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99",
+  "task": "1.1",
+  "purpose": "Source-controlled transcription of the retained external capture. It permits a Git-only reviewer to recompute every SHA256SUMS entry, inspect every captured byte, and verify the recorded capture-before-candidate ordering without treating this transcription as the original capture.",
+  "external_capture": {
+    "root": "/home/raphael/verification-records/ai-coding-agent-skills/profile-group-1-replacement-preservation-proof-20261118T174619Z",
+    "manifest_path": "SHA256SUMS",
+    "manifest_utf8": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  owner-object.stdout.log\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  owner-status.stdout.log\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  source-ancestry.stdout.log\nafdd65f963842456dc5127e70aacc8cd055558c879802d2cc0794e0ff3e2ad2a  source-input.stdout.log\ndef46c04e6425a63cb892c16a93807c759b14fd6b44e9b0201829e1fa0b4b6d8  source-main.stdout.log\n5b8877fbdb968b99110b674b8b4a09badd039afe501178f6771d612ddff137bb  owner-object.stderr.log\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  owner-status.stderr.log\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  source-ancestry.stderr.log\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  source-input.stderr.log\ne3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  source-main.stderr.log\n56292515f7d3a7110811eb8de26b3f75f82a0766aa5a1fd66ebcfcb84fe6d5ff  owner-object.exit\n9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  owner-status.exit\n9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  source-ancestry.exit\n9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  source-input.exit\n9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa  source-main.exit\n",
+    "manifest_sha256": "1db73749ebb4c59a1d059dbf8933062972fe9264b15016509a4c40e8150ca26f",
+    "manifest_mtime_utc": "2026-11-18T17:46:19.672899Z",
+    "files": [
+      {"path":"owner-object.exit","sha256":"56292515f7d3a7110811eb8de26b3f75f82a0766aa5a1fd66ebcfcb84fe6d5ff","content_utf8":"128\n","mtime_utc":"2026-11-18T17:46:19.657847Z"},
+      {"path":"owner-object.stderr.log","sha256":"5b8877fbdb968b99110b674b8b4a09badd039afe501178f6771d612ddff137bb","content_utf8":"fatal: Not a valid object name 5f48fbe4826b739fe1f35be19de52543d101c7f5^{commit}\n","mtime_utc":"2026-11-18T17:46:19.657847Z"},
+      {"path":"owner-object.stdout.log","sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","content_utf8":"","mtime_utc":"2026-11-18T17:46:19.653947Z"},
+      {"path":"owner-status.exit","sha256":"9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa","content_utf8":"0\n","mtime_utc":"2026-11-18T17:46:19.653947Z"},
+      {"path":"owner-status.stderr.log","sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","content_utf8":"","mtime_utc":"2026-11-18T17:46:19.653947Z"},
+      {"path":"owner-status.stdout.log","sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","content_utf8":"","mtime_utc":"2026-11-18T17:46:19.653947Z"},
+      {"path":"source-ancestry.exit","sha256":"9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa","content_utf8":"0\n","mtime_utc":"2026-11-18T17:46:19.669848Z"},
+      {"path":"source-ancestry.stderr.log","sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","content_utf8":"","mtime_utc":"2026-11-18T17:46:19.665848Z"},
+      {"path":"source-ancestry.stdout.log","sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","content_utf8":"","mtime_utc":"2026-11-18T17:46:19.665848Z"},
+      {"path":"source-input.exit","sha256":"9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa","content_utf8":"0\n","mtime_utc":"2026-11-18T17:46:19.665848Z"},
+      {"path":"source-input.stderr.log","sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","content_utf8":"","mtime_utc":"2026-11-18T17:46:19.662336Z"},
+      {"path":"source-input.stdout.log","sha256":"afdd65f963842456dc5127e70aacc8cd055558c879802d2cc0794e0ff3e2ad2a","content_utf8":"5f48fbe4826b739fe1f35be19de52543d101c7f5\nb1ba4d54b29d731a4d9d188435cb9d7051af338c\nc35027bf76aed90fcb0a8658a5572544634e7336\nfeat(autonomous-review): prepare role profiles\n","mtime_utc":"2026-11-18T17:46:19.665848Z"},
+      {"path":"source-main.exit","sha256":"9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa","content_utf8":"0\n","mtime_utc":"2026-11-18T17:46:19.662336Z"},
+      {"path":"source-main.stderr.log","sha256":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","content_utf8":"","mtime_utc":"2026-11-18T17:46:19.657847Z"},
+      {"path":"source-main.stdout.log","sha256":"def46c04e6425a63cb892c16a93807c759b14fd6b44e9b0201829e1fa0b4b6d8","content_utf8":"850244e95f48c35e4485d8c7bb6de9290a233d6f\n","mtime_utc":"2026-11-18T17:46:19.662336Z"}
+    ]
+  },
+  "chronology": {
+    "capture_finished_at_utc": "2026-11-18T17:46:19.672899Z",
+    "candidate": "dfbf22fd1758804967cc5b153b7f10de4d203894",
+    "candidate_committed_at_utc": "2026-11-18T17:46:59Z",
+    "relationship": "capture_finished_before_candidate_commit",
+    "verified_from": "external filesystem mtimes observed in the retained capture and the candidate commit timestamp; filesystem mtimes are retained observations, not Git timestamps."
+  },
+  "non_acceptance": "This record neither changes task progress nor accepts task 2 or task 3. It preserves the prior review finding and is an evidence-only successor to be independently reviewed."
+}

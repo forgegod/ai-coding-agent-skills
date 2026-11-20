@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "kind": "group-1-labeled-historical-evidence-blob-proof",
+  "change": "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99",
+  "task": "1.1",
+  "preserved_candidate": "cc5f23a7f3892fb9e0e5eb858ca8b32e319ac566",
+  "candidate": "e4266d56fd4ec8de7f7cc31ebbe831e86ea7f900",
+  "capture_root": "/home/raphael/verification-records/ai-coding-agent-skills/profile-group-1-final-blob-proof-20261115T185035Z",
+  "capture": {"command": "command.txt", "stdout": "stdout.log", "stderr": "stderr.log", "exit": "exit"},
+  "assertion": "Each named historical evidence path has a labeled preserved and candidate Git blob ID, and git diff --exit-code over those same paths exited zero.",
+  "historical_evidence_byte_identical": true
+}

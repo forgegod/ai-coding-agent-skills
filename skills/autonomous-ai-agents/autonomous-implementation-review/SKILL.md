@@ -1,7 +1,7 @@
 ---
 name: autonomous-implementation-review
 description: Implement changes with an independent review loop.
-version: 0.14.0
+version: 0.17.0
 author: Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
@@ -21,13 +21,28 @@ metadata:
 
 # Autonomous Implementation Review
 
-High-risk work needs external review. The unit is one authorized OpenSpec change
-and one named task group. This skill does not specify the change and does not
-write GitHub state.
+One authorized OpenSpec change, one named task group per worker; no GitHub writes.
+
+## Portable core
+
+Follow [references/portable-core.md](references/portable-core.md),
+[references/terminal-adapters.md](references/terminal-adapters.md),
+[references/profile-preparation.md](references/profile-preparation.md) and
+`references/openspec.md`, without Hermes or Herdr. Use
+[references/worker-handoff.md](references/worker-handoff.md). Dispatch uses a
+qualified adapter; replacement readiness precedes retirement; no fallback.
+
+## Legacy host execution
+
+`replacementReadiness` is satisfied. `resolveLegacyRouteRequest` stops
+`code-tab-phase-roles` and `herdr-pane-dispatch` with `status: "retired-route"`,
+without fallback or `.claude/agents` edits. `HERDR_ENV` selects no role transport;
+[references/herdr.md](references/herdr.md) and `references/lifecycle-watch.md`
+govern only the Herdr interaction fallback.
 
 ## Preconditions and roles
 
-- Read the contributor contract, the selected `openspec/changes/<name>/` artifacts,
+- Read the contributor contract, `openspec/changes/<name>/` artifacts,
   code/tests, branch/status, gates and authority. Load `references/openspec.md`
   before dispatch. A planning-only request stops after proposal/spec/design/tasks;
   do not dispatch implementation.
@@ -35,88 +50,79 @@ write GitHub state.
   Git and `tasks.md` writer through `openspec-delivery`. The executor
   must not edit `tasks.md`, stage, commit, integrate, or retire checkouts.
   Reviewers are read-only.
-- This automated role loop is Herdr-only. Require `$HERDR_ENV=1` and load
-  [references/herdr.md](references/herdr.md) before pane control.
-  Use an explicitly selected different Herdr pane; this pane remains the orchestrator.
-  Issue #141194 blocks handoff proof. Until closed, only operator approval of pane
-  authorizes next packet.
-  No implicit consent or `delegate_task` fallback.
-  Outside Herdr, stop unless the operator sent `code-tab-phase-roles`; then load
-  `references/claude-code-roles.md`. Do not mix that token with Herdr.
-- Model keys are session selectors, not executables. A rejected key blocks;
-  never shell-execute it or edit global config.
-- Isolate writers and mutable services; use finite budgets. No secrets, destructive
-  tasks or unresolved choices; browser access must be scoped.
-- For a source checkout, compare installed skill version once and report drift;
-  source edits neither update installed skills nor authorize installation.
+- Dispatch roles via an explicitly selected qualified terminal adapter
+  (`hermes`, `claude-code`, `codex`, `grok-build`) in `references/terminal-adapters.md`.
+  One client may run all roles sequentially in fresh sessions without distinct
+  models unless `requireDistinctModels: true`. No implicit consent, `delegate_task`,
+  subagent, or multiplexer fallback. `code-tab-phase-roles` (`references/claude-code-roles.md`)
+  and Herdr pane dispatch stop at `resolveLegacyRouteRequest` (`retired-route`).
+- Model keys are session selectors, not executables; never shell-execute them or edit global config.
+- Isolate writers/services; use finite budgets; no secrets or destructive tasks.
+- Compare installed skill version to source once; source edits do not update profiles.
 
 ## Goal and repository truth
 
-In a project adopting delivery's short-invocation policy, `/openspec-next` or
-`/openspec-delivery <name>` selects the approved group and automatically calls
-this configured role loop. The operator need not repeat its Git recipe. Local
-authority includes workspace creation/bootstrap, task updates and previewed
-autonomous commits, not push/PR/merge. Restrictions override defaults.
+Under short-invocation policy, `/openspec-next` or `/openspec-delivery <name>`
+selects one approved group. Local setup/commits exclude push/PR/merge; restrictions win.
 
-Optional persisted-goal launch (display alone grants no authority):
+Optional persisted-goal launch (display grants no authority):
 
 ```text
 /goal draft /openspec-delivery <name>
 ```
 
-`/goal draft` starts execution; the operator inspects `/goal show`. Resume from
-real state; use `session_search` only for missing evidence, not scratch plans.
+`/goal draft` starts execution; inspect `/goal show`. Resume from repository truth.
 
 Use `/goal`, not `/loop`. The operator controls pause/resume/clear and `/subgoal`.
-Compression is automatic; for earlier compression the operator runs `/goal pause`,
-`/compress here 2`, inspects `/context`, then `/goal resume`.
-Printed commands do not execute.
+For earlier compression the operator runs `/goal pause`, `/compress here 2`,
+`/context`, then `/goal resume`. Printed commands do not execute.
 
-Stop discovery once scope, authority, executor, ownership, bootstrap and gates
-resolve. Reuse valid evidence; batch independent lookups.
+Stop discovery once authority, ownership, bootstrap and gates resolve.
+Reuse valid evidence; batch independent lookups.
 
 ## Procedure
 
 1. Confirm recovery and an isolated checkout through `openspec-delivery`.
    Do not start a second writer for the same change.
-2. Through the Herdr recipe, start a fresh outcome-named implementer session with
-   accepted `/busy queue`, configured model and a visible `Agent Running` readback.
-   Send outcome, scope/non-goals, workspace/base, paths, links, gates, constraints
-   and budget; require focused tests, paths/results/risks and a report with links.
-3. On watcher `settled`, inspect the candidate and run relevant checks; lifecycle is
-   not success. Under `lifecycle-watch.md`, one `inconclusive` receipt may be resumed
-   once with `--resume-from`; the role stays incomplete until it settles. Otherwise
-   non-`settled` stops. Reviewer/correction needs fresh approval; never inject
-   status/reset/goal. Dispatch failed prerequisites to a fresh implementer session;
+2. Via `references/terminal-adapters.md` (`references/profile-preparation.md` for
+   `hermes`), bind role config (`resolveRoleConfiguration`), prepare non-argv
+   transport (`preparePromptTransport`), and launch a fresh implementer session
+   (`superviseWorkerLaunch`, `createAttempt`) with outcome, scope/non-goals,
+   workspace/base, paths, gates and budget; require focused tests and a report.
+3. Admit worker output via `readHandoff` (`references/worker-handoff.md`).
+   On human-input waits, `exposeOperatorInteraction` exposes the same session
+   natively or via a fresh Herdr fallback pane (`references/herdr.md`,
+   `references/lifecycle-watch.md`, `--resume-from` once on `inconclusive`). Worker
+   caps use turn-cap recovery below; other incomplete outcomes stop.
+   Dispatch failed prerequisites to a fresh implementer session;
    the orchestrator does not edit worker code.
-4. Freeze the clean committed candidate through the integration skill. Dispatch a
-   fresh reviewer role through Herdr with base/digest, paths/diff, acceptance
-   criteria, gate evidence and implementation report. Keep the candidate frozen.
-5. Require severity-ordered findings with `path:line`, impact, trigger and minimal
-   correction/reproduction, or `No findings`. Review correctness, regressions,
-   security/privacy, data loss/concurrency, contracts and test gaps, not refactors.
-6. Reproduce findings; send confirmed fixes to a fresh implementer role in the same
-   checkout with the original contract. Changed content requires renewed gates and
-   review. Limit to two fix/review cycles; a third needs operator direction.
-7. The integration skill owns publication and completion evidence. Standalone commits
-   use project policy and `git-commit-message`. Neither agent identity nor green tests
-   grant writes. Push, pull requests and merge need separate authorization and
-   remote-ref readback. Without that authority, preserve and report the candidate.
-8. Continue only unfinished work in the named task group. Stop after that group or a
-   real blocker; no next change without a new request.
+4. Freeze the clean committed candidate via `openspec-delivery`. Dispatch a
+   fresh read-only reviewer via the selected qualified terminal adapter with
+   base/digest, paths/diff, acceptance, gate evidence and implementation report.
+5. Apply candidate review criteria in `references/portable-core.md`; require
+   actionable findings or literal `Verdict: No findings` with empty findings and
+   empty coverage limitations.
+6. Reproduce findings; send confirmed fixes to a fresh implementer role in the
+   checkout with the original contract. Changed content needs renewed gates and
+   review. Limit to eight fix/review cycles (two for already-frozen legacy work).
+7. Delivery owns publication/completion; commits use `git-commit-message`.
+   Identity/tests grant no writes. Push/PR/merge need separate authority and
+   remote-ref readback; otherwise preserve/report the candidate.
+8. Continue only unfinished work in the named task group. Stop after that group or
+   a real blocker; no next change without a new request.
 
 ## Executor turn-cap recovery
 
-`Iteration budget exhausted` means the role did not finish. The
-implementer/reviewer only returns factual state; it never self-continues or
-switches role. The orchestrator inspects report and workspace, then alone decides
-whether to stop or dispatch a fresh bounded, same-role packet for the exact
-unfinished action in the existing checkout. A cap is not completion or authority:
-split oversized packets, not raise caps.
+`Iteration budget exhausted` is incomplete. The worker stops; it never self-continues or
+switches role.
+The orchestrator alone decides via delivery's `workerContinuationDecision`
+before every cap handoff: once per native task in the existing checkout.
+Never split, relabel or change sessions to reset it; a second cap stops.
+Preserve identity, budget, review and native-input gates; follow
+`references/portable-core.md`. Legacy handoff approvals still apply.
 
 ## Pitfalls and verification
 
-- Conflicting checkout changes block; preserve them, never reset or choose a merge side.
-- This loop is done only with acceptance evidence, actual gates and frozen review.
-  Integration and documentation writes are separate authority. Separate verified
-  results, skips and blockers.
+- Conflicting checkout changes block; preserve them, never reset or pick a side.
+- Require acceptance evidence, actual gates and frozen review. Report verified
+  results, skips and blockers separately; integration/docs need separate authority.

@@ -27,15 +27,31 @@ This adds no upstream skill or runtime dependency. Package installation/validati
 does not establish native Git behavior; missing native macOS/Windows results remain
 hardening completion blockers, and WSL or case simulations do not replace them.
 
-Delivery 1.0.5 (in `openspec-development` 1.0.6) also includes
+Delivery 1.2.1 (in `openspec-development` 1.2.1) also includes
 `references/evidence-retention.md` and `scripts/evidence-retention.mjs`; keep both
 in complete companion copies and ZIPs. This is local lossless representation and
 claim-support checking, not a Git helper, gate runner, reviewer authenticator or
 approval/publication authority. It adds no upstream workflow, runtime dependency
-or installation route. `openspec-next` remains 0.1.1 and the separate optional
-`autonomous-orchestration` plugin remains 1.4.0. Installation, account sync and
+or installation route. `openspec-next` is 0.3.0 and the separate optional
+`autonomous-orchestration` plugin is 1.7.0 (core skill 0.17.0). Installation, account sync and
 host execution verification remain separate; package byte checks establish none
 of native client discovery, Desktop acceptance or scanner approval.
+
+Keep delivery's `references/delivery-policy.md`, `references/task-authoring.md`
+and `scripts/delivery-policy.mjs`, plus orchestration's `references/portable-core.md`
+and `scripts/orchestration-core.mjs`, plus its required `references/worker-handoff.md`,
+`scripts/worker-handoff.mjs`, `references/terminal-adapters.md`,
+`scripts/terminal-adapters.mjs` and `references/profile-preparation.md`, in complete copies and generated skill/plugin
+packages. Handoff support is not disposable worker scratch. Follow the
+[policy protocol](../skills/software-development/openspec-delivery/references/delivery-policy.md)
+for integrated-parent selection and contract-alignment/readiness checks. Single-group is the
+default. Explicitly selected pre-execution-review or continuous-goal policy
+requires the optional orchestration package; missing it blocks freeze/execution.
+Core checks run without Hermes/Herdr, but do not qualify any terminal client,
+retire legacy routes or change installed profiles. No new installation route or
+upstream workflow dependency is introduced; use the existing reviewed install,
+update/removal and collision/backup procedures. Policy adoption is a separate
+project decision and never retroactively rewrites frozen plans.
 
 ## Required upstream inventory
 
@@ -431,11 +447,15 @@ obsolete copies and registrations, preserve local edits/backups, and obtain
 operator approval for migration or removal. A running shared-profile skill must
 not modify or remove its own installed package.
 
-Optional orchestration still needs a supported host and separately configured
-roles/models/permissions: [Herdr](../skills/autonomous-ai-agents/autonomous-implementation-review/references/herdr.md)
-or the explicitly selected [Claude Code role protocol](../skills/autonomous-ai-agents/autonomous-implementation-review/references/claude-code-roles.md).
-Installing either upstream or companion skills does not create those roles or
-select a different orchestration host.
+Optional orchestration still needs a qualified terminal adapter and separately
+configured role/model/permission bindings:
+[terminal-adapters.md](../skills/autonomous-ai-agents/autonomous-implementation-review/references/terminal-adapters.md)
+(`hermes`, `claude-code`, `codex`, `grok-build`), with
+[Herdr](../skills/autonomous-ai-agents/autonomous-implementation-review/references/herdr.md)
+serving only as the prequalified same-session human-input fallback and the legacy
+[Claude Code role protocol](../skills/autonomous-ai-agents/autonomous-implementation-review/references/claude-code-roles.md)
+retired via `resolveLegacyRouteRequest`. Installing either upstream or companion
+skills does not configure those adapters or authorize execution.
 
 ## Keep prerequisites and instructions in the same change
 

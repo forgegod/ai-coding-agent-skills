@@ -1,8 +1,13 @@
-# Passive Herdr lifecycle watcher
+# Passive Herdr lifecycle watcher (fallback and retained surfaces)
 
-Load before the role packet. It observes one dispatch, never sends pane input, and never decides that the task succeeded.
+Use only when observing a prequalified Herdr same-session fallback pane
+(`herdr-fallback`) or a retained Herdr surface; role packets are launched only
+through a qualified terminal adapter in [terminal-adapters.md](terminal-adapters.md),
+while `resolveLegacyRouteRequest` stops `herdr-pane-dispatch` with
+`status: "retired-route"`. The watcher observes one surface, never sends pane
+input, and never decides that the task succeeded.
 
-## Arm, dispatch, then leave
+## Arm and observe
 
 1. Start one background watcher with a fresh absolute receipt outside the target checkout:
 
@@ -18,11 +23,9 @@ Use `background=true`, `persist_on_release=true`, and `notify=true`. That notifi
 node <this-skill-dir>/scripts/herdr_lifecycle_watch.mjs --wait-armed --receipt <same-receipt> --timeout-ms 10000
 ```
 
-Require exit 0 and JSON `outcome` `armed`. The baseline is visibly `idle`, with literal pane, workspace, and terminal IDs and `source: pane-output`. Any other result blocks delivery: stop that background process with `process_manage`, and do not dispatch or start another watcher.
+Require exit 0 and JSON `outcome` `armed`. The baseline is visibly `idle`, with literal pane, workspace, and terminal IDs and `source: pane-output`. Any other result blocks observation: stop that background process with `process_manage`, and do not start another watcher.
 
-3. Send the role packet once, without `--wait`, then end the turn. Do not poll, run `herdr agent wait`, or inject input. The watcher never runs `agent prompt`, `/new`, `/busy`, `/goal`, or a status question.
-The setup `/status` readback belongs to herdr.md step 4, before arming; while this
-watcher runs it stays forbidden.
+3. For a retained Herdr observation, never poll, run `herdr agent wait`, or inject input. The watcher never runs `agent prompt`, `/new`, `/busy`, `/model`, `/goal`, or `/status`. Qualified terminal adapters prepare Hermes profiles offline via `references/profile-preparation.md` rather than live pane slash setup; while this watcher runs, pane input stays forbidden.
 
 4. On the exit notification, read the receipt once with `read_file`. The last JSON object is the verdict; earlier `unreadable` lines are samples and can precede `settled`. If the watcher ended `inconclusive`, the role may still be running. Run one fresh `--inspect` and compare its literal pane, workspace, and terminal IDs with the receipt's `final` identity. A verdict that followed `unreadable` events means frames could not be parsed, not that the pane looked unfamiliar: the recorded excerpt shows what was on screen. Only when all three match and the status is `working` may you resume:
 
@@ -40,9 +43,11 @@ It uses `herdr agent get <pane-id>` before and after `agent read <pane-id> --sou
 The packaged `herdr-pane-state.mjs` binds literal identities and reads activity
 from the current bottom composer/footer. `agent_status`, `state_change_seq`, and
 `completion_seq` are not activity evidence: they can remain frozen while Hermes works.
-Nor can pane output identify the bound Hermes session. While issue #141194 remains
-open, a watcher receipt never authorizes a role handoff; explicit operator approval
-of the literal next target pane is the only continuation authority.
+Nor can pane output identify the bound Hermes session: under issue #141194, a
+watcher receipt never authorizes a role handoff, and historical per-pane
+approval on legacy Herdr role dispatch is why `herdr-pane-dispatch` is retired
+via `resolveLegacyRouteRequest` (current role continuations use qualified
+terminal adapters and `workerContinuationDecision`).
 `settled` requires observed post-baseline visible `working`, then two matching
 visible `idle` samples. Stable `blocked` is not completion. Identity drift or an
 API error fails closed; unfamiliar UI is inconclusive. Never use old transcript
@@ -51,14 +56,14 @@ API error fails closed; unfamiliar UI is inconclusive. Never use old transcript
 The supported English CLI has either a `☤ ❯` composer or a named-session prompt
 ending in `❯`, plus a `☤` status footer. Working needs the busy-queue placeholder
 plus a live `⏱`/spinner or `ctrl+c stop` hint; idle needs an empty composer and
-frozen `⏲` without that stop hint. Drafts, queued input and live subagents block
-automatic injection. Other skins, locales, TUI layouts, truncation or overlays
+frozen `⏲` without that stop hint. Drafts, queued input and live subagents are
+reported as ambiguous rather than idle. Other skins, locales, TUI layouts, truncation or overlays
 require operator recovery, not an automatic fallback to metadata.
 
 An `unknown` status carries a `reason` in two classes, and the watcher treats them
 differently. `composer-text` and `queued-input` are readable screens whose input is
 ambiguous: they stop the watch at once, because no observation can prove such a
-pane safe to inject into. `no-composer`, `no-footer` and `no-activity-marker` mean
+pane idle. `no-composer`, `no-footer` and `no-activity-marker` mean
 the frame itself could not be read. A repaint in flight hides the composer and
 footer rows for milliseconds, so one such sample is not evidence of an unfamiliar
 UI: the watcher tolerates `--unknown-tolerance <n>` consecutive unreadable frames
@@ -78,7 +83,7 @@ panel titles are translated: `🔐` password, `🔑` credential, `⚠` approval,
 `✎`/`?` clarify, `⚙` connection. A `blocked` status carries the matching
 `reason`: `password-prompt`, `credential-prompt`, `approval`, `clarify` or
 `connection`. Prose in the transcript that merely names a prompt is not a
-pending prompt and must stay injectable.
+pending prompt and remains `idle` when the composer is empty.
 
 | Outcome | Meaning | Action |
 | --- | --- | --- |
@@ -96,7 +101,7 @@ A resumed watch inherits the earlier working evidence, so it can settle without
 re-observing `working` in its own samples; it still requires the same terminal
 and two matching stable terminal samples. It sends no input and starts no new
 role. A later `inconclusive` is not success, and the same receipt cannot be
-resumed twice. A role switch still needs the orchestrator's separate, explicitly
-approved handoff after factual verification.
+resumed twice. Any new role attempt is launched through a qualified terminal
+adapter after factual verification.
 
 For every non-`settled` outcome, read the recorded events first: a transient unreadable frame is already preserved there with its excerpt, and a later `agent read` cannot reproduce it. Then capture `herdr agent get`, `herdr agent read`, and external artifacts. Never inject a status request while watching. Waiting is an external process, so it spends neither executor tokens nor goal turns. A deadline bounds polling and debounce; it cannot become a late `settled`.

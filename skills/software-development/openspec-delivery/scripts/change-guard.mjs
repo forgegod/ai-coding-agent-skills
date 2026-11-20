@@ -2,7 +2,7 @@
 // Read-only committed OpenSpec evidence checks. Not a lock or execution attestation.
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { closeSync, constants, fstatSync, lstatSync, openSync, readFileSync, readSync, realpathSync } from "node:fs";
+import { closeSync, constants, fstatSync, lstatSync, openSync, readFileSync, readdirSync, readSync, realpathSync } from "node:fs";
 import path from "node:path";
 import { parseArgs } from "node:util";
 import { gitEnvironment } from "./git-environment.mjs";
@@ -104,21 +104,27 @@ function taskLines(source) {
   requireThat(tasks.length > 0, "Expected at least one real OpenSpec task");
   return { normalized: bom + normalized, complete: tasks.every(Boolean) };
 }
+function planningPaths(allPaths, change) {
+  const prefix = root(change);
+  const required = ["openspec/config.yaml", `${prefix}.openspec.yaml`, `${prefix}proposal.md`, `${prefix}tasks.md`];
+  for (const file of required) requireThat(allPaths.includes(file), `Missing planning file: ${file}`);
+  return allPaths.filter((file) => required.includes(file) || file === `${prefix}design.md` || file.startsWith(`${prefix}specs/`)).sort();
+}
 function planning(repo, ref, change) {
   const prefix = root(change);
   const tree = entries(repo, ref);
-  const required = ["openspec/config.yaml", `${prefix}.openspec.yaml`, `${prefix}proposal.md`, `${prefix}tasks.md`];
-  for (const file of required) requireThat(tree.has(file), `Missing planning file: ${file}`);
-  const paths = [...tree.keys()].filter((file) => required.includes(file) || file === `${prefix}design.md` || file.startsWith(`${prefix}specs/`)).sort();
+  const paths = planningPaths([...tree.keys()], change);
   // Path, mode and raw blob bytes are length-framed into one SHA-256 digest so that
   // arbitrary bytes hash distinctly instead of being lossily re-encoded.
   const hash = createHash("sha256");
+  const inputs = {};
   let complete = false;
   for (const file of paths) {
     const entry = tree.get(file);
     requireThat(entry.type === "blob" && ["100644", "100755"].includes(entry.mode), `Planning inputs must be regular files: ${file}`);
     let bytes = gitBytes(repo, "show", `${ref}:${file}`);
     requireThat(bytes.length <= MAX_PLANNING_BYTES, `Planning input is too large: ${file}`);
+    inputs[file] = createHash("sha256").update(bytes).digest("hex");
     if (file === `${prefix}tasks.md`) {
       const tasks = taskLines(decode(bytes, `Planning input is not valid UTF-8: ${file}`));
       bytes = Buffer.from(tasks.normalized, "utf8");
@@ -129,7 +135,61 @@ function planning(repo, ref, change) {
     hash.update(bytes);
     hash.update(Buffer.from([0]));
   }
-  return { digest: hash.digest("hex"), complete };
+  return { digest: hash.digest("hex"), complete, inputs };
+}
+
+function planningWorktree(repo, change) {
+  const prefix = root(change);
+  const inspect = (relative) => {
+    let current = repo;
+    const parts = relative.split("/");
+    for (const [index, part] of parts.entries()) {
+      current = path.join(current, part);
+      const info = lstatSync(current);
+      requireThat(!info.isSymbolicLink(), `Planning symlink is unsupported: ${relative}`);
+      if (index < parts.length - 1) requireThat(info.isDirectory(), `Planning parent must be a directory: ${relative}`);
+      else return info;
+    }
+  };
+  const optional = (relative) => {
+    try { return inspect(relative); }
+    catch (error) { if (error.code === "ENOENT") return null; throw error; }
+  };
+  const files = ["openspec/config.yaml", ...[".openspec.yaml", "proposal.md", "tasks.md"].map((file) => prefix + file)];
+  if (optional(`${prefix}design.md`)) files.push(`${prefix}design.md`);
+  const walk = (relative) => {
+    const info = inspect(relative);
+    if (info.isDirectory()) for (const name of readdirSync(path.join(repo, relative))) walk(`${relative}/${name}`);
+    else { requireThat(info.isFile(), `Planning inputs must be regular files: ${relative}`); files.push(relative); }
+  };
+  if (optional(`${prefix}specs`)) {
+    requireThat(inspect(`${prefix}specs`).isDirectory(), "Planning specs must be a directory");
+    walk(`${prefix}specs`);
+  }
+  const inputs = {};
+  for (const file of planningPaths(files, change)) {
+    const before = inspect(file);
+    requireThat(before.isFile() && before.size <= MAX_PLANNING_BYTES, `Planning input must be a bounded regular file: ${file}`);
+    const descriptor = openSync(path.join(repo, file), constants.O_RDONLY | (constants.O_NOFOLLOW || 0));
+    try {
+      const info = fstatSync(descriptor);
+      requireThat(info.isFile() && info.size === before.size && info.dev === before.dev && info.ino === before.ino, `Planning input changed during open: ${file}`);
+      const buffer = Buffer.alloc(info.size + 1);
+      let total = 0;
+      while (total < buffer.length) {
+        const length = readSync(descriptor, buffer, total, buffer.length - total, null);
+        if (!length) break;
+        total += length;
+      }
+      const after = fstatSync(descriptor);
+      requireThat(total === info.size && after.mtimeMs === info.mtimeMs && after.ctimeMs === info.ctimeMs, `Planning input changed during read: ${file}`);
+      const bytes = buffer.subarray(0, total);
+      const source = decode(bytes, `Planning input is not valid UTF-8: ${file}`);
+      if (file === `${prefix}tasks.md`) taskLines(source);
+      inputs[file] = createHash("sha256").update(bytes).digest("hex");
+    } finally { closeSync(descriptor); }
+  }
+  return { ok: true, change, inputs };
 }
 function clean(repo, head, requireBranch = true) {
   requireThat(git(repo, "rev-parse", "HEAD").trim() === head, "Checkout HEAD changed");
@@ -291,12 +351,30 @@ function receipt(o) {
   clean(o.repo, target, false);
   return { ...snapshot, integrated, verified, target, receiptSha256: record.sha256 };
 }
+function policyContext(o) {
+  const plan = commit(o.repo, o.plan);
+  const target = commit(o.repo, o.target);
+  const parents = git(o.repo, "rev-list", "--parents", "-n", "1", plan).trim().split(/\s+/).slice(1);
+  requireThat(parents.length === 1, "Plan must have one integrated parent");
+  const [parent] = parents;
+  ancestor(o.repo, parent, target);
+  const contractInputs = {};
+  for (const [file, entry] of entries(o.repo, parent)) {
+    if (!["AGENTS.md", "CLAUDE.md"].includes(file.split("/").at(-1))) continue;
+    requireThat(entry.type === "blob" && ["100644", "100755"].includes(entry.mode), `Contributor contract must be a regular file: ${file}`);
+    contractInputs[file] = createHash("sha256").update(gitBytes(o.repo, "show", `${parent}:${file}`)).digest("hex");
+  }
+  const result = planning(o.repo, plan, o.change);
+  const changedPaths = git(o.repo, "diff-tree", "--no-commit-id", "--no-renames", "--name-only", "-r", "-z", parent, plan).split("\0").filter(Boolean).sort();
+  return { ok: true, change: o.change, plan, parent, target, planDigest: result.digest, inputs: result.inputs, contractInputs, changedPaths };
+}
+
 function main() {
   childEnv = gitEnvironment(process.env);
   const command = process.argv[2];
-  requireThat(["candidate", "review", "receipt"].includes(command), "Expected candidate, review or receipt command");
+  requireThat(["planning", "planning-worktree", "policy-context", "candidate", "review", "receipt"].includes(command), "Expected planning, planning-worktree, policy-context, candidate, review or receipt command");
   const args = process.argv.slice(3);
-  const names = ["repo", "change", ...(command === "receipt" ? ["target", "receipt", "issue", "receipt-path", "max-closure-commits"] : ["base", "head", "plan", "expect-plan", ...(command === "review" ? ["issue", "review"] : [])])];
+  const names = ["repo", "change", ...(command === "planning-worktree" ? [] : command === "policy-context" ? ["plan", "target"] : command === "planning" ? ["head"] : command === "receipt" ? ["target", "receipt", "issue", "receipt-path", "max-closure-commits"] : ["base", "head", "plan", "expect-plan", ...(command === "review" ? ["issue", "review"] : [])])];
   const seen = new Set();
   for (const arg of args) {
     const match = /^--([A-Za-z][A-Za-z-]*)(?:=|$)/.exec(arg);
@@ -309,6 +387,13 @@ function main() {
   if (o["expect-plan"] !== undefined) requireThat(/^[a-f0-9]{64}$/.test(o["expect-plan"]), "Expected a full plan digest");
   requireThat(path.isAbsolute(o.repo) && realpathSync(o.repo) === realpathSync(git(o.repo, "rev-parse", "--show-toplevel").trim()), "Expected an absolute repository-root path");
   topology(o.repo);
+  if (command === "planning-worktree") return console.log(JSON.stringify(planningWorktree(o.repo, o.change)));
+  if (command === "policy-context") return console.log(JSON.stringify(policyContext(o)));
+  if (command === "planning") {
+    const head = commit(o.repo, o.head);
+    const result = planning(o.repo, head, o.change);
+    return console.log(JSON.stringify({ ok: true, head, change: o.change, planDigest: result.digest, inputs: result.inputs }));
+  }
   if (command === "candidate") return console.log(JSON.stringify({ ok: true, ...candidate(o) }));
   if (command === "review") {
     const snapshot = candidate(o);

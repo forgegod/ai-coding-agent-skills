@@ -35,6 +35,25 @@ GitHub issues and pull requests document and review. They are not the task list 
 
 Installing these packages does not select the workflow for another project, transfer that project's records, or grant Git or GitHub authority.
 
+The [delivery policy protocol](skills/software-development/openspec-delivery/references/delivery-policy.md)
+checks the integrated plan parent and declared contributor-contract paths before
+freeze/execution; independent review determines goal alignment without a separate
+approval checkpoint for an in-scope edit. Single-group continuation remains the default; pre-execution
+approach review and continuous-goal continuation require explicit selection at
+that parent and the optional orchestration package. Later policy edits do not
+widen frozen plans. Its [portable core](skills/autonomous-ai-agents/autonomous-implementation-review/references/portable-core.md)
+checks outcome/review evidence without Hermes or Herdr; it does not qualify a
+client or retire a legacy route. Terminal adapter qualification remains a separate
+prerequisite for new role dispatch. Minimum-outcome authoring accompanies workflow
+adoption for unfrozen plans, without rewriting already-approved plans.
+The [artifact-first handoff](skills/autonomous-ai-agents/autonomous-implementation-review/references/worker-handoff.md)
+binds immutable requests, complete native reports/captures and atomic adapter-only
+results. Execution completion never grants delivery acceptance. Routine corrections
+use the permitted writer and retained budget; one verified iteration-cap continuation
+is keyed to the native task, not a session or label. Unintegrated contract changes
+are inert for their own change through integration. This repository's future-policy
+selection becomes effective only for later plans after integration.
+
 The delivery Git helpers share an explicit [child environment contract](skills/software-development/openspec-delivery/references/git-environment.md):
 only allowlisted runtime/configuration values reach Git, with global/system selectors
 preserved and topology overrides refused. Configuration remains trusted, not sandboxed.
@@ -340,9 +359,14 @@ Use `autonomous-implementation-review` from the orchestrator session, not an
 executor pane. It coordinates implementation and review for one authorized
 OpenSpec task group. It does not replace OpenSpec artifacts or create a second
 progress tracker.
-This automated role loop currently supports Herdr only (`HERDR_ENV=1`, selected
-Hermes executor, verified model keys). Outside Herdr, stop unless the operator
-sent `code-tab-phase-roles`. Do not invent a fallback transport.
+Role execution uses an explicitly selected qualified terminal adapter
+(`hermes`, `claude-code`, `codex`, `grok-build`) under
+`skills/autonomous-ai-agents/autonomous-implementation-review/references/terminal-adapters.md`.
+Legacy requests for operator-selected Herdr pane dispatch (`herdr-pane-dispatch`)
+or `code-tab-phase-roles` stop at `resolveLegacyRouteRequest` with
+`status: "retired-route"`, without fallback or `.claude/agents` edits (`HERDR_ENV`
+does not select a role transport; Herdr remains available as the prequalified
+same-session human-input fallback).
 
 For a project that explicitly adopts the short-invocation policy, the operator
 sends `/openspec-next` to advance the current approved group, or
@@ -368,11 +392,22 @@ dispatching. Use `/goal show` to inspect the drafted contract. Pause or clear it
 if it materially misstates the change.
 
 The operator decides when and where to send the goal. After submission,
-`autonomous-implementation-review` keeps that session as orchestrator and asks
-for an explicitly selected different Herdr pane for implementer/reviewer roles.
-It owns that role handoff, including fresh-session queue/model setup, visible
-idle/input checks and passive executor monitoring. It never resets or runs a
-worker in the orchestrator pane. A displayed goal grants no execution authority.
+`autonomous-implementation-review` keeps that session as orchestrator and
+launches fresh implementer and read-only reviewer sessions through the selected
+qualified terminal adapter (`hermes`, `claude-code`, `codex`, `grok-build`),
+publishing sealed attempt handoffs (`worker-handoff.mjs`) and exposing any
+native human-input wait on the same session (`exposeOperatorInteraction`,
+native CLI or fresh Herdr fallback pane). It never resets or runs a worker in
+the orchestrator session. A displayed goal grants no execution authority.
+
+#### Configure and verify qualified terminal adapters
+
+See [`references/terminal-adapters.md`](skills/autonomous-ai-agents/autonomous-implementation-review/references/terminal-adapters.md)
+for the complete adapter inventory and executable JSON examples:
+
+- **Supported clients and selectors:** `hermes` (`>=0.23.0 <1.0.0`, `--profile <verified-profile> chat --query-file <-|prompt.md> --oneshot --format stream-json --pass-session-id --in <workspace> -t <file|file,terminal>`, profile keys `model.default`, `model.provider`, `display.busy_input_mode = queue`, declarative frontmatter `autonomous_ai_agents.implementer` / `autonomous_ai_agents.reviewer`), `claude-code` (`>=2.1.273 <3.0.0`, `--print --output-format json --session-id <session> --permission-mode <plan|manual> --tools <...> --disallowed-tools <...>` with `stdin`), `codex` (`>=0.167.0 <1.0.0`, `exec - -C <workspace> -s <read-only|workspace-write> --json -o <captureDir>/last-message.txt` with `stdin`), and `grok-build` (`>=1.0.89 <2.0.0`, `--prompt-file <captureDir>/prompt.md --cwd <workspace> -s <session> --no-subagents --no-leader --output-format json --permission-mode <plan|default> --disallowed-tools <...>`). Workers run with scratch `HOME=<scratchRoot>` and `TMPDIR=<scratchRoot>`; external-client model/provider selection is verified via caller-supplied `effectiveReadback` in `resolveRoleConfiguration` rather than injected into `preparePromptTransport` argv. `opencode`, `kilo-modern`, `kilo-legacy`, `pi`, and chat-only `grok-bot` remain explicit unsupported candidates.
+- **Precedence, effective verification, and changing/removing selections:** `resolveRoleConfiguration` applies `per-run-override` > `project-default` > `client-default` within project restrictions (`allowedClients`, `allowedProviders`, `allowedModels`, `requireDistinctModels`), requires positive `effectiveReadback` (`verified: true`, `credentialsRead: false`, `aliasOnly: false`, `entitlementOnly: false`, `globalDefaultsModified: false`), and supports one-client sequential (same or different model) or mixed-client execution in distinct fresh sessions. Change a selection with a new `perRunOverride`; remove it by clearing `perRunOverride` or retiring the disposable role profile/scratch config root without modifying persistent global settings.
+- **Native CLI default, interaction exposure, and artifact handoffs:** Native CLI execution is default (`native-cli` qualification requires no Herdr); Herdr is mandatory only as the bound `herdr-fallback` when unavoidable operator input cannot use native exposure (orchestrator-created fresh pane without per-pane approval or setup, verified prior-process termination before resume, and state preservation on unavailable routes). Adapters write sealed `request.md` (`0400`), `report.md`, `native.txt`, `stderr.log`, `exit.txt`, `lifecycle.jsonl`, and atomic `result.json` (`0400` in a `0700` attempt directory, plus `<scratchRoot>/transport/` for `stdout.log`, `stderr.log`, and `exit.txt`) outside the checkout; lifecycle completion never implies delivery acceptance, and invalid or incomplete artifacts throw in `readHandoff` (not admitted; preserving the `0700` attempt directory and any sealed `0400` files inside it as evidence) and recover only via a new `predecessor` (`predecessorAttemptId`)-linked attempt directory.
 
 Publication, a pull request, and merge need separate authorization. The
 [SDLC](docs/openspec-workflow.md) owns that boundary. A pull request documents
@@ -396,20 +431,22 @@ artifact, use only its documented repository-tracked location.
 
 #### Fresh-session busy-input protection
 
-When the orchestrator starts a fresh executor session, it sends `/new --yes
-<goal-name>`, verifies visible idle through output inspection, then sends `/busy queue` before
-the model or role task. Queue mode keeps any later operator message as the next
-turn instead of redirecting the executor's active work. This is an orchestrator
-action; the operator does not need to send it separately during a normal run.
+When the `hermes` terminal adapter is used, Hermes role profiles are prepared
+offline via `references/profile-preparation.md` (`hermes --profile <name> config set display.busy_input_mode queue`
+and `verifyHermesProfilePreparation` two-process readbacks) rather than injecting
+live `/new`, `/busy queue`, `/model`, or `/status` commands into a pane. Queue
+mode keeps any later operator message as the next turn instead of redirecting
+active work.
 
 #### Stop an execution deliberately
 
 Stopping is an explicit operator decision. The operator sends `/goal pause` in
 the orchestrator session; the orchestrator does not dispatch another packet.
-After the executor settles, the orchestrator prompts it with `/stop` to stop Hermes background processes and
-then verifies the pane state. `/stop` is not an immediate foreground-turn
-interrupt; with `/busy queue` it is queued until the current role turn finishes.
-Do not use `ctrl+c` as an undocumented substitute.
+To stop a running terminal worker, the adapter terminates the exact owned
+process tree only after immediate identity readback (`handleWorkerStopOrViolation`),
+never by injecting `/stop` into an executor pane or scraping live pane state.
+In an interactive Hermes session, `/stop` is not an immediate foreground-turn
+interrupt. Do not use `ctrl+c` as an undocumented substitute.
 
 Do not use `/loop` for implementation and review: it replays a fixed prompt on
 a cadence and lacks `/goal`'s outcome, verification, constraint, boundary, and
@@ -519,13 +556,14 @@ loaded skill path and content rather than relying only on the model's claim.
 
 Reference: [Claude Code skills](https://code.claude.com/docs/en/skills).
 
-That copy installs skills only. It does not install Code-tab subagents and does
-not receive Hermes scanner approval for them. Role templates are
+That copy installs skills only. With `replacementReadiness` verified, the legacy
+`code-tab-phase-roles` subagent route is retired (`resolveLegacyRouteRequest`
+stops with `status: "retired-route"` and redirects to the standalone `claude-code`
+terminal adapter in `references/terminal-adapters.md`). The files
 `templates/phase-implementer.md` and `templates/phase-reviewer.md` in
-`autonomous-implementation-review`. Copy them into the target project's `.claude/agents/` only
-after review, and refuse an existing file. Set distinct non-`inherit` `model`
-values and keep the parent session in Manual mode before use. Absence of Herdr
-does not select this path.
+`autonomous-implementation-review` are retired legacy templates retained for
+package compatibility: do not copy them into `.claude/agents/` or dispatch
+subagents for role execution.
 
 ### Codex
 
@@ -696,14 +734,22 @@ no generated skill copies are committed. Its explicit skill lists separate the
 OpenSpec companion workflow from opt-in orchestration. Bump every affected plugin's version when
 its bundled content changes. See the [Claude release checks](docs/claude-installation.md#maintainer-verification).
 
-Current source versions are delivery 1.0.5 and its affected
-`openspec-development` plugin 1.0.6; `openspec-next` remains 0.1.1 and
-`autonomous-orchestration` remains 1.4.0. Complete well-known output, the delivery
+Current source versions are delivery 1.2.1 and its affected
+`openspec-development` plugin 1.2.1; `openspec-next` is 0.3.0 and
+`autonomous-orchestration` is 1.7.0 (core skill 0.17.0). Complete well-known output, the delivery
 skill ZIP, workflow plugin ZIP and isolated native copies must retain the lossless
 reference/helper pair byte-for-byte. Source assertions are not executed packaging
 proof or a claim of updated public downloads, native client discovery, Desktop
 acceptance or scanner approval. No upstream prerequisite or installation route is
 added by this representation facility.
+
+Preserve orchestration's complete `references/portable-core.md`,
+`scripts/orchestration-core.mjs`, `references/worker-handoff.md`,
+`scripts/worker-handoff.mjs`, `references/terminal-adapters.md`,
+`scripts/terminal-adapters.mjs` and `references/profile-preparation.md` in well-known output, skill/plugin ZIPs and native
+copies. The artifact publisher/reader is part of the portable core, not optional
+adapter scratch or a qualification result. Keep delivery's `references/delivery-policy.md`,
+`references/task-authoring.md` and `scripts/delivery-policy.mjs` as well.
 
 The optional `npm run test:local-update` probe requires the installed `hermes`
 CLI and internet access. It installs all local packages into a disposable scratch

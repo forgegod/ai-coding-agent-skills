@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "kind": "group-1-reconstruction-preservation-reconciliation",
+  "change": "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99",
+  "task": "1.1",
+  "preserved_candidate": "cc5f23a7f3892fb9e0e5eb858ca8b32e319ac566",
+  "candidate": "f8fe991d5858a6a4c773539691879b2d5dd07503",
+  "approved_plan": "480c443b43bf344a3bbd83ade5a28f1a274a7e1a",
+  "approved_digest": "b8aad918d69fd5eb190a1ac1e8dc662f319a2074060cfd71fa3d79bc2ab32aee",
+  "capture_root": "/home/raphael/verification-records/ai-coding-agent-skills/profile-group-1-preservation-repair-20261115T182756Z",
+  "observations": {
+    "preserved_to_candidate_name_status": "preserved-to-candidate-name-status.stdout.log",
+    "plan_to_candidate_name_status": "plan-to-candidate-name-status.stdout.log",
+    "historical_evidence_blob_comparison": "historical-evidence-blobs.stdout.log"
+  },
+  "result": {
+    "source_outside_change_package_unchanged": true,
+    "historical_evidence_byte_identical": true,
+    "plan_to_candidate_changes_are_existing_task_progress_and_evidence": true
+  },
+  "limitations": "This is a fresh reconciliation observation. It preserves, rather than reconstructs, the historical placeholder captures."
+}
