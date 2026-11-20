@@ -1,9 +1,29 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { chmod, mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import * as core from "../skills/autonomous-ai-agents/autonomous-implementation-review/scripts/orchestration-core.mjs";
+
+const resolveChangeEvidenceUrl = async (
+  change,
+  relativePath,
+  changesDirUrl = new URL("../openspec/changes/", import.meta.url),
+) => {
+  const activeUrl = new URL(`${change}/${relativePath}`, changesDirUrl);
+  try {
+    await stat(activeUrl);
+    return activeUrl;
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+  }
+  const archiveDirUrl = new URL("archive/", changesDirUrl);
+  const archivePattern = new RegExp(`^\\d{4}-\\d{2}-\\d{2}-${change}$`);
+  const entries = (await readdir(archiveDirUrl)).filter((entry) => archivePattern.test(entry));
+  assert.equal(entries.length, 1, `expected active or single archived change for ${change}`);
+  return new URL(`${entries[0]}/${relativePath}`, archiveDirUrl);
+};
 
 const validProbe = (overrides = {}) => ({
   client: "hermes",
@@ -55,18 +75,34 @@ test("candidate qualification records cover all eight design candidates plus cha
   assert.equal(readiness.shipHermesProfilePreparation, true);
   assert.equal(readiness.bootstrapExceptionExpired, true);
 
-  const evidenceRaw = await readFile(
-    new URL(
-      "../openspec/changes/profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99/evidence/group-3-candidate-qualification-20261119.json",
-      import.meta.url,
-    ),
-    "utf8",
-  );
+  const changeName = "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99";
+  const evidenceRelPath = "evidence/group-3-candidate-qualification-20261119.json";
+  const evidenceRaw = await readFile(await resolveChangeEvidenceUrl(changeName, evidenceRelPath), "utf8");
   const evidence = JSON.parse(evidenceRaw);
   for (const name of [...core.DESIGN_CANDIDATES, "grok-bot"]) {
     assert.ok(evidence.candidates[name], `missing candidate evidence for ${name}`);
     assert.equal(evidence.candidates[name].status, core.CANDIDATE_RECORDS[name].status, name);
     assert.equal(evidence.candidates[name].supported, core.CANDIDATE_RECORDS[name].supported, name);
+  }
+
+  const scratchChanges = await mkdtemp(path.join(os.tmpdir(), "qual-archive-resolve-"));
+  try {
+    const archivedEvidencePath = path.join(
+      scratchChanges,
+      "archive",
+      `2026-11-20-${changeName}`,
+      evidenceRelPath,
+    );
+    await mkdir(path.dirname(archivedEvidencePath), { recursive: true });
+    await writeFile(archivedEvidencePath, evidenceRaw, "utf8");
+    const resolvedArchivedUrl = await resolveChangeEvidenceUrl(
+      changeName,
+      evidenceRelPath,
+      pathToFileURL(`${scratchChanges}/`),
+    );
+    assert.equal(await readFile(resolvedArchivedUrl, "utf8"), evidenceRaw);
+  } finally {
+    await rm(scratchChanges, { recursive: true, force: true });
   }
 });
 
