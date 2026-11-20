@@ -1,0 +1,16 @@
+# Pre-gate detached worktree readback
+DETACHED_WT=/home/raphael/src/ai-coding-agent-skills--profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99-integrated-36076f5
+WT_HEAD=36076f5be86eed9c1529d7c9d16baf88802648db
+WT_TREE=23f1b2adfde4b31b089ef44cd2e3af806fd6f34a
+WT_BRANCH_BYTES=0
+WT_STATUS_EMPTY=yes
+SCANNER_ROOT=/home/raphael/.hermes/hermes-agent
+SCANNER_HEAD=ae2a81ccc00e9b7c06301523e5bb09608397149c
+SCANNER_FILE_SHA=a1b174fc7febc1b619d89b4acb2da2726067ad5851d9065adec15850f1f5862d
+
+# Post-gate detached worktree readback
+DETACHED_WT=/home/raphael/src/ai-coding-agent-skills--profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99-integrated-36076f5
+WT_HEAD=36076f5be86eed9c1529d7c9d16baf88802648db
+WT_TREE=23f1b2adfde4b31b089ef44cd2e3af806fd6f34a
+WT_BRANCH_BYTES=0
+WT_STATUS_EMPTY=yes

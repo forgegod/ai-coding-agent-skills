@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "change": "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99",
+  "issueUrl": "https://github.com/forgegod/ai-coding-agent-skills/issues/21",
+  "base": "42a975d8da521de82972be1824546ccd45a3b27d",
+  "head": "4d625da62862a617ed4d860c1670f82079fc7173",
+  "plan": "54a09ec9fccf0da3d5db6aaa353ee8990d8b8fd0",
+  "planDigest": "79e6cd8808746fbf9201d9e8b39401aebc89854096bab21aea6b5e3fa7956289",
+  "integrated": "36076f5be86eed9c1529d7c9d16baf88802648db",
+  "verified": "36076f5be86eed9c1529d7c9d16baf88802648db",
+  "review": {
+    "schemaVersion": 1,
+    "change": "profile-oriented-autonomous-orchestration-01m7d0f7jvv3wyg9ng26fq2w99",
+    "issueUrl": "https://github.com/forgegod/ai-coding-agent-skills/issues/21",
+    "head": "4d625da62862a617ed4d860c1670f82079fc7173",
+    "planDigest": "79e6cd8808746fbf9201d9e8b39401aebc89854096bab21aea6b5e3fa7956289",
+    "verdict": "pass",
+    "findings": [],
+    "reviewer": "hermes-dev-review (grok-4.7 xai-oauth, session local-0908dca3640b9da9d7d4416a339e7239f7d1582e9561412e8e511a427ede6d59, Herdr pane w1G:p1F, terminal term_660b02eee699031)",
+    "reference": "/home/raphael/verification-records/ai-coding-agent-skills/archive-path-repair-20261120T071425Z/attempt2-settled/pane-scrollback-2000.txt",
+    "gates": [
+      {
+        "command": "npm run validate:openspec",
+        "commit": "4d625da62862a617ed4d860c1670f82079fc7173",
+        "exitCode": 0,
+        "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/archive-path-repair-20261120T071425Z/candidate-gates/01-validate-openspec"
+      },
+      {
+        "command": "openspec validate --all --strict --json --no-interactive",
+        "commit": "4d625da62862a617ed4d860c1670f82079fc7173",
+        "exitCode": 0,
+        "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/archive-path-repair-20261120T071425Z/candidate-gates/02-openspec-strict"
+      },
+      {
+        "command": "npm test",
+        "commit": "4d625da62862a617ed4d860c1670f82079fc7173",
+        "exitCode": 0,
+        "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/archive-path-repair-20261120T071425Z/candidate-gates/03-npm-test"
+      },
+      {
+        "command": "npm run build",
+        "commit": "4d625da62862a617ed4d860c1670f82079fc7173",
+        "exitCode": 0,
+        "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/archive-path-repair-20261120T071425Z/candidate-gates/04-npm-build"
+      },
+      {
+        "command": "HERMES_SOURCE=/home/raphael/.hermes/hermes-agent npm run test:security",
+        "commit": "4d625da62862a617ed4d860c1670f82079fc7173",
+        "exitCode": 0,
+        "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/archive-path-repair-20261120T071425Z/candidate-gates/05-test-security"
+      },
+      {
+        "command": "git diff --check 42a975d8da521de82972be1824546ccd45a3b27d..4d625da62862a617ed4d860c1670f82079fc7173",
+        "commit": "4d625da62862a617ed4d860c1670f82079fc7173",
+        "exitCode": 0,
+        "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/archive-path-repair-20261120T071425Z/candidate-gates/06-git-diff-check"
+      },
+      {
+        "command": "node skills/software-development/openspec-delivery/scripts/change-guard.mjs candidate",
+        "commit": "4d625da62862a617ed4d860c1670f82079fc7173",
+        "exitCode": 0,
+        "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/archive-path-repair-20261120T071425Z/candidate-gates/07-change-guard-candidate"
+      }
+    ]
+  },
+  "integrationReference": "https://github.com/forgegod/ai-coding-agent-skills/pull/23",
+  "gates": [
+    {
+      "command": "npm run validate:openspec",
+      "commit": "36076f5be86eed9c1529d7c9d16baf88802648db",
+      "exitCode": 0,
+      "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/finish-pr23-and-closure-20261120T082309Z/gates/01-validate-openspec",
+      "hashes": {
+        "command.txt": "4d0e4eceeab940e9c5044274d64363eddccd7d16e97768575fe3b0727c498448",
+        "stdout.log": "0a0b2c411bdf925780cd7a851ddb6cb1f191d2487e496ed0a3e3ce8ae76a07b8",
+        "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "command": "openspec validate --all --strict --json --no-interactive",
+      "commit": "36076f5be86eed9c1529d7c9d16baf88802648db",
+      "exitCode": 0,
+      "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/finish-pr23-and-closure-20261120T082309Z/gates/02-openspec-strict",
+      "hashes": {
+        "command.txt": "84b27ea1cea4dd8ea4443353d408e6bab662a5173c583a65b20367cafc5e9282",
+        "stdout.log": "e3335cedd0ad94516c2903ed892e1c14a3bc342d4c0e8d88ea95ce73b62728c2",
+        "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "command": "npm test",
+      "commit": "36076f5be86eed9c1529d7c9d16baf88802648db",
+      "exitCode": 0,
+      "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/finish-pr23-and-closure-20261120T082309Z/gates/03-npm-test",
+      "hashes": {
+        "command.txt": "f135f9fa4f38fd0c92563221116e2f79df0838f5ff86440ae44d4b428576fc62",
+        "stdout.log": "37898b7a17a78b3188b4613245d59ace63a8c005c0fd43c053b3b39f7375d31b",
+        "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "command": "npm run build",
+      "commit": "36076f5be86eed9c1529d7c9d16baf88802648db",
+      "exitCode": 0,
+      "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/finish-pr23-and-closure-20261120T082309Z/gates/04-npm-build",
+      "hashes": {
+        "command.txt": "dae58de3ddfde95b066b259e24d83e50d15aedeafb58b0b20d7b26dd324ef0ef",
+        "stdout.log": "00381d8da9b02326769422a28461f91833eadbdf50c1c5b1c773b25dc5e308dd",
+        "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "command": "HERMES_SOURCE=/home/raphael/.hermes/hermes-agent npm run test:security",
+      "commit": "36076f5be86eed9c1529d7c9d16baf88802648db",
+      "exitCode": 0,
+      "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/finish-pr23-and-closure-20261120T082309Z/gates/05-test-security",
+      "hashes": {
+        "command.txt": "6db9715044c918a3df1f969d7d55f12a101d8328a2670ce7d10b58a12e576812",
+        "stdout.log": "2ff0bc31fa0fcc9f12ef6082e7490d63ccff2aa73634fbafa84f4593772875be",
+        "stderr.log": "5af2b9acef0f16ddfd9d6e4d6a9a9bdc66c81213b6311541145a65776318bbac",
+        "exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "command": "git diff --check ae6488e23414a07d12959bf22bcd283b84d9d8a3..36076f5be86eed9c1529d7c9d16baf88802648db",
+      "commit": "36076f5be86eed9c1529d7c9d16baf88802648db",
+      "exitCode": 0,
+      "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/finish-pr23-and-closure-20261120T082309Z/gates/06-git-diff-check-integrated",
+      "hashes": {
+        "command.txt": "8d600a3e8207ae579216cb152a33ee9949201f97010f18dafe8e0da2fc1a7835",
+        "stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    },
+    {
+      "command": "git diff --check 42a975d8da521de82972be1824546ccd45a3b27d..36076f5be86eed9c1529d7c9d16baf88802648db",
+      "commit": "36076f5be86eed9c1529d7c9d16baf88802648db",
+      "exitCode": 0,
+      "evidence": "/home/raphael/verification-records/ai-coding-agent-skills/finish-pr23-and-closure-20261120T082309Z/gates/07-git-diff-check-guard-base",
+      "hashes": {
+        "command.txt": "d0f0481007cc245a965c4e0f0abe7b7966efaaf2c294ea9940cf837d265b26ab",
+        "stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "exit": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+      }
+    }
+  ]
+}

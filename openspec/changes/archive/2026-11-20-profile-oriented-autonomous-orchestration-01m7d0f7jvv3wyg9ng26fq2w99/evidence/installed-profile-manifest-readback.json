@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-11-20T08:25:00Z",
+  "profiles": [
+    {
+      "profile": "hermes-dev",
+      "installedSkillDir": "/home/raphael/.hermes/profiles/hermes-dev/skills/autonomous-ai-agents/autonomous-implementation-review",
+      "baselineManifestPath": "/home/raphael/verification-records/ai-coding-agent-skills/package-baselines-20261119T101711Z/hermes-dev.sha256",
+      "baselineManifestSha256": "2b4714914388bde93f1a196b0515e7dc2c2ab4942b23ed68afc4a03774b982de",
+      "filesVerified": 14,
+      "driftDetected": false
+    },
+    {
+      "profile": "hermes-dev-review",
+      "installedSkillDir": "/home/raphael/.hermes/profiles/hermes-dev-review/skills/autonomous-ai-agents/autonomous-implementation-review",
+      "baselineManifestPath": "/home/raphael/verification-records/ai-coding-agent-skills/profile-reviewer-package-baseline-20261117T160729.700877632Z/package-manifest.sha256",
+      "baselineManifestSha256": "11e43ea9682b9096042334d923fdca911cc98f8a91a6bf6ace8d3c6ffbb7f740",
+      "filesVerified": 12,
+      "driftDetected": false
+    }
+  ]
+}
