@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 1,
+  "kind": "public-verification-summary",
+  "scope": "Disclosure-safe projections, not original logs. Digests identify retained originals; raw logs and restricted historical captures are not published. PR #30 checks are fresh pre-merge captures, not evidence of historical PR #26\u201329 checks or a new deployment.",
+  "candidateGates": [
+    {
+      "command": "openspec validate --all --strict --json --no-interactive",
+      "commit": "726009281a7c3fe4818c771c0458088a6a5694f7",
+      "exitCode": 0,
+      "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json",
+      "phase": "candidate",
+      "name": "strict",
+      "stdoutSha256": "ad54766b40ceeeb2ed35c9b3f535d7b43359508fa1d0401be564602ee0bc8be2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "npm run validate:openspec",
+      "commit": "726009281a7c3fe4818c771c0458088a6a5694f7",
+      "exitCode": 0,
+      "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json",
+      "phase": "candidate",
+      "name": "metadata",
+      "stdoutSha256": "b9470b22865dd49644832340ddff683f419dfc7757440e0ab4b9e386385c63c2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "git diff --check 4f047e588adb91f594c6e64d377bc6f9bdb9118d 726009281a7c3fe4818c771c0458088a6a5694f7",
+      "commit": "726009281a7c3fe4818c771c0458088a6a5694f7",
+      "exitCode": 0,
+      "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json",
+      "phase": "candidate",
+      "name": "whitespace",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "npm test",
+      "commit": "726009281a7c3fe4818c771c0458088a6a5694f7",
+      "exitCode": 0,
+      "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json",
+      "phase": "candidate",
+      "name": "test",
+      "stdoutSha256": "f8fd78ba7441632d987d2116a70a01718a8014fb392484c1069757ea10074548",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "npm run build",
+      "commit": "726009281a7c3fe4818c771c0458088a6a5694f7",
+      "exitCode": 0,
+      "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json",
+      "phase": "candidate",
+      "name": "build",
+      "stdoutSha256": "cc4a0bdb33a51aa3170799acc5d397795e01702039e2d92ba99252e1e9dcf463",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "integratedGates": [
+    {
+      "command": "openspec validate --all --strict --json --no-interactive",
+      "commit": "01daf8dc575c1226af261a6aa36cd40c8f6fd1f7",
+      "exitCode": 0,
+      "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json",
+      "phase": "integrated",
+      "name": "strict",
+      "stdoutSha256": "a0ac8ee27a13c13cfe5e48c914b92d370d3f9f5918f27ec81a78522842081e18",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "npm run validate:openspec",
+      "commit": "01daf8dc575c1226af261a6aa36cd40c8f6fd1f7",
+      "exitCode": 0,
+      "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json",
+      "phase": "integrated",
+      "name": "metadata",
+      "stdoutSha256": "b9470b22865dd49644832340ddff683f419dfc7757440e0ab4b9e386385c63c2",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "git diff --check 4f047e588adb91f594c6e64d377bc6f9bdb9118d 01daf8dc575c1226af261a6aa36cd40c8f6fd1f7",
+      "commit": "01daf8dc575c1226af261a6aa36cd40c8f6fd1f7",
+      "exitCode": 0,
+      "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json",
+      "phase": "integrated",
+      "name": "whitespace",
+      "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "npm test",
+      "commit": "01daf8dc575c1226af261a6aa36cd40c8f6fd1f7",
+      "exitCode": 0,
+      "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json",
+      "phase": "integrated",
+      "name": "test",
+      "stdoutSha256": "95b67a5bb9c624f15df9272e262f4007d71c398fbd5114404433e103d10ff3ce",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "npm run build",
+      "commit": "01daf8dc575c1226af261a6aa36cd40c8f6fd1f7",
+      "exitCode": 0,
+      "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json",
+      "phase": "integrated",
+      "name": "build",
+      "stdoutSha256": "1d698abede91067215f112b6d0270b13f6b3c3bd1708cb9dc7f654dbab0535d1",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "integratedTests": {
+    "passed": 360,
+    "failed": 0
+  },
+  "pullRequest": {
+    "url": "https://github.com/grewety/ai-coding-agent-skills/pull/30",
+    "head": "726009281a7c3fe4818c771c0458088a6a5694f7",
+    "mergedAt": "2026-11-21T15:46:25Z",
+    "mergeCommit": "01daf8dc575c1226af261a6aa36cd40c8f6fd1f7",
+    "requiredCheckRuns": [
+      {
+        "app": 15368,
+        "completed_at": "2026-11-21T15:44:38Z",
+        "conclusion": "success",
+        "head_sha": "726009281a7c3fe4818c771c0458088a6a5694f7",
+        "id": 136896027607,
+        "name": "verify"
+      },
+      {
+        "app": 15368,
+        "completed_at": "2026-11-21T15:44:14Z",
+        "conclusion": "success",
+        "head_sha": "726009281a7c3fe4818c771c0458088a6a5694f7",
+        "id": 136895943278,
+        "name": "verify"
+      }
+    ],
+    "preMergeUnresolvedThreads": 0
+  },
+  "installerSpec": {
+    "integration": "https://github.com/grewety/ai-coding-agent-skills/pull/29",
+    "unchangedInRecovery": true
+  }
+}
