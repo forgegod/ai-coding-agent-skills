@@ -200,7 +200,7 @@ export async function installLocalSkills({
   for (const target of targets) {
     const lock = target.profile ? locks.get(target.profile.name) : null;
     for (const skill of packages) {
-      if (lock) checkRegistration(lock, skill);
+      if (lock) checkRegistration(lock, skill, { allowLegacy: update });
       const relativePath = target.kind === "hermes" ? skill.relativePath : skill.name;
       const destination = path.join(target.skillsDirectory, relativePath);
       await assertDirectoryChain(target.base, destination);
@@ -229,7 +229,7 @@ export async function installLocalSkills({
         }
         if (!(await existing(destination))) continue;
         const registration = lock?.data.installed[legacy.name];
-        if (registration) checkRegistration(lock, legacy);
+        if (registration) checkRegistration(lock, legacy, { allowLegacy: true });
         await assertDirectoryChain(target.base, target.backupDirectory);
         const backup = path.join(target.backupDirectory, batch, relativePath);
         const registrationBackup = registration
@@ -283,7 +283,7 @@ export async function installLocalSkills({
           activated = true;
           if (profile) {
             await assertDirectoryChain(home, path.join(profile.home, "skills", ".hub"));
-            await recordLocalInstall(locks.get(profile.name), skill, destination);
+            await recordLocalInstall(locks.get(profile.name), skill, destination, { allowLegacy: update });
           }
         } catch (error) {
           if (activated) await rename(destination, staged);
@@ -310,7 +310,7 @@ export async function installLocalSkills({
             await mkdir(path.dirname(registrationBackup), { recursive: true, mode: 0o700 });
             await writeFile(registrationBackup, JSON.stringify(registration, null, 2) + "\n", { flag: "wx", mode: 0o600 });
             backups.push({ kind: "retired-registration", target: target.name, profile: profile.name, skill: legacy.name, path: registrationBackup });
-            await removeRegistration(locks.get(profile.name), legacy);
+            await removeRegistration(locks.get(profile.name), legacy, { allowLegacy: true });
           }
         } catch (error) {
           if (!(await existing(destination)) && (await existing(backup))) {

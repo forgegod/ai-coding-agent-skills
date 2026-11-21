@@ -15,7 +15,7 @@ test("Claude instructions lead with native GUI installation and cite primary sou
   assert.ok(section, "README needs a simple Claude Desktop installation entry point");
   assert.match(section, /Customize.*Plugins/);
   assert.match(section, /Add marketplace/);
-  assert.match(section, /forgegod\/ai-coding-agent-skills/);
+  assert.match(section, /grewety\/ai-coding-agent-skills/);
   assert.match(section, /openspec-development/);
   assert.match(section, /autonomous-orchestration/);
   assert.match(section, /docs\/claude-installation\.md/);
@@ -86,7 +86,7 @@ test("normal installer loop documents all generic software-development skills", 
 
 test("OpenSpec installation and orchestration use the explicitly selected workflow", async () => {
   const source = await readFile(readme, "utf8");
-  assert.equal(source.includes("hermes -p hermes-dev skills install \"well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery\" --category software-development"), true, "document the independent OpenSpec Hermes install route");
+  assert.equal(source.includes("hermes -p hermes-dev skills install \"well-known:https://grewety.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery\" --category software-development"), true, "document the independent OpenSpec Hermes install route");
   const marketplace = JSON.parse(await readFile(new URL("../.claude-plugin/marketplace.json", import.meta.url), "utf8"));
   const orchestration = marketplace.plugins.find(({ name }) => name === "autonomous-orchestration");
   for (const workflow of ["openspec-development"]) assert.equal(orchestration.description.includes(workflow), true, workflow);
@@ -129,7 +129,7 @@ test("local installation docs distinguish source, migration, profile scope, and 
 test("directory-discovery instructions separate installation telemetry from authenticated submission", async () => {
   const source = await readFile(readme, "utf8");
   assert.match(source, /## Discovery on skill directories/);
-  assert.match(source, /npx skills add forgegod\/ai-coding-agent-skills --list/);
+  assert.match(source, /npx skills add grewety\/ai-coding-agent-skills --list/);
   assert.match(source, /--skill openspec-delivery --agent claude-code/);
   assert.match(source, /anonymous installation telemetry/);
   assert.match(source, /DISABLE_TELEMETRY=1/);
