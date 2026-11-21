@@ -668,11 +668,10 @@ Users can opt out with `DISABLE_TELEMETRY=1` or `DO_NOT_TRACK=1`; opted-out inst
 should not be relied on to seed leaderboard visibility. A `--list` discovery check
 is not an installation and does not establish a directory entry.
 
-Share the explicit install command with users and check the resulting
-[repository directory page](https://skills.sh/forgegod/ai-coding-agent-skills) (the pre-transfer external listing; a grewety listing remains pending independent verification after transfer)
-after real adoption. Indexing timing and ranking belong to skills.sh; do not claim
-a listing merely because the CLI can discover the packages. The GitHub and
-well-known install routes remain available independently.
+No public directory entry was confirmed for either repository slug during the
+[repository-transfer URL audit](docs/repository-transfer-url-audit.md).
+Indexing timing and ranking belong to skills.sh; CLI discovery does not establish
+a listing. The GitHub and well-known install routes remain available independently.
 
 References: [skills.sh documentation](https://skills.sh/docs) and
 [upstream skills CLI](https://github.com/vercel-labs/skills#telemetry).
