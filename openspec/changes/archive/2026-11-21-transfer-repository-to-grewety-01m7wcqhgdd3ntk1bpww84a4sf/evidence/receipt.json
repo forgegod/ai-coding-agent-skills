@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "change": "transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf",
+  "issueUrl": "https://github.com/grewety/ai-coding-agent-skills/issues/25",
+  "base": "4f047e588adb91f594c6e64d377bc6f9bdb9118d",
+  "head": "726009281a7c3fe4818c771c0458088a6a5694f7",
+  "plan": "3c15e401768b0cdd3df2678e305f20bee1894934",
+  "planDigest": "1212a15f18f69f17980e27989e788c3bc792bc6786f981e94e1515a0c8c341d8",
+  "integrated": "01daf8dc575c1226af261a6aa36cd40c8f6fd1f7",
+  "verified": "01daf8dc575c1226af261a6aa36cd40c8f6fd1f7",
+  "review": {
+    "schemaVersion": 1,
+    "change": "transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf",
+    "issueUrl": "https://github.com/grewety/ai-coding-agent-skills/issues/25",
+    "head": "726009281a7c3fe4818c771c0458088a6a5694f7",
+    "planDigest": "1212a15f18f69f17980e27989e788c3bc792bc6786f981e94e1515a0c8c341d8",
+    "verdict": "pass",
+    "findings": [],
+    "reviewer": "Claude Code 2.1.330 / Claude Sonnet 4.6 (independent review session 695e6cd8-c6d8-4afb-a476-564901e00775)",
+    "reference": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-review.md",
+    "gates": [
+      {
+        "command": "openspec validate --all --strict --json --no-interactive",
+        "commit": "726009281a7c3fe4818c771c0458088a6a5694f7",
+        "exitCode": 0,
+        "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json"
+      },
+      {
+        "command": "npm run validate:openspec",
+        "commit": "726009281a7c3fe4818c771c0458088a6a5694f7",
+        "exitCode": 0,
+        "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json"
+      },
+      {
+        "command": "git diff --check 4f047e588adb91f594c6e64d377bc6f9bdb9118d 726009281a7c3fe4818c771c0458088a6a5694f7",
+        "commit": "726009281a7c3fe4818c771c0458088a6a5694f7",
+        "exitCode": 0,
+        "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json"
+      },
+      {
+        "command": "npm test",
+        "commit": "726009281a7c3fe4818c771c0458088a6a5694f7",
+        "exitCode": 0,
+        "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json"
+      },
+      {
+        "command": "npm run build",
+        "commit": "726009281a7c3fe4818c771c0458088a6a5694f7",
+        "exitCode": 0,
+        "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json"
+      }
+    ],
+    "coverageLimitations": [],
+    "reportSha256": "31cdacf6754cd5a431b30a17975ec54b053e42fa5852f9026e3a64ce622e6368"
+  },
+  "integrationReference": "https://github.com/grewety/ai-coding-agent-skills/pull/30",
+  "gates": [
+    {
+      "command": "openspec validate --all --strict --json --no-interactive",
+      "commit": "01daf8dc575c1226af261a6aa36cd40c8f6fd1f7",
+      "exitCode": 0,
+      "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json"
+    },
+    {
+      "command": "npm run validate:openspec",
+      "commit": "01daf8dc575c1226af261a6aa36cd40c8f6fd1f7",
+      "exitCode": 0,
+      "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json"
+    },
+    {
+      "command": "git diff --check 4f047e588adb91f594c6e64d377bc6f9bdb9118d 01daf8dc575c1226af261a6aa36cd40c8f6fd1f7",
+      "commit": "01daf8dc575c1226af261a6aa36cd40c8f6fd1f7",
+      "exitCode": 0,
+      "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json"
+    },
+    {
+      "command": "npm test",
+      "commit": "01daf8dc575c1226af261a6aa36cd40c8f6fd1f7",
+      "exitCode": 0,
+      "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json"
+    },
+    {
+      "command": "npm run build",
+      "commit": "01daf8dc575c1226af261a6aa36cd40c8f6fd1f7",
+      "exitCode": 0,
+      "evidence": "openspec/changes/archive/2026-11-21-transfer-repository-to-grewety-01m7wcqhgdd3ntk1bpww84a4sf/evidence/recovery-verification.json"
+    }
+  ]
+}
