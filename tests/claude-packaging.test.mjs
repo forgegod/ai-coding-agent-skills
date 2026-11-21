@@ -96,6 +96,8 @@ test("distribution builds complete skill and plugin ZIPs from canonical bytes", 
     const selected = packages.filter((pkg) => configured.skills.includes(`./skills/${pkg.relativePath.split(path.sep).join("/")}`));
     assert.ok(archive["README.md"], "plugin ZIP needs standalone installation and safety guidance");
     assert.match(Buffer.from(archive["README.md"]).toString(), /does not grant execution authority/);
+    assert.ok(Buffer.from(archive["README.md"]).toString().includes("https://github.com/grewety/ai-coding-agent-skills#install-with-claude-desktop"));
+    assert.ok(!Buffer.from(archive["README.md"]).toString().includes("https://github.com/forgegod/"));
     assert.deepEqual(Buffer.from(archive.LICENSE), await readFile(path.join(root, "LICENSE")));
     const expected = [".claude-plugin/plugin.json", "README.md", "LICENSE"];
     for (const pkg of selected) {
@@ -139,6 +141,8 @@ test("distribution builds complete skill and plugin ZIPs from canonical bytes", 
   );
   assert.ok(!("skills/phased-plan-next/SKILL.md" in integrationArchive));
   const html = await readFile(path.join(output, "downloads/index.html"), "utf8");
+  assert.ok(html.includes("https://github.com/grewety/ai-coding-agent-skills#install-with-claude-desktop"));
+  assert.ok(!html.includes("https://github.com/forgegod/"));
   for (const entry of [...catalog.plugins, ...catalog.skills]) assert.ok(html.includes(`href="${entry.file}"`));
   assert.match(html, /operator review/i);
   assert.match(await readFile(path.join(output, "index.html"), "utf8"), /downloads\/index.html/);

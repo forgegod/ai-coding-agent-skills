@@ -115,7 +115,7 @@ export async function buildWellKnownSkills({ root = scriptRoot, output }) {
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Coding Agent Skills</title></head>
 <body><h1>AI Coding Agent Skills</h1><p>Portable engineering playbooks for AI coding agents.</p>
 <p><a href=".well-known/skills/index.json">Skill discovery index</a></p>
-<p><a href="https://github.com/forgegod/ai-coding-agent-skills#install-with-hermes">Catalog and installation instructions</a></p>
+<p><a href="https://github.com/grewety/ai-coding-agent-skills#install-with-hermes">Catalog and installation instructions</a></p>
 </body></html>\n`);
   return { endpoint, skills };
 }

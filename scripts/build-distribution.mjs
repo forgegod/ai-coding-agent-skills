@@ -156,7 +156,7 @@ export async function buildDistribution({ root = scriptRoot, output }) {
       "These are community engineering workflows. Chat, Cowork, and Claude Code do not have equivalent execution capabilities. Git workflows require a project checkout, Git, Node 22+ for packaged guards, and the target project's tooling and permissions. Hermes-specific tool names must be mapped to available host tools.\n\n" +
       `${scope}\n\n` +
       "No agents, hooks, connectors, or permission changes are installed by this package.\n\n" +
-      "Instructions: https://github.com/forgegod/ai-coding-agent-skills#install-with-claude-desktop\n" +
+      "Instructions: https://github.com/grewety/ai-coding-agent-skills#install-with-claude-desktop\n" +
       "Upstream: https://claude.com/docs/plugins/overview\n\nMIT; see LICENSE. Canonical skill authors and metadata are preserved.\n";
     const files = { ".claude-plugin/plugin.json": Buffer.from(json(manifest)), "README.md": Buffer.from(readme), LICENSE: license };
     for (const directory of plugin.skills) {
@@ -179,7 +179,7 @@ export async function buildDistribution({ root = scriptRoot, output }) {
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Claude skill downloads</title></head>
 <body><h1>Claude skill downloads</h1>
 <p>Community packages, not official Anthropic skills or Hermes scanner-approved installations. Review before enabling. Installation does not grant execution authority.</p>
-<p><a href="https://github.com/forgegod/ai-coding-agent-skills#install-with-claude-desktop">Installation instructions and execution requirements</a></p>
+<p><a href="https://github.com/grewety/ai-coding-agent-skills#install-with-claude-desktop">Installation instructions and execution requirements</a></p>
 <h2>Plugin bundles</h2><p>Use openspec-development for OpenSpec changes. Upload through Customize → Plugins → Add → Upload plugin. Orchestration is a separate opt-in; neither bundle installs OpenSpec or writes GitHub state.</p><ul>${list(plugins)}</ul>
 <h2>Individual skills</h2><p>Upload one ZIP through Customize → Skills → + → Create skill → Upload a skill. Do not unzip it. Related workflows may require other skills.</p><ul>${list(skills)}</ul>
 <p><a href="index.json">Download inventory and SHA-256 checksums</a> · <a href="../index.html">Home</a></p>

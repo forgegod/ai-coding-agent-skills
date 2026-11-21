@@ -24,6 +24,9 @@ test("well-known build publishes every skill and all advertised files", async ()
   try {
     const result = await buildWellKnownSkills({ root, output });
     assert.deepEqual(result.skills.map((skill) => skill.name), expectedSkillNames);
+    const html = await readFile(path.join(output, "index.html"), "utf8");
+    assert.ok(html.includes("https://github.com/grewety/ai-coding-agent-skills#install-with-hermes"));
+    assert.ok(!html.includes("https://github.com/forgegod/"));
 
     const endpoint = path.join(output, ".well-known", "skills");
     const index = JSON.parse(await readFile(path.join(endpoint, "index.json"), "utf8"));
