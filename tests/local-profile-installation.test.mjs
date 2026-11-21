@@ -7,7 +7,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { installLocalSkills } from "../scripts/install-local-skills.mjs";
-import { loadHubLock, recordLocalInstall } from "../scripts/hermes-skill-provenance.mjs";
+import { checkRegistration, loadHubLock, recordLocalInstall, removeRegistration } from "../scripts/hermes-skill-provenance.mjs";
 
 const script = fileURLToPath(new URL("../scripts/install-local-skills.mjs", import.meta.url));
 
@@ -204,7 +204,7 @@ test("purges only the seven historical packages with explicit authority and pres
   await writeFile(path.join(unrelated, "SKILL.md"), "Personal skill.\n");
   const registration = {
     source: "well-known",
-    identifier: "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/phased-plan-next",
+    identifier: "well-known:https://grewety.github.io/ai-coding-agent-skills/.well-known/skills/phased-plan-next",
     install_path: "software-development/phased-plan-next",
   };
   await mkdir(path.join(f.hermesHome, "skills", ".hub"), { recursive: true });
@@ -248,7 +248,7 @@ test("purge rollback reports only preserved backups and warns of earlier partial
     const lock = JSON.parse(await readFile(lockFile, "utf8"));
     const registration = {
       source: "well-known",
-      identifier: "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/phased-plan-next",
+      identifier: "well-known:https://grewety.github.io/ai-coding-agent-skills/.well-known/skills/phased-plan-next",
       install_path: "software-development/phased-plan-next",
     };
     lock.installed["phased-plan-next"] = registration;
@@ -472,7 +472,8 @@ test("local installs register the public update source and the exact installed h
     const entry = lock.installed.demo;
     assert.equal(lock.version, 1);
     assert.equal(entry.source, "well-known");
-    assert.equal(entry.identifier, "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/demo");
+    assert.equal(entry.identifier, "well-known:https://grewety.github.io/ai-coding-agent-skills/.well-known/skills/demo");
+    assert.equal(entry.metadata.update_source, "https://grewety.github.io/ai-coding-agent-skills/.well-known/skills/demo");
     assert.equal(entry.install_path, "software-development/demo");
     assert.deepEqual(entry.files, ["references/guide.md", "SKILL.md"]);
     assert.equal(entry.trust_level, "community");
@@ -515,7 +516,7 @@ test("malformed, unsupported and conflicting hub records fail before any profile
     ["malformed", "not json"],
     ["unsupported", JSON.stringify({ version: 2, installed: {} })],
     ["other source", JSON.stringify({ version: 1, installed: { demo: { source: "github", identifier: "another/repo/demo", install_path: "software-development/demo" } } })],
-    ["other path", JSON.stringify({ version: 1, installed: { demo: { source: "well-known", identifier: "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/demo", install_path: "other/demo" } } })],
+    ["other path", JSON.stringify({ version: 1, installed: { demo: { source: "well-known", identifier: "well-known:https://grewety.github.io/ai-coding-agent-skills/.well-known/skills/demo", install_path: "other/demo" } } })],
   ]) await t.test(name, async (t) => {
     const f = await fixture(t);
     const directory = path.join(f.hermesHome, "profiles/named/skills/.hub");
@@ -545,4 +546,137 @@ test("registration refuses a hub lock changed by another writer", async (t) => {
   await writeFile(lock.file, changed);
   await assert.rejects(recordLocalInstall(lock, result.packages[0], f.source), /lock changed/);
   assert.equal(await readFile(lock.file, "utf8"), changed);
+});
+
+const legacyUrl = "https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills";
+const currentUrl = "https://grewety.github.io/ai-coding-agent-skills/.well-known/skills";
+const legacyEntry = (name, overrides = {}) => ({
+  source: "well-known", identifier: `well-known:${legacyUrl}/${name}`,
+  install_path: `software-development/${name}`, ...overrides,
+});
+
+async function seedNamedLock(f, installed) {
+  const file = path.join(f.hermesHome, "profiles/named/skills/.hub/lock.json");
+  await mkdir(path.dirname(file), { recursive: true });
+  const raw = JSON.stringify({ version: 1, installed });
+  await writeFile(file, raw);
+  return { file, raw };
+}
+
+test("orphaned legacy registration requires explicit update across profiles", async (t) => {
+  const f = await fixture(t);
+  const { file, raw } = await seedNamedLock(f, { demo: legacyEntry("demo") });
+  await assert.rejects(installLocalSkills(installOptions(f)), /legacy well-known registration requires explicit --update/);
+  assert.equal(await readFile(file, "utf8"), raw);
+  await assert.rejects(stat(path.join(f.hermesHome, "skills")), { code: "ENOENT" });
+  await installLocalSkills(installOptions(f, { update: true }));
+  await sourceAndDestinationMatch(f.source, path.join(f.hermesHome, "profiles/named/skills/software-development/demo"));
+  assert.equal(JSON.parse(await readFile(file, "utf8")).installed.demo.identifier, `well-known:${currentUrl}/demo`);
+});
+
+test("legacy update previews without changes and preserves complete backup and unrelated provenance", async (t) => {
+  const f = await fixture(t);
+  const destination = path.join(f.hermesHome, "profiles/named/skills/software-development/demo");
+  await cp(f.source, destination, { recursive: true });
+  await writeFile(path.join(destination, "references/guide.md"), "Local edits.\n");
+  await writeFile(path.join(destination, "obsolete.md"), "Obsolete.\n");
+  const personal = { source: "github", identifier: "other/personal", install_path: "personal" };
+  const entry = legacyEntry("demo", { installed_at: "2020-01-01", scan_verdict: "safe", scan_provenance: { old: true }, source_revision: "old", metadata: { source_revision: "old" } });
+  const { file, raw } = await seedNamedLock(f, { demo: entry, personal });
+  const options = installOptions(f, { update: true });
+  await installLocalSkills({ ...options, dryRun: true });
+  assert.equal(await readFile(file, "utf8"), raw);
+  assert.equal(await readFile(path.join(destination, "references/guide.md"), "utf8"), "Local edits.\n");
+  assert.equal(await readFile(path.join(destination, "obsolete.md"), "utf8"), "Obsolete.\n");
+  const result = await installLocalSkills(options);
+  await sourceAndDestinationMatch(f.source, destination);
+  await assert.rejects(stat(path.join(destination, "obsolete.md")), { code: "ENOENT" });
+  const backup = result.backups.find((item) => item.target === "named" && item.skill === "demo");
+  assert.equal(await readFile(path.join(backup.path, "references/guide.md"), "utf8"), "Local edits.\n");
+  assert.equal(await readFile(path.join(backup.path, "obsolete.md"), "utf8"), "Obsolete.\n");
+  const updated = JSON.parse(await readFile(file, "utf8")).installed;
+  assert.deepEqual(updated.personal, personal);
+  assert.equal(updated.demo.installed_at, entry.installed_at);
+  assert.equal(updated.demo.scan_verdict, "unscanned");
+  assert.deepEqual(updated.demo.scan_provenance, {});
+  assert.equal(updated.demo.source_revision, undefined);
+  assert.equal(updated.demo.metadata.source_revision, undefined);
+  assert.equal(updated.demo.identifier, `well-known:${currentUrl}/demo`);
+  assert.equal(updated.demo.metadata.update_source, `${currentUrl}/demo`);
+});
+
+test("purge backs up legacy retired package and exact registration while preserving unrelated data", async (t) => {
+  const f = await fixture(t);
+  const base = path.join(f.hermesHome, "profiles/named/skills/software-development");
+  const retired = path.join(base, "phased-plan-next");
+  await mkdir(retired, { recursive: true });
+  await writeFile(path.join(retired, "SKILL.md"), "Historical.\n");
+  await writeFile(path.join(retired, "local.md"), "Local edits.\n");
+  await mkdir(path.join(base, "personal"));
+  await writeFile(path.join(base, "personal/SKILL.md"), "Personal.\n");
+  const registration = legacyEntry("phased-plan-next", { metadata: { note: "keep" } });
+  const personal = { source: "github", identifier: "other/personal", install_path: "personal" };
+  const { file } = await seedNamedLock(f, { "phased-plan-next": registration, personal });
+  const result = await installLocalSkills(installOptions(f, { profiles: ["named"], purge: true }));
+  await assert.rejects(stat(retired), { code: "ENOENT" });
+  assert.equal(await readFile(path.join(base, "personal/SKILL.md"), "utf8"), "Personal.\n");
+  const packageBackup = result.backups.find((item) => item.kind === "retired-package");
+  const registrationBackup = result.backups.find((item) => item.kind === "retired-registration");
+  assert.match(packageBackup.path, /\.skills-backups/);
+  assert.match(registrationBackup.path, /\.skills-backups/);
+  assert.equal(await readFile(path.join(packageBackup.path, "SKILL.md"), "utf8"), "Historical.\n");
+  assert.equal(await readFile(path.join(packageBackup.path, "local.md"), "utf8"), "Local edits.\n");
+  assert.deepEqual(JSON.parse(await readFile(registrationBackup.path, "utf8")), registration);
+  const installed = JSON.parse(await readFile(file, "utf8")).installed;
+  assert.equal(installed["phased-plan-next"], undefined);
+  assert.deepEqual(installed.personal, personal);
+});
+
+test("conflicting identifiers, sources and legacy paths block all selected profiles", async (t) => {
+  for (const mode of ["default", "update", "purge"]) for (const conflict of ["source", "identifier", "legacy path"]) await t.test(`${mode}: ${conflict}`, async (t) => {
+    const f = await fixture(t);
+    const name = mode === "purge" ? "phased-plan-next" : "demo";
+    const overrides = conflict === "source" ? { source: "github" } : conflict === "identifier" ? { identifier: "well-known:https://example.org/other" } : { install_path: `other/${name}` };
+    const { file, raw } = await seedNamedLock(f, { [name]: legacyEntry(name, overrides) });
+    if (mode === "purge") {
+      const retired = path.join(f.hermesHome, "profiles/named/skills/software-development", name);
+      await mkdir(retired, { recursive: true });
+      await writeFile(path.join(retired, "SKILL.md"), "Historical.\n");
+    }
+    await assert.rejects(installLocalSkills(installOptions(f, { update: mode === "update", purge: mode === "purge" })), /Conflicting Hermes hub registration/);
+    assert.equal(await readFile(file, "utf8"), raw);
+    await assert.rejects(stat(path.join(f.hermesHome, "skills")), { code: "ENOENT" });
+    if (mode === "purge") assert.equal(await readFile(path.join(f.hermesHome, "profiles/named/skills/software-development", name, "SKILL.md"), "utf8"), "Historical.\n");
+  });
+});
+
+test("provenance helpers require explicit legacy authority and exact source and path", async (t) => {
+  const f = await fixture(t);
+  const skill = { name: "demo", relativePath: path.join("software-development", "demo"), files: ["SKILL.md"] };
+  for (const [label, entry, allowed] of [
+    ["legacy", legacyEntry("demo"), true],
+    ["other identifier", legacyEntry("demo", { identifier: "well-known:https://example.org/demo" }), false],
+    ["other source", legacyEntry("demo", { source: "github" }), false],
+    ["other path", legacyEntry("demo", { install_path: "other/demo" }), false],
+  ]) await t.test(label, async () => {
+    const { file, raw } = await seedNamedLock(f, { demo: entry });
+    const lock = await loadHubLock(path.join(f.hermesHome, "profiles/named"));
+    assert.throws(() => checkRegistration(lock, skill), /Conflicting/);
+    await assert.rejects(recordLocalInstall(lock, skill, f.source), /Conflicting/);
+    await assert.rejects(removeRegistration(lock, skill), /Conflicting/);
+    if (allowed) {
+      checkRegistration(lock, skill, { allowLegacy: true });
+      await recordLocalInstall(lock, skill, f.source, { allowLegacy: true });
+      assert.equal(lock.data.installed.demo.identifier, `well-known:${currentUrl}/demo`);
+      await writeFile(file, raw);
+      const again = await loadHubLock(path.join(f.hermesHome, "profiles/named"));
+      assert.deepEqual(await removeRegistration(again, skill, { allowLegacy: true }), entry);
+      assert.equal(again.data.installed.demo, undefined);
+    } else {
+      assert.throws(() => checkRegistration(lock, skill, { allowLegacy: true }), /Conflicting/);
+      await assert.rejects(recordLocalInstall(lock, skill, f.source, { allowLegacy: true }), /Conflicting/);
+      await assert.rejects(removeRegistration(lock, skill, { allowLegacy: true }), /Conflicting/);
+      assert.equal(await readFile(file, "utf8"), raw);
+    }
+  });
 });

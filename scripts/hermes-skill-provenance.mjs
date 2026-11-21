@@ -3,7 +3,8 @@ import { createHash, randomUUID } from "node:crypto";
 import { lstat, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-export const upstreamSkills = "https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills";
+export const upstreamSkills = "https://grewety.github.io/ai-coding-agent-skills/.well-known/skills";
+export const legacyUpstreamSkills = "https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills";
 
 async function readLock(file) {
   const info = await lstat(file).catch((error) => {
@@ -25,13 +26,21 @@ export async function loadHubLock(home) {
   return { file, raw, data };
 }
 
-export function checkRegistration(lock, skill) {
+export function checkRegistration(lock, skill, { allowLegacy = false } = {}) {
   const previous = lock.data.installed[skill.name];
   if (previous === undefined) return;
   const installPath = skill.relativePath.split(path.sep).join("/");
-  if (previous?.install_path !== installPath || previous?.source !== "well-known" || previous?.identifier !== `well-known:${upstreamSkills}/${skill.name}`) {
+  const currentIdentifier = `well-known:${upstreamSkills}/${skill.name}`;
+  const legacyIdentifier = `well-known:${legacyUpstreamSkills}/${skill.name}`;
+  if (previous?.install_path !== installPath || previous?.source !== "well-known") {
     throw new Error(`Conflicting Hermes hub registration for ${skill.name}; resolve its existing source/path before local installation`);
   }
+  if (previous?.identifier === currentIdentifier) return;
+  if (previous?.identifier === legacyIdentifier) {
+    if (allowLegacy === true) return;
+    throw new Error(`Conflicting Hermes hub registration for ${skill.name}: legacy well-known registration requires explicit --update authority before transitioning to the current source`);
+  }
+  throw new Error(`Conflicting Hermes hub registration for ${skill.name}; resolve its existing source/path before local installation`);
 }
 
 async function persistLock(lock, data) {
@@ -61,8 +70,8 @@ export async function localContentHash(directory, files) {
   return `sha256:${hash.digest("hex").slice(0, 16)}`;
 }
 
-export async function recordLocalInstall(lock, skill, directory) {
-  checkRegistration(lock, skill);
+export async function recordLocalInstall(lock, skill, directory, { allowLegacy = false } = {}) {
+  checkRegistration(lock, skill, { allowLegacy });
   const now = new Date().toISOString();
   const entry = {
     source: "well-known",
@@ -81,8 +90,8 @@ export async function recordLocalInstall(lock, skill, directory) {
   await persistLock(lock, data);
 }
 
-export async function removeRegistration(lock, skill) {
-  checkRegistration(lock, skill);
+export async function removeRegistration(lock, skill, { allowLegacy = false } = {}) {
+  checkRegistration(lock, skill, { allowLegacy });
   const previous = lock.data.installed[skill.name];
   if (previous === undefined) return undefined;
   const installed = { ...lock.data.installed };

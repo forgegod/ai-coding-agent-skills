@@ -91,7 +91,7 @@ Companion installation: [Claude Desktop (no terminal)](#install-with-claude-desk
 or hidden-folder copying is needed for installation.
 
 1. Open **Customize → Plugins → Add → Add marketplace**.
-2. Choose **Add from a repository** and enter `forgegod/ai-coding-agent-skills`.
+2. Choose **Add from a repository** and enter `grewety/ai-coding-agent-skills`.
 3. Select **openspec-development**, review its contents, and click **Add**.
 4. Start a new conversation or task and check that its skills appear in the skill picker.
 
@@ -100,7 +100,7 @@ or its CLI. **autonomous-orchestration** is a separate optional plugin: review i
 and its host/role prerequisites before adding it. Neither plugin installs
 execution roles, transfers another project's records, or changes permissions.
 
-Prefer a file upload? The [download page](https://forgegod.github.io/ai-coding-agent-skills/downloads/index.html)
+Prefer a file upload? The [download page](https://grewety.github.io/ai-coding-agent-skills/downloads/index.html)
 offers ready-made plugin ZIPs and individual skill ZIPs. Upload a plugin with
 **Customize → Plugins → Add → Upload plugin**, or an individual skill with
 **Customize → Skills → + → Create skill → Upload a skill**. Do not upload GitHub's
@@ -125,31 +125,31 @@ and [custom skill installation](https://support.claude.com/en/articles/12512180-
 
 Discovery index:
 
-https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/index.json
+https://grewety.github.io/ai-coding-agent-skills/.well-known/skills/index.json
 
 Search the project URL (the project path is required):
 
 ```sh
-hermes skills search https://forgegod.github.io/ai-coding-agent-skills/
+hermes skills search https://grewety.github.io/ai-coding-agent-skills/
 ```
 
 Install an individual skill and its advertised support files through the well-known adapter:
 
 ```sh
-hermes skills install well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery --category software-development
+hermes skills install well-known:https://grewety.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery --category software-development
 ```
 
 To target a named profile, add `-p <profile>`; for example:
 
 ```sh
-hermes -p hermes-dev skills install well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery --category software-development
+hermes -p hermes-dev skills install well-known:https://grewety.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery --category software-development
 ```
 
 Install the workflow skills (POSIX shell; omit `-p hermes-dev` to use the active profile):
 
 ```sh
 for skill in openspec-delivery openspec-next git-commit-message capability-wireframes; do
-  hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/$skill" --category software-development || break
+  hermes -p hermes-dev skills install "well-known:https://grewety.github.io/ai-coding-agent-skills/.well-known/skills/$skill" --category software-development || break
 done
 ```
 
@@ -158,16 +158,16 @@ agents and worktrees. Review its complete package before installing it; the norm
 four-package example does not establish scanner approval for it:
 
 ```sh
-hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/autonomous-implementation-review" --category autonomous-ai-agents
+hermes -p hermes-dev skills install "well-known:https://grewety.github.io/ai-coding-agent-skills/.well-known/skills/autonomous-implementation-review" --category autonomous-ai-agents
 ```
 
 The commands use the published endpoint, not this checkout:
 
 ```sh
-hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery" --category software-development
-hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/openspec-next" --category software-development
-hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/git-commit-message" --category software-development
-hermes -p hermes-dev skills install "well-known:https://forgegod.github.io/ai-coding-agent-skills/.well-known/skills/capability-wireframes" --category software-development
+hermes -p hermes-dev skills install "well-known:https://grewety.github.io/ai-coding-agent-skills/.well-known/skills/openspec-delivery" --category software-development
+hermes -p hermes-dev skills install "well-known:https://grewety.github.io/ai-coding-agent-skills/.well-known/skills/openspec-next" --category software-development
+hermes -p hermes-dev skills install "well-known:https://grewety.github.io/ai-coding-agent-skills/.well-known/skills/git-commit-message" --category software-development
+hermes -p hermes-dev skills install "well-known:https://grewety.github.io/ai-coding-agent-skills/.well-known/skills/capability-wireframes" --category software-development
 ```
 
 OpenSpec's CLI and native workflows remain [separate prerequisites](docs/openspec-installation.md#hermes-selected-profile-scanning-and-enablement).
@@ -185,6 +185,8 @@ On a first install, `--yes` answers the install confirmation only, after operato
 authorization; it does not bypass scanning or resolve existing-copy conflicts.
 
 ### Copy every local package to global agent profiles
+
+Fresh installs register the current `grewety.github.io` well-known source and refuse an orphaned legacy `forgegod.github.io` lock entry without `--update`. Explicit `--update` transitions an exact legacy registration at its managed path to `grewety.github.io`; explicit `--purge` recognizes legacy-registered retired historical packages. Other source or install-path mismatches are refused before any selected profile changes.
 
 Run these commands from the reviewed repository checkout. Local installation
 copies this checkout's bytes to every selected target. Only selected Hermes
@@ -480,7 +482,7 @@ diffs.
 The well-known endpoint is the preferred, host-independent distribution route. The categorized source packages can also be installed directly:
 
 ```sh
-hermes skills install forgegod/ai-coding-agent-skills/skills/software-development/openspec-delivery --category software-development
+hermes skills install grewety/ai-coding-agent-skills/skills/software-development/openspec-delivery --category software-development
 ```
 
 Other Agent Skills-compatible agents can consume the same SKILL.md packages using their own installation mechanism. Well-known discovery and Hermes-specific metadata support depend on the client.
@@ -506,7 +508,7 @@ to record the revision you reviewed. Do not automatically pull
 unreviewed changes into a global skill directory.
 
 ```sh
-git clone https://github.com/forgegod/ai-coding-agent-skills.git ai-coding-agent-skills-review
+git clone https://github.com/grewety/ai-coding-agent-skills.git ai-coding-agent-skills-review
 ```
 
 After review, from the directory containing that checkout, define this helper in
@@ -645,13 +647,13 @@ already contains discoverable SKILL.md packages; a root SKILL.md is not required
 Inspect the available packages without installing:
 
 ```sh
-npx skills add forgegod/ai-coding-agent-skills --list
+npx skills add grewety/ai-coding-agent-skills --list
 ```
 
 After reviewing the selected package, a genuine user installation can use:
 
 ```sh
-npx skills add forgegod/ai-coding-agent-skills --skill openspec-delivery --agent claude-code
+npx skills add grewety/ai-coding-agent-skills --skill openspec-delivery --agent claude-code
 ```
 
 The default scope is the current project; add `--global` for a personal install.
@@ -667,7 +669,7 @@ should not be relied on to seed leaderboard visibility. A `--list` discovery che
 is not an installation and does not establish a directory entry.
 
 Share the explicit install command with users and check the resulting
-[repository directory page](https://skills.sh/forgegod/ai-coding-agent-skills)
+[repository directory page](https://skills.sh/forgegod/ai-coding-agent-skills) (the pre-transfer external listing; a grewety listing remains pending independent verification after transfer)
 after real adoption. Indexing timing and ranking belong to skills.sh; do not claim
 a listing merely because the CLI can discover the packages. The GitHub and
 well-known install routes remain available independently.
@@ -680,7 +682,7 @@ References: [skills.sh documentation](https://skills.sh/docs) and
 The verified SkillsLLM site is `https://skillsllm.com`. Its
 [submission page](https://skillsllm.com/submit) requires GitHub OAuth:
 
-1. Sign in as the operator and submit `https://github.com/forgegod/ai-coding-agent-skills`.
+1. Sign in as the operator and submit `https://github.com/grewety/ai-coding-agent-skills`.
 2. Describe it as a collection of **five** categorized Agent Skills packages and
    retain the README's installation and security boundaries.
 3. Confirm the platform accepts the collection layout, wait for its scanning and

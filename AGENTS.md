@@ -16,7 +16,7 @@ Maintain portable AI coding-agent playbooks and publish complete Agent Skills pa
 - Read applicable parent and child AGENTS.md files before editing. Update owning contracts and child indexes after changing durable responsibilities or workflows.
 - `skills/<category>/<name>/SKILL.md` is canonical. Generated `.well-known/skills/` packages contain only SKILL.md and explicitly supported package directories, never repository-control documents, credentials, or profile state.
 - Preserve portable workflows and synthetic examples; project DOX and product policy always outrank a skill.
-- Publish via GitHub Pages at `https://forgegod.github.io/ai-coding-agent-skills/`. Support discovery under the project URL, not an assumed origin-root endpoint.
+- Publish via GitHub Pages at `https://grewety.github.io/ai-coding-agent-skills/`. Support discovery under the project URL, not an assumed origin-root endpoint.
 - Community installation uses Hermes security scanning. Do not recommend bypassing scan failures with --force or claim built-in trust.
 - Document Claude Code, Codex, Kilo (modern and legacy), and Pi native user/project installation from their current upstream skill-discovery documentation. Native copying preserves complete packages, preflights collisions, and does not claim Hermes scanner approval or cross-host tool equivalence.
 - Lead Claude installation with the native marketplace GUI and ready-made ZIP uploads, citing Anthropic primary sources; keep directory copies as advanced alternatives. Separate installation, account sync, and host execution verification. No official catalog listing or Desktop acceptance is implied by local packaging tests.

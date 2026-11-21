@@ -21,7 +21,7 @@ covers user-global installation. Our ready-made downloads remain companion-only.
 
 1. In Claude Desktop or claude.ai, open **Customize → Plugins**.
 2. Select **Add → Add marketplace → Add from a repository**.
-3. Enter `forgegod/ai-coding-agent-skills`.
+3. Enter `grewety/ai-coding-agent-skills`.
 4. Open **openspec-development**, review the package, and select **Add**.
 5. Start a new conversation or Cowork task and look for the skills in the picker.
 
@@ -43,7 +43,7 @@ and [plugin availability](https://support.claude.com/en/articles/13837440-use-pl
 
 ### Alternative: upload a ready-made plugin ZIP
 
-1. Open the [download page](https://forgegod.github.io/ai-coding-agent-skills/downloads/index.html).
+1. Open the [download page](https://grewety.github.io/ai-coding-agent-skills/downloads/index.html).
 2. Download **openspec-development** (`openspec-development.plugin.zip`).
 3. In Claude, select **Customize → Plugins → Add → Upload plugin** and choose the ZIP.
 4. Review the installed plugin and check its skill inventory.
