@@ -82,12 +82,12 @@ Hermes registration outside skill discovery.
 - **THEN** purge leaves that skill unchanged
 
 ### Requirement: Local-copy provenance remains truthful
-Reviewed local copies SHALL remain distinct from scanner-managed installs.
-Fresh local Hermes registrations SHALL use the canonical public well-known source.
+Reviewed local copies SHALL be distinct from scanner-managed installs.
+Fresh local Hermes registrations SHALL use the current canonical public well-known source.
 Only explicit current-package updates or explicit retired-package purges SHALL
 accept the exact former canonical entry at the expected managed install path:
 replace with current on update; back up and remove on purge.
-Other mismatches SHALL conflict. Native installs/purges SHALL NOT claim Hermes
+Mismatches SHALL conflict. Native installs/purges SHALL NOT claim Hermes
 scanner approval or cross-host compatibility.
 
 #### Scenario: Fresh local Hermes installation
